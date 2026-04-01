@@ -76,15 +76,6 @@ Run `npm run lint` and `npm run dev` to verify. Let the AI fix any type errors i
 
 ---
 
-## ⚡ Quick Start
-Run this in your terminal to get the engine started:
-
-```bash
-git clone <your-repo-link> . && npm install && npm run dev
-```
-
----
-
 ## 🔄 Maintenance & Longevity
 This repo is updated every 6 months to ensure compatibility with the latest Next.js patterns and AI agent capabilities.
 
