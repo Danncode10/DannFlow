@@ -1,36 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+I hear you. If you’re willing to put in the work to keep the repo updated every few months, then a clean **`git clone`** is definitely the most "vibe-ready" way to start. It keeps your custom configurations, Shadcn setups, and AI rules exactly where you want them.
 
-## Getting Started
+Here is a clean, no-nonsense README for your repo. Just copy and paste this into your `README.md`.
 
-First, run the development server:
+---
+
+# 🚀 Dann's Vibe-Coding Starter (2026 Edition)
+
+This is a pre-configured, AI-optimized boilerplate for **Next.js**, **Supabase**, and **Vercel**. It is structured specifically to give **Claude Code** and **Antigravity** the "guardrails" they need to code autonomously without breaking the architecture.
+
+### ⚡ Quick Start
+Run this in your terminal to get the engine started:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <your-repo-link> . && npm install && npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🛠 The Tech Stack
+*   **Framework:** Next.js 15+ (App Router)
+*   **Language:** TypeScript (Strict Mode)
+*   **Database/Auth:** Supabase
+*   **Styling:** Tailwind CSS + Shadcn/UI
+*   **Deployment:** Vercel
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## 📁 AI-Legible Folder Structure
+To keep the "vibe" clean, we follow this strict separation of concerns. **Do not let the AI mix these up:**
 
-To learn more about Next.js, take a look at the following resources:
+*   **`@/services/`**: **The Logic Layer.** All Supabase queries, API calls, and business logic live here. *AI Rule: No DB logic in components.*
+*   **`@/types/`**: **The Ground Truth.** Keep your generated Supabase types here.
+*   **`@/prompts/`**: **The Context Layer.** Store feature-specific `.md` files here for the AI to read before coding.
+*   **`AGENTS.md`**: The "Instruction Manual" that every AI agent must read before starting a task.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🤖 AI Workflow (How to Vibe Code)
 
-## Deploy on Vercel
+### 1. Enable MCP Servers
+For the best experience, ensure your environment has the following **MCP Servers** active:
+*   **PostgreSQL/Supabase:** Allows the AI to "see" your live database schema.
+*   **Filesystem:** Essential for the AI to navigate this specific folder structure.
+*   **Memory:** (Optional) To help the AI remember project-wide decisions across sessions.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 2. The Initial Prompt
+When you start a new feature, point the AI to the source of truth:
+> *"Read **AGENTS.md** and **@/types/supabase.ts**. Then, look at the feature requirements in **@/prompts/features/[your-feature].md** and begin implementation in **@/services**."*
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## 🔄 Maintenance Note
+This repo is updated every 6 months to ensure compatibility with the latest Next.js patterns and AI agent capabilities. Last updated: **April 2026**.
+
+---
+
+*Built for speed. Structured for Agents. Optimized for the Vibe.*
