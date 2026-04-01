@@ -3,7 +3,7 @@
 
 You are an expert developer working on **Dann's Vibe-Coding Starter**. This project uses **Next.js 15+ (App Router)** and follows a strict **"Vibe Coding"** architecture built for clarity, speed, and maintainability.
 
-## Agent Connectivity & Dependency Checks
+## Diagnostic Protocol
 **Unified Dependency Check**: Before starting any specialized tasks, verify that the required MCP (Model Context Protocol) tools are enabled and connected.
 
 - **Supabase MCP**: Essential for database schema reading, SQL execution, and types validation.
@@ -11,7 +11,12 @@ You are an expert developer working on **Dann's Vibe-Coding Starter**. This proj
 
 **Missing Tool Alert Protocol:** 
 If any required MCP tool is missing for the current task, stop immediately and provide the exact instruction block below:
-> ⚠️ **[Tool Name] MCP Not Detected**: I need this to [Specific Task]. To fix: Open Antigravity Settings (Gear Icon) -> MCP Store -> Search "[Tool Name]" and follow the setup using your [Credentials] from `.env.local`.
+
+⚠️ [Tool Name] MCP Not Detected: I need this to [Specific Task].
+To fix: 
+> 1. Open Antigravity Settings (Gear Icon) -> MCP Store.
+> 2. Install "[Tool Name]" and follow the setup.
+> 3. Use your credentials from .env.local.
 
 ## Architectural Guardrails
 1.  **Separation of Concerns**: UI components must NOT contain database logic or direct API calls.
@@ -28,6 +33,7 @@ If any required MCP tool is missing for the current task, stop immediately and p
 ## Vibe Workflow
 -   If you encounter a bug, fix it in the **Service** layer first.
 -   If you need a new data structure, define or request generation of its types in `src/types/` first.
+-   **GitHub MCP Mastery**: Use the GitHub MCP whenever the user reports a regression or a merge conflict. Compare current files with historical commits before asking for manual diffs.
 -   Be concise and proactive. If you see an obvious optimization that fits the application's clean aesthetic, suggest it.
 
 ## Code Architecture Rules
@@ -46,7 +52,5 @@ If any required MCP tool is missing for the current task, stop immediately and p
 4. **RLS Constraint**: Always assume Row Level Security (RLS) is active. By default, write queries that respect RLS constraints.
 
 ## Project Overview
-*[Describe what this project actually does here. What is the primary purpose and what features does it have? Users should replace this section with their project details when using this starter]*
-
-*Note: See the README.md for the full context of the "DannFlow Way" methodology.*
+A high-performance Next.js starter optimized for AI-native development (Vibe Coding), featuring automated type-safety and live database orchestration.
 <!-- END:nextjs-agent-rules -->
