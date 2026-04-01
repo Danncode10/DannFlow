@@ -19,9 +19,10 @@ npm run dev
 
 We moved all detailed explanations out of the README so you have a clean setup experience. For the specific "Vibe Way", checkout the `docs/` folder:
 
-- [Methodology](docs/methodology.md) - Learn the "Vibe Coding" philosophy (AI as builder, Developer as architect).
-- [MCP Setup](docs/mcp-setup.md) - Step-by-step guides for setting up Supabase, GitHub, and Terminal MCPs.
-- [File Structure](docs/file-structure.md) - Understand the "Holy Trinity" architecture (`supabase.ts`, `schema.sql`, `src/services/`).
+- [The DannFlow Philosophy](docs/methodology.md) - Learn the "Vibe Coding" philosophy designed for students.
+- [The Holy Trinity](docs/the-holy-trinity.md) - Understand the "Eyes, Blueprint, and Action" file structure.
+- [MCP Trinity Setup](docs/mcp-setup.md) - Step-by-step guides for powering up the AI.
+- [The Time Machine Workflow](docs/backups-and-sync.md) - Learn the crucial loop of changing, syncing, and checkpointing.
 
 ## 🚀 Zero-Cost Setup for Students
 

@@ -1,8 +1,7 @@
-# 🌊 The Vibe Coding Methodology
+# The "DannFlow" Philosophy: Vibe Coding for Students
 
-Vibe coding is an AI-first development methodology. In this architecture:
-- **Developer = The Architect**: You focus on concepts, prompts, architecture, and reviewing edge cases.
-- **AI = The Builder**: Agents (like Antigravity or Claude Code) handle the tedious implementation, boilerplate, and SQL logic.
+DannFlow is a "Vibe Coding" architecture designed to make AI-native development professional, predictable, and 100% free for students.
 
-## Why this works
-By separating intent from implementation, the AI has a specific "Mental Map" to follow. When we isolate UI logic from database queries and strictly enforce type-safety, the AI avoids hallucinating logic and creates a predictable, structured system.
+- **The Developer (Architect)**: You provide the vision, the "vibe," and the logic steering.
+- **The AI (Builder)**: Uses "Eyes" (MCPs) to see your database, code history, and design.
+- **The Workflow**: We build "Live" in the cloud. We don't guess; we sync.

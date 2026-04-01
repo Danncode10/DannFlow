@@ -1,15 +1,15 @@
-# ⚙️ MCP Setup Guides
+# Powering Up the AI (The MCP Trinity)
 
-Our AI workflow heavily relies on **Model Context Protocol (MCP)** servers to give the AI "eyes" and "hands" inside your environment. 
+To make "DannFlow" work, the AI needs three sets of tools:
 
-### 1. Supabase MCP
-- **Purpose**: Gives AI read/write access to your live database scheme.
-- **Setup**: Open Antigravity Settings -> MCP Store -> Search "Supabase". Add your credentials from `.env.local` (`NEXT_PUBLIC_SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`).
+### 1. Supabase MCP (The Database Brain)
+- **Purpose**: Allows the AI to create tables, write SQL, and check RLS policies automatically.
+- **Setup**: Use your Supabase Access Token from Account Settings.
 
-### 2. GitHub MCP
-- **Purpose**: Allows the AI to read your repository history, compare branches, diff conflicts, and safely review PRs.
-- **Setup**: Open Antigravity Settings -> MCP Store -> Search "GitHub". Connect your personal access token.
+### 2. GitHub MCP (The Memory)
+- **Purpose**: Allows the AI to "Time Travel." It can compare why your code worked yesterday but broke today without you copying and pasting long diffs.
+- **Setup**: Use a GitHub Personal Access Token with repo scopes.
 
-### 3. Terminal MCP
-- **Purpose**: Enables the AI to run system commands, such as creating database backup checkpoints (`npx supabase db dump`).
-- **Setup**: Usually built-in to robust AI agents, but ensure terminal execution permissions are granted to the agent for "safe" commands.
+### 3. Terminal MCP (The Hands)
+- **Purpose**: Allows the AI to run commands like `npm install` or `npm run update-types` for you.
+- **Setup**: Enable "Terminal" or "Shell" access in Antigravity settings.
