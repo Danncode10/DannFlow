@@ -35,7 +35,7 @@ To fix:
 -   If you encounter a bug, fix it in the **Service** layer first.
 -   If you need a new data structure, define or request generation of its types in `src/types/` first.
 -   **GitHub MCP Mastery**: Use the GitHub MCP whenever the user reports a regression or a merge conflict. Compare current files with historical commits before asking for manual diffs.
--   **Backup & Snapshot**: If I say 'Checkpoint', use the Terminal MCP to run `npx supabase db dump --project-id [ID] -f supabase/backups/schema-$(date +%m-%d-%Y).sql`. All schema snapshots must follow the naming convention `schema-MM-DD-YYYY.sql`.
+-   **Backup & Snapshot**: If I say 'Checkpoint', use the Terminal MCP to run `npx supabase db dump --project-id [ID] -f supabase/backups/schema-$(date +%m-%d-%Y-%H-%M).sql`. All schema snapshots must follow the naming convention `schema-MM-DD-YYYY-HH-MM.sql`.
 -   Be concise and proactive. If you see an obvious optimization that fits the application's clean aesthetic, suggest it.
 
 ## Code Architecture Rules

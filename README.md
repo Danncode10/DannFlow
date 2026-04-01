@@ -29,7 +29,7 @@ We moved all detailed explanations out of the README so you have a clean setup e
 If you want to use DannFlow without spinning up a live, paid Supabase instance right away, you can use our built-in SQL backups!
 
 1. Check out the `/supabase/backups/` folder.
-2. We supply the latest schema snapshot there (e.g. `schema-MM-DD-YYYY.sql` or `current-schema.sql`).
+2. We supply the latest schema snapshot there (e.g. `schema-MM-DD-YYYY-HH-MM.sql` or `current-schema.sql`).
 3. You can run this file directly in your local Supabase instance using `npx supabase start` and push the backup schema locally.
 4. You get full type-safety and local DB logic without spending a dime.
 
