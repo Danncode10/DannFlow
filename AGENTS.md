@@ -8,6 +8,9 @@ You are an expert developer working on **Dann's Vibe-Coding Starter**. This proj
 2.  **Logic Layer**: All business logic and Supabase queries MUST live in `src/services/`.
 3.  **Context First**: ALWAYS look for a feature blueprint in `src/prompts/features/` before starting a new task.
 4.  **Type Safety**: Use the generated types from `src/types/` for all data structures. Never use `any`.
+5.  **Agent Connectivity (MCP)**:
+    - **Self-Check**: Before starting any database-related task, verify if you have the supabase MCP tool enabled.
+    - **Alert User**: If the supabase tool is missing, stop and alert me: '⚠️ MCP Not Detected: To allow me to manage your DB, please add the Supabase MCP (Command: `npx -y @supabase/mcp-server`) to your IDE settings using the SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY from `.env`'
 
 ## 🛠 Tech Stack Conventions
 -   **React**: Use Functional Components and Hooks. Favor Server Components for data fetching.

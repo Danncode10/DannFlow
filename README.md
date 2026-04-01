@@ -85,7 +85,7 @@ The **Supabase MCP Server** gives the AI "eyes" and "hands" inside your project.
 *   **No more SQL Editor manual entry:** You can ask the AI to "Create a `profiles` table with RLS..." and it executes it directly.
 *   **Live Schema Awareness:** The agent can query your *actual* database to see what tables exist, what the column types are, and which RLS policies are active.
 
-*(To set it up in Claude Code, run `claude mcp add supabase` once.)*
+*(To set it up in Claude Code, run `claude mcp add supabase` once. If you are not using Claude Code, you can manually configure the `@supabase/mcp` server in your AI IDE's settings, or fall back to manual SQL entry in the Supabase Dashboard.)*
 
 ### 2. Syncing the "Ground Truth" (The Schema)
 We use the **Supabase CLI** to keep the `src/types/` folder updated. This is the professional way to ensure type safety.
