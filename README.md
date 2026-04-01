@@ -89,13 +89,7 @@ The **Supabase MCP Server** gives the AI "eyes" and "hands" inside your project.
 We use the **Supabase CLI** to keep the `src/types/` folder updated. This is the professional way to ensure type safety.
 
 **The "One-Command" Sync:**
-Add this script to your `package.json` so you never have to think about it again:
-```json
-"scripts": {
-  "update-types": "npx supabase gen types typescript --project-id YOUR_PROJECT_ID > src/types/supabase.ts"
-}
-```
-Now, whenever the database is changed via MCP, just run `npm run update-types`. The AI will immediately see the new TypeScript definitions in `src/types/` and stop hallucinating column names.
+This repository includes a pre-configured `update-types` script in `package.json`. Whenever the database is changed via MCP, just run `npm run update-types`. The AI will immediately see the new TypeScript definitions in `src/types/` and stop hallucinating column names.
 
 ### 3. RLS: The "Invisible" Logic
 Handling Row Level Security (RLS) is critical. As stated in the Code Architecture Rules above:
