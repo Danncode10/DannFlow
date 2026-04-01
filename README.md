@@ -78,33 +78,32 @@ Run `npm run lint` and `npm run dev` to verify. Let the AI fix any type errors i
 
 ---
 
-## 🗄️ Supabase Workflow (The DannFlow Way)
+## ⚙️ MCP Integrations (The DannFlow Way)
 
-### 1. The Game Changer: Supabase MCP
-The **Supabase MCP Server** gives the AI "eyes" and "hands" inside your project.
+Our AI workflow heavily relies on **Model Context Protocol (MCP)** servers to give the AI "eyes" and "hands" inside your environment. If any required MCP is missing, the AI will halt and prompt you to configure it using credentials from `.env.local`.
+
+### 1. The Supabase MCP Server
 *   **No more SQL Editor manual entry:** You can ask the AI to "Create a `profiles` table with RLS..." and it executes it directly.
 *   **Live Schema Awareness:** The agent can query your *actual* database to see what tables exist, what the column types are, and which RLS policies are active.
+*   **Syncing the "Ground Truth":** After an MCP schema change, run `npm run update-types` to refresh `src/types/supabase.ts`. The AI will exactly know your TS interfaces.
 
-*(To set it up in Claude Code, run `claude mcp add supabase` once. If you are not using Claude Code, you can manually configure the `@supabase/mcp` server in your AI IDE's settings, or fall back to manual SQL entry in the Supabase Dashboard.)*
-
-### 2. Syncing the "Ground Truth" (The Schema)
-We use the **Supabase CLI** to keep the `src/types/` folder updated. This is the professional way to ensure type safety.
-
-**The "One-Command" Sync:**
-This repository includes a pre-configured `update-types` script in `package.json`. Whenever the database is changed via MCP, just run `npm run update-types`. The AI will immediately see the new TypeScript definitions in `src/types/` and stop hallucinating column names.
+### 2. The GitHub MCP Server
+*   **Version Control Mastery:** By connecting the GitHub MCP, the AI can read your repository history, compare branches, and review PRs.
+*   **Safe Refactoring:** The AI is instructed via `AGENTS.md` to check commit history *before* suggesting broad refactors, ensuring we don't overwrite crucial recent changes or regress bug fixes.
+*   **Conflict Resolution:** The AI can actively assist in parsing and resolving merge conflicts by having direct read-access to remote states.
 
 ### 3. RLS: The "Invisible" Logic
-Handling Row Level Security (RLS) is critical. As stated in the Code Architecture Rules above:
+Handling Row Level Security (RLS) is critical. As stated in the Code Architecture Rules:
 > **RLS Rule:** Always check `src/types/supabase.ts` and assume RLS is active. Every `select` or `update` service must include a `.eq('id', userId)` filter to pass security policies.
 
 ### The "Old Way" vs. The "DannFlow Way"
 
 | Feature | The Old Struggle (Manual) | The DannFlow Way (Automated) |
 | :--- | :--- | :--- |
-| **Schema Changes** | Copy SQL from AI → Paste in Browser. | AI executes SQL directly via **MCP**. |
+| **Schema Changes** | Copy SQL from AI → Paste in Browser. | AI executes SQL directly via **Supabase MCP**. |
 | **Type Safety** | Guessing column names or manual JSON. | **Supabase CLI** generates perfect TS types. |
-| **RLS Awareness** | AI writes "select all"; query fails. | AI reads live policies via **MCP** & follows **AGENTS.md**. |
-| **Context** | AI is "blind" to your DB state. | AI has a **live connection** to your project. |
+| **Version Control** | Manually reading git diffs blindly. | AI analyzes commits directly via **GitHub MCP**. |
+| **Context** | AI is "blind" to your DB state & git tree. | AI has a **live connection** to your project. |
 
 ---
 
