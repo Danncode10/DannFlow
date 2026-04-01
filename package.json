@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "update-types": "npx supabase gen types typescript --project-id YOUR_PROJECT_ID > src/types/supabase.ts"
+    "update-types": "bash scripts/update-types.sh"
   },
   "dependencies": {
     "next": "16.2.1",

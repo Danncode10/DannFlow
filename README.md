@@ -19,6 +19,8 @@ Run this in your terminal to get the engine started:
 git clone https://github.com/Danncode10/DannFlow . && npm install && npm run dev
 ```
 
+*Note: Add `SUPABASE_PROJECT_ID` to `.env.local` and run `npm run update-types` to sync your schema.*
+
 ---
 
 ## 🛠 The Tech Stack
