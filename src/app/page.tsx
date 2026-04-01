@@ -14,9 +14,9 @@ export default async function Home() {
           {user ? (
             <span className="text-neutral-200">Welcome, {user.email || 'Architect'}</span>
           ) : (
-            <button className="text-neutral-300 hover:text-white transition-colors">
+            <a href="/login" className="text-neutral-300 hover:text-white transition-colors cursor-pointer">
               Connect Account
-            </button>
+            </a>
           )}
         </div>
       </div>
