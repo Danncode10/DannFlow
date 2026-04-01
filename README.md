@@ -76,6 +76,42 @@ Run `npm run lint` and `npm run dev` to verify. Let the AI fix any type errors i
 
 ---
 
+## 🗄️ Supabase Workflow (The DannFlow Way)
+
+### 1. The Game Changer: Supabase MCP
+The **Supabase MCP Server** gives the AI "eyes" and "hands" inside your project.
+*   **No more SQL Editor manual entry:** You can ask the AI to "Create a `profiles` table with RLS..." and it executes it directly.
+*   **Live Schema Awareness:** The agent can query your *actual* database to see what tables exist, what the column types are, and which RLS policies are active.
+
+*(To set it up in Claude Code, run `claude mcp add supabase` once.)*
+
+### 2. Syncing the "Ground Truth" (The Schema)
+We use the **Supabase CLI** to keep the `src/types/` folder updated. This is the professional way to ensure type safety.
+
+**The "One-Command" Sync:**
+Add this script to your `package.json` so you never have to think about it again:
+```json
+"scripts": {
+  "update-types": "npx supabase gen types typescript --project-id YOUR_PROJECT_ID > src/types/supabase.ts"
+}
+```
+Now, whenever the database is changed via MCP, just run `npm run update-types`. The AI will immediately see the new TypeScript definitions in `src/types/` and stop hallucinating column names.
+
+### 3. RLS: The "Invisible" Logic
+Handling Row Level Security (RLS) is critical. As stated in the Code Architecture Rules above:
+> **RLS Rule:** Always check `src/types/supabase.ts` and assume RLS is active. Every `select` or `update` service must include a `.eq('id', userId)` filter to pass security policies.
+
+### The "Old Way" vs. The "DannFlow Way"
+
+| Feature | The Old Struggle (Manual) | The DannFlow Way (Automated) |
+| :--- | :--- | :--- |
+| **Schema Changes** | Copy SQL from AI → Paste in Browser. | AI executes SQL directly via **MCP**. |
+| **Type Safety** | Guessing column names or manual JSON. | **Supabase CLI** generates perfect TS types. |
+| **RLS Awareness** | AI writes "select all"; query fails. | AI reads live policies via **MCP** & follows **AGENTS.md**. |
+| **Context** | AI is "blind" to your DB state. | AI has a **live connection** to your project. |
+
+---
+
 ## 🔄 Maintenance & Longevity
 This repo is updated every 6 months to ensure compatibility with the latest Next.js patterns and AI agent capabilities.
 

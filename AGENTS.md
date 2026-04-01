@@ -26,8 +26,17 @@ You are an expert developer working on **Dann's Vibe-Coding Starter**. This proj
 3.  **DIRECTORY**: Place new components in the existing `/components/` folder and logic in `/lib/` or `/hooks/`.
 4.  **CLEANLINESS**: Follow DRY (Don't Repeat Yourself) and SOLID principles.
 5.  **OUTPUT**: At the end of the response, provide a concise, professional Git commit message (e.g., 'feat: add user login validation') for me to copy. If no changes are made, ignore this. Put this at the chatbot response whenever new feature is added. If no changes are made, ignore this.
-6.  **RLS AWARENESS**: Always assume Row Level Security (RLS) is active; include user ID filters in Service queries where necessary. (This prevents the AI from writing 'Select All' queries that fail in production).
+6.  **RLS AWARENESS**: Always check `src/types/supabase.ts` and assume RLS is active. Every `select` or `update` service must include a `.eq('id', userId)` filter to pass security policies.
 7.  **SERVER VS. CLIENT**: Default to Server Components. Only use 'use client' when interactivity (state/effects) is strictly required.
+
+## 🗄️ Supabase Workflow for AI Agents
+
+1. **Live Schema Awareness**: Use the **Supabase MCP Server** to query the live database state (tables, types, RLS policies). Do not assume schema structure without checking.
+2. **Schema Changes via MCP**: Execute SQL directly using the MCP when prompted to alter tables or policies. Do not ask the user for manual SQL entry.
+3. **Sync Types**: After any schema change, instruct the user to run `npm run update-types` to refresh `src/types/supabase.ts` via the Supabase CLI. Rely ONLY on these generated definitions.
+4. **RLS Constraint**: Always assume Row Level Security (RLS) is active. Every `select` or `update` must include `.eq('id', userId)` unless specifically building a public endpoint. By default, write queries that respect RLS.
+
+*Note: See the README.md for the full context of the "DannFlow Way" methodology.*
 
 ## Project Overview
 *[Describe what this project actually does here. What is the primary purpose and what features does it have? Users should replace this section with their project details when using this starter]*
