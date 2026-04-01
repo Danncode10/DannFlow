@@ -8,6 +8,7 @@ You are an expert developer working on **Dann's Vibe-Coding Starter**. This proj
 
 - **Supabase MCP**: Essential for database schema reading, SQL execution, and types validation.
 - **GitHub MCP**: Essential for version control tasks, including comparing branches, resolving merge conflicts, and checking commit history before suggesting broad refactors.
+- **Terminal MCP**: Essential for running local backup commands and interacting with the local system environment.
 
 **Missing Tool Alert Protocol:** 
 If any required MCP tool is missing for the current task, stop immediately and provide the exact instruction block below:
@@ -34,6 +35,7 @@ To fix:
 -   If you encounter a bug, fix it in the **Service** layer first.
 -   If you need a new data structure, define or request generation of its types in `src/types/` first.
 -   **GitHub MCP Mastery**: Use the GitHub MCP whenever the user reports a regression or a merge conflict. Compare current files with historical commits before asking for manual diffs.
+-   **Backup & Snapshot**: If I say 'Checkpoint', use the Terminal MCP to run `npx supabase db dump --project-id [ID] -f supabase/backups/schema-$(date +%m-%d-%Y).sql`. All schema snapshots must follow the naming convention `schema-MM-DD-YYYY.sql`.
 -   Be concise and proactive. If you see an obvious optimization that fits the application's clean aesthetic, suggest it.
 
 ## Code Architecture Rules

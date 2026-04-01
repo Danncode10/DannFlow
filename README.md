@@ -1,117 +1,36 @@
 # 🚀DannFlow (2026 Edition)
 
-Welcome DannFlow, the ultimate AI-optimized boilerplate for **Next.js**, **Supabase**, and **Vercel**. 
+Welcome to DannFlow, the ultimate AI-optimized boilerplate for **Next.js**, **Supabase**, and **Vercel**. 
 
-This repository is more than just a template—it's a **structured environment** designed specifically to empower AI agents like **Claude Code**, **Antigravity**, and **Cursor** to work alongside you with maximum efficiency and minimum friction.
-
----
-
-## 🌊 What is "Vibe Coding"?
-
-Vibe coding is an AI-first development methodology where you focus on **concepts, prompts, and architecture**, while the AI handles the **implementation, boilerplate, and logic**. 
-
-To do this successfully, your project needs a specific "Mental Map" for the AI to follow. That's what this structure provides.
+This repository is built for **Vibe Coding**—a methodology where you focus on concepts, prompts, and architecture while the AI handles the implementation.
 
 ## ⚡ Quick Start
 
 Run this in your terminal to get the engine started:
+```bash
+git clone https://github.com/Danncode10/DannFlow .
+npm install
+npm run dev
 ```
-git clone https://github.com/Danncode10/DannFlow . && npm install && npm run dev
-```
 
-*Note: Add `SUPABASE_PROJECT_ID` to `.env.local` and run `npm run update-types` to sync your schema.*
+*Note: Add your environment variables to `.env.local` and run `npm run update-types` to sync your schema.*
 
----
+## 📚 In-Depth Documentation
 
-## 🛠 The Tech Stack
-*   **Framework:** Next.js 15+ (App Router) — *Cutting-edge React patterns.*
-*   **Language:** TypeScript (Strict Mode) — *Essential for AI accuracy.*
-*   **Database/Auth:** Supabase — *Instant backend with typed schemas.*
-*   **Styling:** Tailwind CSS + Shadcn/UI — *Rapid UI prototyping with AI.*
-*   **Deployment:** Vercel — *Seamless CI/CD.*
+We moved all detailed explanations out of the README so you have a clean setup experience. For the specific "Vibe Way", checkout the `docs/` folder:
 
----
+- [Methodology](docs/methodology.md) - Learn the "Vibe Coding" philosophy (AI as builder, Developer as architect).
+- [MCP Setup](docs/mcp-setup.md) - Step-by-step guides for setting up Supabase, GitHub, and Terminal MCPs.
+- [File Structure](docs/file-structure.md) - Understand the "Holy Trinity" architecture (`supabase.ts`, `schema.sql`, `src/services/`).
 
-## 📁 The "Vibe Ready" Folder Structure
+## 🚀 Zero-Cost Setup for Students
 
-This structure is designed to separate **intent** from **implementation**, ensuring the AI never gets "confused" or creates spaghetti code.
+If you want to use DannFlow without spinning up a live, paid Supabase instance right away, you can use our built-in SQL backups!
 
-### 1. `src/prompts/` — The Context Layer
-> **The most important folder in Vibe Coding.**
-- **Why it exists:** Before the AI writes a single line of code, it needs a "Feature Blueprint."
-- **How to use it:** Create a `.md` file for every new feature (e.g., `src/prompts/features/auth-flow.md`). Describe the logic, UI, and edge cases here. Point the AI to this file first.
-- **Vibe Rule:** *AI should never code without a corresponding prompt blueprint.*
-
-### 2. `src/services/` — The Logic Layer
-- **Why it exists:** AI often tries to dump database logic directly into UI components. This folder forces a clean separation.
-- **Contents:** All Supabase queries, API calls, and complex business logic live here.
-- **Vibe Rule:** *Components are for UI; Services are for data. No DB calls in components.*
-
-### 3. `src/types/` — The Ground Truth
-- **Why it exists:** AI thrives on strong typing. Without types, AI makes assumptions (and usually gets them wrong).
-- **Contents:** Strongly-typed versions of your Supabase schema and custom interfaces.
-- **Vibe Rule:** *Run `supabase gen types typescript` whenever your schema changes.*
-
-### 4. `AGENTS.md` — The Instruction Manual
-- **Why it exists:** This is the project's "System Prompt." It tells every AI agent the specific rules, conventions, and architectural choices for *this* project.
-- **Vibe Rule:** *Every AI agent MUST read this file upon first load.*
+1. Check out the `/supabase/backups/` folder.
+2. We supply the latest schema snapshot there (e.g. `schema-MM-DD-YYYY.sql` or `current-schema.sql`).
+3. You can run this file directly in your local Supabase instance using `npx supabase start` and push the backup schema locally.
+4. You get full type-safety and local DB logic without spending a dime.
 
 ---
-
-## 🤖 AI Workflow (The Vibe Process)
-
-To build a new feature autonomously, follow these four steps:
-
-### 1. The Blueprinting Phase
-Create a new file in `src/prompts/features/[your-feature].md`.
-Outline exactly what needs to be built. Include UI details, API requirements, and logic flow.
-
-### 2. The Setup Prompt
-Feed the context to your agent (Claude/Antigravity/Cursor):
-> *"Read **AGENTS.md**, **src/types/supabase.ts**, and the blueprint in **src/prompts/features/[feature].md**. Confirm you understand the plan before coding."*
-
-### 3. The Implementation Phase
-Ask the AI to build the **Services** first, then the **UI Components**. This ensures the data logic is solid before you worry about CSS.
-
-### 4. Validation
-Run `npm run lint` and `npm run dev` to verify. Let the AI fix any type errors immediately.
-
----
-
-## ⚙️ MCP Integrations (The DannFlow Way)
-
-Our AI workflow heavily relies on **Model Context Protocol (MCP)** servers to give the AI "eyes" and "hands" inside your environment. If any required MCP is missing, the AI will halt and prompt you to configure it using credentials from `.env.local`.
-
-### 1. The Supabase MCP Server
-*   **No more SQL Editor manual entry:** You can ask the AI to "Create a `profiles` table with RLS..." and it executes it directly.
-*   **Live Schema Awareness:** The agent can query your *actual* database to see what tables exist, what the column types are, and which RLS policies are active.
-*   **Syncing the "Ground Truth":** After an MCP schema change, run `npm run update-types` to refresh `src/types/supabase.ts`. The AI will exactly know your TS interfaces.
-
-### 2. The GitHub MCP Server
-*   **Version Control Mastery:** By connecting the GitHub MCP, the AI can read your repository history, compare branches, and review PRs.
-*   **Safe Refactoring:** The AI is instructed via `AGENTS.md` to check commit history *before* suggesting broad refactors, ensuring we don't overwrite crucial recent changes or regress bug fixes.
-*   **Conflict Resolution:** The AI can actively assist in parsing and resolving merge conflicts by having direct read-access to remote states.
-
-### 3. RLS: The "Invisible" Logic
-Handling Row Level Security (RLS) is critical. As stated in the Code Architecture Rules:
-> **RLS Rule:** Always check `src/types/supabase.ts` and assume RLS is active. Every `select` or `update` service must include a `.eq('id', userId)` filter to pass security policies.
-
-### The "Old Way" vs. The "DannFlow Way"
-
-| Feature | The Old Struggle (Manual) | The DannFlow Way (Automated) |
-| :--- | :--- | :--- |
-| **Schema Changes** | Copy SQL from AI → Paste in Browser. | AI executes SQL directly via **Supabase MCP**. |
-| **Type Safety** | Guessing column names or manual JSON. | **Supabase CLI** generates perfect TS types. |
-| **Version Control** | Manually reading git diffs blindly. | AI analyzes commits directly via **GitHub MCP**. |
-| **Context** | AI is "blind" to your DB state & git tree. | AI has a **live connection** to your project. |
-
----
-
-## 🔄 Maintenance & Longevity
-This repo is updated every 6 months to ensure compatibility with the latest Next.js patterns and AI agent capabilities.
-
-**Last Updated:** April 2026
-
----
-
 *Built for speed. Structured for Agents. Optimized for the Vibe.*
