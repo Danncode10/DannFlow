@@ -1,5 +1,6 @@
 import { Database, GitBranch, Terminal } from "lucide-react";
 import { getVibeCheckData, getUserSession } from "@/services/dashboard";
+import LoginForm from "@/components/auth/LoginForm";
 
 export default async function Home() {
   const profiles = await getVibeCheckData();
@@ -9,32 +10,34 @@ export default async function Home() {
     <div className="min-h-screen bg-neutral-950 text-neutral-50 font-sans selection:bg-neutral-800">
       
       {/* Auth Preview (Top Right) */}
-      <div className="absolute top-6 right-6 md:top-12 md:right-12 z-10">
-        <div className="bg-neutral-900/50 backdrop-blur-md border border-neutral-800 rounded-full px-5 py-2 text-sm font-medium flex items-center shadow-md">
-          {user ? (
+      {user && (
+        <div className="absolute top-6 right-6 md:top-12 md:right-12 z-10">
+          <div className="bg-neutral-900/50 backdrop-blur-md border border-neutral-800 rounded-full px-5 py-2 text-sm font-medium flex items-center shadow-md">
             <span className="text-neutral-200">Welcome, {user.email || 'Architect'}</span>
-          ) : (
-            <a href="/login" className="text-neutral-300 hover:text-white transition-colors cursor-pointer">
-              Connect Account
-            </a>
-          )}
+          </div>
         </div>
-      </div>
+      )}
       
       {/* Main Container */}
-      <main className="max-w-7xl mx-auto px-6 md:px-12 pt-32 pb-24 flex flex-col items-center md:items-start">
+      <main className={`max-w-7xl mx-auto px-6 md:px-12 pt-32 pb-24 flex flex-col w-full ${!user ? 'items-center justify-center min-h-[80vh]' : 'items-center md:items-start'}`}>
         
         {/* 1. Brand Identity */}
-        <div className="mb-20 text-center md:text-left w-full">
+        <div className={`mb-16 w-full ${!user ? 'text-center' : 'text-center md:text-left'}`}>
           <h1 className="text-5xl md:text-7xl font-mono font-bold tracking-tight mb-4 bg-gradient-to-br from-white to-neutral-500 bg-clip-text text-transparent transform hover:scale-[1.01] transition-transform duration-500">
             DannFlow
           </h1>
-          <p className="text-lg md:text-2xl text-neutral-400 font-light tracking-wide max-w-2xl">
+          <p className={`text-lg md:text-2xl text-neutral-400 font-light tracking-wide max-w-2xl ${!user ? 'mx-auto' : ''}`}>
             The AI-Native Starter for High-Achieving Architects.
           </p>
         </div>
 
-        {/* 2. The Trinity Status Board */}
+        {!user ? (
+          <div className="w-full flex justify-center animate-in fade-in duration-500">
+            <LoginForm />
+          </div>
+        ) : (
+          <>
+            {/* 2. The Trinity Status Board */}
         <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-6 mb-20">
           
           <div className="bg-neutral-900 border border-neutral-800 p-6 rounded-2xl shadow-xl flex items-start space-x-4 hover:border-neutral-700 transition duration-300 group">
@@ -119,6 +122,8 @@ export default async function Home() {
             
           </div>
         </div>
+          </>
+        )}
 
       </main>
     </div>
