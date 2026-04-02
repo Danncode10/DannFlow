@@ -19,12 +19,19 @@ export async function getVibeCheckData() {
   }
 }
 
-export async function getUserSession() {
+export async function getUserProfile() {
   try {
-     const supabase = await createClient();
-     const { data: { user }, error } = await supabase.auth.getUser();
-     if (error) return null;
-     return user;
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return null;
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single();
+
+    return { user, profile };
   } catch (err) {
     return null;
   }
