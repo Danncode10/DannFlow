@@ -108,7 +108,7 @@ export default async function Home() {
                   <Database className="w-8 h-8 text-neutral-600" />
                 </div>
                 <p className="text-neutral-400 font-mono text-base text-center max-w-md">
-                  {user ? "No Data Found - Connection Active" : "Sign in to witness the database vibe."}
+                  {user ? "No Data Found - Connection Active" : "is this empty? add an account to test if your supabase works"}
                 </p>
                 {!user && (
                     <a href="/login" className="mt-6 text-sm font-mono text-neutral-500 hover:text-neutral-200 underline decoration-neutral-800 underline-offset-4 decoration-2 transition-all">
