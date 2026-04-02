@@ -1,6 +1,5 @@
 import { Database, GitBranch, Terminal } from "lucide-react";
 import { getVibeCheckData, getUserSession } from "@/services/dashboard";
-import LoginForm from "@/components/auth/LoginForm";
 
 export default async function Home() {
   const profiles = await getVibeCheckData();
@@ -10,34 +9,33 @@ export default async function Home() {
     <div className="min-h-screen bg-neutral-950 text-neutral-50 font-sans selection:bg-neutral-800">
       
       {/* Auth Preview (Top Right) */}
-      {user && (
-        <div className="absolute top-6 right-6 md:top-12 md:right-12 z-10">
-          <div className="bg-neutral-900/50 backdrop-blur-md border border-neutral-800 rounded-full px-5 py-2 text-sm font-medium flex items-center shadow-md">
+      <div className="absolute top-6 right-6 md:top-12 md:right-12 z-10">
+        <div className="bg-neutral-900/50 backdrop-blur-md border border-neutral-800 rounded-full px-5 py-2 text-sm font-medium flex items-center shadow-md">
+          {user ? (
             <span className="text-neutral-200">Welcome, {user.email || 'Architect'}</span>
-          </div>
+          ) : (
+            <a href="/login" className="text-neutral-300 hover:text-white transition-colors cursor-pointer group flex items-center gap-2">
+              <span className="h-1.5 w-1.5 rounded-full bg-neutral-500 group-hover:bg-green-500 transition-colors"></span>
+              Connect Account
+            </a>
+          )}
         </div>
-      )}
+      </div>
       
       {/* Main Container */}
-      <main className={`max-w-7xl mx-auto px-6 md:px-12 pt-32 pb-24 flex flex-col w-full ${!user ? 'items-center justify-center min-h-[80vh]' : 'items-center md:items-start'}`}>
+      <main className="max-w-7xl mx-auto px-6 md:px-12 pt-32 pb-24 flex flex-col items-center md:items-start w-full">
         
         {/* 1. Brand Identity */}
-        <div className={`mb-16 w-full ${!user ? 'text-center' : 'text-center md:text-left'}`}>
+        <div className="mb-20 text-center md:text-left w-full">
           <h1 className="text-5xl md:text-7xl font-mono font-bold tracking-tight mb-4 bg-gradient-to-br from-white to-neutral-500 bg-clip-text text-transparent transform hover:scale-[1.01] transition-transform duration-500">
             DannFlow
           </h1>
-          <p className={`text-lg md:text-2xl text-neutral-400 font-light tracking-wide max-w-2xl ${!user ? 'mx-auto' : ''}`}>
+          <p className="text-lg md:text-2xl text-neutral-400 font-light tracking-wide max-w-2xl mx-auto md:mx-0">
             The AI-Native Starter for High-Achieving Architects.
           </p>
         </div>
 
-        {!user ? (
-          <div className="w-full flex justify-center animate-in fade-in duration-500">
-            <LoginForm />
-          </div>
-        ) : (
-          <>
-            {/* 2. The Trinity Status Board */}
+        {/* 2. The Trinity Status Board */}
         <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-6 mb-20">
           
           <div className="bg-neutral-900 border border-neutral-800 p-6 rounded-2xl shadow-xl flex items-start space-x-4 hover:border-neutral-700 transition duration-300 group">
@@ -110,8 +108,13 @@ export default async function Home() {
                   <Database className="w-8 h-8 text-neutral-600" />
                 </div>
                 <p className="text-neutral-400 font-mono text-base text-center max-w-md">
-                  No Data Found - Connection Active
+                  {user ? "No Data Found - Connection Active" : "Sign in to witness the database vibe."}
                 </p>
+                {!user && (
+                    <a href="/login" className="mt-6 text-sm font-mono text-neutral-500 hover:text-neutral-200 underline decoration-neutral-800 underline-offset-4 decoration-2 transition-all">
+                        Connect account to fetch live profiles
+                    </a>
+                )}
                 <div className="mt-6 flex space-x-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-neutral-700 animate-pulse"></span>
                   <span className="w-1.5 h-1.5 rounded-full bg-neutral-700 animate-pulse" style={{ animationDelay: '0.2s' }}></span>
@@ -122,8 +125,6 @@ export default async function Home() {
             
           </div>
         </div>
-          </>
-        )}
 
       </main>
     </div>
