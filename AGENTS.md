@@ -35,7 +35,10 @@ To fix:
 -   If you encounter a bug, fix it in the **Service** layer first.
 -   If you need a new data structure, define or request generation of its types in `src/types/` first.
 -   **GitHub MCP Mastery**: Use the GitHub MCP whenever the user reports a regression or a merge conflict. Compare current files with historical commits before asking for manual diffs.
--   **Backup & Snapshot**: If I say 'Checkpoint', run `npm run checkpoint`. This script creates a timestamped SQL file. You are then responsible for reading the live schema (via Supabase MCP) and populating that file with the latest DDL (tables, enums, triggers, RLS policies). Snapshots follow `schema-MM-DD-YYYY-HH-MM.sql`.
+-   **Backup & Snapshot**: If the user runs `npm run checkpoint` and provides the generated prompt, you must:
+    1. Verify Supabase MCP connection.
+    2. Read the live schema (Tables, Enums, RLS, Triggers) for the specified project ID.
+    3. Generate the full DDL and save it to the specified timestamped SQL file in `supabase/backups/`.
 -   Be concise and proactive. If you see an obvious optimization that fits the application's clean aesthetic, suggest it.
 
 ## Code Architecture Rules

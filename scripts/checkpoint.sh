@@ -14,20 +14,18 @@ fi
 TIMESTAMP=$(date +%m-%d-%Y-%H-%M)
 FILENAME="supabase/backups/schema-$TIMESTAMP.sql"
 
-echo "VIBE CHECKPOINT INITIATED"
-echo "------------------------"
-echo "Project: $SUPABASE_PROJECT_ID"
-echo "Target:  $FILENAME"
-mkdir -p supabase/backups
-
-# This command acts as a signal for the AI Agent.
-# Antigravity will now read the live DDL and populate the file.
-echo "[AI_SYNC_SIGNAL]: Please fulfill schema checkpoint at $FILENAME"
-
-# POWER USER: If you have your DB password, you can enable standalone backups:
-if [ ! -z "$SUPABASE_DB_PASSWORD" ]; then
-  echo "Standalone mode detected. Executing remote dump..."
-  npx supabase db dump --project-ref "$SUPABASE_PROJECT_ID" -p "$SUPABASE_DB_PASSWORD" -f "$FILENAME"
-else
-  echo "AI Mode: Handing over to Antigravity for schema generation."
-fi
+echo "--------------------------------------------------------"
+echo "🚀 DANNFLOW CHECKPOINT READY"
+echo "--------------------------------------------------------"
+echo ""
+echo "Copy and paste the message below to your AI Agent:"
+echo ""
+echo "---"
+echo "Hey Antigravity (or AI Agent), please perform a 'Vibe Checkpoint'."
+echo "1. Verify Supabase MCP is connected."
+echo "2. Read the live schema (Tables, Enums, RLS, Triggers) for project: $SUPABASE_PROJECT_ID"
+echo "3. Save the full DDL to: $FILENAME"
+echo "---"
+echo ""
+echo "Target path: $FILENAME"
+echo "--------------------------------------------------------"
