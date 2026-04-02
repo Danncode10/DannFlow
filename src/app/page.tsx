@@ -1,9 +1,10 @@
-import { Database, GitBranch, Terminal } from "lucide-react";
-import { getVibeCheckData, getUserSession } from "@/services/dashboard";
+import { Database, GitBranch, Terminal, Sparkles } from "lucide-react";
+import { getVibeCheckData, getUserSession, getGithubRepos } from "@/services/dashboard";
 
 export default async function Home() {
   const profiles = await getVibeCheckData();
   const user = await getUserSession();
+  const repos = await getGithubRepos();
 
   return (
     <div className="min-h-screen bg-neutral-950 text-neutral-50 font-sans selection:bg-neutral-800">
@@ -80,10 +81,16 @@ export default async function Home() {
         </div>
 
         {/* 3. Vibe Check Section (Live Data) */}
-        <div className="w-full">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-semibold text-neutral-200">Live Data Vibe Check</h2>
-            <span className="text-xs font-mono text-neutral-500 bg-neutral-900 px-3 py-1 rounded-full border border-neutral-800">
+        <div className="w-full mb-16">
+          <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+            <div>
+              <h2 className="text-2xl font-semibold text-neutral-200">Check if Supabase MCP is connected</h2>
+              <div className="flex items-center gap-2 mt-2 text-neutral-500">
+                <Sparkles className="w-4 h-4 text-green-500/50" />
+                <p className="text-sm italic">Used by AI to auto-generate schemas, debug RLS, and orchestrate live database states.</p>
+              </div>
+            </div>
+            <span className="text-xs font-mono text-neutral-500 bg-neutral-900 px-3 py-1 rounded-full border border-neutral-800 self-start md:self-center">
               public.profiles
             </span>
           </div>
@@ -123,6 +130,57 @@ export default async function Home() {
               </div>
             )}
             
+          </div>
+        </div>
+
+        {/* 4. GitHub Vibe Check Section */}
+        <div className="w-full">
+          <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+            <div>
+              <h2 className="text-2xl font-semibold text-neutral-200">Check if GitHub MCP is connected</h2>
+              <div className="flex items-center gap-2 mt-2 text-neutral-500">
+                <GitBranch className="w-4 h-4 text-blue-500/50" />
+                <p className="text-sm italic">Used by AI to read history, analyze commit patterns, and provide contextual repository insights.</p>
+              </div>
+            </div>
+            <span className="text-xs font-mono text-neutral-500 bg-neutral-900 px-3 py-1 rounded-full border border-neutral-800 self-start md:self-center">
+              API.repositories
+            </span>
+          </div>
+
+          <div className="bg-[#0a0a0a] border border-neutral-800 rounded-2xl p-8 shadow-2xl overflow-hidden relative group">
+            
+            {/* Ambient Background Glow */}
+            <div className="absolute -top-20 -right-20 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl pointer-events-none group-hover:bg-blue-500/10 transition-colors duration-700"></div>
+
+            <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10 w-full">
+              {repos.map((repo: any, i: number) => (
+                <a 
+                  key={i} 
+                  href={repo.url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex flex-col p-4 bg-neutral-900/50 rounded-xl border border-neutral-800/50 hover:bg-neutral-800/50 hover:border-blue-900/50 transition-all group/repo"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-mono text-sm font-bold text-neutral-200">{repo.name}</span>
+                    <GitBranch className="w-4 h-4 text-neutral-600 group-hover/repo:text-blue-400 transition-colors" />
+                  </div>
+                  <p className="text-xs text-neutral-500 line-clamp-1">{repo.description || "No description provided."}</p>
+                </a>
+              ))}
+            </ul>
+             
+          </div>
+
+          <div className="mt-12 p-6 bg-neutral-900/30 border border-neutral-800/50 rounded-2xl">
+            <h3 className="text-sm font-mono font-bold text-neutral-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+              <Sparkles className="w-4 h-4" />
+              The MCP Vibe Advantage
+            </h3>
+            <p className="text-sm text-neutral-500 leading-relaxed max-w-3xl">
+              In <span className="text-neutral-300 font-medium">DannFlow</span>, MCP (Model Context Protocol) servers aren't just tools—they are the eyes and hands of your AI partner. By granting the AI direct access to your <span className="text-green-500/80">Supabase</span> schema and <span className="text-blue-500/80">GitHub</span> memory, you enable "Vibe Coding": a state where you describe the outcome, and the AI handles the orchestration, debugging, and data synchronization with 100% architectural precision.
+            </p>
           </div>
         </div>
 
