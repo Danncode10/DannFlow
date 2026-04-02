@@ -13,7 +13,7 @@ npm install
 npm run dev
 ```
 
-*Note: Add your environment variables to `.env.local` and run `npm run update-types` to sync your schema.*
+*Note: Add your environment variables to `.env.local` and run `npm run update-types` to sync your schema. Use `npm run checkpoint` to snapshot your database.*
 
 ## 📚 In-Depth Documentation
 
