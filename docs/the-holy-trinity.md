@@ -1,37 +1,43 @@
-# Understanding the "Eyes, Blueprint, and Action"
+# The DannFlow "Holy Trinity" Architecture
 
-To a beginner, the file structure can look messy. Here is the simplified breakdown:
+DannFlow follows a strict **Separation of Concerns** model designed to maximize AI-human collaboration and maintain high system velocity.
 
-### Architecture Flow
+### 🏗️ Architectural Pattern
 
 ```mermaid
 graph TD
-    classDef theEyes fill:#f9f0ff,stroke:#d8b4e2,stroke-width:2px;
-    classDef theBlueprint fill:#e6f3ff,stroke:#a6c8e6,stroke-width:2px;
-    classDef theAction fill:#eaffe6,stroke:#a6d9a6,stroke-width:2px;
+    classDef layerEyes fill:#f9f0ff,stroke:#d8b4e2,stroke-width:2px;
+    classDef layerBlueprint fill:#e6f3ff,stroke:#a6c8e6,stroke-width:2px;
+    classDef layerAction fill:#eaffe6,stroke:#a6d9a6,stroke-width:2px;
     classDef cloud fill:#fff5e6,stroke:#ffd699,stroke-width:2px;
 
     DB[("Supabase Cloud Database")]:::cloud
-    DB -->|"npm run update-types"| Eyes("1. The Eyes (src/types/supabase.ts)"):::theEyes
+    DB -->|"Introspection"| Eyes("1. The Typed Layer (src/types/)"):::layerEyes
     
-    Eyes -->|"Provides Type Safety"| Action("3. The Action (src/services/)"):::theAction
-    Action -->|"Feeds typed data to"| UI["Next.js UI Components"]
+    Eyes -->|"Provides Type Safety"| Action("3. The Service Layer (src/services/)"):::layerAction
+    Action -->|"Serve typed DTOs"| UI["Next.js UI Components"]
     
-    Action -.->|"Developer triggers check"| Checkpoint{"AI Checkpoint Command"}
-    Checkpoint -->|"Generates"| Blueprint("2. The Blueprint (schema-MM-DD-YYYY-HH-MM.sql)"):::theBlueprint
-    Blueprint -.->|"Restore or Clone"| DB
+    Action -.->|"State Persistence"| Checkpoint{"AI Checkpoint Command"}
+    Checkpoint -->|"Serialized DDL"| Blueprint("2. The Snapshot Layer (supabase/backups/)"):::layerBlueprint
+    Blueprint -.->|"Restore / Branch"| DB
 ```
 
 ---
 
-### 1. The Eyes (`src/types/supabase.ts`)
-- **What it is**: A giant file of TypeScript definitions.
-- **Why it exists**: AI cannot "see" your cloud database. This file acts as a mirror. When you run `npm run update-types`, you are giving the AI "new eyes" to see your latest table changes.
+### 1. The Typed Layer (`src/types/`)
+- **Software Engineering Concept**: **Schema Mirroring**
+- **Definition**: A static representation of the dynamic database schema.
+- **Role**: This layer acts as the "Eyes" of the AI. By running `npm run update-types`, the AI is granted full introspection into the database's foreign keys, enums, and row-level security (RLS) constraints.
 
-### 2. The Blueprint (`supabase/backups/schema-MM-DD-YYYY-HH-MM.sql`)
-- **What it is**: A text-based "Save Point" of your entire database structure.
-- **Why it exists**: If you mess up your database or want to share your project with a friend, they just "Run" this blueprint in their own Supabase account. It builds the house instantly.
+### 2. The Snapshot Layer (`supabase/backups/`)
+- **Software Engineering Concept**: **Version-Controlled State**
+- **Definition**: Timestamped DDL (Data Definition Language) exports.
+- **Role**: This is our "Blueprint" for disaster recovery and environment parity. This file ensures that your database state is tracked along with your code, allowing for atomic rollbacks.
 
-### 3. The Action (`src/services/`)
-- **What it is**: Where the actual coding happens.
-- **Why it exists**: We keep database logic out of the UI. This folder is the "Kitchen" where data is prepared before it's served to the screen.
+### 3. The Service Layer (`src/services/`)
+- **Software Engineering Concept**: **Domain Logic Isolation**
+- **Definition**: Pure asynchronous functions that encapsulate data fetching and business rules.
+- **Role**: This is the "Action" layer. UI components must remain "dumb" and only focus on presentation. All logic, from row filtering for RLS to complex aggregations, must happen here to ensure maintainability and testability.
+
+### 🛡️ Security Protocol (RLS Awareness)
+Every developer and agent working on DannFlow must adhere to the RLS Constraint: **Queries must always include current user context**. By default, services are designed to fail-safe unless an explicit `userId` filter is provided.
