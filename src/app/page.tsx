@@ -1,21 +1,15 @@
-import {
-  Zap,
-  Shield,
-  Database,
-  GitBranch,
-  Terminal,
-  Layers,
-  ArrowRight,
-  Check,
-  Star,
-} from "lucide-react";
-import { getUserProfile } from "@/services/dashboard";
+import { ArrowRight, Check, Star } from "lucide-react";
+import { getUserProfile, getVibeCheckData, getGithubRepos } from "@/services/dashboard";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
+import { FeaturesTabs } from "@/components/features-tabs";
 
 export default async function Home() {
   const session = await getUserProfile();
   const user = session?.user;
+  const profile = session?.profile;
+  const profiles = await getVibeCheckData() || [];
+  const repos = await getGithubRepos() || [];
 
   return (
     <>
@@ -28,9 +22,9 @@ export default async function Home() {
         id="home"
         className="relative overflow-hidden bg-background"
       >
-        {/* Gradient blobs */}
-        <div className="pointer-events-none absolute -top-40 -right-40 h-[600px] w-[600px] rounded-full bg-primary/10 blur-[120px]" />
-        <div className="pointer-events-none absolute -bottom-40 -left-40 h-[500px] w-[500px] rounded-full bg-accent/10 blur-[120px]" />
+        {/* Gradient blobs — capped to stay inside hero */}
+        <div className="pointer-events-none absolute -top-40 -right-40 h-[600px] w-[600px] rounded-full bg-primary/10 blur-[120px] -z-10" />
+        <div className="pointer-events-none absolute -bottom-40 -left-40 h-[500px] w-[500px] rounded-full bg-accent/10 blur-[120px] -z-10" />
 
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-24 md:py-36 text-center">
           {/* Badge */}
@@ -83,92 +77,27 @@ export default async function Home() {
       </section>
 
       {/* =============================
-          FEATURES SECTION
+          FEATURES SECTION (WITH TABS)
           ============================= */}
       <section id="features" className="bg-card border-t border-border">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-24">
           <div className="text-center mb-16">
             <span className="text-sm font-semibold text-primary uppercase tracking-wider">
-              Features
+              Features & Integrations
             </span>
             <h2 className="mt-3 text-3xl sm:text-4xl font-bold text-foreground">
               Everything you need to launch
             </h2>
             <p className="mt-4 text-muted-foreground max-w-2xl mx-auto">
-              One template. Every essential built in. From auth to database to
-              deployment — DannFlow has your back.
+              One template. Every essential built in. Check out our active integrations below.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                icon: Database,
-                title: "Supabase Integration",
-                description:
-                  "Auth, database, and real-time built in. Type-safe queries powered by auto-generated TypeScript definitions.",
-                color: "text-emerald-500",
-                bg: "bg-emerald-500/10",
-              },
-              {
-                icon: Shield,
-                title: "Auth & RLS Ready",
-                description:
-                  "Login, signup, and role-based access out of the box. Row Level Security policies baked into every service.",
-                color: "text-primary",
-                bg: "bg-primary/10",
-              },
-              {
-                icon: GitBranch,
-                title: "Git-First Workflow",
-                description:
-                  "Structured for clean commits, branch strategies, and AI-assisted code reviews via GitHub MCP.",
-                color: "text-violet-500",
-                bg: "bg-violet-500/10",
-              },
-              {
-                icon: Zap,
-                title: "AI-Native Architecture",
-                description:
-                  "Built for Vibe Coding. Describe what you want, and the AI builds it using your typed services and schema.",
-                color: "text-accent",
-                bg: "bg-accent/10",
-              },
-              {
-                icon: Terminal,
-                title: "Checkpoint System",
-                description:
-                  "One command to snapshot your database. Instant disaster recovery and environment cloning.",
-                color: "text-orange-500",
-                bg: "bg-orange-500/10",
-              },
-              {
-                icon: Layers,
-                title: "Clean Architecture",
-                description:
-                  "Separation of concerns by design. UI, services, types, and prompts — each in its own lane.",
-                color: "text-pink-500",
-                bg: "bg-pink-500/10",
-              },
-            ].map((feature) => (
-              <div
-                key={feature.title}
-                className="group rounded-2xl border border-border bg-background p-6 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300"
-              >
-                <div
-                  className={`inline-flex h-12 w-12 items-center justify-center rounded-xl ${feature.bg} mb-5`}
-                >
-                  <feature.icon className={`h-6 w-6 ${feature.color}`} />
-                </div>
-                <h3 className="text-lg font-semibold text-foreground mb-2">
-                  {feature.title}
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {feature.description}
-                </p>
-              </div>
-            ))}
-          </div>
+          <FeaturesTabs
+            profiles={profiles}
+            repos={repos}
+            currentRole={profile?.role}
+          />
         </div>
       </section>
 
