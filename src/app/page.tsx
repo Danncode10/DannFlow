@@ -79,7 +79,7 @@ export default async function Home() {
       {/* =============================
           FEATURES SECTION (WITH TABS)
           ============================= */}
-      <section id="features" className="bg-card border-t border-border">
+      <section id="features" className="bg-card border-t border-border isolate">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-24">
           <div className="text-center mb-16">
             <span className="text-sm font-semibold text-primary uppercase tracking-wider">
@@ -127,7 +127,7 @@ export default async function Home() {
                 step: "02",
                 title: "Describe Your Vision",
                 description:
-                  "Use feature prompts in src/prompts/ to steer your AI. It reads your schema, types, and services automatically.",
+                  "Use feature prompts in src/prompts/features/ to steer your AI. It reads your schema, types, and services automatically.",
               },
               {
                 step: "03",
@@ -170,7 +170,7 @@ export default async function Home() {
           </div>
 
           <div className="mx-auto grid max-w-5xl grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Free */}
+            {/* Starter */}
             <div className="rounded-2xl border border-border bg-background p-8 flex flex-col">
               <h3 className="text-lg font-semibold text-foreground">Starter</h3>
               <p className="mt-1 text-sm text-muted-foreground">
