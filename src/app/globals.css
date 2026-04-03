@@ -1,42 +1,24 @@
 @import "tailwindcss";
 
 @theme {
-  /* Core Colors */
+  /* This tells the AI: "primary" IS your blue vibe */
+  --color-primary: #2563eb;
+  --color-primary-foreground: #ffffff;
+  
   --color-background: #ffffff;
   --color-foreground: #020617;
   
   --color-card: #ffffff;
   --color-card-foreground: #020617;
   
-  --color-primary: #2563eb;
-  --color-primary-foreground: #ffffff;
-  
   --color-secondary: #f1f5f9;
-  --color-secondary-foreground: #0f172a;
-  
-  --color-muted: #f1f5f9;
-  --color-muted-foreground: #64748b;
-  
-  --color-accent: #f59e0b;
-  --color-accent-foreground: #ffffff;
-  
   --color-border: #e2e8f0;
-  --color-input: #e2e8f0;
-  --color-ring: #2563eb;
 
-  /* Spacing & Radius */
-  --radius-3xl: 1.5rem;
-  --radius-4xl: 2.25rem;
-  --radius-5xl: 3rem;
-  
-  /* Animations */
-  --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  /* Matches your [3rem] preference but as a reusable variable */
+  --radius-5xl: 3rem; 
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
   body {
     @apply bg-background text-foreground antialiased;
   }
