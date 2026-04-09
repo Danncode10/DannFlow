@@ -3,6 +3,27 @@
 import { createClient } from '@/utils/supabase/server';
 
 
+export async function getVibeCheckDataPaginated({ pageParam = 0 }: { pageParam?: number } = {}) {
+  try {
+    const limit = 5; // default page scale
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .range(pageParam * limit, (pageParam + 1) * limit - 1);
+      
+    if (error) {
+      console.warn("Vibe Check Error. Check your tables:", error.message);
+      return [];
+    }
+    
+    return data || [];
+  } catch (err) {
+    return [];
+  }
+}
+
+// Keeping original for Server Component base render fallback
 export async function getVibeCheckData() {
   try {
     const supabase = await createClient();

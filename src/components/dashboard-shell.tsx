@@ -20,8 +20,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { siteConfig } from "@/lib/config"
 import { ProfileForm } from "./profile-form"
-
-
+import { useInfiniteQuery } from "@tanstack/react-query"
+import { getVibeCheckDataPaginated } from "@/services/dashboard"
 
 import { PillTabs } from "@/components/ui/pill-tabs"
 
@@ -34,6 +34,16 @@ interface DashboardShellProps {
 
 export function DashboardShell({ profiles, user, profile, repos }: DashboardShellProps) {
   const [activeTab, setActiveTab] = React.useState("overview")
+
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
+    queryKey: ['profiles-db'],
+    queryFn: ({ pageParam = 0 }) => getVibeCheckDataPaginated({ pageParam }),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, allPages) => lastPage.length === 5 ? allPages.length : undefined,
+    initialData: { pages: [profiles], pageParams: [0] }
+  });
+
+  const displayProfiles = data?.pages.flat() || profiles;
 
   const DASHBOARD_TABS = [
     { id: "overview", label: "Overview", icon: Activity },
@@ -128,8 +138,8 @@ export function DashboardShell({ profiles, user, profile, repos }: DashboardShel
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {profiles.length > 0 ? (
-            profiles.map((p: any, i: number) => (
+          {displayProfiles.length > 0 ? (
+            displayProfiles.map((p: any, i: number) => (
               <Card key={i} className="bg-card text-card-foreground border border-border hover:bg-card/90 transition-all group relative shadow-sm rounded-3xl">
                 <CardHeader className="flex flex-row items-center gap-4 pb-4">
                   <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center shrink-0">
@@ -158,8 +168,19 @@ export function DashboardShell({ profiles, user, profile, repos }: DashboardShel
             </div>
           )}
         </div>
+        
+        {hasNextPage && (
+          <div className="flex justify-center mt-8">
+            <button
+               onClick={() => fetchNextPage()}
+               disabled={isFetchingNextPage}
+               className="px-6 py-2.5 rounded-full bg-secondary text-foreground text-sm font-bold uppercase tracking-widest hover:bg-card border border-border transition-all cursor-pointer shadow-sm active:scale-95"
+            >
+               {isFetchingNextPage ? 'Retrieving...' : 'Load Additional Nodes'}
+            </button>
+          </div>
+        )}
       </TabsContent>
-
 
       {/* 3. Code Tab */}
       <TabsContent value="code" className="space-y-6 animate-in slide-in-from-bottom-2 duration-500">

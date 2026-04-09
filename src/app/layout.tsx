@@ -13,6 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 import { siteConfig } from "@/lib/config";
+import { QueryProvider } from "@/components/query-provider";
 
 export const metadata: Metadata = {
   title: `${siteConfig.name} — AI-Native Starter for Builders`,
@@ -32,7 +33,9 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable}`}
     >
       <body className="min-h-screen flex flex-col antialiased">
-        {children}
+        <QueryProvider>
+          {children}
+        </QueryProvider>
       </body>
     </html>
   );
