@@ -31,6 +31,7 @@ We moved all detailed explanations out of the README so you have a clean setup e
 - [The Holy Trinity](docs/the-holy-trinity.md) - Understand the "Eyes, Blueprint, and Action" file structure.
 - [MCP Trinity Setup](docs/mcp-setup.md) - Step-by-step guides for powering up the AI.
 - [The Time Machine Workflow](docs/backups-and-sync.md) - Learn the crucial loop of changing, syncing, and checkpointing.
+- [Production Ready Features](docs/production-features.md) - Details on integrated caching, Upstash rate limits, pagination, and SEO.
 
 ## 🚀 Zero-Cost Setup for Students
 
