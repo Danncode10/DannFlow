@@ -49,6 +49,8 @@ To fix:
 5.  **OUTPUT**: If any code changes are made, provide a concise, professional Git commit message (e.g., 'feat: add user login validation') at the end of your response for easy copy-pasting.
 6.  **RLS AWARENESS**: Always check `src/types/supabase.ts` and assume RLS is active. Every `select` or `update` service must include an `.eq('id', userId)` filter to pass security policies unless building a public endpoint.
 7.  **SERVER VS. CLIENT**: Default to Server Components. Only use `'use client'` when interactivity, client state, or specific lifecycle effects are strictly required.
+8.  **STRICT SEMANTIC COMPLIANCE**: Use ONLY Shadcn/Tailwind semantic tokens (e.g., bg-background, bg-card, text-foreground). Stating hex codes, rgba, or hardcoded neutral/white/blur colors is a CRITICAL FAILURE.
+
 
 ## 🗄️ Supabase Workflow for AI Agents
 1. **Live Schema Awareness**: Use the **Supabase MCP Server** to query the live database state (tables, types, RLS policies). Do not assume schema structure without checking.
