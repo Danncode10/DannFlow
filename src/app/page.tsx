@@ -45,6 +45,7 @@ export default async function Home() {
             in Record Time
           </h1>
 
+
           <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground leading-relaxed">
             {siteConfig.name} is the AI-native starter template for websites, management
             systems, apps, and startup ideas. Stop building boilerplate — start
@@ -55,11 +56,12 @@ export default async function Home() {
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
             <a
               href={user ? "/dashboard" : "/login"}
-              className="inline-flex items-center gap-2 px-8 py-3.5 text-sm font-semibold rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5"
+              className="inline-flex items-center gap-2 px-8 py-3.5 text-sm font-semibold rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_4px_14px_0_rgba(37,99,235,0.39),0_0_0_1px_rgba(255,255,255,0.1)] transition-all hover:shadow-[0_6px_20px_rgba(37,99,235,0.45),0_0_0_1px_rgba(255,255,255,0.2)] hover:-translate-y-0.5"
             >
               Get Started Free
               <ArrowRight className="h-4 w-4" />
             </a>
+
 
             <a
               href={siteConfig.githubUrl}
@@ -83,14 +85,16 @@ export default async function Home() {
           FEATURES SECTION (WITH TABS)
           ============================= */}
       <section id="features" className="bg-card border-t border-border isolate">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-32">
+
           <div className="text-center mb-16">
             <span className="text-sm font-semibold text-primary uppercase tracking-wider">
               Features & Integrations
             </span>
-            <h2 className="mt-3 text-3xl sm:text-4xl font-bold text-foreground">
+            <h2 className="mt-3 text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
               Everything you need to launch
             </h2>
+
             <p className="mt-4 text-muted-foreground max-w-2xl mx-auto">
               One template. Every essential built in. Check out our active integrations below.
             </p>
@@ -114,9 +118,10 @@ export default async function Home() {
             <span className="text-sm font-semibold text-primary uppercase tracking-wider">
               How It Works
             </span>
-            <h2 className="mt-3 text-3xl sm:text-4xl font-bold text-foreground">
+            <h2 className="mt-3 text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
               Three steps to your next project
             </h2>
+
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8">
@@ -141,9 +146,10 @@ export default async function Home() {
               },
             ].map((item) => (
               <div key={item.step} className="text-center md:text-left">
-                <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-blue-400 text-primary-foreground text-xl font-bold mb-5 shadow-lg shadow-primary/20">
+                <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-blue-400 text-primary-foreground text-xl font-bold mb-5 shadow-[0_4px_10px_rgba(37,99,235,0.25),0_0_0_1px_rgba(255,255,255,0.1)]">
                   {item.step}
                 </div>
+
                 <h3 className="text-xl font-semibold text-foreground mb-3">
                   {item.title}
                 </h3>
@@ -165,9 +171,10 @@ export default async function Home() {
             <span className="text-sm font-semibold text-primary uppercase tracking-wider">
               Pricing
             </span>
-            <h2 className="mt-3 text-3xl sm:text-4xl font-bold text-foreground">
+            <h2 className="mt-3 text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
               Simple, transparent pricing
             </h2>
+
             <p className="mt-4 text-muted-foreground max-w-xl mx-auto">
               Start free. Scale when you are ready.
             </p>

@@ -71,49 +71,50 @@ export function Navbar({ user }: { user: any }) {
         <div className="hidden md:flex items-center gap-3">
           {user ? (
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-2.5 bg-white/5 hover:bg-white/10 active:scale-[0.98] transition-all rounded-full px-1.5 py-1.5 md:pl-1.5 md:pr-3 border border-white/5 hover:border-white/10 group cursor-pointer">
+              <DropdownMenuTrigger className="flex items-center gap-3 bg-white/5 hover:bg-white/10 active:scale-[0.98] transition-all rounded-full px-1.5 py-1.5 md:pl-1.5 md:pr-4 border border-white/10 hover:border-white/20 shadow-sm shadow-black/50 backdrop-blur-md group cursor-pointer group">
                 {/* ── Avatar ── */}
-                <Avatar className="h-7 w-7 md:h-8 md:w-8 border border-white/20 shadow-lg ring-1 ring-white/5">
+                <Avatar className="h-7 w-7 md:h-8 md:w-8 border border-white/20 shadow-lg ring-1 ring-white/5 transition-transform group-hover:scale-105">
                   <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-white font-black text-[10px] md:text-xs">
                     {user.email?.[0].toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
 
                 {/* ── Identity (Hidden on Mobile) ── */}
-                <div className="hidden md:flex items-center gap-2 max-w-[150px]">
-                  <span className="text-sm font-semibold text-foreground/90 group-hover:text-foreground transition-colors truncate">
+                <div className="hidden md:flex items-center gap-2.5 max-w-[150px]">
+                  <span className="text-sm font-medium text-foreground group-hover:text-white transition-colors truncate tracking-tight">
                     {user.email?.split("@")[0]}
                   </span>
-                  <ChevronDown className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary transition-colors" />
+                  <ChevronDown className="w-3.5 h-3.5 text-white/40 group-hover:text-primary transition-colors" />
                 </div>
               </DropdownMenuTrigger>
 
-              <DropdownMenuContent className="w-64 mt-3">
+              <DropdownMenuContent className="w-64 mt-3 bg-black/80 backdrop-blur-xl border-white/10 rounded-2xl shadow-2xl">
                 <DropdownMenuLabel>
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-xs font-black text-foreground uppercase tracking-tight truncate">
+                  <div className="flex flex-col space-y-1 py-1">
+                    <p className="text-xs font-black text-foreground uppercase tracking-wider truncate">
                       {user.email?.split("@")[0]}
                     </p>
-                    <p className="text-[10px] text-muted-foreground font-mono truncate">{user.email}</p>
+                    <p className="text-[10px] text-white/40 font-mono truncate">{user.email}</p>
                   </div>
                 </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => router.push("/dashboard")}>
+                <DropdownMenuSeparator className="bg-white/5" />
+                <DropdownMenuItem onClick={() => router.push("/dashboard")} className="rounded-lg mx-1 my-0.5">
                   <LayoutDashboard className="mr-2 h-4 w-4 text-primary" />
-                  <span className="font-medium">Dashboard</span>
+                  <span className="font-semibold text-sm">Dashboard</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => router.push("/dashboard?tab=settings")}>
+                <DropdownMenuItem onClick={() => router.push("/dashboard?tab=settings")} className="rounded-lg mx-1 my-0.5">
                   <Settings className="mr-2 h-4 w-4" />
-                  <span className="font-medium">Settings</span>
+                  <span className="font-semibold text-sm">Settings</span>
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleSignOut} className="text-red-400 hover:text-red-300 hover:bg-red-400/10 transition-colors">
+                <DropdownMenuSeparator className="bg-white/5" />
+                <DropdownMenuItem onClick={handleSignOut} className="rounded-lg mx-1 my-0.5 text-red-400 hover:text-red-300 hover:bg-red-400/10 transition-colors">
                   <LogOut className="mr-2 h-4 w-4" />
-                  <span className="font-bold uppercase tracking-widest text-[10px]">Sign Out</span>
+                  <span className="font-black uppercase tracking-widest text-[10px]">Sign Out</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
+
 
             <>
               <a

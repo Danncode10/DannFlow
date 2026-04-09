@@ -130,9 +130,10 @@ export function FeaturesTabs({
                 {isActive && (
                   <motion.div
                     layoutId="modern-pill"
-                    className="absolute inset-0 bg-card rounded-full shadow-lg border border-border z-0"
+                    className="absolute inset-0 bg-card rounded-full shadow-[0_4px_10px_rgba(0,0,0,0.3),0_0_0_1px_rgba(255,255,255,0.05),0_10px_20px_-5px_rgba(0,0,0,0.5)] z-0"
                     transition={{ type: "spring", bounce: 0.15, duration: 0.6 }}
                   />
+
                 )}
                 {isHovered && !isActive && (
                   <motion.div
@@ -178,7 +179,7 @@ export function FeaturesTabs({
               {FEATURES.map((feature, i) => (
                 <div
                   key={i}
-                  className={`group bg-card p-6 md:p-10 rounded-3xl md:rounded-5xl border border-border hover:border-primary/20 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 relative overflow-hidden h-full flex flex-col ${
+                  className={`group bg-card p-6 md:p-10 rounded-3xl md:rounded-5xl border border-border shadow-[0_10px_30px_-15px_rgba(0,0,0,0.3),0_0_0_1px_rgba(255,255,255,0.05)] hover:border-primary/20 hover:shadow-[0_20px_50px_-20px_rgba(0,0,0,0.5),0_0_0_1px_rgba(255,255,255,0.1)] transition-all duration-500 relative overflow-hidden h-full flex flex-col ${
                     i === 0 || i === 5 ? "lg:col-span-2" : ""
                   }`}
                 >
@@ -210,7 +211,7 @@ export function FeaturesTabs({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="rounded-3xl md:rounded-5xl border border-border bg-card p-6 md:p-10 lg:p-14 shadow-xl overflow-hidden"
+              className="rounded-3xl md:rounded-5xl border border-border bg-card p-6 md:p-10 lg:p-14 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.5),0_0_0_1px_rgba(255,255,255,0.05)] overflow-hidden"
             >
               <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8 md:gap-10 mb-10 md:mb-12">
                 <div className="flex items-center gap-4 md:gap-6">
@@ -218,7 +219,7 @@ export function FeaturesTabs({
                     <Database className="w-6 h-6 md:w-8 md:h-8" />
                   </div>
                   <div>
-                    <h3 className="text-xl md:text-3xl font-black text-foreground tracking-tighter uppercase italic leading-none">Supabase Orbit</h3>
+                    <h3 className="text-xl md:text-3xl font-black text-foreground tracking-tight uppercase italic leading-none">Supabase Orbit</h3>
                     <div className="flex items-center gap-2 mt-2">
                        <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 text-[10px] font-black uppercase tracking-widest border border-emerald-500/20">
                          <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -232,13 +233,14 @@ export function FeaturesTabs({
                    <div className="bg-secondary border border-border rounded-xl md:rounded-2xl px-4 md:px-6 py-3 md:py-4 flex flex-col flex-1 lg:min-w-[140px]">
                       <span className="text-[9px] md:text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1 leading-none">Your Identity</span>
                       <span className="text-lg md:text-xl font-bold text-primary tracking-tight flex items-center gap-2 capitalize">
+
                         <Lock className="w-3.5 h-3.5 md:w-4 md:h-4" />
                         {currentRole || "User"}
                       </span>
                    </div>
                    <div className="bg-foreground border border-foreground rounded-xl md:rounded-2xl px-4 md:px-6 py-3 md:py-4 flex flex-col flex-1 lg:min-w-[140px] text-background">
                       <span className="text-[9px] md:text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1 leading-none">Total Nodes</span>
-                      <span className="text-xl md:text-2xl font-black">{profiles?.length || 0}</span>
+                      <span className="text-xl md:text-2xl font-black tracking-tight">{profiles?.length || 0}</span>
                    </div>
                 </div>
               </div>
@@ -298,7 +300,7 @@ export function FeaturesTabs({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="rounded-3xl md:rounded-5xl border border-border bg-card p-6 md:p-10 lg:p-14 shadow-xl"
+              className="rounded-3xl md:rounded-5xl border border-border bg-card p-6 md:p-10 lg:p-14 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.5),0_0_0_1px_rgba(255,255,255,0.05)]"
             >
                <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8 mb-10 md:mb-12">
                  <div className="flex items-center gap-4 md:gap-6">
@@ -306,7 +308,7 @@ export function FeaturesTabs({
                      <GitHubIcon className="w-6 h-6 md:w-8 md:h-8" />
                    </div>
                    <div>
-                     <h3 className="text-xl md:text-3xl font-black text-foreground tracking-tighter uppercase italic leading-none">GitHub Hub</h3>
+                     <h3 className="text-xl md:text-3xl font-black text-foreground tracking-tight uppercase italic leading-none">GitHub Hub</h3>
                      <span className="text-[9px] md:text-[10px] font-black uppercase text-muted-foreground tracking-widest mt-1.5 block">MCP Integration Core</span>
                    </div>
                  </div>

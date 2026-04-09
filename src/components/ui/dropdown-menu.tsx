@@ -100,9 +100,10 @@ export function DropdownMenuItem({
   )
 }
 
-export function DropdownMenuSeparator() {
-  return <div className="h-px bg-white/5 my-1" />
+export function DropdownMenuSeparator({ className }: { className?: string }) {
+  return <div className={cn("h-px bg-white/5 my-1", className)} />
 }
+
 
 export function DropdownMenuLabel({ children }: { children: React.ReactNode }) {
   return <div className="px-4 py-2 text-[10px] font-black uppercase tracking-widest text-neutral-500">{children}</div>

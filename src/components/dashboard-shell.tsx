@@ -244,14 +244,15 @@ export function DashboardShell({ profiles, user, profile, repos }: DashboardShel
       </TabsContent>
       {/* 5. Settings Tab */}
       <TabsContent value="settings" className="animate-in slide-in-from-bottom-2 duration-500">
-        <div className="flex justify-center w-full py-10">
-          <Card className="bg-neutral-900/40 border-neutral-800/50 backdrop-blur-xl p-8 md:p-12 max-w-2xl w-full shadow-2xl relative overflow-hidden group">
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-blue-500 to-accent opacity-50" />
+        <div className="flex justify-center w-full py-16">
+          <Card className="bg-neutral-900/60 border-white/5 backdrop-blur-2xl p-8 md:p-14 max-w-2xl w-full shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8),0_0_0_1px_rgba(255,255,255,0.05)] rounded-[2.5rem] relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-blue-500 to-accent opacity-30" />
             <ProfileForm profile={profile} />
           </Card>
         </div>
       </TabsContent>
     </Tabs>
+
 
 
   )
