@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from '@/utils/supabase/server';
+import { verifyRateLimit } from '@/lib/ratelimit';
 
 
 export async function getAllProfiles() {
@@ -54,6 +55,9 @@ export async function updateProfile(updates: {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
+
+  const { success } = await verifyRateLimit(user.id);
+  if (!success) throw new Error("Rate limit exceeded. Try again in 10 seconds.");
 
   const { data, error } = await supabase
     .from('profiles')

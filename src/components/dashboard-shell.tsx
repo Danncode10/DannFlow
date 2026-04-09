@@ -22,6 +22,8 @@ import { siteConfig } from "@/lib/config"
 import { ProfileForm } from "./profile-form"
 import { useInfiniteQuery } from "@tanstack/react-query"
 import { getVibeCheckDataPaginated } from "@/services/dashboard"
+import { useInView } from "react-intersection-observer"
+import { BentoSkeleton } from "./dashboard/bento-skeleton"
 
 import { PillTabs } from "@/components/ui/pill-tabs"
 
@@ -34,6 +36,7 @@ interface DashboardShellProps {
 
 export function DashboardShell({ profiles, user, profile, repos }: DashboardShellProps) {
   const [activeTab, setActiveTab] = React.useState("overview")
+  const { ref, inView } = useInView()
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
     queryKey: ['profiles-db'],
@@ -42,6 +45,12 @@ export function DashboardShell({ profiles, user, profile, repos }: DashboardShel
     getNextPageParam: (lastPage, allPages) => lastPage.length === 5 ? allPages.length : undefined,
     initialData: { pages: [profiles], pageParams: [0] }
   });
+
+  React.useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const displayProfiles = data?.pages.flat() || profiles;
 
@@ -169,17 +178,15 @@ export function DashboardShell({ profiles, user, profile, repos }: DashboardShel
           )}
         </div>
         
-        {hasNextPage && (
-          <div className="flex justify-center mt-8">
-            <button
-               onClick={() => fetchNextPage()}
-               disabled={isFetchingNextPage}
-               className="px-6 py-2.5 rounded-full bg-secondary text-foreground text-sm font-bold uppercase tracking-widest hover:bg-card border border-border transition-all cursor-pointer shadow-sm active:scale-95"
-            >
-               {isFetchingNextPage ? 'Retrieving...' : 'Load Additional Nodes'}
-            </button>
+        {isFetchingNextPage && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+             <BentoSkeleton />
+             <BentoSkeleton />
+             <BentoSkeleton />
           </div>
         )}
+        
+        <div ref={ref} className="h-4 w-full mt-4 flex items-center justify-center" />
       </TabsContent>
 
       {/* 3. Code Tab */}

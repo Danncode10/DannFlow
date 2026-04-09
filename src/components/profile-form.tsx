@@ -4,10 +4,12 @@ import { useState, useEffect } from "react";
 import { updateProfile } from "@/services/users";
 import { User, Calendar, CircleUser, Loader2, CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export function ProfileForm({ profile }: { profile: any }) {
-  const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const queryClient = useQueryClient();
+  
   const [formData, setFormData] = useState({
     full_name: profile?.full_name || "",
     age: profile?.age || "",
@@ -31,24 +33,34 @@ export function ProfileForm({ profile }: { profile: any }) {
     }
   }, [formData.birthday]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setSuccess(false);
-
-    try {
-      await updateProfile({
-        ...formData,
-        age: formData.age ? parseInt(formData.age as string) : undefined,
-      });
+  const mutation = useMutation({
+    mutationFn: (data: typeof formData) => updateProfile({
+      ...data,
+      age: data.age ? parseInt(data.age as string) : undefined,
+    }),
+    onMutate: async (newProfileData) => {
+      await queryClient.cancelQueries({ queryKey: ['profiles-db'] });
+      const previousProfiles = queryClient.getQueryData(['profiles-db']);
+      
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
-    } catch (error) {
-      console.error("Error updating profile:", error);
-      alert("Failed to update profile");
-    } finally {
-      setLoading(false);
+      
+      return { previousProfiles };
+    },
+    onError: (err, newProfile, context) => {
+      if (context?.previousProfiles) {
+        queryClient.setQueryData(['profiles-db'], context.previousProfiles);
+      }
+      console.error("Mutation failed: ", err);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['profiles-db'] });
     }
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    mutation.mutate(formData);
   };
 
   return (
@@ -128,14 +140,20 @@ export function ProfileForm({ profile }: { profile: any }) {
 
         <div className="pt-4 border-t border-border mt-8 flex items-center justify-between gap-4">
            <p className="text-[10px] text-muted-foreground font-semibold italic">Syncing with Supabase public.profiles cluster</p>
-           <button
-             type="submit"
-             disabled={loading}
-             className="min-w-[140px] bg-primary text-primary-foreground py-3 px-6 rounded-xl font-bold text-sm shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-           >
-             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : success ? <CheckCircle2 className="w-4 h-4 text-emerald-400" /> : null}
-             {loading ? "Saving..." : success ? "Saved!" : "Update Profile"}
-           </button>
+          {/* Submit Button */}
+      <button
+        type="submit"
+        disabled={mutation.isPending}
+        className="w-full relative py-3 bg-primary text-primary-foreground font-black uppercase tracking-widest rounded-xl overflow-hidden hover:bg-primary/90 transition-all flex items-center justify-center gap-2 group"
+      >
+        {mutation.isPending ? (
+          <Loader2 className="w-5 h-5 animate-spin" />
+        ) : success ? (
+          <><CheckCircle2 className="w-5 h-5" /> Saved</>
+        ) : (
+          <><CheckCircle2 className="w-5 h-5 group-hover:scale-110 transition-transform" /> Save Node State</>
+        )}
+      </button>
         </div>
       </form>
     </div>
