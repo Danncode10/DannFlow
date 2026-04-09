@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { updateProfile } from "@/services/users";
 import { User, Calendar, CircleUser, Loader2, CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +14,22 @@ export function ProfileForm({ profile }: { profile: any }) {
     birthday: profile?.birthday || "",
     gender: profile?.gender || "",
   });
+
+  // Automatically calculate age based on birthday
+  useEffect(() => {
+    if (formData.birthday) {
+      const birthDate = new Date(formData.birthday);
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const m = today.getMonth() - birthDate.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      if (age >= 0 && formData.age !== String(age)) {
+        setFormData(prev => ({ ...prev, age: String(age) }));
+      }
+    }
+  }, [formData.birthday]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

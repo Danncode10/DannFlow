@@ -34,24 +34,24 @@ export function DashboardShell({ profiles, user, profile, repos }: DashboardShel
   return (
     <Tabs defaultValue="overview" className="w-full">
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-        <TabsList className="bg-neutral-900/50 border border-neutral-800 p-1 h-12">
-          <TabsTrigger value="overview" className="gap-2 px-4">
+        <TabsList className="flex p-1.5 rounded-full bg-secondary border border-border shadow-inner backdrop-blur-md relative overflow-x-auto no-scrollbar max-w-full h-auto">
+          <TabsTrigger value="overview" className="relative flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-black uppercase tracking-widest transition-all duration-300 whitespace-nowrap data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:text-foreground">
             <Activity className="w-4 h-4" />
             <span>Overview</span>
           </TabsTrigger>
-          <TabsTrigger value="database" className="gap-2 px-4">
+          <TabsTrigger value="database" className="relative flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-black uppercase tracking-widest transition-all duration-300 whitespace-nowrap data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:text-foreground">
             <Database className="w-4 h-4" />
             <span>Database</span>
           </TabsTrigger>
-          <TabsTrigger value="code" className="gap-2 px-4">
+          <TabsTrigger value="code" className="relative flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-black uppercase tracking-widest transition-all duration-300 whitespace-nowrap data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:text-foreground">
             <Code2 className="w-4 h-4" />
             <span>Code</span>
           </TabsTrigger>
-          <TabsTrigger value="docs" className="gap-2 px-4">
+          <TabsTrigger value="docs" className="relative flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-black uppercase tracking-widest transition-all duration-300 whitespace-nowrap data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:text-foreground">
             <BookOpen className="w-4 h-4" />
             <span>Docs</span>
           </TabsTrigger>
-          <TabsTrigger value="settings" className="gap-2 px-4">
+          <TabsTrigger value="settings" className="relative flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-black uppercase tracking-widest transition-all duration-300 whitespace-nowrap data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:text-foreground">
             <Settings className="w-4 h-4" />
             <span>Settings</span>
           </TabsTrigger>

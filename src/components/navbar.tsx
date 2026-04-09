@@ -21,10 +21,10 @@ import Link from "next/link";
 
 
 const navLinks = [
-  { label: "Home", href: "#home" },
-  { label: "Features", href: "#features" },
-  { label: "How It Works", href: "#how-it-works" },
-  { label: "Pricing", href: "#pricing" },
+  { label: "Home", href: "/#home" },
+  { label: "Features", href: "/#features" },
+  { label: "How It Works", href: "/#how-it-works" },
+  { label: "Pricing", href: "/#pricing" },
 ];
 
 export function Navbar({ user }: { user: any }) {
@@ -45,7 +45,7 @@ export function Navbar({ user }: { user: any }) {
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo */}
-        <a href="#home" className="flex items-center gap-2">
+        <a href="/#home" className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
             <span className="text-sm font-bold text-primary-foreground">D</span>
           </div>
