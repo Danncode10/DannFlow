@@ -103,8 +103,8 @@ export function FeaturesTabs({
   return (
     <div className="w-full">
       {/* ── Tabs Navigation ── */}
-      <div className="flex justify-center mb-16">
-        <div className="inline-flex p-1.5 rounded-full bg-secondary border border-border shadow-inner backdrop-blur-md relative overflow-hidden">
+      <div className="flex justify-center mb-8 md:mb-16">
+        <div className="flex p-1.5 rounded-full bg-secondary border border-border shadow-inner backdrop-blur-md relative overflow-x-auto no-scrollbar max-w-[calc(100vw-2rem)]">
           {TABS_CONFIG.map((tab) => {
             const TabIcon = tab.icon;
             const isActive = active === tab.id;
@@ -115,7 +115,7 @@ export function FeaturesTabs({
                 onClick={() => setActive(tab.id)}
                 onMouseEnter={() => setHovered(tab.id)}
                 onMouseLeave={() => setHovered(null)}
-                className={`relative flex items-center gap-3 px-8 py-3.5 rounded-full text-[13px] font-black uppercase tracking-widest transition-all duration-300 ${
+                className={`relative flex items-center gap-2 md:gap-3 px-4 md:px-8 py-2.5 md:py-3.5 rounded-full text-[11px] md:text-[13px] font-black uppercase tracking-widest transition-all duration-300 whitespace-nowrap ${
                   isActive
                     ? "text-primary scale-[1.02]"
                     : "text-muted-foreground hover:text-foreground"
@@ -167,12 +167,12 @@ export function FeaturesTabs({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
             >
               {FEATURES.map((feature, i) => (
                 <div
                   key={i}
-                  className={`group bg-card p-10 rounded-5xl border border-border hover:border-primary/20 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 relative overflow-hidden h-full flex flex-col ${
+                  className={`group bg-card p-6 md:p-10 rounded-3xl md:rounded-5xl border border-border hover:border-primary/20 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 relative overflow-hidden h-full flex flex-col ${
                     i === 0 || i === 5 ? "lg:col-span-2" : ""
                   }`}
                 >
@@ -204,15 +204,15 @@ export function FeaturesTabs({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="rounded-5xl border border-border bg-card p-10 lg:p-14 shadow-xl overflow-hidden"
+              className="rounded-3xl md:rounded-5xl border border-border bg-card p-6 md:p-10 lg:p-14 shadow-xl overflow-hidden"
             >
-              <div className="flex flex-col md:flex-row items-center justify-between gap-10 mb-12">
-                <div className="flex items-center gap-6">
-                  <div className="h-16 w-16 bg-primary rounded-2xl flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/20">
-                    <Database className="w-8 h-8" />
+              <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8 md:gap-10 mb-10 md:mb-12">
+                <div className="flex items-center gap-4 md:gap-6">
+                  <div className="h-12 w-12 md:h-16 md:w-16 bg-primary rounded-xl md:rounded-2xl flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/20 shrink-0">
+                    <Database className="w-6 h-6 md:w-8 md:h-8" />
                   </div>
                   <div>
-                    <h3 className="text-3xl font-black text-foreground tracking-tighter uppercase italic leading-none">Supabase Orbit</h3>
+                    <h3 className="text-xl md:text-3xl font-black text-foreground tracking-tighter uppercase italic leading-none">Supabase Orbit</h3>
                     <div className="flex items-center gap-2 mt-2">
                        <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 text-[10px] font-black uppercase tracking-widest border border-emerald-500/20">
                          <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -222,26 +222,26 @@ export function FeaturesTabs({
                   </div>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-4">
-                   <div className="bg-secondary border border-border rounded-2xl px-6 py-4 flex flex-col min-w-[140px]">
-                      <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1 leading-none">Your Identity</span>
-                      <span className="text-xl font-bold text-primary tracking-tight flex items-center gap-2 capitalize">
-                        <Lock className="w-4 h-4" />
+                <div className="flex flex-wrap items-center gap-3 md:gap-4 w-full lg:w-auto">
+                   <div className="bg-secondary border border-border rounded-xl md:rounded-2xl px-4 md:px-6 py-3 md:py-4 flex flex-col flex-1 lg:min-w-[140px]">
+                      <span className="text-[9px] md:text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1 leading-none">Your Identity</span>
+                      <span className="text-lg md:text-xl font-bold text-primary tracking-tight flex items-center gap-2 capitalize">
+                        <Lock className="w-3.5 h-3.5 md:w-4 md:h-4" />
                         {currentRole || "User"}
                       </span>
                    </div>
-                   <div className="bg-foreground border border-foreground rounded-2xl px-6 py-4 flex flex-col min-w-[140px] text-background">
-                      <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1 leading-none">Total Nodes</span>
-                      <span className="text-2xl font-black">{profiles?.length || 0}</span>
+                   <div className="bg-foreground border border-foreground rounded-xl md:rounded-2xl px-4 md:px-6 py-3 md:py-4 flex flex-col flex-1 lg:min-w-[140px] text-background">
+                      <span className="text-[9px] md:text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1 leading-none">Total Nodes</span>
+                      <span className="text-xl md:text-2xl font-black">{profiles?.length || 0}</span>
                    </div>
                 </div>
               </div>
 
-              <div className="bg-primary/5 border border-primary/10 rounded-3xl p-8 mb-10 flex gap-6 items-start">
-                  <Shield className="w-6 h-6 text-primary shrink-0 mt-1" />
+              <div className="bg-primary/5 border border-primary/10 rounded-2xl md:rounded-3xl p-6 md:p-8 mb-8 md:mb-10 flex gap-4 md:gap-6 items-start">
+                  <Shield className="w-5 h-5 md:w-6 md:h-6 text-primary shrink-0 mt-1" />
                   <div>
-                    <h4 className="text-lg font-bold text-foreground mb-2 tracking-tight uppercase">Row-Level Security Guard</h4>
-                    <p className="text-muted-foreground text-[15px] leading-relaxed font-medium">
+                    <h4 className="text-base md:text-lg font-bold text-foreground mb-1 md:mb-2 tracking-tight uppercase">Row-Level Security Guard</h4>
+                    <p className="text-muted-foreground text-[14px] md:text-[15px] leading-relaxed font-medium">
                       Your identity is encrypted by Supabase Auth and governed by strict RLS policies. 
                       Only <strong className="text-primary">ADMIN</strong> role can edit data in this cluster.
                     </p>
@@ -257,17 +257,17 @@ export function FeaturesTabs({
                 {profiles && profiles.length > 0 ? (
                   <div className="divide-y divide-border bg-card">
                     {profiles.map((p, i) => (
-                      <div key={i} className="px-8 py-6 flex items-center justify-between hover:bg-secondary transition-colors group">
-                        <div className="flex items-center gap-6">
-                          <div className="h-12 w-12 rounded-xl bg-secondary text-primary flex items-center justify-center font-black text-lg border border-border">
+                      <div key={i} className="px-4 md:px-8 py-4 md:py-6 flex items-center justify-between hover:bg-secondary transition-colors group gap-4">
+                        <div className="flex items-center gap-3 md:gap-6 min-w-0">
+                          <div className="h-10 w-10 md:h-12 md:w-12 rounded-lg md:rounded-xl bg-secondary text-primary flex items-center justify-center font-black text-base md:text-lg border border-border shrink-0">
                              {(p.full_name || "U")[0].toUpperCase()}
                           </div>
-                          <div className="flex flex-col">
-                            <span className="text-base font-bold text-foreground mb-1 tracking-tight">{p.full_name || "Anonymous identity"}</span>
-                            <span className="text-[10px] font-bold text-muted-foreground font-mono tracking-tight opacity-70 italic">{p.email || p.id?.slice(0, 24)}</span>
+                          <div className="flex flex-col min-w-0">
+                            <span className="text-sm md:text-base font-bold text-foreground mb-0.5 md:mb-1 tracking-tight truncate">{p.full_name || "Anonymous identity"}</span>
+                            <span className="text-[9px] md:text-[10px] font-bold text-muted-foreground font-mono tracking-tight opacity-70 italic truncate">{p.email || p.id?.slice(0, 24)}</span>
                           </div>
                         </div>
-                        <span className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border transition-all ${
+                        <span className={`px-2 md:px-4 py-1 rounded md:rounded-lg text-[9px] md:text-[10px] font-black uppercase tracking-widest border transition-all shrink-0 ${
                           p.role === 'admin' ? 'bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/20' : 'bg-card text-muted-foreground border-border'
                         }`}>
                           {p.role || "Standard"}
@@ -292,19 +292,19 @@ export function FeaturesTabs({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="rounded-5xl border border-border bg-card p-10 lg:p-14 shadow-xl"
+              className="rounded-3xl md:rounded-5xl border border-border bg-card p-6 md:p-10 lg:p-14 shadow-xl"
             >
-               <div className="flex flex-col lg:flex-row items-center justify-between gap-8 mb-12">
-                 <div className="flex items-center gap-6">
-                   <div className="h-16 w-16 bg-foreground rounded-2xl flex items-center justify-center text-background shadow-xl">
-                     <GitHubIcon className="w-8 h-8" />
+               <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8 mb-10 md:mb-12">
+                 <div className="flex items-center gap-4 md:gap-6">
+                   <div className="h-12 w-12 md:h-16 md:w-16 bg-foreground rounded-xl md:rounded-2xl flex items-center justify-center text-background shadow-xl shrink-0">
+                     <GitHubIcon className="w-6 h-6 md:w-8 md:h-8" />
                    </div>
                    <div>
-                     <h3 className="text-3xl font-black text-foreground tracking-tighter uppercase italic leading-none">GitHub Hub</h3>
-                     <span className="text-[10px] font-black uppercase text-muted-foreground tracking-widest mt-1">MCP Integration Core</span>
+                     <h3 className="text-xl md:text-3xl font-black text-foreground tracking-tighter uppercase italic leading-none">GitHub Hub</h3>
+                     <span className="text-[9px] md:text-[10px] font-black uppercase text-muted-foreground tracking-widest mt-1.5 block">MCP Integration Core</span>
                    </div>
                  </div>
-                 <a href="https://github.com/settings/tokens" target="_blank" rel="noreferrer" className="flex items-center gap-2 px-6 py-3 rounded-xl bg-secondary border border-border hover:bg-card transition-all text-xs font-black uppercase tracking-widest text-foreground hover:shadow-md">
+                 <a href="https://github.com/settings/tokens" target="_blank" rel="noreferrer" className="flex items-center gap-2 px-5 md:px-6 py-2.5 md:py-3 rounded-lg md:rounded-xl bg-secondary border border-border hover:bg-card transition-all text-[10px] md:text-xs font-black uppercase tracking-widest text-foreground hover:shadow-md w-full md:w-auto justify-center">
                     Deploy Connection <ExternalLink className="w-3 h-3 text-primary" />
                  </a>
                </div>
@@ -312,15 +312,15 @@ export function FeaturesTabs({
                {repos && repos.length > 0 ? (
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                    {repos.slice(0, 4).map((repo, i) => (
-                     <div key={i} className="group p-8 rounded-5xl border border-border bg-card hover:border-primary/20 transition-all duration-300 flex flex-col h-full relative overflow-hidden hover:shadow-2xl hover:shadow-primary/5">
-                        <div className="flex items-center justify-between mb-8">
-                           <div className="h-12 w-12 rounded-xl bg-secondary border border-border flex items-center justify-center text-muted-foreground group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-500 shadow-inner">
-                              <GitBranch className="w-6 h-6" />
+                     <div key={i} className="group p-6 md:p-8 rounded-3xl md:rounded-5xl border border-border bg-card hover:border-primary/20 transition-all duration-300 flex flex-col h-full relative overflow-hidden hover:shadow-2xl hover:shadow-primary/5">
+                        <div className="flex items-center justify-between mb-6 md:mb-8">
+                           <div className="h-10 w-10 md:h-12 md:w-12 rounded-lg md:rounded-xl bg-secondary border border-border flex items-center justify-center text-muted-foreground group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-500 shadow-inner">
+                              <GitBranch className="w-5 h-5 md:w-6 md:h-6" />
                            </div>
-                           <span className="text-[10px] font-black uppercase text-muted-foreground tracking-widest opacity-40">Active Repository</span>
+                           <span className="text-[9px] md:text-[10px] font-black uppercase text-muted-foreground tracking-widest opacity-40">Active Repository</span>
                         </div>
-                        <h4 className="text-xl font-bold text-foreground mb-3 tracking-tight group-hover:text-primary transition-colors uppercase">{repo.name}</h4>
-                        <p className="text-[15px] text-muted-foreground leading-relaxed font-semibold italic opacity-80 mb-8 h-12 line-clamp-2">
+                        <h4 className="text-lg md:text-xl font-bold text-foreground mb-2 md:mb-3 tracking-tight group-hover:text-primary transition-colors uppercase truncate">{repo.name}</h4>
+                        <p className="text-[13px] md:text-[15px] text-muted-foreground leading-relaxed font-semibold italic opacity-80 mb-6 md:mb-8 h-10 md:h-12 line-clamp-2">
                            {repo.description || "No project manifest description available."}
                         </p>
                         <div className="mt-auto pt-6 border-t border-border flex items-center justify-between">
