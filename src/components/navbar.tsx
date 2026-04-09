@@ -5,7 +5,18 @@ import { Menu, X } from "lucide-react";
 import { siteConfig } from "@/lib/config";
 import { signOut } from "@/lib/supabase/auth-service";
 import { useRouter } from "next/navigation";
-import { LogOut, User as UserIcon } from "lucide-react";
+import { LogOut, User as UserIcon, LayoutDashboard, Settings, ChevronDown } from "lucide-react";
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuLabel, 
+  DropdownMenuSeparator, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import Link from "next/link";
+
 
 
 
@@ -59,19 +70,51 @@ export function Navbar({ user }: { user: any }) {
         {/* CTA */}
         <div className="hidden md:flex items-center gap-3">
           {user ? (
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-muted-foreground flex items-center gap-1.5">
-                Welcome, <span className="font-semibold text-foreground truncate max-w-[80px] md:max-w-[150px] inline-block">{user.email?.split("@")[0]}</span>
-              </span>
-              <button 
-                onClick={handleSignOut}
-                className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-red-400 transition-colors"
-              >
-                <LogOut className="w-4 h-4" />
-                <span>Sign Out</span>
-              </button>
-            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center gap-2.5 bg-white/5 hover:bg-white/10 active:scale-[0.98] transition-all rounded-full px-1.5 py-1.5 md:pl-1.5 md:pr-3 border border-white/5 hover:border-white/10 group cursor-pointer">
+                {/* ── Avatar ── */}
+                <Avatar className="h-7 w-7 md:h-8 md:w-8 border border-white/20 shadow-lg ring-1 ring-white/5">
+                  <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-white font-black text-[10px] md:text-xs">
+                    {user.email?.[0].toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+
+                {/* ── Identity (Hidden on Mobile) ── */}
+                <div className="hidden md:flex items-center gap-2 max-w-[150px]">
+                  <span className="text-sm font-semibold text-foreground/90 group-hover:text-foreground transition-colors truncate">
+                    {user.email?.split("@")[0]}
+                  </span>
+                  <ChevronDown className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary transition-colors" />
+                </div>
+              </DropdownMenuTrigger>
+
+              <DropdownMenuContent className="w-64 mt-3">
+                <DropdownMenuLabel>
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-xs font-black text-foreground uppercase tracking-tight truncate">
+                      {user.email?.split("@")[0]}
+                    </p>
+                    <p className="text-[10px] text-muted-foreground font-mono truncate">{user.email}</p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => router.push("/dashboard")}>
+                  <LayoutDashboard className="mr-2 h-4 w-4 text-primary" />
+                  <span className="font-medium">Dashboard</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push("/dashboard?tab=settings")}>
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span className="font-medium">Settings</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleSignOut} className="text-red-400 hover:text-red-300 hover:bg-red-400/10 transition-colors">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span className="font-bold uppercase tracking-widest text-[10px]">Sign Out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           ) : (
+
             <>
               <a
                 href="/login"
@@ -114,17 +157,32 @@ export function Navbar({ user }: { user: any }) {
           ))}
           <div className="pt-3 border-t border-border mt-2">
             {user ? (
-              <div className="space-y-3">
-                <span className="block px-4 text-sm text-muted-foreground">
-                  Signed in as <span className="font-semibold text-foreground truncate max-w-[150px] inline-block align-bottom">{user.email?.split("@")[0]}</span>
-                </span>
-                <button 
-                  onClick={handleSignOut}
-                  className="flex w-full items-center gap-2 px-4 py-2 text-sm font-medium text-red-400 hover:bg-red-400/10 rounded-lg transition-colors"
-                >
-                  <LogOut className="w-4 h-4" />
-                  Sign Out
-                </button>
+              <div className="space-y-4 pt-2">
+                <div className="flex items-center gap-3 px-4 py-2 bg-secondary/50 rounded-xl border border-white/5">
+                  <Avatar className="h-10 w-10">
+                    <AvatarFallback>{user.email?.[0].toUpperCase()}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-xs font-black uppercase text-foreground truncate">{user.email?.split("@")[0]}</span>
+                    <span className="text-[10px] text-muted-foreground truncate">{user.email}</span>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <button 
+                    onClick={() => { router.push("/dashboard"); setMobileOpen(false); }}
+                    className="flex items-center justify-center gap-2 px-4 py-3 text-xs font-black uppercase tracking-widest bg-secondary text-foreground rounded-xl border border-white/5"
+                  >
+                    <LayoutDashboard className="w-4 h-4 text-primary" />
+                    Dashboard
+                  </button>
+                  <button 
+                    onClick={handleSignOut}
+                    className="flex items-center justify-center gap-2 px-4 py-3 text-xs font-black uppercase tracking-widest bg-red-400/10 text-red-400 rounded-xl border border-red-400/20"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Exit
+                  </button>
+                </div>
               </div>
             ) : (
               <a

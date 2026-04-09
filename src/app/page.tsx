@@ -54,12 +54,13 @@ export default async function Home() {
           {/* CTA Buttons */}
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
             <a
-              href="/login"
+              href={user ? "/dashboard" : "/login"}
               className="inline-flex items-center gap-2 px-8 py-3.5 text-sm font-semibold rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5"
             >
               Get Started Free
               <ArrowRight className="h-4 w-4" />
             </a>
+
             <a
               href={siteConfig.githubUrl}
               target="_blank"
@@ -98,8 +99,9 @@ export default async function Home() {
           <FeaturesTabs
             profiles={profiles}
             repos={repos}
-            profile={profile}
+            currentRole={profile?.role}
           />
+
         </div>
       </section>
 
@@ -196,11 +198,12 @@ export default async function Home() {
                 ))}
               </ul>
               <a
-                href="/login"
+                href={user ? "/dashboard" : "/login"}
                 className="block w-full text-center py-3 rounded-xl border border-border text-sm font-semibold text-foreground hover:bg-secondary transition-colors"
               >
                 Get Started
               </a>
+
             </div>
 
             {/* Pro — highlighted */}
@@ -231,11 +234,12 @@ export default async function Home() {
                 ))}
               </ul>
               <a
-                href="/login"
+                href={user ? "/dashboard" : "/login"}
                 className="block w-full text-center py-3 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 shadow-md shadow-primary/25 transition-all"
               >
                 Start Free Trial
               </a>
+
             </div>
 
             {/* Enterprise */}
@@ -285,12 +289,13 @@ export default async function Home() {
             MVPs faster than ever.
           </p>
           <a
-            href="/login"
+            href={user ? "/dashboard" : "/login"}
             className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-white text-primary font-semibold hover:bg-white/90 shadow-lg transition-all hover:-translate-y-0.5"
           >
             Start Building
             <ArrowRight className="h-4 w-4" />
           </a>
+
         </div>
       </section>
 

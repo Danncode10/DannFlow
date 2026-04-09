@@ -13,10 +13,8 @@ import {
   ChevronRight,
   Code,
   Lock,
-  User as UserIcon,
-  Settings,
 } from "lucide-react";
-import { ProfileForm } from "./profile-form";
+
 
 
 /**
@@ -79,12 +77,13 @@ function GitHubIcon({ className }: { className?: string }) {
 export function FeaturesTabs({
   profiles,
   repos,
-  profile,
+  currentRole,
 }: {
   profiles: any[];
   repos: any[];
-  profile?: any;
+  currentRole?: string;
 }) {
+
 
   const [active, setActive] = useState("features");
   const [hovered, setHovered] = useState<string | null>(null);
@@ -103,13 +102,8 @@ export function FeaturesTabs({
       icon: GitHubIcon,
       count: repos?.length || 0,
     },
-    ...(profile ? [{
-      id: "profile",
-      label: "Profile",
-      icon: UserIcon,
-      count: 1,
-    }] : []),
   ];
+
 
 
   return (
@@ -239,7 +233,7 @@ export function FeaturesTabs({
                       <span className="text-[9px] md:text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1 leading-none">Your Identity</span>
                       <span className="text-lg md:text-xl font-bold text-primary tracking-tight flex items-center gap-2 capitalize">
                         <Lock className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                        {profile?.role || "User"}
+                        {currentRole || "User"}
                       </span>
                    </div>
                    <div className="bg-foreground border border-foreground rounded-xl md:rounded-2xl px-4 md:px-6 py-3 md:py-4 flex flex-col flex-1 lg:min-w-[140px] text-background">
@@ -351,21 +345,9 @@ export function FeaturesTabs({
                )}
             </motion.div>
           )}
-          {/* Section: Profile Settings */}
-          {active === "profile" && profile && (
-            <motion.div
-              key="profile-view"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="rounded-3xl md:rounded-5xl border border-border bg-card p-6 md:p-10 lg:p-14 shadow-xl"
-            >
-              <ProfileForm profile={profile} />
-            </motion.div>
-          )}
-
         </AnimatePresence>
       </div>
     </div>
   );
 }
+
