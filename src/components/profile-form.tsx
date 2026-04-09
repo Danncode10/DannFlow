@@ -5,6 +5,7 @@ import { updateProfile } from "@/services/users";
 import { User, Calendar, CircleUser, Loader2, CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 export function ProfileForm({ profile }: { profile: any }) {
   const [success, setSuccess] = useState(false);
@@ -47,11 +48,14 @@ export function ProfileForm({ profile }: { profile: any }) {
       
       return { previousProfiles };
     },
-    onError: (err, newProfile, context) => {
+    onError: (err: any, newProfile, context) => {
       if (context?.previousProfiles) {
         queryClient.setQueryData(['profiles-db'], context.previousProfiles);
       }
-      console.error("Mutation failed: ", err);
+      toast.error(err.message || "Failed to mutate node. Rate limit exceeded.");
+    },
+    onSuccess: () => {
+      toast.success("Profile Node successfully updated in cluster!");
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['profiles-db'] });

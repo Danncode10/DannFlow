@@ -24,6 +24,7 @@ import { useInfiniteQuery } from "@tanstack/react-query"
 import { getVibeCheckDataPaginated } from "@/services/dashboard"
 import { useInView } from "react-intersection-observer"
 import { BentoSkeleton } from "./dashboard/bento-skeleton"
+import { useRouter, useSearchParams } from "next/navigation"
 
 import { PillTabs } from "@/components/ui/pill-tabs"
 
@@ -35,7 +36,16 @@ interface DashboardShellProps {
 }
 
 export function DashboardShell({ profiles, user, profile, repos }: DashboardShellProps) {
-  const [activeTab, setActiveTab] = React.useState("overview")
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const initialTab = searchParams.get("tab") || "overview"
+  const [activeTab, setActiveTabLocal] = React.useState(initialTab)
+  
+  const setActiveTab = (tab: string) => {
+    setActiveTabLocal(tab)
+    router.push(`/dashboard?tab=${tab}`, { scroll: false })
+  }
+
   const { ref, inView } = useInView()
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({

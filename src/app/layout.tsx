@@ -14,12 +14,25 @@ const geistMono = Geist_Mono({
 
 import { siteConfig } from "@/lib/config";
 import { QueryProvider } from "@/components/query-provider";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: `${siteConfig.name} — AI-Native Starter for Builders`,
-
-  description:
-    "The backbone template for websites, management systems, apps, and startup ideas. Built with Next.js, Supabase, and Tailwind CSS.",
+  description: "The backbone template for websites, management systems, apps, and startup ideas. Built with Next.js, Supabase, and Tailwind CSS.",
+  metadataBase: new URL(siteConfig.url),
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: siteConfig.url,
+    title: `${siteConfig.name} — AI-Native Starter for Builders`,
+    description: "The backbone template for websites, management systems, apps, and startup ideas. Built with Next.js, Supabase, and Tailwind CSS.",
+    siteName: siteConfig.name,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${siteConfig.name} — AI-Native Starter for Builders`,
+    description: "The backbone template for websites, management systems, apps, and startup ideas. Built with Next.js, Supabase, and Tailwind CSS.",
+  },
 };
 
 export default function RootLayout({
@@ -35,6 +48,14 @@ export default function RootLayout({
       <body className="min-h-screen flex flex-col antialiased">
         <QueryProvider>
           {children}
+          <Toaster 
+            position="bottom-right" 
+            theme="system" 
+            richColors 
+            toastOptions={{
+              className: "font-mono font-bold tracking-tight rounded-xl border border-border shadow-2xl",
+            }} 
+          />
         </QueryProvider>
       </body>
     </html>
