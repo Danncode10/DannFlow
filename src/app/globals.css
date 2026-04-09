@@ -4,18 +4,18 @@
   /* This tells the AI: "primary" IS your blue vibe */
   --color-primary: #2563eb;
   --color-primary-foreground: #ffffff;
-  
+
   --color-background: #ffffff;
   --color-foreground: #020617;
-  
+
   --color-card: #ffffff;
   --color-card-foreground: #020617;
-  
+
   --color-secondary: #f1f5f9;
   --color-border: #e2e8f0;
 
   /* Matches your [3rem] preference but as a reusable variable */
-  --radius-5xl: 3rem; 
+  --radius-5xl: 3rem;
 }
 
 @layer base {
@@ -23,10 +23,12 @@
     @apply bg-background text-foreground antialiased;
   }
 }
+
 @layer utilities {
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
+
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;

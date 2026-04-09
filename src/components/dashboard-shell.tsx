@@ -1,15 +1,15 @@
 "use client"
 
 import * as React from "react"
-import { 
-  Database, 
-  GitBranch, 
-  Terminal, 
-  Sparkles, 
-  User, 
-  Shield, 
-  Edit3, 
-  BookOpen, 
+import {
+  Database,
+  GitBranch,
+  Terminal,
+  Sparkles,
+  User,
+  Shield,
+  Edit3,
+  BookOpen,
   Activity,
   Code2,
   Lock,
@@ -145,7 +145,7 @@ export function DashboardShell({ profiles, user, profile, repos }: DashboardShel
           <h2 className="text-2xl font-semibold text-foreground">Database Orchestration</h2>
           <p className="text-sm text-muted-foreground">Real-time sync with <span className="font-mono text-foreground/80">public.profiles</span></p>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {displayProfiles.length > 0 ? (
             displayProfiles.map((p: any, i: number) => (
@@ -177,15 +177,15 @@ export function DashboardShell({ profiles, user, profile, repos }: DashboardShel
             </div>
           )}
         </div>
-        
+
         {isFetchingNextPage && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-             <BentoSkeleton />
-             <BentoSkeleton />
-             <BentoSkeleton />
+            <BentoSkeleton />
+            <BentoSkeleton />
+            <BentoSkeleton />
           </div>
         )}
-        
+
         <div ref={ref} className="h-4 w-full mt-4 flex items-center justify-center" />
       </TabsContent>
 
