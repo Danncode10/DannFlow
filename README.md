@@ -15,6 +15,14 @@ npm run dev
 
 *Note: Add your environment variables to `.env.local` and run `npm run update-types` to sync your schema. Use `npm run checkpoint` to snapshot your database.*
 
+## 🎨 Branding & Customization
+
+This template is designed to be rebranded in seconds:
+- **Global Config**: Modify `src/lib/config.ts` to change the site name, GitHub link, and description.
+- **Env Variables**: Set `NEXT_PUBLIC_SITE_NAME` and `NEXT_PUBLIC_GITHUB_URL` in `.env.local`.
+- **Favicon**: Replace `src/app/favicon.ico` with your brand's icon.
+
+
 ## 📚 In-Depth Documentation
 
 We moved all detailed explanations out of the README so you have a clean setup experience. For the specific "Vibe Way", checkout the `docs/` folder:

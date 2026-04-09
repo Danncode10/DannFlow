@@ -15,7 +15,7 @@ TIMESTAMP=$(date +%m-%d-%Y-%H-%M)
 FILENAME="supabase/backups/schema-$TIMESTAMP.sql"
 
 echo "--------------------------------------------------------"
-echo "🚀 DANNFLOW CHECKPOINT READY"
+echo "🚀 ${NEXT_PUBLIC_SITE_NAME:-DANNFLOW} CHECKPOINT READY"
 echo "--------------------------------------------------------"
 echo ""
 echo "Copy and paste the message below to your AI Agent:"
