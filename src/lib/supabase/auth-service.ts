@@ -21,3 +21,10 @@ export async function signInWithEmail(email: string, password: string) {
 
   return { success: true, requiresMFA: false };
 }
+
+export async function signOut() {
+  const client = createClient();
+  const { error } = await client.auth.signOut();
+  if (error) throw error;
+  return { success: true };
+}

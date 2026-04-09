@@ -1,4 +1,7 @@
+"use server";
+
 import { createClient } from '@/utils/supabase/server';
+
 
 export async function getAllProfiles() {
   const supabase = await createClient();
@@ -27,13 +30,39 @@ export async function getAllProfiles() {
   return profiles || [];
 }
 
-export async function updateProfile(id: string, updates: any) {
+export async function getProfile() {
   const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
+
+  const { data: profile, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .single();
+
+  if (error) throw error;
+  return profile;
+}
+
+export async function updateProfile(updates: {
+  full_name?: string;
+  age?: number;
+  birthday?: string;
+  gender?: string;
+}) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
   const { data, error } = await supabase
     .from('profiles')
     .update(updates)
-    .eq('id', id);
+    .eq('id', user.id)
+    .select()
+    .single();
     
   if (error) throw error;
   return data;
 }
+

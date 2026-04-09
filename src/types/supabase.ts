@@ -16,20 +16,32 @@ export type Database = {
     Tables: {
       profiles: {
         Row: {
+          age: number | null
+          birthday: string | null
           created_at: string
           email: string | null
+          full_name: string | null
+          gender: string | null
           id: string
           role: Database["public"]["Enums"]["user_role"] | null
         }
         Insert: {
+          age?: number | null
+          birthday?: string | null
           created_at?: string
           email?: string | null
+          full_name?: string | null
+          gender?: string | null
           id: string
           role?: Database["public"]["Enums"]["user_role"] | null
         }
         Update: {
+          age?: number | null
+          birthday?: string | null
           created_at?: string
           email?: string | null
+          full_name?: string | null
+          gender?: string | null
           id?: string
           role?: Database["public"]["Enums"]["user_role"] | null
         }
@@ -40,7 +52,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_admin: { Args: never; Returns: boolean }
     }
     Enums: {
       user_role: "admin" | "user"

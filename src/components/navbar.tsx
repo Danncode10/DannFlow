@@ -3,6 +3,10 @@
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { siteConfig } from "@/lib/config";
+import { signOut } from "@/lib/supabase/auth-service";
+import { useRouter } from "next/navigation";
+import { LogOut, User as UserIcon } from "lucide-react";
+
 
 
 const navLinks = [
@@ -14,6 +18,17 @@ const navLinks = [
 
 export function Navbar({ user }: { user: any }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const router = useRouter();
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      router.refresh();
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
+
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl">
@@ -44,9 +59,18 @@ export function Navbar({ user }: { user: any }) {
         {/* CTA */}
         <div className="hidden md:flex items-center gap-3">
           {user ? (
-            <span className="text-sm text-muted-foreground flex items-center gap-1.5">
-              Welcome, <span className="font-semibold text-foreground truncate max-w-[80px] md:max-w-[150px] inline-block">{user.email?.split("@")[0]}</span>
-            </span>
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-muted-foreground flex items-center gap-1.5">
+                Welcome, <span className="font-semibold text-foreground truncate max-w-[80px] md:max-w-[150px] inline-block">{user.email?.split("@")[0]}</span>
+              </span>
+              <button 
+                onClick={handleSignOut}
+                className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-red-400 transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Sign Out</span>
+              </button>
+            </div>
           ) : (
             <>
               <a
@@ -90,9 +114,18 @@ export function Navbar({ user }: { user: any }) {
           ))}
           <div className="pt-3 border-t border-border mt-2">
             {user ? (
-              <span className="block px-4 text-sm text-muted-foreground">
-                Signed in as <span className="font-semibold text-foreground truncate max-w-[150px] inline-block align-bottom">{user.email?.split("@")[0]}</span>
-              </span>
+              <div className="space-y-3">
+                <span className="block px-4 text-sm text-muted-foreground">
+                  Signed in as <span className="font-semibold text-foreground truncate max-w-[150px] inline-block align-bottom">{user.email?.split("@")[0]}</span>
+                </span>
+                <button 
+                  onClick={handleSignOut}
+                  className="flex w-full items-center gap-2 px-4 py-2 text-sm font-medium text-red-400 hover:bg-red-400/10 rounded-lg transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Sign Out
+                </button>
+              </div>
             ) : (
               <a
                 href="/login"

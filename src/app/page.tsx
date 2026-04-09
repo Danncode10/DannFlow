@@ -98,7 +98,7 @@ export default async function Home() {
           <FeaturesTabs
             profiles={profiles}
             repos={repos}
-            currentRole={profile?.role}
+            profile={profile}
           />
         </div>
       </section>
