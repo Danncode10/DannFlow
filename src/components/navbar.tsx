@@ -88,7 +88,7 @@ export function Navbar({ user }: { user: any }) {
                 </div>
               </DropdownMenuTrigger>
 
-              <DropdownMenuContent className="w-64 mt-3 bg-popover border-border rounded-xl shadow-xl">
+              <DropdownMenuContent className="w-64 mt-3 rounded-xl shadow-xl">
                 <DropdownMenuLabel>
                   <div className="flex flex-col space-y-1 py-1">
                     <p className="text-xs font-black text-foreground uppercase tracking-wider truncate">

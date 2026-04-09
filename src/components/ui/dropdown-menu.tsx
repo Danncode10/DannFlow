@@ -66,7 +66,7 @@ export function DropdownMenuContent({
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95, y: 10 }}
       className={cn(
-        "absolute right-0 mt-2 w-56 origin-top-right rounded-xl border border-white/10 bg-black/80 backdrop-blur-xl shadow-2xl z-50 overflow-hidden",
+        "absolute right-0 mt-2 w-56 origin-top-right rounded-xl border border-border bg-card text-card-foreground shadow-lg z-50 overflow-hidden",
         className
       )}
     >
@@ -91,7 +91,7 @@ export function DropdownMenuItem({
     <button
       onClick={onClick}
       className={cn(
-        "flex w-full items-center px-4 py-2.5 text-sm text-neutral-300 hover:bg-white/5 hover:text-white transition-colors",
+        "flex w-full items-center px-4 py-2.5 text-sm text-foreground hover:bg-accent hover:text-accent-foreground transition-colors",
         className
       )}
     >
@@ -101,10 +101,10 @@ export function DropdownMenuItem({
 }
 
 export function DropdownMenuSeparator({ className }: { className?: string }) {
-  return <div className={cn("h-px bg-white/5 my-1", className)} />
+  return <div className={cn("h-px bg-border my-1", className)} />
 }
 
 
 export function DropdownMenuLabel({ children }: { children: React.ReactNode }) {
-  return <div className="px-4 py-2 text-[10px] font-black uppercase tracking-widest text-neutral-500">{children}</div>
+  return <div className="px-4 py-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground">{children}</div>
 }
