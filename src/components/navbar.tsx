@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
+import { siteConfig } from "@/lib/config";
+
 
 const navLinks = [
   { label: "Home", href: "#home" },
@@ -22,7 +24,7 @@ export function Navbar({ user }: { user: any }) {
             <span className="text-sm font-bold text-primary-foreground">D</span>
           </div>
           <span className="text-lg font-bold tracking-tight text-foreground">
-            DannFlow
+            {siteConfig.name}
           </span>
         </a>
 
@@ -42,8 +44,8 @@ export function Navbar({ user }: { user: any }) {
         {/* CTA */}
         <div className="hidden md:flex items-center gap-3">
           {user ? (
-            <span className="text-sm text-muted-foreground">
-              Welcome, <span className="font-semibold text-foreground">{user.email?.split("@")[0]}</span>
+            <span className="text-sm text-muted-foreground flex items-center gap-1.5">
+              Welcome, <span className="font-semibold text-foreground truncate max-w-[80px] md:max-w-[150px] inline-block">{user.email?.split("@")[0]}</span>
             </span>
           ) : (
             <>
@@ -89,7 +91,7 @@ export function Navbar({ user }: { user: any }) {
           <div className="pt-3 border-t border-border mt-2">
             {user ? (
               <span className="block px-4 text-sm text-muted-foreground">
-                Signed in as <span className="font-semibold text-foreground">{user.email?.split("@")[0]}</span>
+                Signed in as <span className="font-semibold text-foreground truncate max-w-[150px] inline-block align-bottom">{user.email?.split("@")[0]}</span>
               </span>
             ) : (
               <a

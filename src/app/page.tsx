@@ -3,6 +3,8 @@ import { getUserProfile, getVibeCheckData, getGithubRepos } from "@/services/das
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { FeaturesTabs } from "@/components/features-tabs";
+import { siteConfig } from "@/lib/config";
+
 
 export default async function Home() {
   const session = await getUserProfile();
@@ -44,7 +46,7 @@ export default async function Home() {
           </h1>
 
           <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground leading-relaxed">
-            DannFlow is the AI-native starter template for websites, management
+            {siteConfig.name} is the AI-native starter template for websites, management
             systems, apps, and startup ideas. Stop building boilerplate — start
             building your vision.
           </p>
@@ -59,7 +61,7 @@ export default async function Home() {
               <ArrowRight className="h-4 w-4" />
             </a>
             <a
-              href="https://github.com/Danncode10"
+              href={siteConfig.githubUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-8 py-3.5 text-sm font-semibold rounded-xl border border-border text-foreground hover:bg-secondary transition-all"
@@ -279,7 +281,7 @@ export default async function Home() {
             Ready to build something great?
           </h2>
           <p className="text-primary-foreground/80 max-w-xl mx-auto mb-8">
-            Join builders who use DannFlow to ship websites, apps, and startup
+            Join builders who use {siteConfig.name} to ship websites, apps, and startup
             MVPs faster than ever.
           </p>
           <a

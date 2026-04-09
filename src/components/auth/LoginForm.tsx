@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { Mail, Lock, Loader2 } from 'lucide-react';
 import { signInWithEmail } from '@/lib/supabase/auth-service';
 import { useRouter } from 'next/navigation';
+import { siteConfig } from '@/lib/config';
+
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
@@ -36,7 +38,7 @@ export default function LoginForm() {
     <div className="w-full max-w-md mx-auto bg-zinc-900 border border-zinc-800 rounded-2xl p-8 shadow-2xl flex flex-col items-center">
       <div className="w-full text-center mb-8">
         <h2 className="text-2xl font-semibold text-zinc-100">Welcome Back</h2>
-        <p className="text-zinc-400 text-sm mt-2">Sign in to your DannFlow account</p>
+        <p className="text-zinc-400 text-sm mt-2">Sign in to your {siteConfig.name} account</p>
       </div>
 
       {error && (

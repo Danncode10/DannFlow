@@ -12,8 +12,11 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+import { siteConfig } from "@/lib/config";
+
 export const metadata: Metadata = {
-  title: "DannFlow — AI-Native Starter for Builders",
+  title: `${siteConfig.name} — AI-Native Starter for Builders`,
+
   description:
     "The backbone template for websites, management systems, apps, and startup ideas. Built with Next.js, Supabase, and Tailwind CSS.",
 };

@@ -17,6 +17,8 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { siteConfig } from "@/lib/config"
+
 
 interface DashboardShellProps {
   profiles: any[]
@@ -81,7 +83,7 @@ export function DashboardShell({ profiles, user, profile, repos }: DashboardShel
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">Indexed</div>
-              <p className="text-xs text-neutral-500 mt-1 font-mono">Repo: DannFlow-v2</p>
+              <p className="text-xs text-neutral-500 mt-1 font-mono">Repo: {siteConfig.name}-v2</p>
             </CardContent>
           </Card>
           <Card className="bg-neutral-900/40 border-neutral-800 hover:border-neutral-700 transition-colors group">
@@ -105,7 +107,7 @@ export function DashboardShell({ profiles, user, profile, repos }: DashboardShel
               <div className="space-y-4">
                 <h3 className="text-xl font-semibold text-neutral-200">The Software Engineering Edge</h3>
                 <p className="text-neutral-500 leading-relaxed max-w-4xl italic">
-                  "DannFlow is designed for architects who treat AI as a first-class collaborator. By structuring your project around the <span className="text-neutral-300">Trinity Model</span> (DB, Code, Terminal), you reduce cognitive load and maximize throughput. Every file exists for a reason, and every reason is typed."
+                  "{siteConfig.name} is designed for architects who treat AI as a first-class collaborator. By structuring your project around the <span className="text-neutral-300">Trinity Model</span> (DB, Code, Terminal), you reduce cognitive load and maximize throughput. Every file exists for a reason, and every reason is typed."
                 </p>
                 <div className="flex gap-4">
                   <Badge variant="secondary">Modular Architecture</Badge>
@@ -186,7 +188,7 @@ export function DashboardShell({ profiles, user, profile, repos }: DashboardShel
       <TabsContent value="docs" className="space-y-8 animate-in slide-in-from-bottom-2 duration-500">
         <div className="flex flex-col gap-1">
           <h2 className="text-2xl font-semibold text-neutral-200">Internal Documentation</h2>
-          <p className="text-sm text-neutral-500">The architectural wisdom of the DannFlow ecosystem</p>
+          <p className="text-sm text-neutral-500">The architectural wisdom of the {siteConfig.name} ecosystem</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
