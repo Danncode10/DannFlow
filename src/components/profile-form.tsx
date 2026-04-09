@@ -10,7 +10,7 @@ import { toast } from "sonner";
 export function ProfileForm({ profile }: { profile: any }) {
   const [success, setSuccess] = useState(false);
   const queryClient = useQueryClient();
-  
+
   const [formData, setFormData] = useState({
     full_name: profile?.full_name || "",
     age: profile?.age || "",
@@ -42,10 +42,10 @@ export function ProfileForm({ profile }: { profile: any }) {
     onMutate: async (newProfileData) => {
       await queryClient.cancelQueries({ queryKey: ['profiles-db'] });
       const previousProfiles = queryClient.getQueryData(['profiles-db']);
-      
+
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
-      
+
       return { previousProfiles };
     },
     onError: (err: any, newProfile, context) => {
@@ -75,7 +75,7 @@ export function ProfileForm({ profile }: { profile: any }) {
           <p className="text-sm text-muted-foreground mt-1 font-semibold italic">Manage your account identity and personal details.</p>
         </div>
         <Badge variant={profile?.role === 'admin' ? 'default' : 'secondary'} className="uppercase tracking-widest px-3 py-1">
-           {profile?.role || 'User'}
+          {profile?.role || 'User'}
         </Badge>
       </div>
 
@@ -143,21 +143,21 @@ export function ProfileForm({ profile }: { profile: any }) {
         </div>
 
         <div className="pt-4 border-t border-border mt-8 flex items-center justify-between gap-4">
-           <p className="text-[10px] text-muted-foreground font-semibold italic">Syncing with Supabase public.profiles cluster</p>
+          <p className="text-[10px] text-muted-foreground font-semibold italic">Syncing with Supabase public.profiles cluster</p>
           {/* Submit Button */}
-      <button
-        type="submit"
-        disabled={mutation.isPending}
-        className="w-full relative py-3 bg-primary text-primary-foreground font-black uppercase tracking-widest rounded-xl overflow-hidden hover:bg-primary/90 transition-all flex items-center justify-center gap-2 group"
-      >
-        {mutation.isPending ? (
-          <Loader2 className="w-5 h-5 animate-spin" />
-        ) : success ? (
-          <><CheckCircle2 className="w-5 h-5" /> Saved</>
-        ) : (
-          <><CheckCircle2 className="w-5 h-5 group-hover:scale-110 transition-transform" /> Save Node State</>
-        )}
-      </button>
+          <button
+            type="submit"
+            disabled={mutation.isPending}
+            className="w-full relative py-3 bg-primary text-primary-foreground font-black uppercase tracking-widest rounded-xl overflow-hidden hover:bg-primary/90 transition-all flex items-center justify-center gap-2 group"
+          >
+            {mutation.isPending ? (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            ) : success ? (
+              <><CheckCircle2 className="w-5 h-5" /> Saved</>
+            ) : (
+              <><CheckCircle2 className="w-5 h-5 group-hover:scale-110 transition-transform" /> Save Node State</>
+            )}
+          </button>
         </div>
       </form>
     </div>

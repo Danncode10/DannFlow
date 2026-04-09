@@ -48,13 +48,13 @@ export default function RootLayout({
       <body className="min-h-screen flex flex-col antialiased">
         <QueryProvider>
           {children}
-          <Toaster 
-            position="bottom-right" 
-            theme="system" 
-            richColors 
+          <Toaster
+            position="bottom-right"
+            theme="system"
+            richColors
             toastOptions={{
               className: "font-mono font-bold tracking-tight rounded-xl border border-border shadow-2xl",
-            }} 
+            }}
           />
         </QueryProvider>
       </body>

@@ -40,7 +40,7 @@ export function DashboardShell({ profiles, user, profile, repos }: DashboardShel
   const searchParams = useSearchParams()
   const initialTab = searchParams.get("tab") || "overview"
   const [activeTab, setActiveTabLocal] = React.useState(initialTab)
-  
+
   const setActiveTab = (tab: string) => {
     setActiveTabLocal(tab)
     router.push(`/dashboard?tab=${tab}`, { scroll: false })
