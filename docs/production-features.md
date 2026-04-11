@@ -20,3 +20,17 @@ This project isn't just a prototype shell; it is fully engineered for high scala
 ### 5. Native SEO Implementations
 - Automated `sitemap.ts` and `robots.ts` indexing endpoints.
 - Extensive OpenGraph metadata and structured Twitter schema maps connected right to `siteConfig` inside your layouts.
+
+### 6. Email Authentication (Gmail SMTP)
+When deploying on a free `*.vercel.app` domain, email providers like Resend often block outgoing mail to prevent spam. For a 100% free solution that allows up to 500 emails/day, use **Gmail SMTP**.
+
+#### Setup Steps:
+1.  **Google App Password**: 
+    - Enable **2-Step Verification** in your Google Account.
+    - Generate an [App Password](https://myaccount.google.com/apppasswords) and save the 16-character code.
+2.  **Supabase SMTP**: 
+    - Enable Custom SMTP in **Auth > Notifications > Email**.
+    - Host: `smtp.gmail.com` | Port: `465`
+    - User/Pass: Your Gmail & the 16-character App Password.
+3.  **Redirects**: 
+    - Set your **Site URL** and **Redirect URLs** (e.g., `/auth/callback`) in Supabase to your live Vercel link to ensure confirmation links work.

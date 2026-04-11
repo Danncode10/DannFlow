@@ -31,16 +31,16 @@ We moved all detailed explanations out of the README so you have a clean setup e
 - [The Holy Trinity](docs/the-holy-trinity.md) - Understand the "Eyes, Blueprint, and Action" file structure.
 - [MCP Trinity Setup](docs/mcp-setup.md) - Step-by-step guides for powering up the AI.
 - [The Time Machine Workflow](docs/backups-and-sync.md) - Learn the crucial loop of changing, syncing, and checkpointing.
-- [Production Ready Features](docs/production-features.md) - Details on integrated caching, Upstash rate limits, pagination, and SEO.
+- [Production Ready Features](docs/production-features.md) - Details on caching, rate limits, SEO, and **Gmail SMTP workaround for free auth**.
 
 ## 🚀 Zero-Cost Setup for Students
 
 If you want to use DannFlow without spinning up a live, paid Supabase instance right away, you can use our built-in SQL backups!
 
 1. Check out the `/supabase/backups/` folder.
-2. We supply the latest schema snapshot there (e.g. `schema-MM-DD-YYYY-HH-MM.sql` or `current-schema.sql`).
-3. You can run this file directly in your local Supabase instance using `npx supabase start` and push the backup schema locally.
-4. You get full type-safety and local DB logic without spending a dime.
+2. We supply the latest schema snapshot there (e.g. `schema-MM-DD-YYYY-HH-MM.sql`).
+3. Push the backup schema locally using `npx supabase start`.
+4. **Email Fix**: No custom domain? Use **Gmail SMTP** in your Supabase dashboard to send unlimited free auth emails even on a `.vercel.app` domain. See the [full guide here](docs/production-features.md#6-email-authentication-gmail-smtp).
 
 ---
 *Built for speed. Structured for Agents. Optimized for the Vibe.*
