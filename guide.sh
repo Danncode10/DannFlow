@@ -38,6 +38,7 @@ show_main() {
     echo -e "  ${BOLD}Step 3:${NC} ${GREEN}./guide.sh supabase${NC}  - Configure Supabase, Auth, and SMTP"
     echo -e "  ${BOLD}Step 4:${NC} ${GREEN}./guide.sh security${NC}  - Setup Gmail security notifications"
     echo -e "  ${BOLD}Step 5:${NC} ${GREEN}./guide.sh ready${NC}     - Commit your fresh DannFlow project"
+    echo -e "  ${BOLD}Step 6:${NC} ${GREEN}./guide.sh deploy${NC}    - Deploy to Vercel (Production)"
     echo ""
     echo -e "Other helpful commands:"
     echo -e "  ${CYAN}npm run dev${NC}          - Start development server"
@@ -67,11 +68,6 @@ show_env() {
     echo -e "   - ${CYAN}NEXT_PUBLIC_SITE_URL${NC}: Set to ${YELLOW}http://localhost:3000${NC} for now."
     echo -e "   - ${CYAN}NEXT_PUBLIC_GITHUB_URL${NC}: Link to your main repository.\n"
     
-    echo -e "${BOLD}4. Rate Limiting (Upstash Redis)${NC}"
-    echo -e "   Required for server-side protection in production:"
-    echo -e "   - ${CYAN}UPSTASH_REDIS_REST_URL${NC}"
-    echo -e "   - ${CYAN}NEXT_PUBLIC_UPSTASH_REDIS_REST_TOKEN${NC}\n"
-
     echo -e "📖 See ${BLUE}docs/production-features.md${NC} for more details on env vars."
     echo ""
 }
@@ -180,6 +176,29 @@ show_ready() {
     echo ""
 }
 
+# Deploy Command
+show_deploy() {
+    show_header
+    echo -e "${BOLD}🚀 Vercel Deployment Guide${NC}\n"
+    echo -e "Ready to show the world? Follow these steps to deploy on Vercel:\n"
+    
+    echo -e "${BOLD}1. Push to GitHub${NC}"
+    echo -e "   - Create a new repository on GitHub."
+    echo -e "   - Push your code: ${CYAN}git remote add origin ... && git push -u origin main${NC}\n"
+    
+    echo -e "${BOLD}2. Import to Vercel${NC}"
+    echo -e "   - Go to ${CYAN}vercel.com${NC} and import your repository."
+    echo -e "   - Add all environment variables from your ${YELLOW}.env.local${NC}."
+    
+    echo -e "${BOLD}3. Supabase Redirects (CRITICAL)${NC}"
+    echo -e "   - Once deployed, copy your Vercel URL (e.g., ${YELLOW}https://my-app.vercel.app${NC})."
+    echo -e "   - Go to ${CYAN}Supabase > Auth > URL Configuration${NC}."
+    echo -e "   - Add your Vercel URL to the ${BOLD}Redirect URLs${NC}.\n"
+    
+    echo -e "📖 Full Production Guide: ${BLUE}docs/production-features.md#7-vercel-deployment${NC}"
+    echo ""
+}
+
 # Init Command
 show_init() {
     show_header
@@ -255,5 +274,6 @@ case "$1" in
     vibe)     show_vibe ;;
     security) show_security ;;
     ready)    show_ready ;;
+    deploy)   show_deploy ;;
     *)        show_main ;;
 esac

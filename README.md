@@ -1,6 +1,6 @@
 # 🚀 DannFlow (2026 Edition)
 
-> **The High-Performance AI-Native SaaS Starter.** Built with TanStack caching, Upstash Redis rate-limiting, Mobile-First Bento UI, and designed strictly for Vibe Coding.
+> **The High-Performance AI-Native SaaS Starter.** Built with TanStack caching, Mobile-First Bento UI, and designed strictly for Vibe Coding.
 
 [![Next.js](https://img.shields.io/badge/Next.js-15+-black?logo=next.js)](https://nextjs.org)
 [![Supabase](https://img.shields.io/badge/Supabase-Auth%20%26%20DB-3ECF8E?logo=supabase)](https://supabase.com)
@@ -69,7 +69,6 @@ NEXT_PUBLIC_GITHUB_URL=https://github.com/yourusername
 | **Internal Docs Tab** | `dashboard-shell.tsx` | Live documentation for all features |
 | **TanStack Query** | `src/hooks/` | Client caching + optimistic mutations |
 | **Cursor Pagination** | `Dashboard > Database` | Infinite scroll via Intersection Observer |
-| **Rate Limiting** | `src/services/` | Upstash Redis sliding-window guard |
 | **Toast Notifications** | Global | Sonner — success, error, descriptions |
 | **Gmail SMTP** | Supabase Auth settings | Free auth emails on any domain |
 
@@ -220,7 +219,7 @@ DannFlow enforces the **AGENTS.md Standard**. When using AI tools:
 | [docs/the-holy-trinity.md](docs/the-holy-trinity.md) | Eyes, Blueprint, Action explained |
 | [docs/mcp-setup.md](docs/mcp-setup.md) | Step-by-step MCP tool setup |
 | [docs/backups-and-sync.md](docs/backups-and-sync.md) | Checkpoint & schema sync loop |
-| [docs/production-features.md](docs/production-features.md) | Gmail SMTP, rate limiting, SEO |
+| [docs/production-features.md](docs/production-features.md) | Gmail SMTP, SEO, and Toasts |
 
 ---
 
