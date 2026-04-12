@@ -279,8 +279,8 @@ export function DashboardShell({ profiles, user, profile, repos }: DashboardShel
 
       {/* 5. Security Tab */}
       <TabsContent value="security" className="animate-in slide-in-from-bottom-2 duration-500">
-        <div className="flex justify-center w-full py-16">
-          <Card className="bg-card text-card-foreground border border-border p-8 md:p-14 max-w-2xl w-full shadow-sm rounded-3xl relative overflow-hidden group">
+        <div className="flex justify-center w-full py-6 md:py-12">
+          <Card className="bg-card text-card-foreground border border-border p-6 md:p-12 max-w-2xl w-full shadow-sm rounded-3xl relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-blue-500 to-accent opacity-30" />
             <SecurityForm />
           </Card>
@@ -289,8 +289,8 @@ export function DashboardShell({ profiles, user, profile, repos }: DashboardShel
 
       {/* 6. Settings Tab */}
       <TabsContent value="settings" className="animate-in slide-in-from-bottom-2 duration-500">
-        <div className="flex justify-center w-full py-16">
-          <Card className="bg-card text-card-foreground border border-border p-8 md:p-14 max-w-2xl w-full shadow-sm rounded-3xl relative overflow-hidden group">
+        <div className="flex justify-center w-full py-6 md:py-12">
+          <Card className="bg-card text-card-foreground border border-border p-6 md:p-12 max-w-2xl w-full shadow-sm rounded-3xl relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-blue-500 to-accent opacity-30" />
             <ProfileForm profile={profile} />
           </Card>
