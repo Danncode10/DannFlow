@@ -71,7 +71,7 @@ export function ProfileForm({ profile }: { profile: any }) {
   return (
     <div className="w-full max-w-md mx-auto md:max-w-2xl">
       {/* ── Header — stacks on mobile, row on sm+ ── */}
-      <div className="flex flex-col gap-3 mb-8 sm:flex-row sm:items-start sm:justify-between">
+      <div className="flex flex-col gap-3 mb-10 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h3 className="text-2xl font-black text-foreground tracking-tighter uppercase italic leading-tight">
             Profile Settings
@@ -88,8 +88,8 @@ export function ProfileForm({ profile }: { profile: any }) {
         </Badge>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
           {/* Full Name */}
           <div className="space-y-2">
@@ -162,7 +162,7 @@ export function ProfileForm({ profile }: { profile: any }) {
         </div>
 
         {/* ── Footer / Submit ── */}
-        <div className="pt-5 border-t border-border mt-2 flex flex-col gap-3">
+        <div className="pt-6 border-t border-border mt-4 flex flex-col gap-4">
           <p className="text-[10px] text-muted-foreground font-mono tracking-widest uppercase">
             Syncing with Supabase public.profiles
           </p>

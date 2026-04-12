@@ -116,7 +116,7 @@ export function SecurityForm() {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-6">
         {/* Current password */}
         <PasswordField
           label="Current Password"
@@ -130,7 +130,7 @@ export function SecurityForm() {
         />
 
         {/* Divider */}
-        <div className="border-t border-border pt-1" />
+        <div className="border-t border-border pt-2" />
 
         {/* New password */}
         <PasswordField
@@ -160,7 +160,7 @@ export function SecurityForm() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full h-14 bg-primary text-primary-foreground font-black uppercase tracking-widest rounded-2xl hover:bg-primary/90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-sm shadow-primary/20"
+          className="w-full h-14 mt-2 bg-primary text-primary-foreground font-black uppercase tracking-widest rounded-2xl hover:bg-primary/90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-sm shadow-primary/20"
         >
           {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : null}
           {loading ? "Verifying & Updating..." : "Update Password"}

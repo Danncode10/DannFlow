@@ -233,47 +233,116 @@ export function DashboardShell({ profiles, user, profile, repos }: DashboardShel
           <p className="text-sm text-muted-foreground">The architectural wisdom of the {siteConfig.name} ecosystem</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+          {/* Trinity Model */}
           <Card className="bg-card text-card-foreground border border-border shadow-sm rounded-3xl">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Shield className="w-5 h-5 text-primary" />
                 The Trinity Model
               </CardTitle>
-              <CardDescription>Understanding Eyes, Blueprint, and Action</CardDescription>
+              <CardDescription>Eyes, Blueprint, and Action</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4 text-sm text-muted-foreground leading-relaxed">
-              <p>
-                To maintain high velocity, we divide our system into three layers:
-              </p>
-              <ul className="list-disc list-inside space-y-2 marker:text-foreground/50">
-                <li><span className="text-foreground font-medium tracking-tight">The Eyes:</span> Typed definitions that mirror your cloud database state.</li>
-                <li><span className="text-foreground font-medium tracking-tight">The Blueprint:</span> Timestamped SQL savepoints for instant disaster recovery.</li>
-                <li><span className="text-foreground font-medium tracking-tight">The Action:</span> Pure business logic isolated from UI components.</li>
+            <CardContent className="space-y-3 text-sm text-muted-foreground leading-relaxed">
+              <ul className="space-y-2 marker:text-foreground/50">
+                <li><span className="text-foreground font-semibold">The Eyes:</span> Typed definitions that mirror your cloud database state via <code className="text-[11px] bg-secondary px-1.5 py-0.5 rounded font-mono">src/types/supabase.ts</code>.</li>
+                <li><span className="text-foreground font-semibold">The Blueprint:</span> Timestamped SQL savepoints in <code className="text-[11px] bg-secondary px-1.5 py-0.5 rounded font-mono">supabase/backups/</code> for disaster recovery.</li>
+                <li><span className="text-foreground font-semibold">The Action:</span> Pure business logic isolated in <code className="text-[11px] bg-secondary px-1.5 py-0.5 rounded font-mono">src/services/</code>, never in UI components.</li>
               </ul>
             </CardContent>
           </Card>
 
+          {/* Vibe Coding Workflow */}
           <Card className="bg-card text-card-foreground border border-border shadow-sm rounded-3xl">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Terminal className="w-5 h-5 text-primary" />
                 Vibe Coding Workflow
               </CardTitle>
-              <CardDescription>How to dance with the AI architect</CardDescription>
+              <CardDescription>How to work with the AI architect</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4 text-sm text-muted-foreground leading-relaxed">
-              <p>
-                1. **Check Point**: Always run `npm run checkpoint` before big changes.
-              </p>
-              <p>
-                2. **Sync Types**: After modifying the database, run `npm run update-types`.
-              </p>
-              <p>
-                3. **Diagnostic**: Use the Diagnostic Protocol in `AGENTS.md` whenever tools feel disconnected.
-              </p>
+            <CardContent className="space-y-3 text-sm text-muted-foreground leading-relaxed">
+              <ul className="space-y-2">
+                <li><span className="text-foreground font-semibold">1. Check Point:</span> Run <code className="text-[11px] bg-secondary px-1.5 py-0.5 rounded font-mono">npm run checkpoint</code> before big changes.</li>
+                <li><span className="text-foreground font-semibold">2. Sync Types:</span> After any schema change, run <code className="text-[11px] bg-secondary px-1.5 py-0.5 rounded font-mono">npm run update-types</code>.</li>
+                <li><span className="text-foreground font-semibold">3. Diagnostic:</span> Use the MCP Diagnostic Protocol in <code className="text-[11px] bg-secondary px-1.5 py-0.5 rounded font-mono">AGENTS.md</code> when tools disconnect.</li>
+              </ul>
             </CardContent>
           </Card>
+
+          {/* Password Recovery Flow */}
+          <Card className="bg-card text-card-foreground border border-border shadow-sm rounded-3xl">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Edit3 className="w-5 h-5 text-primary" />
+                Password Recovery
+              </CardTitle>
+              <CardDescription>Forgot password end-to-end flow</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm text-muted-foreground leading-relaxed">
+              <ul className="space-y-2">
+                <li><span className="text-foreground font-semibold">/forgot-password:</span> Collects email and triggers Supabase <code className="text-[11px] bg-secondary px-1.5 py-0.5 rounded font-mono">resetPasswordForEmail</code> via Gmail SMTP.</li>
+                <li><span className="text-foreground font-semibold">/reset-password:</span> Session-guarded — only renders the form if a valid Supabase auth token is present. Expired links show a clear "Link Expired" state.</li>
+                <li><span className="text-foreground font-semibold">Toasts:</span> Sonner notifications confirm every step of the flow.</li>
+              </ul>
+            </CardContent>
+          </Card>
+
+          {/* Security Settings */}
+          <Card className="bg-card text-card-foreground border border-border shadow-sm rounded-3xl">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Lock className="w-5 h-5 text-primary" />
+                Security Settings
+              </CardTitle>
+              <CardDescription>Re-authentication & password management</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm text-muted-foreground leading-relaxed">
+              <ul className="space-y-2">
+                <li><span className="text-foreground font-semibold">Re-auth Gate:</span> Dashboard password changes require the current password first — verified via a silent <code className="text-[11px] bg-secondary px-1.5 py-0.5 rounded font-mono">signInWithPassword</code> before <code className="text-[11px] bg-secondary px-1.5 py-0.5 rounded font-mono">updateUser</code>.</li>
+                <li><span className="text-foreground font-semibold">Visibility Toggles:</span> All password fields have Eye/EyeOff icons for improved UX.</li>
+                <li><span className="text-foreground font-semibold">Gmail Alert:</span> Enable the "Password Change" Supabase email template to trigger automatic Gmail security notifications on every successful update.</li>
+              </ul>
+            </CardContent>
+          </Card>
+
+          {/* Gmail SMTP */}
+          <Card className="bg-card text-card-foreground border border-border shadow-sm rounded-3xl">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <User className="w-5 h-5 text-primary" />
+                Gmail SMTP Setup
+              </CardTitle>
+              <CardDescription>Free email authentication for production</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm text-muted-foreground leading-relaxed">
+              <ul className="space-y-2">
+                <li><span className="text-foreground font-semibold">App Password:</span> Enable 2-Step Verification in Google, then generate a 16-char App Password.</li>
+                <li><span className="text-foreground font-semibold">Supabase SMTP:</span> Host <code className="text-[11px] bg-secondary px-1.5 py-0.5 rounded font-mono">smtp.gmail.com</code>, Port <code className="text-[11px] bg-secondary px-1.5 py-0.5 rounded font-mono">465</code>.</li>
+                <li><span className="text-foreground font-semibold">Templates:</span> Enable "Password Change" and "Reset Password" templates in Auth → Email Templates.</li>
+              </ul>
+            </CardContent>
+          </Card>
+
+          {/* Performance */}
+          <Card className="bg-card text-card-foreground border border-border shadow-sm rounded-3xl">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Activity className="w-5 h-5 text-primary" />
+                Performance Stack
+              </CardTitle>
+              <CardDescription>Caching, pagination & rate limiting</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm text-muted-foreground leading-relaxed">
+              <ul className="space-y-2">
+                <li><span className="text-foreground font-semibold">TanStack Query:</span> Client-side caching with optimistic mutations — zero redundant fetches on tab navigation.</li>
+                <li><span className="text-foreground font-semibold">Cursor Pagination:</span> <code className="text-[11px] bg-secondary px-1.5 py-0.5 rounded font-mono">useInfiniteQuery</code> + Intersection Observer for infinite scrolling.</li>
+                <li><span className="text-foreground font-semibold">Rate Limiting:</span> Upstash Redis sliding-window via <code className="text-[11px] bg-secondary px-1.5 py-0.5 rounded font-mono">verifyRateLimit()</code> on all server actions.</li>
+              </ul>
+            </CardContent>
+          </Card>
+
         </div>
       </TabsContent>
 
