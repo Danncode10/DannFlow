@@ -22,11 +22,14 @@ echo -e "${NC}"
 echo -e "${BOLD}Welcome to the DannFlow 'Elite' Installer!${NC}"
 echo -e "The high-performance AI-Native Next.js SaaS Starter.\n"
 
-# 1. Prompt for Project Name
-read -p "Enter your project name [my-dannflow-app]: " folder_name < /dev/tty
-folder_name=${folder_name:-"my-dannflow-app"}
+# 1. Prompt for App Name
+read -p "Enter your App Name [My DannFlow App]: " app_name < /dev/tty
+app_name=${app_name:-"My DannFlow App"}
 
-echo -e "\n🚀 ${CYAN}Initializing $folder_name...${NC}\n"
+# Derive slug for the folder name
+folder_name=$(echo "$app_name" | tr '[:upper:]' '[:lower:]' | sed 's/ /-/g' | sed 's/[^a-z0-9-]//g')
+
+echo -e "\n🚀 ${CYAN}Creating $app_name in $folder_name...${NC}\n"
 
 # 2. Clone the Repository
 if git clone https://github.com/Danncode10/DannFlow "$folder_name"; then
@@ -47,7 +50,7 @@ cp .env.example .env.local
 # This handles the branding and resetting of GIT history for the user.
 echo -e "✨ ${CYAN}Running project initialization...${NC}"
 chmod +x guide.sh
-./guide.sh init
+./guide.sh init "$app_name"
 
 echo -e "\n${GREEN}${BOLD}Setup Complete!${NC}"
 echo -e "Your project is ready in: ${CYAN}$folder_name${NC}"

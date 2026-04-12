@@ -206,14 +206,22 @@ show_deploy() {
 
 # Init Command
 show_init() {
+    local passed_name="$1"
+    
     show_header
     echo -e "${RED}${BOLD}⚠️  CRITICAL: RUN ONLY ONCE${NC}"
     echo -e "${RED}This command will rebrand your project and PERMANENTLY REMOVE${NC}"
     echo -e "${RED}all existing Git history to start your own fresh repository.${NC}\n"
     
     echo -e "${BOLD}🚀 Project Rebranding & Initialization${NC}"
-    read -p "Enter your App Name [my-app]: " input_name < /dev/tty
-    app_name=${input_name:-"my-app"}
+    
+    if [ -n "$passed_name" ]; then
+        app_name="$passed_name"
+        echo -e "Using App Name: ${GREEN}${BOLD}$app_name${NC}"
+    else
+        read -p "Enter your App Name [my-app]: " input_name < /dev/tty
+        app_name=${input_name:-"my-app"}
+    fi
 
     # Format for package.json (lowercase, dashes for spaces)
     pkg_name=$(echo "$app_name" | tr '[:upper:]' '[:lower:]' | sed 's/ /-/g' | sed 's/[^a-z0-9-]//g')
@@ -273,7 +281,7 @@ show_init() {
 
 # Routing logic
 case "$1" in
-    init)     show_init ;;
+    init)     show_init "$2" ;;
     env)      show_env ;;
     supabase) show_supabase ;;
     vibe)     show_vibe ;;
