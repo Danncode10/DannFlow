@@ -15,6 +15,9 @@ function ResetPasswordForm() {
   const [sessionLoading, setSessionLoading] = useState(true);
   const [hasSession, setHasSession] = useState(false);
   
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  
   const router = useRouter();
   const searchParams = useSearchParams();
   const errorCode = searchParams.get('error');
@@ -122,14 +125,21 @@ function ResetPasswordForm() {
             <Lock className="h-4 w-4 text-neutral-500 group-focus-within:text-primary transition-colors" />
           </div>
           <input 
-            type="password" 
+            type={showPassword ? 'text' : 'password'} 
             placeholder="New Password" 
-            className="w-full pl-10 pr-4 py-3 bg-neutral-900/50 border border-neutral-800 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all font-mono text-sm placeholder:text-neutral-600"
+            className="w-full pl-10 pr-12 py-3 bg-neutral-900/50 border border-neutral-800 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all font-mono text-sm placeholder:text-neutral-600"
             value={password}
             onChange={e => setPassword(e.target.value)}
             required
             autoComplete="new-password"
           />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute inset-y-0 right-0 pr-4 flex items-center text-neutral-500 hover:text-neutral-300 transition-colors"
+          >
+            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+          </button>
         </div>
 
         <div className="relative group">
@@ -137,14 +147,21 @@ function ResetPasswordForm() {
             <Lock className="h-4 w-4 text-neutral-500 group-focus-within:text-primary transition-colors" />
           </div>
           <input 
-            type="password" 
+            type={showConfirmPassword ? 'text' : 'password'} 
             placeholder="Confirm New Password" 
-            className="w-full pl-10 pr-4 py-3 bg-neutral-900/50 border border-neutral-800 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all font-mono text-sm placeholder:text-neutral-600"
+            className="w-full pl-10 pr-12 py-3 bg-neutral-900/50 border border-neutral-800 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all font-mono text-sm placeholder:text-neutral-600"
             value={confirmPassword}
             onChange={e => setConfirmPassword(e.target.value)}
             required
             autoComplete="new-password"
           />
+          <button
+            type="button"
+            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+            className="absolute inset-y-0 right-0 pr-4 flex items-center text-neutral-500 hover:text-neutral-300 transition-colors"
+          >
+            {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+          </button>
         </div>
         
         <button 
