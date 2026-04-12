@@ -80,7 +80,7 @@ show_supabase() {
 
     echo -e "${BOLD}2. AI Orchestration (Vibe Coding)${NC}"
     echo -e "   If your Supabase MCP is connected, copy and paste this to your agent:"
-    echo -e "   ${CYAN}\"Hey, I've created a new project on the Supabase website. Ask me for the Project Reference ID. Once I provide it, automatically find the latest SQL file in supabase/backups/, read it, and execute it using the Supabase MCP to restore the full schema. Don't ask for permission for each table—just set it up so it matches the DannFlow template exactly.\"${NC}\n"
+    echo -e "   ${CYAN}\"I've created a new Supabase project. Ask me for the Project Reference ID. Once provided, execute this protocol:\n\n1. Target: Connect to the new project via Supabase MCP.\n2. Execution: Locate the latest .sql backup in supabase/backups/. Read its content and execute it against the new project.\n3. Verification (MANDATORY): Immediately after execution, run an MCP command to list all tables and functions in the public schema.\n4. Report: Compare the results with the DannFlow architecture requirements.\n\nDo not report success until you can physically see the 'profiles' table and 'handle_new_user' function in the live database. If the list is empty, troubleshoot the connection and try again.\"${NC}\n"
 
     echo -e "${BOLD}3. Google App Password (SMTP)${NC}"
     echo -e "   Enable 2-Step Verification in Google, then generate an ${YELLOW}App Password${NC}."

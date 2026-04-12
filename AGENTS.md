@@ -44,6 +44,12 @@ To fix:
     2. Ask for the Project Name and Organization ID.
     3. Check costs using `get_cost` and `confirm_cost` before `create_project`.
     4. After initialization, read the latest backup from `supabase/backups/` and apply it using `apply_migration`.
+-   **Project Initialization & Migration**: If a user provides a Project ID for a new project:
+    1. Locate the latest `.sql` backup in `supabase/backups/`.
+    2. Read and apply the schema using the Supabase MCP.
+    3. **MANDATORY Verification**: After execution, list tables and functions in the `public` schema.
+    4. Confirm existence of core architecture (`profiles` table, `handle_new_user` function).
+    5. Do not report success until verification is complete.
 -   **Be concise and proactive**. If you see an obvious optimization that fits the application's clean aesthetic, suggest it.
 
 ## Code Architecture Rules
