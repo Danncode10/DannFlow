@@ -1,93 +1,125 @@
 "use client";
 
 import { useState } from 'react';
-import { createClient } from '@/utils/supabase/client';
+import { signInWithEmail, signUpWithEmail } from '@/services/auth';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+import Link from 'next/link';
+import { Mail, Lock, Loader2 } from 'lucide-react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const router = useRouter();
-  const supabase = createClient();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
     
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) setError(error.message);
-    else {
-      router.push('/');
-      router.refresh();
+    try {
+      const result = await signInWithEmail(email, password);
+      
+      if (result.requiresMFA) {
+        toast.info('MFA Required', { description: 'Please enter your verification code.' });
+        router.push('/auth/mfa');
+      } else {
+        toast.success('Login successful!', { description: 'Welcome back to Mission Control.' });
+        router.push('/dashboard');
+        router.refresh();
+      }
+    } catch (err: any) {
+      toast.error('Authentication Failed', { description: err.message || 'Invalid credentials' });
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleSignUp = async () => {
     setLoading(true);
-    setError('');
     
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
-
-    if (error) setError(error.message);
-    else {
-      alert('Signup logic triggered! Going back to dashboard to check live database changes.');
-      router.push('/');
-      router.refresh();
+    try {
+      await signUpWithEmail(email, password);
+      toast.success('Check your email!', { description: 'We have sent a confirmation link to your inbox.' });
+    } catch (err: any) {
+      toast.error('Signup Failed', { description: err.message });
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-neutral-950 text-neutral-50 font-sans">
-      <form onSubmit={handleLogin} className="w-full max-w-sm bg-[#0a0a0a] border border-neutral-800 p-8 rounded-2xl shadow-2xl flex flex-col gap-4 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-neutral-950 text-neutral-50 font-sans px-4">
+      <div className="w-full max-w-sm bg-[#0a0a0a] border border-neutral-800 p-8 rounded-2xl shadow-2xl flex flex-col gap-6 relative overflow-hidden">
         
-        <div className="absolute -top-10 -right-10 w-40 h-40 bg-green-500/5 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="absolute -top-10 -right-10 w-40 h-40 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
 
-        <h1 className="text-2xl font-mono mb-4 text-center z-10 text-neutral-200">Authenticate</h1>
-        
-        {error && <div className="p-3 bg-red-900/50 text-red-200 text-sm font-mono rounded-lg border border-red-800 z-10">{error}</div>}
-
-        <div className="z-10 flex flex-col gap-3">
-          <input 
-            type="email" 
-            placeholder="Email address" 
-            className="w-full px-4 py-3 bg-neutral-900/50 border border-neutral-800 rounded-lg focus:outline-none focus:border-green-500/50 focus:ring-1 focus:ring-green-500/50 transition-all font-mono text-sm placeholder:text-neutral-600"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            required
-          />
-          
-          <input 
-            type="password" 
-            placeholder="Password" 
-            className="w-full px-4 py-3 bg-neutral-900/50 border border-neutral-800 rounded-lg focus:outline-none focus:border-green-500/50 focus:ring-1 focus:ring-green-500/50 transition-all font-mono text-sm placeholder:text-neutral-600"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            required
-          />
+        <div className="flex flex-col gap-2 text-center z-10">
+          <h1 className="text-2xl font-black tracking-tighter uppercase italic">Authenticate</h1>
+          <p className="text-muted-foreground text-xs font-semibold italic">Secure access to Mission Control</p>
         </div>
         
-        <div className="flex flex-col gap-2 mt-4 z-10">
-          <button type="submit" disabled={loading} className="w-full py-3 bg-neutral-200 text-neutral-900 font-mono font-bold text-sm rounded-lg hover:bg-white transition-colors">
-            {loading ? 'Processing...' : 'Log In'}
-          </button>
+        <form onSubmit={handleLogin} className="flex flex-col gap-4 z-10">
+          <div className="flex flex-col gap-3">
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Mail className="h-4 w-4 text-neutral-500 group-focus-within:text-primary transition-colors" />
+              </div>
+              <input 
+                type="email" 
+                placeholder="Email address" 
+                className="w-full pl-10 pr-4 py-3 bg-neutral-900/50 border border-neutral-800 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all font-mono text-sm placeholder:text-neutral-600"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Lock className="h-4 w-4 text-neutral-500 group-focus-within:text-primary transition-colors" />
+              </div>
+              <input 
+                type="password" 
+                placeholder="Password" 
+                className="w-full pl-10 pr-4 py-3 bg-neutral-900/50 border border-neutral-800 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all font-mono text-sm placeholder:text-neutral-600"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                required
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-end">
+            <Link 
+              href="/forgot-password" 
+              className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors"
+            >
+              Forgot Password?
+            </Link>
+          </div>
           
-          <button type="button" onClick={handleSignUp} disabled={loading} className="w-full py-3 border border-neutral-800 font-mono font-medium text-sm text-neutral-400 rounded-lg hover:bg-neutral-800 hover:text-neutral-200 transition-colors">
-            Push Sign Up (Test Trigger)
-          </button>
-        </div>
-      </form>
+          <div className="flex flex-col gap-3 mt-2">
+            <button 
+              type="submit" 
+              disabled={loading} 
+              className="w-full py-3 bg-foreground text-background font-mono font-bold text-sm rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+            >
+              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+              {loading ? 'Processing...' : 'Log In'}
+            </button>
+            
+            <button 
+              type="button" 
+              onClick={handleSignUp} 
+              disabled={loading} 
+              className="w-full py-3 border border-neutral-800 font-mono font-medium text-sm text-neutral-400 rounded-xl hover:bg-neutral-800 hover:text-neutral-200 transition-colors"
+            >
+              Sign Up
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

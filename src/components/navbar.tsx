@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { siteConfig } from "@/lib/config";
-import { signOut } from "@/lib/supabase/auth-service";
+import { signOut } from "@/services/auth";
 import { useRouter } from "next/navigation";
 import { LogOut, User as UserIcon, LayoutDashboard, Settings, ChevronDown } from "lucide-react";
 import { 

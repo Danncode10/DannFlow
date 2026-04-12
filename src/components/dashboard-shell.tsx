@@ -13,7 +13,8 @@ import {
   Activity,
   Code2,
   Lock,
-  Settings
+  Settings,
+  ShieldCheck
 } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -25,6 +26,7 @@ import { getVibeCheckDataPaginated } from "@/services/dashboard"
 import { useInView } from "react-intersection-observer"
 import { BentoSkeleton } from "./dashboard/bento-skeleton"
 import { useRouter, useSearchParams } from "next/navigation"
+import { SecurityForm } from "./security-form"
 
 import { PillTabs } from "@/components/ui/pill-tabs"
 
@@ -69,6 +71,7 @@ export function DashboardShell({ profiles, user, profile, repos }: DashboardShel
     { id: "database", label: "Database", icon: Database },
     { id: "code", label: "Code", icon: Code2 },
     { id: "docs", label: "Docs", icon: BookOpen },
+    { id: "security", label: "Security", icon: ShieldCheck },
     { id: "settings", label: "Settings", icon: Settings },
   ]
 
@@ -274,7 +277,17 @@ export function DashboardShell({ profiles, user, profile, repos }: DashboardShel
         </div>
       </TabsContent>
 
-      {/* 5. Settings Tab */}
+      {/* 5. Security Tab */}
+      <TabsContent value="security" className="animate-in slide-in-from-bottom-2 duration-500">
+        <div className="flex justify-center w-full py-16">
+          <Card className="bg-card text-card-foreground border border-border p-8 md:p-14 max-w-2xl w-full shadow-sm rounded-3xl relative overflow-hidden group">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-blue-500 to-accent opacity-30" />
+            <SecurityForm />
+          </Card>
+        </div>
+      </TabsContent>
+
+      {/* 6. Settings Tab */}
       <TabsContent value="settings" className="animate-in slide-in-from-bottom-2 duration-500">
         <div className="flex justify-center w-full py-16">
           <Card className="bg-card text-card-foreground border border-border p-8 md:p-14 max-w-2xl w-full shadow-sm rounded-3xl relative overflow-hidden group">

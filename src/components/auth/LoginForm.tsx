@@ -2,9 +2,10 @@
 
 import { useState } from 'react';
 import { Mail, Lock, Loader2 } from 'lucide-react';
-import { signInWithEmail } from '@/lib/supabase/auth-service';
+import { signInWithEmail } from '@/services/auth';
 import { useRouter } from 'next/navigation';
 import { siteConfig } from '@/lib/config';
+import Link from 'next/link';
 
 
 export default function LoginForm() {
@@ -80,6 +81,15 @@ export default function LoginForm() {
               className="block w-full pl-11 pr-3 py-3 bg-zinc-950/50 border border-zinc-800 rounded-xl text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500 transition-all sm:text-sm"
             />
           </div>
+        </div>
+
+        <div className="flex justify-end px-1">
+          <Link 
+            href="/forgot-password" 
+            className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+          >
+            Forgot password?
+          </Link>
         </div>
 
         <button
