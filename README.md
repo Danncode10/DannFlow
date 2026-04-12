@@ -1,6 +1,8 @@
 # 🚀 DannFlow (2026 Edition)
 
+DannFlow is an open-source Next.js 15 & Supabase starter optimized for "Vibe Coding." It features my own "Zero-Hallucination" methodology—using npm run checkpoint and update-types to force AI agents to stay in sync with the live database schema. By providing the agent with a perfect snapshot of RLS policies, triggers, and types, it eliminates the guesswork that usually breaks AI-generated code. With a custom "Engineering Edge" UI and a tactical ./guide.sh CLI, it moves you from a blank terminal to a production-ready SaaS in minutes.
 > **The High-Performance AI-Native SaaS Starter.** Built with TanStack caching, Mobile-First Bento UI, and designed strictly for Vibe Coding.
+
 
 [![Next.js](https://img.shields.io/badge/Next.js-15+-black?logo=next.js)](https://nextjs.org)
 [![Supabase](https://img.shields.io/badge/Supabase-Auth%20%26%20DB-3ECF8E?logo=supabase)](https://supabase.com)
@@ -9,7 +11,7 @@
 
 ---
 
-## ⚡ Quick Start (The Elite Way)
+## Quick Start 
 
 Boot up your project and set your App Name with a single command:
 
