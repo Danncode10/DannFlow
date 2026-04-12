@@ -34,6 +34,8 @@ echo -e "\n🚀 ${CYAN}Creating $app_name in $folder_name...${NC}\n"
 # 2. Clone the Repository
 if git clone https://github.com/Danncode10/DannFlow "$folder_name"; then
     cd "$folder_name" || exit
+    # Remove the installer script from the new project to avoid clutter
+    rm install.sh
 else
     echo -e "❌ ${RED}Failed to clone the repository.${NC}"
     exit 1
