@@ -1,6 +1,6 @@
 # 🚀 DannFlow (2026 Edition)
 
-> **The AI-native Next.js SaaS starter.** Built for Vibe Coding — ship full-featured apps without writing boilerplate.
+> **The High-Performance AI-Native SaaS Starter.** Built with TanStack caching, Upstash Redis rate-limiting, Mobile-First Bento UI, and designed strictly for Vibe Coding.
 
 [![Next.js](https://img.shields.io/badge/Next.js-15+-black?logo=next.js)](https://nextjs.org)
 [![Supabase](https://img.shields.io/badge/Supabase-Auth%20%26%20DB-3ECF8E?logo=supabase)](https://supabase.com)
@@ -11,14 +11,25 @@
 
 ## ⚡ Quick Start
 
+Boot up your project with our interactive setup script:
+
 ```bash
 git clone https://github.com/Danncode10/my-structure .
 npm install
-cp .env.example .env.local   # fill in your Supabase keys
-npm run dev
+cp .env.example .env.local
+./guide.sh
 ```
 
-Open [http://localhost:3000](http://localhost:3000). That's it.
+### The Initial Commit
+
+Once configured, disconnect from the template's Git history and start your own:
+
+```bash
+rm -rf .git
+git init
+git add .
+git commit -m "🚀 project: Dannflow was used here - Initializing high-performance architecture"
+```
 
 ---
 
@@ -48,6 +59,7 @@ NEXT_PUBLIC_GITHUB_URL=https://github.com/yourusername
 | **Forgot Password** | `src/app/forgot-password/` | Sends reset email via Gmail SMTP |
 | **Reset Password** | `src/app/reset-password/` | Session-guarded — handles expired links gracefully |
 | **Dashboard** | `src/app/dashboard/` | Protected route, server-rendered |
+| **PillTabs & Bento UI** | `src/components/` | Mobile-first smooth interfaces with Shadcn constraints |
 | **Profile Settings** | `src/components/profile-form.tsx` | Full name, age, birthday, gender |
 | **Security Settings** | `src/components/security-form.tsx` | Re-auth gate → change password |
 | **Version Control Tab** | `dashboard-shell.tsx` | Paginated GitHub repos (5/page) |
@@ -188,11 +200,12 @@ DannFlow follows the **Trinity Model**:
 3. npm run update-types        → after any schema change
 ```
 
-### MCP Diagnostic
-If tools disconnect, follow the protocol in `AGENTS.md`:
-- Supabase MCP → live schema reads + SQL execution
-- GitHub MCP → repo browsing + diff comparison
-- Terminal MCP → local commands + backups
+### MCP Agent Setup (Antigravity/Cursor/Claude)
+DannFlow enforces the **AGENTS.md Standard**. When using AI tools:
+1. Connect the **Supabase MCP** (for schema live reads).
+2. Connect the **GitHub MCP** (for branch history and PRs).
+3. Connect the **Terminal MCP** (for running `npm run checkpoint`).
+4. **Always** point your AI to read `AGENTS.md` before it touches any code.
 
 ---
 
