@@ -257,7 +257,7 @@ show_init() {
     rm -rf .git
     git init > /dev/null
     git add .
-    git commit -m "this projects initialized Dannflow" > /dev/null
+    git commit -m "DannFlow: Initialized fresh repository and rebranded project" > /dev/null
     echo -e "✅ Git history reset and project initialized"
 
     # 5. Rename Folder (Last step)
