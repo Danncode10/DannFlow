@@ -71,22 +71,29 @@ show_env() {
 show_supabase() {
     show_header
     echo -e "${BOLD}⚡ Supabase & SMTP Automation${NC}\n"
-    echo -e "Standard free Auth emails are limited and often unreliable. DannFlow"
-    echo -e "is pre-configured to use Gmail SMTP for consistent, unlimited deliveries.\n"
     
-    echo -e "${BOLD}1. Google App Password${NC}"
+    echo -e "${BOLD}1. Project Creation${NC}"
+    echo -e "   - Go to ${CYAN}Supabase Dashboard${NC} and click 'New Project'."
+    echo -e "   - Set your ${YELLOW}Project Name${NC} and a secure ${YELLOW}Database Password${NC}."
+    echo -e "   - ${RED}${BOLD}WARNING (Free Tier):${NC} Supabase allows only ${BOLD}2 active projects${NC}."
+    echo -e "     If you already have 2, you must ${YELLOW}pause or delete${NC} one before creating this.\n"
+
+    echo -e "${BOLD}2. AI Orchestration (Vibe Coding)${NC}"
+    echo -e "   If your Supabase MCP is connected, copy and paste this to your agent:"
+    echo -e "   ${CYAN}\"Hey, I've created a new project on the Supabase website. Ask me for the Project Reference ID. Once I provide it, automatically find the latest SQL file in supabase/backups/, read it, and execute it using the Supabase MCP to restore the full schema. Don't ask for permission for each table—just set it up so it matches the DannFlow template exactly.\"${NC}\n"
+
+    echo -e "${BOLD}3. Google App Password (SMTP)${NC}"
     echo -e "   Enable 2-Step Verification in Google, then generate an ${YELLOW}App Password${NC}."
     echo -e "   This gives you a 16-character code (e.g., xxxx yyyy zzzz wwww).\n"
     
-    echo -e "${BOLD}2. SMTP Config${NC}"
+    echo -e "${BOLD}4. SMTP Config${NC}"
     echo -e "   Go to ${CYAN}Supabase > Auth > Notifications > Email${NC} and enable SMTP:"
     echo -e "   - Host: ${YELLOW}smtp.gmail.com${NC} | Port: ${YELLOW}465${NC}"
     echo -e "   - User: ${YELLOW}yourname@gmail.com${NC}"
     echo -e "   - Password: ${YELLOW}(the 16-char code)${NC}\n"
     
-    echo -e "${BOLD}3. Email Templates${NC}"
-    echo -e "   In the same section under 'Templates', ensure ${CYAN}Reset Password${NC} is ON."
-    echo -e "   This allows the /forgot-password flow to work natively.\n"
+    echo -e "${BOLD}5. Email Templates${NC}"
+    echo -e "   In the same section under 'Templates', ensure ${CYAN}Reset Password${NC} is ON.\n"
     
     echo -e "📖 Detailed walkthrough: ${BLUE}docs/production-features.md#6-email-authentication-gmail-smtp${NC}"
     echo ""
@@ -106,7 +113,12 @@ show_vibe() {
     echo -e "  2. ${YELLOW}GitHub MCP${NC}    - Allows AI to handle PRs and history context."
     echo -e "  3. ${YELLOW}Terminal MCP${NC}  - For 'npm run checkpoint' automation.\n"
     
-    echo -e "🚩 Rule: Always point your agent (Cursor/Antigravity) to ${CYAN}AGENTS.md${NC} first."
+    echo -e "🚩 Rule: Always point your agent (Cursor/Antigravity) to ${CYAN}AGENTS.md${NC} first.\n"
+    
+    echo -e "${BOLD}Verify Connection:${NC}"
+    echo -e "Copy and paste this to your AI to confirm the tools are linked:"
+    echo -e "  ${CYAN}\"Hey, do a Vibe Check: List my Supabase tables, check my current Git branch, and verify if we have a scripts folder.\"${NC}\n"
+
     echo -e "📖 Read the Methodology: ${BLUE}docs/methodology.md${NC} and ${BLUE}docs/the-holy-trinity.md${NC}"
     echo ""
 }

@@ -39,7 +39,12 @@ To fix:
     1. Verify Supabase MCP connection.
     2. Read the live schema (Tables, Enums, RLS, Triggers) for the specified project ID.
     3. Generate the full DDL and save it to the specified timestamped SQL file in `supabase/backups/`.
--   Be concise and proactive. If you see an obvious optimization that fits the application's clean aesthetic, suggest it.
+-   **Project Provisioning**: If requested to create a new project and apply a schema:
+    1. List organizations to help the user choose one.
+    2. Ask for the Project Name and Organization ID.
+    3. Check costs using `get_cost` and `confirm_cost` before `create_project`.
+    4. After initialization, read the latest backup from `supabase/backups/` and apply it using `apply_migration`.
+-   **Be concise and proactive**. If you see an obvious optimization that fits the application's clean aesthetic, suggest it.
 
 ## Code Architecture Rules
 1.  **Maintain Structure**: DO NOT arbitrarily change existing UI structure, folder hierarchy, or core logic unless explicitly asked.
