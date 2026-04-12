@@ -122,12 +122,8 @@ show_ready() {
 show_init() {
     show_header
     echo -e "${BOLD}🚀 Name Your Project${NC}\n"
-    read -p "Enter your App Name (e.g., MyAwesomeSaaS): " app_name
-    
-    if [ -z "$app_name" ]; then
-        echo -e "\n${RED}App name cannot be empty. Aborting.${NC}"
-        exit 1
-    fi
+    read -p "Enter your App Name [my-app]: " input_name
+    app_name=${input_name:-"my-app"}
 
     # Format for package.json (lowercase, dashes for spaces)
     pkg_name=$(echo "$app_name" | tr '[:upper:]' '[:lower:]' | sed 's/ /-/g' | sed 's/[^a-z0-9-]//g')
