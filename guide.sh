@@ -115,6 +115,10 @@ show_vibe() {
     
     echo -e "🚩 Rule: Always point your agent (Cursor/Antigravity) to ${CYAN}AGENTS.md${NC} first.\n"
     
+    echo -e "${BOLD}Automation Commands:${NC}"
+    echo -e "  - ${GREEN}npm run update-types${NC} : Refreshes ${CYAN}src/types/supabase.ts${NC} with live DB schema."
+    echo -e "  - ${GREEN}npm run checkpoint${NC}   : Snapshots your DB to ${CYAN}supabase/backups/${NC} for AI context.\n"
+
     echo -e "${BOLD}Verify Connection:${NC}"
     echo -e "Copy and paste this to your AI to confirm the tools are linked:"
     echo -e "  ${CYAN}\"Hey, do a Vibe Check: List my Supabase tables, check my current Git branch, and verify if we have a scripts folder.\"${NC}\n"
