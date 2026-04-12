@@ -14,7 +14,8 @@
 Boot up your project and set your App Name with our interactive setup script:
 
 ```bash
-git clone https://github.com/Danncode10/my-structure .
+git clone https://github.com/Danncode10/DannFlow my-app
+cd my-app
 npm install
 cp .env.example .env.local
 ./guide.sh init
