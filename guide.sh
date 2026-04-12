@@ -39,8 +39,11 @@ show_main() {
     echo -e "  ${BOLD}Step 4:${NC} ${GREEN}./guide.sh security${NC}  - Setup Gmail security notifications"
     echo -e "  ${BOLD}Step 5:${NC} ${GREEN}./guide.sh ready${NC}     - Commit your fresh DannFlow project"
     echo ""
-    echo -e "Example: ${YELLOW}./guide.sh init${NC}"
-    echo ""
+    echo -e "Other helpful commands:"
+    echo -e "  ${CYAN}npm run dev${NC}          - Start development server"
+    echo -e "  ${CYAN}npm run update-types${NC} - Sync TypeScript types with Supabase"
+    echo -e "  ${CYAN}npm run checkpoint${NC}   - Take a DB schema snapshot (SQL)"
+
 }
 
 # Env Command
@@ -59,10 +62,16 @@ show_env() {
     echo -e "   - ${CYAN}NEXT_PUBLIC_SUPABASE_ANON_KEY${NC}  (Client-side key)"
     echo -e "   - ${CYAN}SUPABASE_SERVICE_ROLE_KEY${NC}      (Admin key - KEEP SECRET)\n"
     
-    echo -e "${BOLD}3. Site Branding${NC}"
+    echo -e "${BOLD}3. Site Branding & SEO${NC}"
     echo -e "   - ${CYAN}NEXT_PUBLIC_SITE_NAME${NC}: Your app's display name."
-    echo -e "   - ${CYAN}NEXT_PUBLIC_SITE_URL${NC}: Set to ${YELLOW}http://localhost:3000${NC} for now.\n"
+    echo -e "   - ${CYAN}NEXT_PUBLIC_SITE_URL${NC}: Set to ${YELLOW}http://localhost:3000${NC} for now."
+    echo -e "   - ${CYAN}NEXT_PUBLIC_GITHUB_URL${NC}: Link to your main repository.\n"
     
+    echo -e "${BOLD}4. Rate Limiting (Upstash Redis)${NC}"
+    echo -e "   Required for server-side protection in production:"
+    echo -e "   - ${CYAN}UPSTASH_REDIS_REST_URL${NC}"
+    echo -e "   - ${CYAN}NEXT_PUBLIC_UPSTASH_REDIS_REST_TOKEN${NC}\n"
+
     echo -e "📖 See ${BLUE}docs/production-features.md${NC} for more details on env vars."
     echo ""
 }
@@ -83,17 +92,22 @@ show_supabase() {
     echo -e "   ${CYAN}\"I've created a new Supabase project. Ask me for the Project Reference ID. Once provided, execute this protocol:\n\n1. Target: Connect to the new project via Supabase MCP.\n2. Execution: Locate the latest .sql backup in supabase/backups/. Read its content and execute it against the new project.\n3. Verification (MANDATORY): Immediately after execution, run an MCP command to list all tables and functions in the public schema.\n4. Report: Compare the results with the DannFlow architecture requirements.\n\nDo not report success until you can physically see the 'profiles' table and 'handle_new_user' function in the live database. If the list is empty, troubleshoot the connection and try again.\"${NC}\n"
 
     echo -e "${BOLD}3. Google App Password (SMTP)${NC}"
-    echo -e "   Enable 2-Step Verification in Google, then generate an ${YELLOW}App Password${NC}."
-    echo -e "   This gives you a 16-character code (e.g., xxxx yyyy zzzz wwww).\n"
+    echo -e "   - Enable 2-Step Verification in Google."
+    echo -e "   - Generate an ${YELLOW}App Password${NC} at ${CYAN}myaccount.google.com/apppasswords${NC}."
+    echo -e "   - This gives you a 16-character code.\n"
     
     echo -e "${BOLD}4. SMTP Config${NC}"
-    echo -e "   Go to ${CYAN}Supabase > Auth > Notifications > Email${NC} and enable SMTP:"
+    echo -e "   Go to ${CYAN}Authentication > Email > SMTP Settings${NC}:"
+    echo -e "   - Enable ${YELLOW}Enable custom SMTP${NC} to ON."
     echo -e "   - Host: ${YELLOW}smtp.gmail.com${NC} | Port: ${YELLOW}465${NC}"
     echo -e "   - User: ${YELLOW}yourname@gmail.com${NC}"
     echo -e "   - Password: ${YELLOW}(the 16-char code)${NC}\n"
     
-    echo -e "${BOLD}5. Email Templates${NC}"
-    echo -e "   In the same section under 'Templates', ensure ${CYAN}Reset Password${NC} is ON.\n"
+    echo -e "${BOLD}5. URL Configuration${NC}"
+    echo -e "   Go to ${CYAN}Authentication > URL Configuration${NC}:"
+    echo -e "   - ${BOLD}Site URL${NC}: Set to your live production domain."
+    echo -e "   - ${BOLD}Redirect URLs${NC}: Add ${YELLOW}http://localhost:3000/**${NC} (local development)."
+    echo -e "   - ${BOLD}Redirect URLs${NC}: Add ${YELLOW}https://yourdomain.com/**${NC} (production).\n"
     
     echo -e "📖 Detailed walkthrough: ${BLUE}docs/production-features.md#6-email-authentication-gmail-smtp${NC}"
     echo ""
@@ -136,10 +150,13 @@ show_security() {
     
     echo -e "${BOLD}Setup Steps:${NC}"
     echo -e "1. Ensure your ${CYAN}Gmail SMTP${NC} is active (run ./guide.sh supabase)."
-    echo -e "2. Go to ${YELLOW}Supabase > Auth > Email Templates > Password Change${NC}."
-    echo -e "3. Toggle it ON. This sends a free alert whenever a security update occurs.\n"
+    echo -e "2. Go to ${YELLOW}Authentication > Email > Templates${NC}."
+    echo -e "3. Ensure these are ${GREEN}${BOLD}ON${NC}:"
+    echo -e "   - ${CYAN}Reset Password${NC}"
+    echo -e "   - ${CYAN}Password Changed${NC}\n"
     
-    echo -e "💡 This utilizes the re-authentication logic in ${CYAN}src/services/auth.ts${NC}."
+    echo -e "💡 These allow the application to handle secure recovery and security alerts."
+    echo -e "💡 Utilizes re-authentication logic in ${CYAN}src/services/auth.ts${NC}."
     echo -e "📖 Security breakdown: ${BLUE}docs/production-features.md#security-notifications${NC}"
     echo ""
 }
@@ -150,7 +167,8 @@ show_ready() {
     echo -e "${BOLD}🚀 Ready for Launch? Checkbox:${NC}\n"
     
     echo -e " [ ] ${CYAN}Branding${NC}: App name and GitHub URLs set in .env.local"
-    echo -e " [ ] ${CYAN}Auth Setup${NC}: Gmail SMTP configured and templates enabled"
+    echo -e " [ ] ${CYAN}Auth Setup${NC}: Gmail SMTP and URL Configuration applied"
+    echo -e " [ ] ${CYAN}Personalize${NC}: Updated siteConfig in ${CYAN}src/lib/config.ts${NC}"
     echo -e " [ ] ${CYAN}AI Sync${NC}: Supabase MCP connected for Vibe Coding"
     echo -e " [ ] ${CYAN}Snapshot${NC}: Ran 'npm run checkpoint' to save DB state\n"
     
