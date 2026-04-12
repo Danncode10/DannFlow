@@ -9,18 +9,15 @@
 
 ---
 
-## ⚡ Quick Start
+## ⚡ Quick Start (The Elite Way)
 
-Boot up your project and set your App Name with our interactive setup script:
+Boot up your project and set your App Name with a single command:
 
 ```bash
-git clone https://github.com/Danncode10/DannFlow my-app
-cd my-app
-npm install
-cp .env.example .env.local
-./guide.sh init
-npm run dev
+curl -sSL https://raw.githubusercontent.com/Danncode10/DannFlow/main/install.sh | bash
 ```
+
+This automates the entire setup: clones the repo, installs dependencies, sets up environment variables, and interactive rebranding with a fresh Git history.
 
 ### The Initial Commit
 
