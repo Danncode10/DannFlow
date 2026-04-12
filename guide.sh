@@ -46,74 +46,102 @@ show_main() {
 # Env Command
 show_env() {
     show_header
-    echo -e "${BOLD}🌍 Environment Setup${NC}\n"
-    echo -e "1. Copy the example file if you haven't already:"
-    echo -e "   ${CYAN}cp .env.example .env.local${NC}\n"
-    echo -e "2. Get your Supabase keys from ${YELLOW}Project Settings > Data API${NC}"
-    echo -e "   - NEXT_PUBLIC_SUPABASE_URL"
-    echo -e "   - NEXT_PUBLIC_SUPABASE_ANON_KEY"
-    echo -e "   - SUPABASE_SERVICE_ROLE_KEY\n"
-    echo -e "3. Customize your branding:"
-    echo -e "   - NEXT_PUBLIC_SITE_NAME=${YELLOW}\"Your App Name\"${NC}"
-    echo -e "   - NEXT_PUBLIC_GITHUB_URL=${YELLOW}\"https://github.com/your-username\"${NC}"
+    echo -e "${BOLD}🌍 Environment Configuration${NC}\n"
+    echo -e "Your ${CYAN}.env.local${NC} file holds your secrets. It is ignored by Git to"
+    echo -e "keep your credentials safe. Never share this file.\n"
+    
+    echo -e "${BOLD}1. Initialize File${NC}"
+    echo -e "   Run: ${CYAN}cp .env.example .env.local${NC}\n"
+    
+    echo -e "${BOLD}2. Database Credentials${NC}"
+    echo -e "   Find these in ${YELLOW}Supabase > Project Settings > Data API${NC}:"
+    echo -e "   - ${CYAN}NEXT_PUBLIC_SUPABASE_URL${NC}       (The API endpoint)"
+    echo -e "   - ${CYAN}NEXT_PUBLIC_SUPABASE_ANON_KEY${NC}  (Client-side key)"
+    echo -e "   - ${CYAN}SUPABASE_SERVICE_ROLE_KEY${NC}      (Admin key - KEEP SECRET)\n"
+    
+    echo -e "${BOLD}3. Site Branding${NC}"
+    echo -e "   - ${CYAN}NEXT_PUBLIC_SITE_NAME${NC}: Your app's display name."
+    echo -e "   - ${CYAN}NEXT_PUBLIC_SITE_URL${NC}: Set to ${YELLOW}http://localhost:3000${NC} for now.\n"
+    
+    echo -e "📖 See ${BLUE}docs/production-features.md${NC} for more details on env vars."
     echo ""
 }
 
 # Supabase Command
 show_supabase() {
     show_header
-    echo -e "${BOLD}⚡ Supabase & Free Auth Emails${NC}\n"
-    echo -e "Supabase limits free auth emails. We bypass this using Gmail SMTP:\n"
-    echo -e "1. Create an ${YELLOW}App Password${NC} in your Google Account (Security > 2-Step Verification)."
-    echo -e "2. Go to Supabase > Auth > Providers > Email."
-    echo -e "3. Scroll to ${CYAN}SMTP Settings${NC} and enable it:"
-    echo -e "   - Host: ${YELLOW}smtp.gmail.com${NC}"
-    echo -e "   - Port: ${YELLOW}465${NC}"
-    echo -e "   - Username: ${YELLOW}your-gmail@gmail.com${NC}"
-    echo -e "   - Password: ${YELLOW}your-16-char-app-password${NC}"
-    echo -e "4. Go to ${CYAN}Email Templates${NC} and turn ON 'Reset Password'."
+    echo -e "${BOLD}⚡ Supabase & SMTP Automation${NC}\n"
+    echo -e "Standard free Auth emails are limited and often unreliable. DannFlow"
+    echo -e "is pre-configured to use Gmail SMTP for consistent, unlimited deliveries.\n"
+    
+    echo -e "${BOLD}1. Google App Password${NC}"
+    echo -e "   Enable 2-Step Verification in Google, then generate an ${YELLOW}App Password${NC}."
+    echo -e "   This gives you a 16-character code (e.g., xxxx yyyy zzzz wwww).\n"
+    
+    echo -e "${BOLD}2. SMTP Config${NC}"
+    echo -e "   Go to ${CYAN}Supabase > Auth > Notifications > Email${NC} and enable SMTP:"
+    echo -e "   - Host: ${YELLOW}smtp.gmail.com${NC} | Port: ${YELLOW}465${NC}"
+    echo -e "   - User: ${YELLOW}yourname@gmail.com${NC}"
+    echo -e "   - Password: ${YELLOW}(the 16-char code)${NC}\n"
+    
+    echo -e "${BOLD}3. Email Templates${NC}"
+    echo -e "   In the same section under 'Templates', ensure ${CYAN}Reset Password${NC} is ON."
+    echo -e "   This allows the /forgot-password flow to work natively.\n"
+    
+    echo -e "📖 Detailed walkthrough: ${BLUE}docs/production-features.md#6-email-authentication-gmail-smtp${NC}"
     echo ""
 }
 
 # Vibe Command
 show_vibe() {
     show_header
-    echo -e "${BOLD}🤖 AI Agent Integration (Vibe Coding)${NC}\n"
-    echo -e "DannFlow is designed for the Trinity Model (Eyes, Blueprint, Action)."
-    echo -e "Ensure your AI (Antigravity/Cursor) has these MCPs active:\n"
-    echo -e "  ${CYAN}1. Supabase MCP${NC} - For reading live schema and executing SQL."
-    echo -e "  ${CYAN}2. GitHub MCP${NC}   - For branching, PRs, and history context."
-    echo -e "  ${CYAN}3. Terminal MCP${NC} - For running 'npm run checkpoint' backups.\n"
-    echo -e "Rule of thumb: Point your AI to ${YELLOW}AGENTS.md${NC} as the master instruction file."
-    echo -e "Never let the AI put DB logic in UI components. UI is dumb. ${YELLOW}src/services/${NC} is smart."
+    echo -e "${BOLD}🤖 AI-Native Development (Vibe Coding)${NC}\n"
+    echo -e "DannFlow isn't just a UI; it's a workflow built on the ${CYAN}Trinity Model${NC}:"
+    echo -e "  - ${BOLD}The Eyes (Types)${NC}: Auto-generated TypeScript mirroring your DB."
+    echo -e "  - ${BOLD}The Blueprint (SQL)${NC}: Snapshots for disaster recovery & agents."
+    echo -e "  - ${BOLD}The Action (Services)${NC}: Pure business logic away from the UI.\n"
+    
+    echo -e "${BOLD}Required Agent Tools (MCPs):${NC}"
+    echo -e "  1. ${YELLOW}Supabase MCP${NC}  - Grants AI the ability to see and edit your DB."
+    echo -e "  2. ${YELLOW}GitHub MCP${NC}    - Allows AI to handle PRs and history context."
+    echo -e "  3. ${YELLOW}Terminal MCP${NC}  - For 'npm run checkpoint' automation.\n"
+    
+    echo -e "🚩 Rule: Always point your agent (Cursor/Antigravity) to ${CYAN}AGENTS.md${NC} first."
+    echo -e "📖 Read the Methodology: ${BLUE}docs/methodology.md${NC} and ${BLUE}docs/the-holy-trinity.md${NC}"
     echo ""
 }
 
 # Security Command
 show_security() {
     show_header
-    echo -e "${BOLD}🔒 Security Notifications Setup${NC}\n"
-    echo -e "DannFlow has built-in Re-Authentication. If a user changes their password,"
-    echo -e "they should receive an email alert.\n"
-    echo -e "1. Go to Supabase Dashboard > Auth > ${CYAN}Email Templates${NC}."
-    echo -e "2. Find the ${YELLOW}Password Change${NC} template."
-    echo -e "3. Enable it."
-    echo -e "4. This utilizes your Gmail SMTP setup to send free security alerts."
+    echo -e "${BOLD}🔒 Security Notifications & Re-Auth${NC}\n"
+    echo -e "DannFlow includes a high-security flow for password changes, requiring"
+    echo -e "the user's current password to be verified before any update.\n"
+    
+    echo -e "${BOLD}Setup Steps:${NC}"
+    echo -e "1. Ensure your ${CYAN}Gmail SMTP${NC} is active (run ./guide.sh supabase)."
+    echo -e "2. Go to ${YELLOW}Supabase > Auth > Email Templates > Password Change${NC}."
+    echo -e "3. Toggle it ON. This sends a free alert whenever a security update occurs.\n"
+    
+    echo -e "💡 This utilizes the re-authentication logic in ${CYAN}src/services/auth.ts${NC}."
+    echo -e "📖 Security breakdown: ${BLUE}docs/production-features.md#security-notifications${NC}"
     echo ""
 }
 
-# Ready Command (Git commit)
+# Ready Command
 show_ready() {
     show_header
-    echo -e "${BOLD}🚀 Initialize Your DannFlow Project${NC}\n"
-    echo -e "Ready to start coding? Run these exact commands to disconnect from the"
-    echo -e "DannFlow template repository and start your own fresh Git history:\n"
+    echo -e "${BOLD}🚀 Ready for Launch? Checkbox:${NC}\n"
     
-    echo -e "${CYAN}rm -rf .git${NC}"
-    echo -e "${CYAN}git init${NC}"
-    echo -e "${CYAN}git add .${NC}"
-    echo -e "${CYAN}git commit -m \"🚀 project: Dannflow was used here - Initializing high-performance architecture\"${NC}"
-    echo ""
+    echo -e " [ ] ${CYAN}Branding${NC}: App name and GitHub URLs set in .env.local"
+    echo -e " [ ] ${CYAN}Auth Setup${NC}: Gmail SMTP configured and templates enabled"
+    echo -e " [ ] ${CYAN}AI Sync${NC}: Supabase MCP connected for Vibe Coding"
+    echo -e " [ ] ${CYAN}Snapshot${NC}: Ran 'npm run checkpoint' to save DB state\n"
+    
+    echo -e "Ready to start coding? Disconnect from the template and start your own legacy:\n"
+    echo -e "👉 Run ${YELLOW}./guide.sh init${NC} (This will reset your Git history!)\n"
+    
+    echo -e "📖 Deployment and Next Steps: ${BLUE}docs/backups-and-sync.md${NC}"
     echo -e "Happy shipping! 🚢"
     echo ""
 }
