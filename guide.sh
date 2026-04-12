@@ -30,14 +30,14 @@ EOF
 show_main() {
     show_header
     echo -e "${BOLD}Getting Started Guide${NC}\n"
-    echo -e "Run any of the following commands to configure your project:\n"
+    echo -e "Follow these steps in order to configure your project:\n"
     
-    echo -e "  ${GREEN}./guide.sh init${NC}      - ${YELLOW}${BOLD}RUN ONCE:${NC} Rebrand app & ${RED}RESET GIT HISTORY${NC}"
-    echo -e "  ${GREEN}./guide.sh env${NC}       - Set up environment variables (.env.local)"
-    echo -e "  ${GREEN}./guide.sh supabase${NC}  - Configure Supabase, Auth, and SMTP"
-    echo -e "  ${GREEN}./guide.sh vibe${NC}      - Connect AI Agents (MCPs/Cursor/Antigravity)"
-    echo -e "  ${GREEN}./guide.sh security${NC}  - Setup Gmail security notifications"
-    echo -e "  ${GREEN}./guide.sh ready${NC}     - Commit your fresh DannFlow project"
+    echo -e "  ${BOLD}Step 0:${NC} ${GREEN}./guide.sh init${NC}      - ${YELLOW}${BOLD}RUN ONCE:${NC} Rebrand app & ${RED}RESET GIT HISTORY${NC}"
+    echo -e "  ${BOLD}Step 1:${NC} ${GREEN}./guide.sh env${NC}       - Set up environment variables (.env.local)"
+    echo -e "  ${BOLD}Step 2:${NC} ${GREEN}./guide.sh vibe${NC}      - Connect AI Agents (MCPs/Cursor/Antigravity)"
+    echo -e "  ${BOLD}Step 3:${NC} ${GREEN}./guide.sh supabase${NC}  - Configure Supabase, Auth, and SMTP"
+    echo -e "  ${BOLD}Step 4:${NC} ${GREEN}./guide.sh security${NC}  - Setup Gmail security notifications"
+    echo -e "  ${BOLD}Step 5:${NC} ${GREEN}./guide.sh ready${NC}     - Commit your fresh DannFlow project"
     echo ""
     echo -e "Example: ${YELLOW}./guide.sh init${NC}"
     echo ""
