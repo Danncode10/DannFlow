@@ -74,6 +74,87 @@ function GitHubIcon({ className }: { className?: string }) {
   );
 }
 
+const GITHUB_PER_PAGE = 5;
+
+function GithubRepoPaginated({ repos }: { repos: any[] }) {
+  const [page, setPage] = useState(0);
+  const totalPages = Math.ceil(repos.length / GITHUB_PER_PAGE);
+  const pageRepos = repos.slice(page * GITHUB_PER_PAGE, (page + 1) * GITHUB_PER_PAGE);
+
+  return (
+    <div className="space-y-6">
+      {/* Creator attribution */}
+      <div className="flex items-start gap-3 px-4 py-3 rounded-2xl bg-secondary border border-border">
+        <GitBranch className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+        <p className="text-[11px] font-mono text-muted-foreground leading-relaxed">
+          Repositories of <span className="text-foreground font-black">Danncode10</span>, the creator of DannFlow.
+          To show <span className="text-foreground font-black">your own repos</span>, edit{" "}
+          <code className="bg-border px-1.5 py-0.5 rounded text-[10px]">src/lib/config.ts</code> → <code className="bg-border px-1.5 py-0.5 rounded text-[10px]">creatorRepos</code>.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+        {pageRepos.map((repo: any, i: number) => (
+          <a key={i} href={repo.url} target="_blank" rel="noreferrer" className="block group">
+            <div className="group p-6 md:p-8 rounded-3xl md:rounded-5xl border border-border bg-card hover:border-primary/20 transition-all duration-300 flex flex-col h-full relative overflow-hidden hover:shadow-2xl hover:shadow-primary/5">
+              <div className="flex items-center justify-between mb-5 md:mb-6">
+                <div className="h-10 w-10 md:h-12 md:w-12 rounded-lg md:rounded-xl bg-secondary border border-border flex items-center justify-center text-muted-foreground group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-500 shadow-inner">
+                  <GitBranch className="w-5 h-5 md:w-6 md:h-6" />
+                </div>
+                <span className="text-[9px] md:text-[10px] font-black uppercase text-muted-foreground tracking-widest opacity-40">Repository</span>
+              </div>
+              <h4 className="text-base md:text-lg font-bold text-foreground mb-2 tracking-tight group-hover:text-primary transition-colors uppercase truncate">
+                {repo.name}
+              </h4>
+              <p className="text-[13px] text-muted-foreground leading-relaxed font-semibold italic opacity-80 line-clamp-2">
+                {repo.description || "No project manifest description available."}
+              </p>
+              <div className="mt-auto pt-5 border-t border-border flex items-center justify-between mt-5">
+                <span className="text-[11px] font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2 group-hover:translate-x-1 transition-transform">
+                  Access Code <ChevronRight className="w-3 h-3" />
+                </span>
+              </div>
+            </div>
+          </a>
+        ))}
+      </div>
+
+      {/* [‹] 1 2 3 4 [›] */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2 pt-2">
+          <button
+            onClick={() => setPage(p => Math.max(0, p - 1))}
+            disabled={page === 0}
+            className="w-9 h-9 flex items-center justify-center rounded-xl border border-border text-muted-foreground hover:border-primary/50 hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed transition-all text-base font-black"
+          >
+            ‹
+          </button>
+          {Array.from({ length: totalPages }).map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setPage(i)}
+              className={`w-9 h-9 flex items-center justify-center rounded-xl text-[12px] font-black transition-all border ${
+                page === i
+                  ? "bg-primary text-primary-foreground border-primary shadow-sm shadow-primary/20"
+                  : "border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"
+              }`}
+            >
+              {i + 1}
+            </button>
+          ))}
+          <button
+            onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
+            disabled={page === totalPages - 1}
+            className="w-9 h-9 flex items-center justify-center rounded-xl border border-border text-muted-foreground hover:border-primary/50 hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed transition-all text-base font-black"
+          >
+            ›
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function FeaturesTabs({
   profiles,
   repos,
@@ -313,27 +394,7 @@ export function FeaturesTabs({
               </div>
 
               {repos && repos.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {repos.slice(0, 4).map((repo, i) => (
-                    <div key={i} className="group p-6 md:p-8 rounded-3xl md:rounded-5xl border border-border bg-card hover:border-primary/20 transition-all duration-300 flex flex-col h-full relative overflow-hidden hover:shadow-2xl hover:shadow-primary/5">
-                      <div className="flex items-center justify-between mb-6 md:mb-8">
-                        <div className="h-10 w-10 md:h-12 md:w-12 rounded-lg md:rounded-xl bg-secondary border border-border flex items-center justify-center text-muted-foreground group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-500 shadow-inner">
-                          <GitBranch className="w-5 h-5 md:w-6 md:h-6" />
-                        </div>
-                        <span className="text-[9px] md:text-[10px] font-black uppercase text-muted-foreground tracking-widest opacity-40">Active Repository</span>
-                      </div>
-                      <h4 className="text-lg md:text-xl font-bold text-foreground mb-2 md:mb-3 tracking-tight group-hover:text-primary transition-colors uppercase truncate">{repo.name}</h4>
-                      <p className="text-[13px] md:text-[15px] text-muted-foreground leading-relaxed font-semibold italic opacity-80 mb-6 md:mb-8 h-10 md:h-12 line-clamp-2">
-                        {repo.description || "No project manifest description available."}
-                      </p>
-                      <div className="mt-auto pt-6 border-t border-border flex items-center justify-between">
-                        <a href={repo.html_url || "#"} target="_blank" rel="noreferrer" className="text-[11px] font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2 group-hover:translate-x-1 transition-transform">
-                          Access Code <ChevronRight className="w-3 h-3" />
-                        </a>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                <GithubRepoPaginated repos={repos} />
               ) : (
                 <div className="p-32 text-center flex flex-col items-center border border-dashed border-border rounded-5xl bg-secondary/30 grayscale opacity-40">
                   <Code className="w-12 h-12 mb-6 text-muted-foreground" />

@@ -30,6 +30,81 @@ import { SecurityForm } from "./security-form"
 
 import { PillTabs } from "@/components/ui/pill-tabs"
 
+const REPOS_PER_PAGE = 5;
+
+function RepoPagination({ repos }: { repos: any[] }) {
+  const [page, setPage] = React.useState(0);
+  const totalPages = Math.ceil(repos.length / REPOS_PER_PAGE);
+  const pageRepos = repos.slice(page * REPOS_PER_PAGE, (page + 1) * REPOS_PER_PAGE);
+
+  return (
+    <div className="space-y-5">
+      {/* Creator description banner */}
+      <div className="flex items-start gap-3 px-4 py-3 rounded-2xl bg-secondary border border-border">
+        <GitBranch className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+        <p className="text-[11px] font-mono text-muted-foreground leading-relaxed">
+          These are the public repositories of <span className="text-foreground font-black">Danncode10</span>, the creator of DannFlow.
+          To show <span className="text-foreground font-black">your own repos</span>, edit{" "}
+          <code className="bg-border px-1.5 py-0.5 rounded text-[10px]">src/lib/config.ts</code> → <code className="bg-border px-1.5 py-0.5 rounded text-[10px]">creatorRepos</code>.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {pageRepos.map((repo: any, i: number) => (
+          <a key={i} href={repo.url} target="_blank" rel="noopener noreferrer" className="block group">
+            <Card className="bg-card text-card-foreground border border-border group-hover:border-primary/50 hover:bg-card/80 transition-all duration-300 shadow-sm rounded-3xl h-full">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-mono text-foreground group-hover:text-primary transition-colors uppercase truncate pr-2">
+                  {repo.name}
+                </CardTitle>
+                <GitBranch className="w-4 h-4 text-muted-foreground group-hover:text-primary/70 shrink-0" />
+              </CardHeader>
+              <CardContent>
+                <p className="text-xs text-muted-foreground leading-relaxed italic line-clamp-2">
+                  "{repo.description || "No mission statement."}"
+                </p>
+              </CardContent>
+            </Card>
+          </a>
+        ))}
+      </div>
+
+      {/* Pagination — [<] 1 2 3 [>] */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2 pt-2">
+          <button
+            onClick={() => setPage(p => Math.max(0, p - 1))}
+            disabled={page === 0}
+            className="w-8 h-8 flex items-center justify-center rounded-lg border border-border text-muted-foreground hover:border-primary/50 hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed transition-all text-sm font-black"
+          >
+            ‹
+          </button>
+          {Array.from({ length: totalPages }).map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setPage(i)}
+              className={`w-8 h-8 flex items-center justify-center rounded-lg text-[11px] font-black transition-all border ${
+                page === i
+                  ? "bg-primary text-primary-foreground border-primary shadow-sm shadow-primary/20"
+                  : "border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"
+              }`}
+            >
+              {i + 1}
+            </button>
+          ))}
+          <button
+            onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
+            disabled={page === totalPages - 1}
+            className="w-8 h-8 flex items-center justify-center rounded-lg border border-border text-muted-foreground hover:border-primary/50 hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed transition-all text-sm font-black"
+          >
+            ›
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 interface DashboardShellProps {
   profiles: any[]
   user: any
@@ -204,26 +279,17 @@ export function DashboardShell({ profiles, user, profile, repos }: DashboardShel
 
       {/* 3. Code Tab */}
       <TabsContent value="code" className="space-y-6 animate-in slide-in-from-bottom-2 duration-500">
-        <div className="flex flex-col gap-1">
-          <h2 className="text-2xl font-semibold text-foreground">Version Control Context</h2>
-          <p className="text-sm text-muted-foreground">AI-indexed repository history and active modules</p>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <div className="flex flex-col gap-1">
+            <h2 className="text-2xl font-semibold text-foreground">Version Control Context</h2>
+            <p className="text-sm text-muted-foreground">AI-indexed repository history and active modules</p>
+          </div>
+          <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground self-start sm:self-auto">
+            {repos.length} repositories indexed
+          </span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {repos.map((repo: any, i: number) => (
-            <a key={i} href={repo.url} target="_blank" rel="noopener noreferrer" className="block group">
-              <Card className="bg-card text-card-foreground border border-border group-hover:border-primary/50 hover:bg-card/80 transition-all duration-300 shadow-sm rounded-3xl">
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle className="text-sm font-mono text-foreground group-hover:text-primary transition-colors uppercase">{repo.name}</CardTitle>
-                  <GitBranch className="w-4 h-4 text-muted-foreground group-hover:text-primary/70" />
-                </CardHeader>
-                <CardContent>
-                  <p className="text-xs text-muted-foreground leading-relaxed italic line-clamp-1">"{repo.description || "No mission statement."}"</p>
-                </CardContent>
-              </Card>
-            </a>
-          ))}
-        </div>
+        <RepoPagination repos={repos} />
       </TabsContent>
 
       {/* 4. Docs Tab */}

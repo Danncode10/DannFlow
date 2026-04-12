@@ -1,8 +1,9 @@
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { DashboardShell } from "@/components/dashboard-shell";
-import { getUserProfile, getVibeCheckData, getGithubRepos } from "@/services/dashboard";
+import { getUserProfile, getVibeCheckData } from "@/services/dashboard";
 import { redirect } from "next/navigation";
+import { creatorRepos } from "@/lib/config";
 
 export default async function DashboardPage() {
   const session = await getUserProfile();
@@ -13,7 +14,7 @@ export default async function DashboardPage() {
 
   const { user, profile } = session;
   const profiles = await getVibeCheckData() || [];
-  const repos = await getGithubRepos() || [];
+  const repos = creatorRepos;
 
   return (
     <div className="min-h-screen bg-background">

@@ -1,9 +1,9 @@
 import { ArrowRight, Check, Star } from "lucide-react";
-import { getUserProfile, getVibeCheckData, getGithubRepos } from "@/services/dashboard";
+import { getUserProfile, getVibeCheckData } from "@/services/dashboard";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { FeaturesTabs } from "@/components/features-tabs";
-import { siteConfig } from "@/lib/config";
+import { siteConfig, creatorRepos } from "@/lib/config";
 
 
 export default async function Home() {
@@ -11,7 +11,7 @@ export default async function Home() {
   const user = session?.user;
   const profile = session?.profile;
   const profiles = await getVibeCheckData() || [];
-  const repos = await getGithubRepos() || [];
+  const repos = creatorRepos;
 
   return (
     <>
