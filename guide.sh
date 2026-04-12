@@ -68,6 +68,11 @@ show_env() {
     echo -e "   - ${CYAN}NEXT_PUBLIC_SITE_URL${NC}: Set to ${YELLOW}http://localhost:3000${NC} for now."
     echo -e "   - ${CYAN}NEXT_PUBLIC_GITHUB_URL${NC}: Link to your main repository.\n"
     
+    echo -e "${BOLD}4. Rate Limiting (Upstash Redis)${NC}"
+    echo -e "   Required for server-side protection. Get these from ${CYAN}console.upstash.com${NC}:"
+    echo -e "   - ${CYAN}UPSTASH_REDIS_REST_URL${NC}"
+    echo -e "   - ${CYAN}UPSTASH_REDIS_REST_TOKEN${NC}\n"
+
     echo -e "📖 See ${BLUE}docs/production-features.md${NC} for more details on env vars."
     echo ""
 }
@@ -128,7 +133,7 @@ show_vibe() {
     echo -e "${BOLD}Automation Commands:${NC}"
     echo -e "  - ${GREEN}npm run update-types${NC} : Refreshes ${CYAN}src/types/supabase.ts${NC} with live DB schema."
     echo -e "  - ${GREEN}npm run checkpoint${NC}   : Snapshots your DB to ${CYAN}supabase/backups/${NC} for AI context.\n"
-
+    
     echo -e "${BOLD}Verify Connection:${NC}"
     echo -e "Copy and paste this to your AI to confirm the tools are linked:"
     echo -e "  ${CYAN}\"Hey, do a Vibe Check: List my Supabase tables, check my current Git branch, and verify if we have a scripts folder.\"${NC}\n"
@@ -207,7 +212,7 @@ show_init() {
     echo -e "${RED}all existing Git history to start your own fresh repository.${NC}\n"
     
     echo -e "${BOLD}🚀 Project Rebranding & Initialization${NC}"
-    read -p "Enter your App Name [my-app]: " input_name
+    read -p "Enter your App Name [my-app]: " input_name < /dev/tty
     app_name=${input_name:-"my-app"}
 
     # Format for package.json (lowercase, dashes for spaces)

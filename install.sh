@@ -23,7 +23,7 @@ echo -e "${BOLD}Welcome to the DannFlow 'Elite' Installer!${NC}"
 echo -e "The high-performance AI-Native Next.js SaaS Starter.\n"
 
 # 1. Prompt for Project Name
-read -p "Enter your project name [my-dannflow-app]: " folder_name
+read -p "Enter your project name [my-dannflow-app]: " folder_name < /dev/tty
 folder_name=${folder_name:-"my-dannflow-app"}
 
 echo -e "\n🚀 ${CYAN}Initializing $folder_name...${NC}\n"
