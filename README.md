@@ -29,13 +29,14 @@ cp .env.example .env.local
 
 ### The Initial Commit
 
-Once configured, disconnect from the template's Git history and start your own:
+The `./guide.sh init` command automatically handles rebranding and resets your Git history so you can start fresh. **Run it only once.**
 
+If you prefer to do it manually:
 ```bash
 rm -rf .git
 git init
 git add .
-git commit -m "🚀 project: Dannflow was used here - Initializing high-performance architecture"
+git commit -m "this projects initialized Dannflow"
 ```
 
 ---

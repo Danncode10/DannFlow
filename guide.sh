@@ -32,7 +32,7 @@ show_main() {
     echo -e "${BOLD}Getting Started Guide${NC}\n"
     echo -e "Run any of the following commands to configure your project:\n"
     
-    echo -e "  ${GREEN}./guide.sh init${NC}      - Set your App Name and configure project"
+    echo -e "  ${GREEN}./guide.sh init${NC}      - ${YELLOW}${BOLD}RUN ONCE:${NC} Rebrand app & ${RED}RESET GIT HISTORY${NC}"
     echo -e "  ${GREEN}./guide.sh env${NC}       - Set up environment variables (.env.local)"
     echo -e "  ${GREEN}./guide.sh supabase${NC}  - Configure Supabase, Auth, and SMTP"
     echo -e "  ${GREEN}./guide.sh vibe${NC}      - Connect AI Agents (MCPs/Cursor/Antigravity)"
@@ -121,7 +121,11 @@ show_ready() {
 # Init Command
 show_init() {
     show_header
-    echo -e "${BOLD}🚀 Name Your Project${NC}\n"
+    echo -e "${RED}${BOLD}⚠️  CRITICAL: RUN ONLY ONCE${NC}"
+    echo -e "${RED}This command will rebrand your project and PERMANENTLY REMOVE${NC}"
+    echo -e "${RED}all existing Git history to start your own fresh repository.${NC}\n"
+    
+    echo -e "${BOLD}🚀 Project Rebranding & Initialization${NC}"
     read -p "Enter your App Name [my-app]: " input_name
     app_name=${input_name:-"my-app"}
 
@@ -147,11 +151,25 @@ show_init() {
         echo -e "✅ Updated ${CYAN}package.json${NC} name to '$pkg_name'"
     fi
 
-    # 3. Rename Folder
+    # 3. Update config.ts fallback
+    if [ -f src/lib/config.ts ]; then
+        sed -i.bak -e "s/name: process.env.NEXT_PUBLIC_SITE_NAME || \".*\"/name: process.env.NEXT_PUBLIC_SITE_NAME || \"$app_name\"/" src/lib/config.ts
+        rm -f src/lib/config.ts.bak
+        echo -e "✅ Updated ${CYAN}src/lib/config.ts${NC} name fallback"
+    fi
+
+    # 4. Reset Git History
+    echo -e "📦 ${YELLOW}Resetting Git History...${NC}"
+    rm -rf .git
+    git init > /dev/null
+    git add .
+    git commit -m "this projects initialized Dannflow" > /dev/null
+    echo -e "✅ Git history reset and project initialized"
+
+    # 5. Rename Folder (Last step)
     current_dir_name=$(basename "$PWD")
     if [ "$current_dir_name" != "$pkg_name" ]; then
         echo -e "📂 Renaming folder from '${YELLOW}$current_dir_name${NC}' to '${GREEN}$pkg_name${NC}'..."
-        # We use the parent move to ensure names match
         if mv "$PWD" "../$pkg_name" 2>/dev/null; then
             echo -e "✅ Folder renamed to '${CYAN}$pkg_name${NC}'"
             echo -e "${YELLOW}NOTE: Your terminal might still show the old path. You may need to run 'cd ../$pkg_name' to refresh your prompt.${NC}"
