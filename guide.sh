@@ -151,6 +151,19 @@ show_init() {
         echo -e "✅ Updated ${CYAN}package.json${NC} name to '$pkg_name'"
     fi
 
+    # 3. Rename Folder
+    current_dir_name=$(basename "$PWD")
+    if [ "$current_dir_name" != "$pkg_name" ]; then
+        echo -e "📂 Renaming folder from '${YELLOW}$current_dir_name${NC}' to '${GREEN}$pkg_name${NC}'..."
+        # We use the parent move to ensure names match
+        if mv "$PWD" "../$pkg_name" 2>/dev/null; then
+            echo -e "✅ Folder renamed to '${CYAN}$pkg_name${NC}'"
+            echo -e "${YELLOW}NOTE: Your terminal might still show the old path. You may need to run 'cd ../$pkg_name' to refresh your prompt.${NC}"
+        else
+            echo -e "❌ ${RED}Failed to rename folder. It might be in use by another process.${NC}"
+        fi
+    fi
+
     echo -e "\n${GREEN}Initialization complete!${NC} Your app is now named ${BOLD}$app_name${NC}."
     echo -e "Next, run: ${YELLOW}./guide.sh env${NC}"
     echo ""
