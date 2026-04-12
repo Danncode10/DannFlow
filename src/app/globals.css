@@ -34,3 +34,33 @@
     scrollbar-width: none;
   }
 }
+
+/**
+ * Suppress all browser-native password icons (reveal eye, key, credentials
+ * autofill button) across Chrome, Edge, Safari, and IE/Legacy Edge.
+ * We use our own custom Eye toggle — these clash and must be hidden.
+ */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}
+
+input[type="password"]::-webkit-credentials-auto-fill-button,
+input[type="password"]::-webkit-input-decoration-container,
+input[type="password"]::-webkit-strong-password-auto-fill-button {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  position: absolute;
+  right: -9999px;
+}
+
+/* Also suppress on text type when toggled visible */
+input[type="text"]::-webkit-credentials-auto-fill-button,
+input[type="text"]::-webkit-input-decoration-container {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  position: absolute;
+  right: -9999px;
+}
