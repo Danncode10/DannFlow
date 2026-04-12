@@ -34,3 +34,6 @@ When deploying on a free `*.vercel.app` domain, email providers like Resend ofte
     - User/Pass: Your Gmail & the 16-character App Password.
 3.  **Redirects**: 
     - Set your **Site URL** and **Redirect URLs** (e.g., `/auth/callback`) in Supabase to your live Vercel link to ensure confirmation links work.
+
+#### Security Notifications:
+- **Password Change Alert**: Go to **Auth > Email Templates > Password Change** and enable the template. This ensures a Gmail notification is sent instantly via your SMTP whenever a user successfully updates their password.
