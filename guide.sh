@@ -32,13 +32,14 @@ show_main() {
     echo -e "${BOLD}Getting Started Guide${NC}\n"
     echo -e "Run any of the following commands to configure your project:\n"
     
+    echo -e "  ${GREEN}./guide.sh init${NC}      - Set your App Name and configure project"
     echo -e "  ${GREEN}./guide.sh env${NC}       - Set up environment variables (.env.local)"
     echo -e "  ${GREEN}./guide.sh supabase${NC}  - Configure Supabase, Auth, and SMTP"
     echo -e "  ${GREEN}./guide.sh vibe${NC}      - Connect AI Agents (MCPs/Cursor/Antigravity)"
     echo -e "  ${GREEN}./guide.sh security${NC}  - Setup Gmail security notifications"
     echo -e "  ${GREEN}./guide.sh ready${NC}     - Commit your fresh DannFlow project"
     echo ""
-    echo -e "Example: ${YELLOW}./guide.sh env${NC}"
+    echo -e "Example: ${YELLOW}./guide.sh init${NC}"
     echo ""
 }
 
@@ -117,8 +118,47 @@ show_ready() {
     echo ""
 }
 
+# Init Command
+show_init() {
+    show_header
+    echo -e "${BOLD}🚀 Name Your Project${NC}\n"
+    read -p "Enter your App Name (e.g., MyAwesomeSaaS): " app_name
+    
+    if [ -z "$app_name" ]; then
+        echo -e "\n${RED}App name cannot be empty. Aborting.${NC}"
+        exit 1
+    fi
+
+    # Format for package.json (lowercase, dashes for spaces)
+    pkg_name=$(echo "$app_name" | tr '[:upper:]' '[:lower:]' | sed 's/ /-/g' | sed 's/[^a-z0-9-]//g')
+
+    echo -e "\nConfiguring your project...\n"
+
+    # 1. Update .env.local
+    if [ -f .env.local ]; then
+        # Use cross-platform sed strategy
+        sed -i.bak -e "s/^NEXT_PUBLIC_SITE_NAME=.*/NEXT_PUBLIC_SITE_NAME=\"$app_name\"/" .env.local
+        rm -f .env.local.bak
+        echo -e "✅ Updated ${CYAN}.env.local${NC} NEXT_PUBLIC_SITE_NAME"
+    else
+        echo -e "⚠️ ${YELLOW}.env.local not found. Run 'cp .env.example .env.local' first.${NC}"
+    fi
+
+    # 2. Update package.json
+    if [ -f package.json ]; then
+        sed -i.bak -e "s/\"name\": \".*\"/\"name\": \"$pkg_name\"/" package.json
+        rm -f package.json.bak
+        echo -e "✅ Updated ${CYAN}package.json${NC} name to '$pkg_name'"
+    fi
+
+    echo -e "\n${GREEN}Initialization complete!${NC} Your app is now named ${BOLD}$app_name${NC}."
+    echo -e "Next, run: ${YELLOW}./guide.sh env${NC}"
+    echo ""
+}
+
 # Routing logic
 case "$1" in
+    init)     show_init ;;
     env)      show_env ;;
     supabase) show_supabase ;;
     vibe)     show_vibe ;;

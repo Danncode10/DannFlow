@@ -11,13 +11,13 @@
 
 ## ⚡ Quick Start
 
-Boot up your project with our interactive setup script:
+Boot up your project and set your App Name with our interactive setup script:
 
 ```bash
 git clone https://github.com/Danncode10/my-structure .
 npm install
 cp .env.example .env.local
-./guide.sh
+./guide.sh init
 ```
 
 ### The Initial Commit
