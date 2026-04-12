@@ -62,11 +62,30 @@ export async function resetPassword(password: string) {
   return { success: true };
 }
 
-export async function updatePassword(password: string) {
+export async function updatePassword(password: string, currentPassword?: string) {
   const client = createClient();
+
+  if (currentPassword) {
+    // 1. Get current user email
+    const { data: { user }, error: userError } = await client.auth.getUser();
+    if (userError || !user?.email) throw new Error('Authentication required');
+
+    // 2. Silent re-auth
+    const { error: reAuthError } = await client.auth.signInWithPassword({
+      email: user.email,
+      password: currentPassword,
+    });
+
+    if (reAuthError) {
+      throw new Error('Incorrect current password');
+    }
+  }
+
+  // 3. Procceed with update
   const { error } = await client.auth.updateUser({
     password: password,
   });
+  
   if (error) throw error;
   return { success: true };
 }
