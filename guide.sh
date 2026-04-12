@@ -171,16 +171,18 @@ show_init() {
     if [ "$current_dir_name" != "$pkg_name" ]; then
         echo -e "📂 Renaming folder from '${YELLOW}$current_dir_name${NC}' to '${GREEN}$pkg_name${NC}'..."
         if mv "$PWD" "../$pkg_name" 2>/dev/null; then
+            cd "../$pkg_name"
             echo -e "✅ Folder renamed to '${CYAN}$pkg_name${NC}'"
-            echo -e "${YELLOW}NOTE: Your terminal might still show the old path. You may need to run 'cd ../$pkg_name' to refresh your prompt.${NC}"
         else
             echo -e "❌ ${RED}Failed to rename folder. It might be in use by another process.${NC}"
         fi
     fi
 
     echo -e "\n${GREEN}Initialization complete!${NC} Your app is now named ${BOLD}$app_name${NC}."
-    echo -e "Next, run: ${YELLOW}./guide.sh env${NC}"
-    echo ""
+    echo -e "🚀 ${CYAN}Starting development server...${NC}"
+    echo -e "${YELLOW}Note: Configure your Supabase keys in .env.local to fix 'fetch failed' errors.${NC}\n"
+    
+    npm run dev
 }
 
 # Routing logic
