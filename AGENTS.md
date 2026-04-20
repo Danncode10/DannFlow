@@ -63,6 +63,23 @@ To fix:
 8.  **STRICT SEMANTIC COMPLIANCE**: Use ONLY Shadcn/Tailwind semantic tokens (e.g., bg-background, bg-card, text-foreground). Stating hex codes, rgba, or hardcoded neutral/white/blur colors is a CRITICAL FAILURE.
 
 
+## 🎨 UI Quality Standards (Non-Negotiable)
+- **Mobile-First**: Every component must be fully responsive. Start at 375px. No horizontal scroll.
+- **Touch Targets**: All interactive elements (buttons, inputs, links) must be at minimum 48px tall.
+- **Visual Hierarchy**: Use font-size, weight, and spacing intentionally. Headings must feel like headings.
+- **Form UX**: Labels go ABOVE inputs, never as placeholder-only. Inputs must have visible focus rings using `ring-ring`.
+- **Spacing Rhythm**: Use consistent spacing scale (p-4, p-6, gap-4, gap-6). Never cram elements together.
+- **Feedback States**: Every button must have a loading state. Every input must have an error state. Use `text-destructive` for errors.
+- **Empty States**: Never leave a blank screen. Use a centered icon + message for empty or loading states.
+- **Semantic Tokens in Practice**: 
+  - Backgrounds: `bg-background`, `bg-card`, `bg-muted`
+  - Text: `text-foreground`, `text-muted-foreground`, `text-primary`
+  - Borders: `border`, `border-border`, `border-input`
+  - Buttons: always use Shadcn `<Button variant="default">` or `variant="outline"` — never raw `<button>`
+- **Card Pattern**: Wrap all form pages in `<Card>` with `<CardHeader>`, `<CardContent>`, `<CardFooter>` from Shadcn.
+- **Multi-step Forms**: Use a visible step indicator (e.g., "Step 2 of 3") with a progress bar using `bg-primary`.
+
+
 ## 🗄️ Supabase Workflow for AI Agents
 1. **Live Schema Awareness**: Use the **Supabase MCP Server** to query the live database state (tables, types, RLS policies). Do not assume schema structure without checking.
 2. **Schema Changes via MCP**: Execute SQL directly using the MCP when prompted to alter tables or policies. Do not ask the user for manual SQL entry.
