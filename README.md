@@ -212,13 +212,52 @@ DannFlow enforces the **AGENTS.md Standard**. When using AI tools:
 
 ## 📚 Extended Documentation
 
+> DannFlow docs live in `docs/dannflow_docs/` — keeping `docs/` free for your own project documentation.
+
 | Doc | What it covers |
 |---|---|
-| [docs/methodology.md](docs/methodology.md) | Vibe Coding philosophy |
-| [docs/the-holy-trinity.md](docs/the-holy-trinity.md) | Eyes, Blueprint, Action explained |
-| [docs/mcp-setup.md](docs/mcp-setup.md) | Step-by-step MCP tool setup |
-| [docs/backups-and-sync.md](docs/backups-and-sync.md) | Checkpoint & schema sync loop |
-| [docs/production-features.md](docs/production-features.md) | Gmail SMTP, SEO, and Toasts |
+| [docs/dannflow_docs/methodology.md](docs/dannflow_docs/methodology.md) | Vibe Coding philosophy |
+| [docs/dannflow_docs/the-holy-trinity.md](docs/dannflow_docs/the-holy-trinity.md) | Eyes, Blueprint, Action explained |
+| [docs/dannflow_docs/mcp-setup.md](docs/dannflow_docs/mcp-setup.md) | Step-by-step MCP tool setup |
+| [docs/dannflow_docs/backups-and-sync.md](docs/dannflow_docs/backups-and-sync.md) | Checkpoint & schema sync loop |
+| [docs/dannflow_docs/production-features.md](docs/dannflow_docs/production-features.md) | Gmail SMTP, SEO, and Toasts |
+| [docs/dannflow_docs/ui-system.md](docs/dannflow_docs/ui-system.md) | Theme tokens & UI standards |
+
+---
+
+## 🤝 Working with Claude Code (Worktree Workflow)
+
+When Claude Code uses **plan mode**, it creates an isolated branch called a **worktree** — a sandboxed copy of your repo where it makes changes safely without touching your working branch.
+
+```
+Your repo/
+└── .claude/worktrees/
+    └── claude/some-branch-name/   ← Claude edits here, not on your branch
+```
+
+### How to get Claude's edits into your branch
+
+**Option A — Simple tasks (skip plan mode)**
+Just ask Claude directly without `/plan`. It edits your files in-place on your current branch. Commit normally.
+
+**Option B — After a plan mode session**
+```bash
+# Merge the worktree branch into YOUR current branch (not necessarily main)
+git merge claude/some-branch-name
+
+# Or cherry-pick just one commit
+git cherry-pick <commit-hash>
+```
+
+**Option C — Push the worktree branch and PR it**
+```bash
+# Claude pushes the worktree branch, then you merge on GitHub
+git checkout main
+git merge claude/some-branch-name
+git push
+```
+
+> **Rule of thumb:** Use plan mode for large structural changes. For everyday edits, skip it — Claude edits directly and you commit as normal.
 
 ---
 
