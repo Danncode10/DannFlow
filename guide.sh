@@ -289,7 +289,12 @@ MCPEOF
             else
                 echo -e "  ${RED}❌ Failed to add GitHub MCP to Claude Code${NC}"
             fi
+
             echo ""
+            echo -e "  ${BOLD}Verify Claude Code MCPs are connected:${NC}"
+            echo -e "  Run: ${CYAN}claude mcp list${NC}\n"
+            echo -e "  You should see both servers with ${GREEN}✓ Connected${NC} status."
+            echo -e "  If not, re-run ${CYAN}./guide.sh 3${NC} and check your tokens.\n"
         fi
     fi
 
