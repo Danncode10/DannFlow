@@ -88,8 +88,6 @@ show_main() {
             esac
         elif [[ "$key" == '' ]]; then # Enter
             run_step "$selected"
-            echo ""
-            read -rsn1 -p "$(echo -e "${CYAN}Press any key to return to menu...${NC}")" < /dev/tty
         elif [[ "$key" == 'q' || "$key" == 'Q' ]]; then
             clear
             break
@@ -124,7 +122,7 @@ show_env() {
     echo -e "   - ${CYAN}UPSTASH_REDIS_REST_TOKEN${NC}\n"
 
     echo -e "📖 See ${BLUE}docs/dannflow_docs/production-features.md${NC} for more details on env vars."
-    echo ""
+    step_footer
 }
 
 # Supabase Command
@@ -161,7 +159,7 @@ show_supabase() {
     echo -e "   - ${BOLD}Redirect URLs${NC}: Add ${YELLOW}https://yourdomain.com/**${NC} (production).\n"
     
     echo -e "📖 Detailed walkthrough: ${BLUE}docs/dannflow_docs/production-features.md#6-email-authentication-gmail-smtp${NC}"
-    echo ""
+    step_footer
 }
 
 # Yes/No selector — returns 0 for Yes, 1 for No
@@ -190,6 +188,19 @@ ask_yes_no() {
         fi
         printf "\033[4A\033[0J"
     done
+}
+
+# Step footer — press g to return to menu, q to quit
+step_footer() {
+    echo -e "${CYAN}────────────────────────────────────────${NC}"
+    echo -e "  ${YELLOW}g${NC} → Back to menu   ${YELLOW}q${NC} → Quit"
+    IFS= read -rsn1 key < /dev/tty
+    if [[ "$key" == 'g' || "$key" == 'G' ]]; then
+        show_main
+    elif [[ "$key" == 'q' || "$key" == 'Q' ]]; then
+        clear
+        exit 0
+    fi
 }
 
 # Vibe Command
@@ -341,7 +352,7 @@ MCPEOF
     echo -e "  ${GREEN}npm run update-types${NC}  — Syncs src/types/supabase.ts with live DB schema"
     echo -e "  ${GREEN}npm run checkpoint${NC}    — Snapshots DB schema to supabase/backups/\n"
     echo -e "📖 ${BLUE}docs/dannflow_docs/mcp-setup.md${NC}"
-    echo ""
+    step_footer
 }
 
 # Security Command
@@ -361,7 +372,7 @@ show_security() {
     echo -e "💡 These allow the application to handle secure recovery and security alerts."
     echo -e "💡 Utilizes re-authentication logic in ${CYAN}src/services/auth.ts${NC}."
     echo -e "📖 Security breakdown: ${BLUE}docs/dannflow_docs/production-features.md#security-notifications${NC}"
-    echo ""
+    step_footer
 }
 
 # Ready Command
@@ -380,7 +391,7 @@ show_ready() {
     
     echo -e "📖 Deployment and Next Steps: ${BLUE}docs/dannflow_docs/backups-and-sync.md${NC}"
     echo -e "Happy shipping! 🚢"
-    echo ""
+    step_footer
 }
 
 # Deploy Command
@@ -403,7 +414,7 @@ show_deploy() {
     echo -e "   - Add your Vercel URL to the ${BOLD}Redirect URLs${NC}.\n"
     
     echo -e "📖 Full Production Guide: ${BLUE}docs/dannflow_docs/production-features.md#7-vercel-deployment${NC}"
-    echo ""
+    step_footer
 }
 
 # UI Command
@@ -436,7 +447,7 @@ show_ui() {
     echo -e "         NEVER hardcode hex, rgba, or raw Tailwind palette colors in JSX.\n"
 
     echo -e "📖 Full UI system guide: ${BLUE}docs/dannflow_docs/ui-system.md${NC}"
-    echo ""
+    step_footer
 }
 
 # Init Command
