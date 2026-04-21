@@ -205,11 +205,65 @@ step_footer() {
 
 # Vibe Command
 show_vibe() {
+    local vibe_options=("Setup MCPs (run wizard)" "View setup instructions")
+    local vibe_selected=0
+
+    while true; do
+        show_header
+        echo -e "${BOLD}🤖 Step 3 — Connect AI Agents${NC}\n"
+        echo -e "MCPs give your AI live access to your database and GitHub."
+        echo -e "Without them, your AI is guessing. With them, it ${GREEN}knows${NC}.\n"
+        echo -e "Use ${CYAN}↑ ↓${NC} to navigate  ${GREEN}Enter${NC} to select  ${YELLOW}g${NC} → menu  ${YELLOW}q${NC} → quit\n"
+
+        for i in "${!vibe_options[@]}"; do
+            if [ "$i" -eq "$vibe_selected" ]; then
+                echo -e "  ${GREEN}${BOLD}› ${vibe_options[$i]}${NC}"
+            else
+                echo -e "    ${vibe_options[$i]}"
+            fi
+        done
+
+        IFS= read -rsn1 key < /dev/tty
+        if [[ "$key" == $'\x1b' ]]; then
+            read -rsn2 key < /dev/tty
+            case "$key" in
+                '[A') ((vibe_selected--)); [ "$vibe_selected" -lt 0 ] && vibe_selected=1 ;;
+                '[B') ((vibe_selected++)); [ "$vibe_selected" -gt 1 ] && vibe_selected=0 ;;
+            esac
+        elif [[ "$key" == '' ]]; then
+            break
+        elif [[ "$key" == 'g' || "$key" == 'G' ]]; then
+            show_main; return
+        elif [[ "$key" == 'q' || "$key" == 'Q' ]]; then
+            clear; exit 0
+        fi
+    done
+
+    # Option 1: Instructions only
+    if [ "$vibe_selected" -eq 1 ]; then
+        show_header
+        echo -e "${BOLD}🤖 MCP Setup Instructions${NC}\n"
+        echo -e "${BOLD}What you need:${NC}"
+        echo -e "  ${YELLOW}Supabase token${NC}  → supabase.com → Account (top right) → Access Tokens → Generate"
+        echo -e "  ${YELLOW}GitHub token${NC}    → github.com/settings/tokens → Generate new token (classic)"
+        echo -e "              Scopes: ${CYAN}repo${NC}, ${CYAN}read:org${NC}\n"
+        echo -e "${BOLD}Antigravity:${NC}"
+        echo -e "  Chats → MCP Servers → Manage MCP Servers → View Raw Config → paste ${CYAN}mcpServers${NC} block\n"
+        echo -e "${BOLD}Claude Code:${NC}"
+        echo -e "  Run: ${CYAN}claude mcp add-json supabase-mcp-server --scope user '{...}'${NC}"
+        echo -e "  ${CYAN}--scope user${NC} = applies to all your projects globally\n"
+        echo -e "${BOLD}MCP Management:${NC}"
+        echo -e "  ${CYAN}claude mcp list${NC}                        — list all MCPs + status"
+        echo -e "  ${CYAN}claude mcp remove supabase-mcp-server${NC}  — remove Supabase MCP"
+        echo -e "  ${CYAN}claude mcp remove github-mcp-server${NC}    — remove GitHub MCP\n"
+        echo -e "Run ${CYAN}./guide.sh 3${NC} and select ${GREEN}Setup MCPs${NC} to configure automatically."
+        step_footer
+        return
+    fi
+
+    # Option 0: Wizard
     show_header
     echo -e "${BOLD}🤖 MCP Setup Wizard${NC}\n"
-    echo -e "MCPs give your AI live access to your database and GitHub."
-    echo -e "Without them, your AI is guessing. With them, it ${GREEN}knows${NC}.\n"
-
     echo -e "${BOLD}Step 1 — Get your tokens before continuing${NC}"
     echo -e "  ${YELLOW}Supabase${NC} → supabase.com → Account (top right) → Access Tokens → Generate new token"
     echo -e "  ${YELLOW}GitHub${NC}   → github.com/settings/tokens → Generate new token (classic)"
@@ -359,19 +413,39 @@ MCPEOF
 show_security() {
     show_header
     echo -e "${BOLD}🔒 Security Notifications & Re-Auth${NC}\n"
-    echo -e "DannFlow includes a high-security flow for password changes, requiring"
-    echo -e "the user's current password to be verified before any update.\n"
-    
-    echo -e "${BOLD}Setup Steps:${NC}"
-    echo -e "1. Ensure your ${CYAN}Gmail SMTP${NC} is active (run ./guide.sh supabase)."
-    echo -e "2. Go to ${YELLOW}Authentication > Email > Templates${NC}."
-    echo -e "3. Ensure these are ${GREEN}${BOLD}ON${NC}:"
-    echo -e "   - ${CYAN}Reset Password${NC}"
-    echo -e "   - ${CYAN}Password Changed${NC}\n"
-    
-    echo -e "💡 These allow the application to handle secure recovery and security alerts."
-    echo -e "💡 Utilizes re-authentication logic in ${CYAN}src/services/auth.ts${NC}."
-    echo -e "📖 Security breakdown: ${BLUE}docs/dannflow_docs/production-features.md#security-notifications${NC}"
+    echo -e "DannFlow has a high-security password change flow: the user must verify their"
+    echo -e "current password before any update is allowed. A Gmail notification is sent"
+    echo -e "automatically on every successful password change.\n"
+    echo -e "  ${YELLOW}⚠️  Requires:${NC} Gmail SMTP active (Step 1 — ./guide.sh supabase)\n"
+
+    echo -e "${BOLD}1. Enable Email Templates${NC}"
+    echo -e "   Go to ${CYAN}Supabase Dashboard → Authentication → Email → Email Templates${NC}"
+    echo -e "   Enable these two templates:\n"
+    echo -e "   ${GREEN}✓ Reset Password${NC}   — Sends password reset link via your Gmail SMTP"
+    echo -e "   ${GREEN}✓ Password Changed${NC} — Notifies user when password is updated\n"
+
+    echo -e "${BOLD}2. Confirm Email Sending is ON${NC}"
+    echo -e "   Go to ${CYAN}Authentication → Providers → Email${NC}:"
+    echo -e "   - ${BOLD}Enable Email Provider${NC} → ${GREEN}ON${NC}"
+    echo -e "   - ${BOLD}Confirm Email${NC}         → ${GREEN}ON${NC} (users must verify email on signup)"
+    echo -e "   - ${BOLD}Secure Email Change${NC}   → ${GREEN}ON${NC} (re-confirm when email changes)\n"
+
+    echo -e "${BOLD}3. How the Re-Auth Gate Works${NC}"
+    echo -e "   ${CYAN}src/services/auth.ts${NC} → ${CYAN}updatePassword()${NC}"
+    echo -e "   1. User enters current password in the Security tab"
+    echo -e "   2. A silent ${CYAN}signInWithPassword${NC} verifies identity"
+    echo -e "   3. If correct → ${CYAN}updateUser${NC} sets the new password"
+    echo -e "   4. Gmail sends a 'Password Changed' alert to the user's inbox"
+    echo -e "   5. If wrong current password → error shown, no change made\n"
+
+    echo -e "${BOLD}4. Test the Full Flow${NC}"
+    echo -e "   1. Run ${CYAN}npm run dev${NC} and log in"
+    echo -e "   2. Go to Dashboard → Settings → Security tab"
+    echo -e "   3. Enter wrong current password → should show error"
+    echo -e "   4. Enter correct current password + new password → should succeed"
+    echo -e "   5. Check inbox — 'Password Changed' email should arrive via Gmail\n"
+
+    echo -e "📖 Full breakdown: ${BLUE}docs/dannflow_docs/production-features.md#security-notifications${NC}"
     step_footer
 }
 
