@@ -214,6 +214,23 @@ show_vibe() {
         return
     fi
 
+    # Optional: limit Supabase MCP to one project
+    project_ref_flag=""
+    ask_yes_no "Limit Supabase AI access to this project only? (Recommended)"
+    if [ "$?" -eq 0 ]; then
+        echo -e "  ${YELLOW}Find your Project Ref:${NC} Supabase Dashboard → Project Settings → General → Reference ID"
+        read -p "  Paste your Project Reference ID: " project_ref < /dev/tty
+        echo ""
+        if [ -n "$project_ref" ]; then
+            project_ref_flag="--project-ref $project_ref"
+            echo -e "  ✅ ${GREEN}Supabase MCP will only access project: ${CYAN}$project_ref${NC}\n"
+        else
+            echo -e "  ${YELLOW}⚠️  Skipped — AI will have access to all your Supabase projects.${NC}\n"
+        fi
+    else
+        echo -e "  ${YELLOW}⚠️  AI will have access to ALL your Supabase projects.${NC}\n"
+    fi
+
     # Detect node/npx paths
     node_path=$(which node 2>/dev/null || echo "/opt/homebrew/bin/node")
     npx_path=$(which npx 2>/dev/null || echo "/opt/homebrew/bin/npx")
@@ -229,10 +246,25 @@ show_vibe() {
         return
     fi
 
+    # Build Supabase args array (with optional --project-ref)
+    supabase_args_json="\"$npx_path\",\"-y\",\"@supabase/mcp-server-supabase@latest\",\"--access-token\",\"$supabase_token\""
+    supabase_args_sh=("$npx_path" "-y" "@supabase/mcp-server-supabase@latest" "--access-token" "$supabase_token")
+    if [ -n "$project_ref" ]; then
+        supabase_args_json+=",\"--project-ref\",\"$project_ref\""
+        supabase_args_sh+=("--project-ref" "$project_ref")
+    fi
+
     echo -e "${BOLD}Configuring your tools...${NC}\n"
 
     # --- Antigravity ---
     if [ "$use_antigravity" -eq 0 ]; then
+        supabase_args_formatted=$(printf '        "%s"' "${supabase_args_sh[@]}" | sed 's/""$//' | tr '\0' '\n')
+        args_block=""
+        for arg in "${supabase_args_sh[@]}"; do
+            args_block+="        \"$arg\","$'\n'
+        done
+        args_block="${args_block%,$'\n'}"
+
         cat > mcp.json << MCPEOF
 {
   "_readme": "Antigravity: Chats → MCP Servers → Manage MCP Servers → View Raw Config → paste the mcpServers block below",
@@ -240,11 +272,7 @@ show_vibe() {
     "supabase-mcp-server": {
       "command": "$node_path",
       "args": [
-        "$npx_path",
-        "-y",
-        "@supabase/mcp-server-supabase@latest",
-        "--access-token",
-        "$supabase_token"
+$args_block
       ],
       "env": {
         "PATH": "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
@@ -275,7 +303,7 @@ MCPEOF
         if ! command -v claude &>/dev/null; then
             echo -e "  ${RED}❌ 'claude' CLI not found.${NC} Install it from ${CYAN}claude.ai/code${NC} first.\n"
         else
-            supabase_json="{\"command\":\"$node_path\",\"args\":[\"$npx_path\",\"-y\",\"@supabase/mcp-server-supabase@latest\",\"--access-token\",\"$supabase_token\"],\"env\":{\"PATH\":\"/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin\"}}"
+            supabase_json="{\"command\":\"$node_path\",\"args\":[$supabase_args_json],\"env\":{\"PATH\":\"/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin\"}}"
             github_json="{\"command\":\"$node_path\",\"args\":[\"$npx_path\",\"-y\",\"@modelcontextprotocol/server-github\"],\"env\":{\"GITHUB_PERSONAL_ACCESS_TOKEN\":\"$github_token\",\"PATH\":\"/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin\"}}"
 
             if claude mcp add-json supabase-mcp-server --scope user "$supabase_json" 2>/dev/null; then
@@ -291,12 +319,17 @@ MCPEOF
             fi
 
             echo ""
-            echo -e "  ${BOLD}Verify Claude Code MCPs are connected:${NC}"
-            echo -e "  Run: ${CYAN}claude mcp list${NC}\n"
-            echo -e "  You should see both servers with ${GREEN}✓ Connected${NC} status."
+            echo -e "  ${BOLD}Verify:${NC} ${CYAN}claude mcp list${NC}"
+            echo -e "  Both servers should show ${GREEN}✓ Connected${NC}."
             echo -e "  If not, re-run ${CYAN}./guide.sh 3${NC} and check your tokens.\n"
         fi
     fi
+
+    echo -e "${BOLD}MCP Management Commands:${NC}"
+    echo -e "  ${CYAN}claude mcp list${NC}                        — see all connected MCPs + status"
+    echo -e "  ${CYAN}claude mcp remove supabase-mcp-server${NC}  — remove Supabase MCP"
+    echo -e "  ${CYAN}claude mcp remove github-mcp-server${NC}    — remove GitHub MCP"
+    echo -e "  ${CYAN}./guide.sh 3${NC}                           — re-run this wizard to reconfigure\n"
 
     echo -e "${BOLD}Verify your setup — paste this to your AI:${NC}\n"
     echo -e "  ${CYAN}\"Vibe Check: List all tables in my Supabase public schema,"
