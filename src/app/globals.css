@@ -1,20 +1,44 @@
 @import "tailwindcss";
 
 @theme {
-  /* This tells the AI: "primary" IS your blue vibe */
+  /* Brand */
   --color-primary: #6C47FF;
   --color-primary-foreground: #ffffff;
 
+  /* Page */
   --color-background: #0A0A0F;
   --color-foreground: #F0EEFF;
 
-  --color-card: #ffffff;
-  --color-card-foreground: #020617;
+  /* Cards / panels */
+  --color-card: #13131F;
+  --color-card-foreground: #F0EEFF;
 
+  /* Muted (subtle backgrounds + secondary text) */
+  --color-muted: #1A1A2E;
+  --color-muted-foreground: #9490B5;
+
+  /* Accent (hover / highlight states) */
+  --color-accent: #1E1640;
+  --color-accent-foreground: #F0EEFF;
+
+  /* Secondary chips / badges */
   --color-secondary: #1A1A2E;
+  --color-secondary-foreground: #F0EEFF;
+
+  /* Destructive / error */
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #ffffff;
+
+  /* Popover / dropdown */
+  --color-popover: #13131F;
+  --color-popover-foreground: #F0EEFF;
+
+  /* Form elements */
+  --color-input: #2E2A4A;
+  --color-ring: #6C47FF;
   --color-border: #2E2A4A;
 
-  /* Matches your [3rem] preference but as a reusable variable */
+  /* Radius */
   --radius-5xl: 3rem;
 }
 

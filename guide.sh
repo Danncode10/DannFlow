@@ -716,7 +716,7 @@ show_ui() {
         echo -e "Project: ${CYAN}$app_name${NC}"
         echo -e "Context: ${YELLOW}$description${NC}\n"
 
-        local ai_prompt="You are a UI/brand designer. Based on this project: \"$app_name — $description\", suggest a color theme for a modern web app. Return ONLY these 8 lines with no extra text or explanation:\nPRIMARY: #hexcode\nPRIMARY_FOREGROUND: #hexcode\nBACKGROUND: #hexcode\nFOREGROUND: #hexcode\nCARD: #hexcode\nCARD_FOREGROUND: #hexcode\nSECONDARY: #hexcode\nBORDER: #hexcode"
+        local ai_prompt="You are a UI/brand designer. Based on this project: \"$app_name — $description\", suggest a complete color theme for a modern web app. Return ONLY these 13 lines with no extra text or explanation:\nPRIMARY: #hexcode\nPRIMARY_FOREGROUND: #hexcode\nBACKGROUND: #hexcode\nFOREGROUND: #hexcode\nCARD: #hexcode\nCARD_FOREGROUND: #hexcode\nMUTED: #hexcode\nMUTED_FOREGROUND: #hexcode\nSECONDARY: #hexcode\nSECONDARY_FOREGROUND: #hexcode\nACCENT: #hexcode\nACCENT_FOREGROUND: #hexcode\nBORDER: #hexcode"
 
         # Tool picker
         local tool_opts=("Claude Code (auto-runs & applies)" "Antigravity (copy prompt to chat)")
@@ -765,8 +765,8 @@ show_ui() {
 
         echo -e "${BOLD}Claude suggests:${NC}\n"
 
-        local suggest_labels=("PRIMARY" "PRIMARY_FOREGROUND" "BACKGROUND" "FOREGROUND" "CARD" "CARD_FOREGROUND" "SECONDARY" "BORDER")
-        local css_tokens=("--color-primary" "--color-primary-foreground" "--color-background" "--color-foreground" "--color-card" "--color-card-foreground" "--color-secondary" "--color-border")
+        local suggest_labels=("PRIMARY" "PRIMARY_FOREGROUND" "BACKGROUND" "FOREGROUND" "CARD" "CARD_FOREGROUND" "MUTED" "MUTED_FOREGROUND" "SECONDARY" "SECONDARY_FOREGROUND" "ACCENT" "ACCENT_FOREGROUND" "BORDER")
+        local css_tokens=("--color-primary" "--color-primary-foreground" "--color-background" "--color-foreground" "--color-card" "--color-card-foreground" "--color-muted" "--color-muted-foreground" "--color-secondary" "--color-secondary-foreground" "--color-accent" "--color-accent-foreground" "--color-border")
         local suggested_vals=()
         local valid=0
 
@@ -806,14 +806,21 @@ show_ui() {
     # --- See current colors (interactive picker) ---
     if [ "$ui_sel" -eq 2 ]; then
         local cur_tokens=(
-            "--color-primary:Primary (buttons, links)"
+            "--color-primary:Primary (brand color — buttons, links)"
             "--color-primary-foreground:Primary foreground (text on primary)"
-            "--color-background:Background"
-            "--color-foreground:Foreground (body text)"
-            "--color-card:Card background"
-            "--color-card-foreground:Card foreground"
-            "--color-secondary:Secondary / muted"
-            "--color-border:Border"
+            "--color-background:Page background"
+            "--color-foreground:Body text"
+            "--color-card:Card / panel background"
+            "--color-card-foreground:Card text"
+            "--color-muted:Muted background (subtle areas)"
+            "--color-muted-foreground:Muted text (secondary labels)"
+            "--color-secondary:Secondary background (chips, badges)"
+            "--color-secondary-foreground:Secondary text"
+            "--color-accent:Accent / hover highlight"
+            "--color-accent-foreground:Accent text"
+            "--color-border:Borders and dividers"
+            "--color-destructive:Error / delete color"
+            "--color-ring:Focus ring"
         )
         local cur_sel=0
         local cur_count=${#cur_tokens[@]}
@@ -892,18 +899,31 @@ show_ui() {
         echo -e "${BOLD}🔄 Reset to DannFlow Defaults${NC}\n"
         ask_yes_no "This will overwrite your current theme. Continue?"
         if [ "$?" -eq 0 ]; then
-            write_css_token "--color-primary" "#2563eb"
+            write_css_token "--color-primary" "#6C47FF"
             write_css_token "--color-primary-foreground" "#ffffff"
-            write_css_token "--color-background" "#ffffff"
-            write_css_token "--color-foreground" "#020617"
-            write_css_token "--color-card" "#ffffff"
-            write_css_token "--color-card-foreground" "#020617"
-            write_css_token "--color-secondary" "#f1f5f9"
-            write_css_token "--color-border" "#e2e8f0"
+            write_css_token "--color-background" "#0A0A0F"
+            write_css_token "--color-foreground" "#F0EEFF"
+            write_css_token "--color-card" "#13131F"
+            write_css_token "--color-card-foreground" "#F0EEFF"
+            write_css_token "--color-muted" "#1A1A2E"
+            write_css_token "--color-muted-foreground" "#9490B5"
+            write_css_token "--color-secondary" "#1A1A2E"
+            write_css_token "--color-secondary-foreground" "#F0EEFF"
+            write_css_token "--color-accent" "#1E1640"
+            write_css_token "--color-accent-foreground" "#F0EEFF"
+            write_css_token "--color-border" "#2E2A4A"
+            write_css_token "--color-destructive" "#ef4444"
+            write_css_token "--color-destructive-foreground" "#ffffff"
+            write_css_token "--color-input" "#2E2A4A"
+            write_css_token "--color-ring" "#6C47FF"
+            write_css_token "--color-popover" "#13131F"
+            write_css_token "--color-popover-foreground" "#F0EEFF"
             echo -e "  ✅ ${GREEN}Reset to DannFlow defaults.${NC}\n"
-            color_swatch "#2563eb" "primary"
-            color_swatch "#ffffff" "background"
-            color_swatch "#020617" "foreground"
+            color_swatch "#6C47FF" "primary"
+            color_swatch "#0A0A0F" "background"
+            color_swatch "#F0EEFF" "foreground"
+            color_swatch "#13131F" "card"
+            color_swatch "#9490B5" "muted-foreground"
         else
             echo -e "  ${YELLOW}Cancelled.${NC}\n"
         fi
@@ -917,9 +937,9 @@ show_ui() {
     echo -e "Copy a hex code (e.g. ${YELLOW}#16a34a${NC}) and paste it below.\n"
     echo -e "${RED}⚠️  Rule:${NC} Always use semantic tokens in components — never hardcode hex in JSX.\n"
 
-    local color_tokens=("--color-primary" "--color-background" "--color-foreground" "--color-secondary" "--color-border")
-    local color_labels=("Primary color (buttons, links, accents)" "Page background" "Body text color" "Muted bg (chips, badges, subtle areas)" "Borders and dividers")
-    local color_defaults=("#2563eb" "#ffffff" "#020617" "#f1f5f9" "#e2e8f0")
+    local color_tokens=("--color-primary" "--color-primary-foreground" "--color-background" "--color-foreground" "--color-card" "--color-card-foreground" "--color-muted" "--color-muted-foreground" "--color-secondary" "--color-secondary-foreground" "--color-accent" "--color-accent-foreground" "--color-border")
+    local color_labels=("Primary brand color (buttons, links)" "Text on primary (usually white)" "Page background" "Body text" "Card / panel background" "Card text" "Muted background (subtle areas)" "Muted text (secondary labels)" "Secondary bg (chips, badges)" "Secondary text" "Accent / hover highlight" "Accent text" "Borders and dividers")
+    local color_defaults=("#6C47FF" "#ffffff" "#0A0A0F" "#F0EEFF" "#13131F" "#F0EEFF" "#1A1A2E" "#9490B5" "#1A1A2E" "#F0EEFF" "#1E1640" "#F0EEFF" "#2E2A4A")
     local new_tokens=()
     local new_vals=()
 
