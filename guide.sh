@@ -130,6 +130,24 @@ show_supabase() {
     show_header
     echo -e "${BOLD}⚡ Supabase Setup${NC}\n"
 
+    # Auto-create .env.local if missing
+    if [ ! -f .env.local ]; then
+        echo -e "${YELLOW}⚠️  .env.local not found.${NC}\n"
+        ask_yes_no "Create .env.local from .env.example now?"
+        if [ "$?" -eq 0 ]; then
+            if [ -f .env.example ]; then
+                cp .env.example .env.local
+                echo -e "  ✅ ${GREEN}.env.local created.${NC} Open it and fill in your credentials as you go.\n"
+            else
+                echo -e "  ${RED}❌ .env.example not found. Check your project files.${NC}\n"
+            fi
+        else
+            echo -e "  ${YELLOW}Skipped. You can run: ${CYAN}cp .env.example .env.local${NC} anytime.\n"
+        fi
+    else
+        echo -e "  ✅ ${GREEN}.env.local already exists.${NC}\n"
+    fi
+
     echo -e "${BOLD}1. Project Creation${NC}"
     echo -e "   - Go to ${CYAN}supabase.com/dashboard${NC} and click ${YELLOW}New Project${NC}."
     echo -e "   - Set your ${YELLOW}Project Name${NC} and a secure ${YELLOW}Database Password${NC}. Save the password!"
