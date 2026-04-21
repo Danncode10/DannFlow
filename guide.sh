@@ -716,7 +716,7 @@ show_ui() {
         echo -e "Project: ${CYAN}$app_name${NC}"
         echo -e "Context: ${YELLOW}$description${NC}\n"
 
-        local ai_prompt="You are a UI/brand designer. Based on this project: \"$app_name — $description\", suggest a color theme for a modern web app. Return ONLY these 5 lines with no extra text or explanation:\nPRIMARY: #hexcode\nBACKGROUND: #hexcode\nFOREGROUND: #hexcode\nSECONDARY: #hexcode\nBORDER: #hexcode"
+        local ai_prompt="You are a UI/brand designer. Based on this project: \"$app_name — $description\", suggest a color theme for a modern web app. Return ONLY these 8 lines with no extra text or explanation:\nPRIMARY: #hexcode\nPRIMARY_FOREGROUND: #hexcode\nBACKGROUND: #hexcode\nFOREGROUND: #hexcode\nCARD: #hexcode\nCARD_FOREGROUND: #hexcode\nSECONDARY: #hexcode\nBORDER: #hexcode"
 
         # Tool picker
         local tool_opts=("Claude Code (auto-runs & applies)" "Antigravity (copy prompt to chat)")
@@ -765,8 +765,8 @@ show_ui() {
 
         echo -e "${BOLD}Claude suggests:${NC}\n"
 
-        local suggest_labels=("PRIMARY" "BACKGROUND" "FOREGROUND" "SECONDARY" "BORDER")
-        local css_tokens=("--color-primary" "--color-background" "--color-foreground" "--color-secondary" "--color-border")
+        local suggest_labels=("PRIMARY" "PRIMARY_FOREGROUND" "BACKGROUND" "FOREGROUND" "CARD" "CARD_FOREGROUND" "SECONDARY" "BORDER")
+        local css_tokens=("--color-primary" "--color-primary-foreground" "--color-background" "--color-foreground" "--color-card" "--color-card-foreground" "--color-secondary" "--color-border")
         local suggested_vals=()
         local valid=0
 
@@ -803,12 +803,9 @@ show_ui() {
         step_footer; return
     fi
 
-    # --- See current colors ---
+    # --- See current colors (interactive picker) ---
     if [ "$ui_sel" -eq 2 ]; then
-        show_header
-        echo -e "${BOLD}🎨 Current Theme Colors${NC}\n"
-        echo -e "Reading from ${CYAN}src/app/globals.css${NC}...\n"
-        local tokens=(
+        local cur_tokens=(
             "--color-primary:Primary (buttons, links)"
             "--color-primary-foreground:Primary foreground (text on primary)"
             "--color-background:Background"
@@ -818,19 +815,75 @@ show_ui() {
             "--color-secondary:Secondary / muted"
             "--color-border:Border"
         )
-        for entry in "${tokens[@]}"; do
-            local token="${entry%%:*}"
-            local label="${entry#*:}"
-            local val
-            val=$(read_css_token "$token")
-            if [[ "$val" =~ ^#[0-9a-fA-F]{6}$ ]]; then
-                color_swatch "$val" "$label ($token)"
-            else
-                echo -e "  ${YELLOW}$val${NC}  $label ($token)"
+        local cur_sel=0
+        local cur_count=${#cur_tokens[@]}
+
+        while true; do
+            show_header
+            echo -e "${BOLD}🎨 Current Theme Colors${NC}\n"
+            echo -e "From ${CYAN}src/app/globals.css${NC}  —  ${CYAN}↑ ↓${NC} navigate  ${GREEN}Enter${NC} to edit  ${YELLOW}g${NC} → menu  ${YELLOW}q${NC} → quit\n"
+            for i in "${!cur_tokens[@]}"; do
+                local entry="${cur_tokens[$i]}"
+                local ctoken="${entry%%:*}"
+                local clabel="${entry#*:}"
+                local cval
+                cval=$(read_css_token "$ctoken")
+                local swatch_str
+                if [[ "$cval" =~ ^#[0-9a-fA-F]{6}$ ]]; then
+                    local cr=$((16#${cval:1:2}))
+                    local cg=$((16#${cval:3:2}))
+                    local cb=$((16#${cval:5:2}))
+                    swatch_str="\033[48;2;${cr};${cg};${cb}m   \033[0m ${cval}"
+                else
+                    swatch_str="${cval}"
+                fi
+                if [ "$i" -eq "$cur_sel" ]; then
+                    echo -e "  ${GREEN}${BOLD}› ${swatch_str}  ${clabel}${NC}"
+                else
+                    echo -e "    ${swatch_str}  ${clabel}"
+                fi
+            done
+            echo ""
+            IFS= read -rsn1 ckey < /dev/tty
+            if [[ "$ckey" == $'\x1b' ]]; then
+                read -rsn2 ckey < /dev/tty
+                case "$ckey" in
+                    '[A') ((cur_sel--)); [ "$cur_sel" -lt 0 ] && cur_sel=$((cur_count - 1)) ;;
+                    '[B') ((cur_sel++)); [ "$cur_sel" -ge "$cur_count" ] && cur_sel=0 ;;
+                esac
+            elif [[ "$ckey" == '' ]]; then
+                local eentry="${cur_tokens[$cur_sel]}"
+                local etoken="${eentry%%:*}"
+                local elabel="${eentry#*:}"
+                local ecurrent
+                ecurrent=$(read_css_token "$etoken")
+                echo -e "${BOLD}Editing: ${CYAN}$elabel${NC}"
+                [[ "$ecurrent" =~ ^#[0-9a-fA-F]{6}$ ]] && color_swatch "$ecurrent" "current"
+                while true; do
+                    printf "New hex (e.g. #16a34a) or blank to cancel: "
+                    IFS= read -r einput < /dev/tty
+                    einput=$(echo "$einput" | tr -d ' ')
+                    [[ -z "$einput" ]] && break
+                    [[ "$einput" != \#* ]] && einput="#$einput"
+                    if [[ "$einput" =~ ^#[0-9a-fA-F]{6}$ ]]; then
+                        color_swatch "$einput" "→ will be set"
+                        ask_yes_no "Apply $einput to $etoken?"
+                        if [ "$?" -eq 0 ]; then
+                            write_css_token "$etoken" "$einput"
+                            echo -e "  ✅ ${GREEN}Updated!${NC}\n"
+                        else
+                            echo -e "  ${YELLOW}Cancelled.${NC}\n"
+                        fi
+                        break
+                    else
+                        echo -e "  ${RED}Invalid hex. Use format #rrggbb${NC}"
+                    fi
+                done
+            elif [[ "$ckey" == 'g' || "$ckey" == 'G' ]]; then show_main; return
+            elif [[ "$ckey" == 'q' || "$ckey" == 'Q' ]]; then clear; exit 0
             fi
         done
-        echo ""
-        step_footer; return
+        return
     fi
 
     # --- Reset to defaults ---
