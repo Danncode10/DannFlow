@@ -128,37 +128,39 @@ show_env() {
 # Supabase Command
 show_supabase() {
     show_header
-    echo -e "${BOLD}⚡ Supabase & SMTP Automation${NC}\n"
-    
+    echo -e "${BOLD}⚡ Supabase Setup${NC}\n"
+
     echo -e "${BOLD}1. Project Creation${NC}"
-    echo -e "   - Go to ${CYAN}Supabase Dashboard${NC} and click 'New Project'."
-    echo -e "   - Set your ${YELLOW}Project Name${NC} and a secure ${YELLOW}Database Password${NC}."
+    echo -e "   - Go to ${CYAN}supabase.com/dashboard${NC} and click ${YELLOW}New Project${NC}."
+    echo -e "   - Set your ${YELLOW}Project Name${NC} and a secure ${YELLOW}Database Password${NC}. Save the password!"
     echo -e "   - ${RED}${BOLD}WARNING (Free Tier):${NC} Supabase allows only ${BOLD}2 active projects${NC}."
-    echo -e "     If you already have 2, you must ${YELLOW}pause or delete${NC} one before creating this.\n"
+    echo -e "     If you already have 2, ${YELLOW}pause or delete${NC} one first.\n"
 
-    echo -e "${BOLD}2. AI Orchestration (Vibe Coding)${NC}"
-    echo -e "   If your Supabase MCP is connected, copy and paste this to your agent:"
-    echo -e "   ${CYAN}\"I've created a new Supabase project. Ask me for the Project Reference ID. Once provided, execute this protocol:\n\n1. Target: Connect to the new project via Supabase MCP.\n2. Execution: Locate the latest .sql backup in supabase/backups/. Read its content and execute it against the new project.\n3. Verification (MANDATORY): Immediately after execution, run an MCP command to list all tables and functions in the public schema.\n4. Report: Compare the results with the DannFlow architecture requirements.\n\nDo not report success until you can physically see the 'profiles' table and 'handle_new_user' function in the live database. If the list is empty, troubleshoot the connection and try again.\"${NC}\n"
+    echo -e "${BOLD}2. Get Your Credentials${NC}"
+    echo -e "   Go to ${CYAN}Project Settings > Data API${NC}:"
+    echo -e "   - Copy ${CYAN}NEXT_PUBLIC_SUPABASE_URL${NC}      → your API endpoint"
+    echo -e "   - Copy ${CYAN}NEXT_PUBLIC_SUPABASE_ANON_KEY${NC} → client-side key"
+    echo -e "   - Copy ${CYAN}SUPABASE_SERVICE_ROLE_KEY${NC}     → admin key (keep secret)"
+    echo -e "   Paste these into your ${CYAN}.env.local${NC} file (Step 2).\n"
 
-    echo -e "${BOLD}3. Google App Password (SMTP)${NC}"
-    echo -e "   - Enable 2-Step Verification in Google."
-    echo -e "   - Generate an ${YELLOW}App Password${NC} at ${CYAN}myaccount.google.com/apppasswords${NC}."
-    echo -e "   - This gives you a 16-character code.\n"
-    
-    echo -e "${BOLD}4. SMTP Config${NC}"
-    echo -e "   Go to ${CYAN}Authentication > Email > SMTP Settings${NC}:"
-    echo -e "   - Enable ${YELLOW}Enable custom SMTP${NC} to ON."
-    echo -e "   - Host: ${YELLOW}smtp.gmail.com${NC} | Port: ${YELLOW}465${NC}"
-    echo -e "   - User: ${YELLOW}yourname@gmail.com${NC}"
-    echo -e "   - Password: ${YELLOW}(the 16-char code)${NC}\n"
-    
-    echo -e "${BOLD}5. URL Configuration${NC}"
+    echo -e "${BOLD}3. URL Configuration${NC}"
     echo -e "   Go to ${CYAN}Authentication > URL Configuration${NC}:"
-    echo -e "   - ${BOLD}Site URL${NC}: Set to your live production domain."
-    echo -e "   - ${BOLD}Redirect URLs${NC}: Add ${YELLOW}http://localhost:3000/**${NC} (local development)."
-    echo -e "   - ${BOLD}Redirect URLs${NC}: Add ${YELLOW}https://yourdomain.com/**${NC} (production).\n"
-    
-    echo -e "📖 Detailed walkthrough: ${BLUE}docs/dannflow_docs/production-features.md#6-email-authentication-gmail-smtp${NC}"
+    echo -e "   - ${BOLD}Site URL${NC}:      Set to your live production domain (or localhost for now)."
+    echo -e "   - ${BOLD}Redirect URLs${NC}: Add ${YELLOW}http://localhost:3000/**${NC}"
+    echo -e "   - ${BOLD}Redirect URLs${NC}: Add ${YELLOW}https://yourdomain.com/**${NC} (after deploy)\n"
+
+    echo -e "${BOLD}4. AI Orchestration — Apply Schema (Vibe Coding)${NC}"
+    echo -e "   Once your Supabase MCP is connected (Step 3), paste this to your AI:\n"
+    echo -e "   ${CYAN}\"I've created a new Supabase project. Ask me for the Project"
+    echo -e "   Reference ID. Once provided:"
+    echo -e "   1. Connect to the project via Supabase MCP."
+    echo -e "   2. Find the latest .sql file in supabase/backups/ and apply it."
+    echo -e "   3. MANDATORY: list all tables and functions in the public schema."
+    echo -e "   4. Confirm the 'profiles' table and 'handle_new_user' function exist."
+    echo -e "   Do not report success until you can see them in the live DB.\"${NC}\n"
+
+    echo -e "💡 Gmail SMTP setup is in ${CYAN}Step 4 → ./guide.sh security${NC}"
+    echo -e "📖 Full walkthrough: ${BLUE}docs/dannflow_docs/production-features.md${NC}"
     step_footer
 }
 
@@ -409,43 +411,181 @@ MCPEOF
     step_footer
 }
 
+# Security — test account signup via Supabase API
+test_auth_account() {
+    show_header
+    echo -e "${BOLD}🧪 Test Account — Signup via Terminal${NC}\n"
+
+    # Load .env.local
+    if [ ! -f .env.local ]; then
+        echo -e "${RED}❌ .env.local not found. Run ./guide.sh 2 first.${NC}"
+        step_footer; return
+    fi
+
+    local url key
+    url=$(grep -E "^NEXT_PUBLIC_SUPABASE_URL=" .env.local | cut -d '=' -f2- | tr -d '"' | tr -d "'")
+    key=$(grep -E "^NEXT_PUBLIC_SUPABASE_ANON_KEY=" .env.local | cut -d '=' -f2- | tr -d '"' | tr -d "'")
+
+    if [ -z "$url" ] || [ -z "$key" ]; then
+        echo -e "${RED}❌ Supabase credentials missing in .env.local. Fill them in first.${NC}"
+        step_footer; return
+    fi
+
+    echo -e "Connected to: ${CYAN}$url${NC}\n"
+
+    local sec_options=("Signup (create new account)" "Login (test existing account)")
+    local sec_sel=0
+    while true; do
+        for i in "${!sec_options[@]}"; do
+            [ "$i" -eq "$sec_sel" ] && echo -e "  ${GREEN}${BOLD}› ${sec_options[$i]}${NC}" || echo -e "    ${sec_options[$i]}"
+        done
+        IFS= read -rsn1 k < /dev/tty
+        if [[ "$k" == $'\x1b' ]]; then
+            read -rsn2 k < /dev/tty
+            [[ "$k" == '[A' || "$k" == '[B' ]] && ((sec_sel = 1 - sec_sel))
+        elif [[ "$k" == '' ]]; then break
+        elif [[ "$k" == 'q' || "$k" == 'Q' ]]; then clear; exit 0
+        fi
+        printf "\033[2A\033[0J"
+    done
+    echo ""
+
+    read -p "  Email: " test_email < /dev/tty
+    read -sp "  Password: " test_pass < /dev/tty
+    echo -e "\n"
+
+    if [ -z "$test_email" ] || [ -z "$test_pass" ]; then
+        echo -e "${RED}❌ Email and password are required.${NC}"
+        step_footer; return
+    fi
+
+    local endpoint action
+    if [ "$sec_sel" -eq 0 ]; then
+        endpoint="$url/auth/v1/signup"
+        action="Signup"
+    else
+        endpoint="$url/auth/v1/token?grant_type=password"
+        action="Login"
+    fi
+
+    echo -e "  ${YELLOW}Running $action...${NC}\n"
+    local response
+    response=$(curl -s -X POST "$endpoint" \
+        -H "apikey: $key" \
+        -H "Content-Type: application/json" \
+        -d "{\"email\":\"$test_email\",\"password\":\"$test_pass\"}")
+
+    if echo "$response" | grep -q '"access_token"'; then
+        echo -e "  ✅ ${GREEN}$action successful!${NC}"
+        if [ "$sec_sel" -eq 0 ]; then
+            echo -e "  📧 Check ${CYAN}$test_email${NC} for a confirmation email (if email confirm is ON)."
+        else
+            echo -e "  🔑 Got access token — auth is working correctly."
+        fi
+    elif echo "$response" | grep -q '"error"'; then
+        local msg
+        msg=$(echo "$response" | grep -o '"message":"[^"]*"' | cut -d'"' -f4)
+        echo -e "  ${RED}❌ $action failed:${NC} $msg"
+        echo -e "  Check your Supabase credentials and project settings."
+    else
+        echo -e "  ${RED}❌ Unexpected response:${NC}"
+        echo "$response"
+    fi
+    echo ""
+    step_footer
+}
+
 # Security Command
 show_security() {
+    local sec_options=("View instructions" "Setup Gmail SMTP" "Test account (signup/login)")
+    local sec_sel=0
+
+    while true; do
+        show_header
+        echo -e "${BOLD}🔒 Step 4 — Security & Gmail Notifications${NC}\n"
+        echo -e "Password change re-auth, Gmail security alerts, and auth email setup.\n"
+        echo -e "Use ${CYAN}↑ ↓${NC} to navigate  ${GREEN}Enter${NC} to select  ${YELLOW}g${NC} → menu  ${YELLOW}q${NC} → quit\n"
+        for i in "${!sec_options[@]}"; do
+            [ "$i" -eq "$sec_sel" ] && echo -e "  ${GREEN}${BOLD}› ${sec_options[$i]}${NC}" || echo -e "    ${sec_options[$i]}"
+        done
+        IFS= read -rsn1 key < /dev/tty
+        if [[ "$key" == $'\x1b' ]]; then
+            read -rsn2 key < /dev/tty
+            case "$key" in
+                '[A') ((sec_sel--)); [ "$sec_sel" -lt 0 ] && sec_sel=2 ;;
+                '[B') ((sec_sel++)); [ "$sec_sel" -gt 2 ] && sec_sel=0 ;;
+            esac
+        elif [[ "$key" == '' ]]; then break
+        elif [[ "$key" == 'g' || "$key" == 'G' ]]; then show_main; return
+        elif [[ "$key" == 'q' || "$key" == 'Q' ]]; then clear; exit 0
+        fi
+    done
+
+    # Test account
+    if [ "$sec_sel" -eq 2 ]; then
+        test_auth_account; return
+    fi
+
     show_header
+
+    # Gmail SMTP setup
+    if [ "$sec_sel" -eq 1 ]; then
+        echo -e "${BOLD}📧 Gmail SMTP Setup${NC}\n"
+        echo -e "${BOLD}1. Create a Google App Password${NC}"
+        echo -e "   - Go to ${CYAN}myaccount.google.com/security${NC}"
+        echo -e "   - Enable ${YELLOW}2-Step Verification${NC} (required)"
+        echo -e "   - Go to ${CYAN}myaccount.google.com/apppasswords${NC}"
+        echo -e "   - App: ${YELLOW}Mail${NC} | Device: ${YELLOW}Other${NC} → name it 'Supabase'"
+        echo -e "   - Copy the ${BOLD}16-character password${NC} generated\n"
+
+        echo -e "${BOLD}2. Configure SMTP in Supabase${NC}"
+        echo -e "   Go to ${CYAN}Authentication > Email > SMTP Settings${NC}:"
+        echo -e "   - ${BOLD}Enable custom SMTP${NC} → ${GREEN}ON${NC}"
+        echo -e "   - ${BOLD}Host${NC}:     ${YELLOW}smtp.gmail.com${NC}"
+        echo -e "   - ${BOLD}Port${NC}:     ${YELLOW}465${NC}"
+        echo -e "   - ${BOLD}User${NC}:     ${YELLOW}yourname@gmail.com${NC}"
+        echo -e "   - ${BOLD}Password${NC}: ${YELLOW}the 16-char app password${NC} (NOT your Gmail password)\n"
+
+        echo -e "${BOLD}3. Verify It Works${NC}"
+        echo -e "   Go to ${CYAN}Authentication > Email > Email Templates${NC}"
+        echo -e "   Click ${YELLOW}Send test email${NC} — should arrive in your inbox within seconds."
+        echo -e "   If it doesn't arrive, double-check the 16-char password and port.\n"
+
+        echo -e "📖 ${BLUE}docs/dannflow_docs/production-features.md#6-email-authentication-gmail-smtp${NC}"
+        step_footer; return
+    fi
+
+    # Instructions
     echo -e "${BOLD}🔒 Security Notifications & Re-Auth${NC}\n"
-    echo -e "DannFlow has a high-security password change flow: the user must verify their"
-    echo -e "current password before any update is allowed. A Gmail notification is sent"
-    echo -e "automatically on every successful password change.\n"
-    echo -e "  ${YELLOW}⚠️  Requires:${NC} Gmail SMTP active (Step 1 — ./guide.sh supabase)\n"
+    echo -e "DannFlow has a high-security password change flow: the user must verify"
+    echo -e "their current password before any update is allowed. A Gmail notification"
+    echo -e "is sent automatically on every successful password change.\n"
+    echo -e "  ${YELLOW}⚠️  Requires:${NC} Gmail SMTP active (choose 'Setup Gmail SMTP' above)\n"
 
     echo -e "${BOLD}1. Enable Email Templates${NC}"
-    echo -e "   Go to ${CYAN}Supabase Dashboard → Authentication → Email → Email Templates${NC}"
-    echo -e "   Enable these two templates:\n"
-    echo -e "   ${GREEN}✓ Reset Password${NC}   — Sends password reset link via your Gmail SMTP"
-    echo -e "   ${GREEN}✓ Password Changed${NC} — Notifies user when password is updated\n"
+    echo -e "   Go to ${CYAN}Supabase → Authentication → Email → Email Templates${NC}:"
+    echo -e "   ${GREEN}✓ Reset Password${NC}   — sends reset link via Gmail SMTP"
+    echo -e "   ${GREEN}✓ Password Changed${NC} — security alert on every password update\n"
 
-    echo -e "${BOLD}2. Confirm Email Sending is ON${NC}"
+    echo -e "${BOLD}2. Email Provider Settings${NC}"
     echo -e "   Go to ${CYAN}Authentication → Providers → Email${NC}:"
     echo -e "   - ${BOLD}Enable Email Provider${NC} → ${GREEN}ON${NC}"
-    echo -e "   - ${BOLD}Confirm Email${NC}         → ${GREEN}ON${NC} (users must verify email on signup)"
-    echo -e "   - ${BOLD}Secure Email Change${NC}   → ${GREEN}ON${NC} (re-confirm when email changes)\n"
+    echo -e "   - ${BOLD}Confirm Email${NC}         → ${GREEN}ON${NC} (verify email on signup)"
+    echo -e "   - ${BOLD}Secure Email Change${NC}   → ${GREEN}ON${NC} (re-confirm on email change)\n"
 
     echo -e "${BOLD}3. How the Re-Auth Gate Works${NC}"
-    echo -e "   ${CYAN}src/services/auth.ts${NC} → ${CYAN}updatePassword()${NC}"
+    echo -e "   ${CYAN}src/services/auth.ts → updatePassword()${NC}"
     echo -e "   1. User enters current password in the Security tab"
-    echo -e "   2. A silent ${CYAN}signInWithPassword${NC} verifies identity"
+    echo -e "   2. Silent ${CYAN}signInWithPassword${NC} verifies identity"
     echo -e "   3. If correct → ${CYAN}updateUser${NC} sets the new password"
-    echo -e "   4. Gmail sends a 'Password Changed' alert to the user's inbox"
-    echo -e "   5. If wrong current password → error shown, no change made\n"
+    echo -e "   4. Gmail sends 'Password Changed' alert to inbox"
+    echo -e "   5. Wrong current password → error shown, no change made\n"
 
     echo -e "${BOLD}4. Test the Full Flow${NC}"
-    echo -e "   1. Run ${CYAN}npm run dev${NC} and log in"
-    echo -e "   2. Go to Dashboard → Settings → Security tab"
-    echo -e "   3. Enter wrong current password → should show error"
-    echo -e "   4. Enter correct current password + new password → should succeed"
-    echo -e "   5. Check inbox — 'Password Changed' email should arrive via Gmail\n"
+    echo -e "   Run ${CYAN}npm run dev${NC}, log in, go to Dashboard → Settings → Security tab."
+    echo -e "   Or use ${GREEN}./guide.sh 4${NC} → ${GREEN}Test account${NC} to test auth in this terminal.\n"
 
-    echo -e "📖 Full breakdown: ${BLUE}docs/dannflow_docs/production-features.md#security-notifications${NC}"
+    echo -e "📖 ${BLUE}docs/dannflow_docs/production-features.md#security-notifications${NC}"
     step_footer
 }
 
