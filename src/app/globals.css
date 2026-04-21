@@ -2,17 +2,17 @@
 
 @theme {
   /* This tells the AI: "primary" IS your blue vibe */
-  --color-primary: #2563eb;
+  --color-primary: #0ea5e9;
   --color-primary-foreground: #ffffff;
 
-  --color-background: #ffffff;
-  --color-foreground: #020617;
+  --color-background: #0f172a;
+  --color-foreground: #ffffff;
 
   --color-card: #ffffff;
   --color-card-foreground: #020617;
 
-  --color-secondary: #f1f5f9;
-  --color-border: #e2e8f0;
+  --color-secondary: #6366f1;
+  --color-border: #334155;
 
   /* Matches your [3rem] preference but as a reusable variable */
   --radius-5xl: 3rem;
