@@ -26,25 +26,75 @@ EOF
     echo -e "${CYAN}The AI-Native Next.js SaaS Starter for Vibe Coding${NC}\n"
 }
 
-# Main Menu
+# Run a step by index (0-based)
+run_step() {
+    case "$1" in
+        0) show_supabase ;;
+        1) show_env ;;
+        2) show_vibe ;;
+        3) show_security ;;
+        4) show_ui ;;
+        5) show_ready ;;
+        6) show_deploy ;;
+    esac
+}
+
+# Interactive Main Menu
 show_main() {
-    show_header
-    echo -e "${BOLD}Getting Started Guide${NC}\n"
-    echo -e "Follow these steps in order to configure your project:\n"
+    local labels=(
+        "Step 1: Create Supabase project, Auth, and SMTP"
+        "Step 2: Set up environment variables (.env.local)"
+        "Step 3: Connect AI Agents (MCPs/Cursor/Antigravity)"
+        "Step 4: Setup Gmail security notifications"
+        "Step 5: Customize your brand theme & colors"
+        "Step 6: Final checklist & rebrand (resets Git history)"
+        "Step 7: Deploy to Vercel (Production)"
+    )
+    local count=${#labels[@]}
+    local selected=0
 
-    echo -e "  ${BOLD}Step 1:${NC} ${GREEN}./guide.sh supabase${NC}  - Create Supabase project, Auth, and SMTP"
-    echo -e "  ${BOLD}Step 2:${NC} ${GREEN}./guide.sh env${NC}       - Set up environment variables (.env.local)"
-    echo -e "  ${BOLD}Step 3:${NC} ${GREEN}./guide.sh vibe${NC}      - Connect AI Agents (MCPs/Cursor/Antigravity)"
-    echo -e "  ${BOLD}Step 4:${NC} ${GREEN}./guide.sh security${NC}  - Setup Gmail security notifications"
-    echo -e "  ${BOLD}Step 5:${NC} ${GREEN}./guide.sh ui${NC}        - Customize your brand theme & colors"
-    echo -e "  ${BOLD}Step 6:${NC} ${GREEN}./guide.sh ready${NC}     - Final checklist & rebrand (${YELLOW}resets Git history${NC})"
-    echo -e "  ${BOLD}Step 7:${NC} ${GREEN}./guide.sh deploy${NC}    - Deploy to Vercel (Production)"
-    echo ""
-    echo -e "Other helpful commands:"
-    echo -e "  ${CYAN}npm run dev${NC}          - Start development server"
-    echo -e "  ${CYAN}npm run update-types${NC} - Sync TypeScript types with Supabase"
-    echo -e "  ${CYAN}npm run checkpoint${NC}   - Take a DB schema snapshot (SQL)"
+    while true; do
+        show_header
+        echo -e "${BOLD}Getting Started Guide${NC}"
+        echo -e "Use ${CYAN}↑ ↓${NC} to navigate  ${GREEN}Enter${NC} to open  ${YELLOW}q${NC} to quit\n"
 
+        for i in "${!labels[@]}"; do
+            if [ "$i" -eq "$selected" ]; then
+                echo -e "  ${GREEN}${BOLD}› ${labels[$i]}${NC}"
+            else
+                echo -e "    ${labels[$i]}"
+            fi
+        done
+
+        echo ""
+        echo -e "Other helpful commands:"
+        echo -e "  ${CYAN}npm run dev${NC}          - Start development server"
+        echo -e "  ${CYAN}npm run update-types${NC} - Sync TypeScript types with Supabase"
+        echo -e "  ${CYAN}npm run checkpoint${NC}   - Take a DB schema snapshot (SQL)"
+
+        # Read keypress
+        IFS= read -rsn1 key < /dev/tty
+        if [[ "$key" == $'\x1b' ]]; then
+            read -rsn2 key < /dev/tty
+            case "$key" in
+                '[A') # Up arrow
+                    ((selected--))
+                    [ "$selected" -lt 0 ] && selected=$((count - 1))
+                    ;;
+                '[B') # Down arrow
+                    ((selected++))
+                    [ "$selected" -ge "$count" ] && selected=0
+                    ;;
+            esac
+        elif [[ "$key" == '' ]]; then # Enter
+            run_step "$selected"
+            echo ""
+            read -rsn1 -p "$(echo -e "${CYAN}Press any key to return to menu...${NC}")" < /dev/tty
+        elif [[ "$key" == 'q' || "$key" == 'Q' ]]; then
+            clear
+            break
+        fi
+    done
 }
 
 # Env Command
@@ -315,12 +365,12 @@ show_init() {
 # Routing logic
 case "$1" in
     init)     show_init "$2" ;;
-    env)      show_env ;;
-    supabase) show_supabase ;;
-    vibe)     show_vibe ;;
-    security) show_security ;;
-    ui)       show_ui ;;
-    ready)    show_ready ;;
-    deploy)   show_deploy ;;
+    env|2)    show_env ;;
+    supabase|1) show_supabase ;;
+    vibe|3)   show_vibe ;;
+    security|4) show_security ;;
+    ui|5)     show_ui ;;
+    ready|6)  show_ready ;;
+    deploy|7) show_deploy ;;
     *)        show_main ;;
 esac
