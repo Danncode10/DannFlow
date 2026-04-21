@@ -1,6 +1,8 @@
 <!-- BEGIN:nextjs-agent-rules -->
 # Project Rules & AI Steering (AGENTS.md)
 
+> **Start here**: Always read this file first before taking any action on this project.
+
 You are an expert developer working on **Dann's Vibe-Coding Starter**. This project uses **Next.js 15+ (App Router)** and follows a strict **"Vibe Coding"** architecture built for clarity, speed, and maintainability.
 
 ## Diagnostic Protocol
@@ -15,7 +17,7 @@ If any required MCP tool is missing for the current task, stop immediately and p
 
 ⚠️ [Tool Name] MCP Not Detected: I need this to [Specific Task].
 To fix: 
-> 1. Open Antigravity Settings (Gear Icon) -> MCP Store.
+> 1. Open your AI IDE's MCP Store (Settings → MCP Store).
 > 2. Install "[Tool Name]" and follow the setup.
 > 3. Use your credentials from .env.local.
 
@@ -52,15 +54,17 @@ To fix:
     5. Do not report success until verification is complete.
 -   **Be concise and proactive**. If you see an obvious optimization that fits the application's clean aesthetic, suggest it.
 
+## 🔒 RLS Security Constraint (Non-Negotiable)
+Always check `src/types/supabase.ts` and **assume RLS is active on every table**. Every `select` or `update` in a service must include an `.eq('id', userId)` filter to pass security policies unless explicitly building a public endpoint. Skipping this is a security vulnerability.
+
 ## Code Architecture Rules
 1.  **Maintain Structure**: DO NOT arbitrarily change existing UI structure, folder hierarchy, or core logic unless explicitly asked.
 2.  **MODULARITY**: Extract repeatable logic into reusable components or custom hooks; avoid spaghetti code.
 3.  **DIRECTORY**: Place new components in the existing `/components/` folder and logic in `/lib/` or `/hooks/`.
 4.  **CLEANLINESS**: Adhere to DRY (Don't Repeat Yourself) and SOLID design principles.
 5.  **OUTPUT**: If any code changes are made, provide a concise, professional Git commit message (e.g., 'feat: add user login validation') at the end of your response for easy copy-pasting.
-6.  **RLS AWARENESS**: Always check `src/types/supabase.ts` and assume RLS is active. Every `select` or `update` service must include an `.eq('id', userId)` filter to pass security policies unless building a public endpoint.
-7.  **SERVER VS. CLIENT**: Default to Server Components. Only use `'use client'` when interactivity, client state, or specific lifecycle effects are strictly required.
-8.  **STRICT SEMANTIC COMPLIANCE**: Use ONLY Shadcn/Tailwind semantic tokens (e.g., bg-background, bg-card, text-foreground). Stating hex codes, rgba, or hardcoded neutral/white/blur colors is a CRITICAL FAILURE.
+6.  **SERVER VS. CLIENT**: Default to Server Components. Only use `'use client'` when interactivity, client state, or specific lifecycle effects are strictly required.
+7.  **STRICT SEMANTIC COMPLIANCE**: Use ONLY Shadcn/Tailwind semantic tokens (e.g., bg-background, bg-card, text-foreground). Stating hex codes, rgba, or hardcoded neutral/white/blur colors is a CRITICAL FAILURE.
 
 
 ## 🎨 UI Quality Standards (Non-Negotiable)

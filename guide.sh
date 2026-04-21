@@ -31,14 +31,14 @@ show_main() {
     show_header
     echo -e "${BOLD}Getting Started Guide${NC}\n"
     echo -e "Follow these steps in order to configure your project:\n"
-    
-    echo -e "  ${BOLD}Step 0:${NC} ${GREEN}./guide.sh init${NC}      - ${YELLOW}${BOLD}RUN ONCE:${NC} Rebrand app & ${RED}RESET GIT HISTORY${NC}"
-    echo -e "  ${BOLD}Step 1:${NC} ${GREEN}./guide.sh env${NC}       - Set up environment variables (.env.local)"
-    echo -e "  ${BOLD}Step 2:${NC} ${GREEN}./guide.sh vibe${NC}      - Connect AI Agents (MCPs/Cursor/Antigravity)"
-    echo -e "  ${BOLD}Step 3:${NC} ${GREEN}./guide.sh supabase${NC}  - Configure Supabase, Auth, and SMTP"
+
+    echo -e "  ${BOLD}Step 1:${NC} ${GREEN}./guide.sh supabase${NC}  - Create Supabase project, Auth, and SMTP"
+    echo -e "  ${BOLD}Step 2:${NC} ${GREEN}./guide.sh env${NC}       - Set up environment variables (.env.local)"
+    echo -e "  ${BOLD}Step 3:${NC} ${GREEN}./guide.sh vibe${NC}      - Connect AI Agents (MCPs/Cursor/Antigravity)"
     echo -e "  ${BOLD}Step 4:${NC} ${GREEN}./guide.sh security${NC}  - Setup Gmail security notifications"
-    echo -e "  ${BOLD}Step 5:${NC} ${GREEN}./guide.sh ready${NC}     - Commit your fresh DannFlow project"
-    echo -e "  ${BOLD}Step 6:${NC} ${GREEN}./guide.sh deploy${NC}    - Deploy to Vercel (Production)"
+    echo -e "  ${BOLD}Step 5:${NC} ${GREEN}./guide.sh ui${NC}        - Customize your brand theme & colors"
+    echo -e "  ${BOLD}Step 6:${NC} ${GREEN}./guide.sh ready${NC}     - Final checklist & rebrand (${YELLOW}resets Git history${NC})"
+    echo -e "  ${BOLD}Step 7:${NC} ${GREEN}./guide.sh deploy${NC}    - Deploy to Vercel (Production)"
     echo ""
     echo -e "Other helpful commands:"
     echo -e "  ${CYAN}npm run dev${NC}          - Start development server"
@@ -73,7 +73,7 @@ show_env() {
     echo -e "   - ${CYAN}UPSTASH_REDIS_REST_URL${NC}"
     echo -e "   - ${CYAN}UPSTASH_REDIS_REST_TOKEN${NC}\n"
 
-    echo -e "📖 See ${BLUE}docs/production-features.md${NC} for more details on env vars."
+    echo -e "📖 See ${BLUE}docs/dannflow_docs/production-features.md${NC} for more details on env vars."
     echo ""
 }
 
@@ -110,7 +110,7 @@ show_supabase() {
     echo -e "   - ${BOLD}Redirect URLs${NC}: Add ${YELLOW}http://localhost:3000/**${NC} (local development)."
     echo -e "   - ${BOLD}Redirect URLs${NC}: Add ${YELLOW}https://yourdomain.com/**${NC} (production).\n"
     
-    echo -e "📖 Detailed walkthrough: ${BLUE}docs/production-features.md#6-email-authentication-gmail-smtp${NC}"
+    echo -e "📖 Detailed walkthrough: ${BLUE}docs/dannflow_docs/production-features.md#6-email-authentication-gmail-smtp${NC}"
     echo ""
 }
 
@@ -138,7 +138,7 @@ show_vibe() {
     echo -e "Copy and paste this to your AI to confirm the tools are linked:"
     echo -e "  ${CYAN}\"Hey, do a Vibe Check: List my Supabase tables, check my current Git branch, and verify if we have a scripts folder.\"${NC}\n"
 
-    echo -e "📖 Read the Methodology: ${BLUE}docs/methodology.md${NC} and ${BLUE}docs/the-holy-trinity.md${NC}"
+    echo -e "📖 Read the Methodology: ${BLUE}docs/dannflow_docs/methodology.md${NC} and ${BLUE}docs/dannflow_docs/the-holy-trinity.md${NC}"
     echo ""
 }
 
@@ -158,7 +158,7 @@ show_security() {
     
     echo -e "💡 These allow the application to handle secure recovery and security alerts."
     echo -e "💡 Utilizes re-authentication logic in ${CYAN}src/services/auth.ts${NC}."
-    echo -e "📖 Security breakdown: ${BLUE}docs/production-features.md#security-notifications${NC}"
+    echo -e "📖 Security breakdown: ${BLUE}docs/dannflow_docs/production-features.md#security-notifications${NC}"
     echo ""
 }
 
@@ -176,7 +176,7 @@ show_ready() {
     echo -e "Ready to start coding? Disconnect from the template and start your own legacy:\n"
     echo -e "👉 Run ${YELLOW}./guide.sh init${NC} (This will reset your Git history!)\n"
     
-    echo -e "📖 Deployment and Next Steps: ${BLUE}docs/backups-and-sync.md${NC}"
+    echo -e "📖 Deployment and Next Steps: ${BLUE}docs/dannflow_docs/backups-and-sync.md${NC}"
     echo -e "Happy shipping! 🚢"
     echo ""
 }
@@ -200,7 +200,40 @@ show_deploy() {
     echo -e "   - Go to ${CYAN}Supabase > Auth > URL Configuration${NC}."
     echo -e "   - Add your Vercel URL to the ${BOLD}Redirect URLs${NC}.\n"
     
-    echo -e "📖 Full Production Guide: ${BLUE}docs/production-features.md#7-vercel-deployment${NC}"
+    echo -e "📖 Full Production Guide: ${BLUE}docs/dannflow_docs/production-features.md#7-vercel-deployment${NC}"
+    echo ""
+}
+
+# UI Command
+show_ui() {
+    show_header
+    echo -e "${BOLD}🎨 Brand Theme & Color System${NC}\n"
+    echo -e "DannFlow uses ${CYAN}Tailwind v4 CSS variables${NC} for theming."
+    echo -e "Edit ${YELLOW}src/app/globals.css${NC} inside the ${CYAN}@theme {}${NC} block to match your brand.\n"
+
+    echo -e "${BOLD}Key Tokens to Customize:${NC}"
+    echo -e "  ${CYAN}--color-primary${NC}             - Your brand's main action color (buttons, links)"
+    echo -e "  ${CYAN}--color-primary-foreground${NC}  - Text on top of primary (usually white)"
+    echo -e "  ${CYAN}--color-background${NC}          - Page background"
+    echo -e "  ${CYAN}--color-foreground${NC}          - Default body text"
+    echo -e "  ${CYAN}--color-card${NC}                - Card/panel background"
+    echo -e "  ${CYAN}--color-card-foreground${NC}     - Text inside cards"
+    echo -e "  ${CYAN}--color-secondary${NC}           - Muted backgrounds, chips, badges"
+    echo -e "  ${CYAN}--color-border${NC}              - Dividers, input borders\n"
+
+    echo -e "${BOLD}Current Defaults (DannFlow Blue):${NC}"
+    echo -e "  primary:     ${BLUE}#2563eb${NC} (blue-600)"
+    echo -e "  background:  #ffffff (white)"
+    echo -e "  foreground:  #020617 (slate-950)\n"
+
+    echo -e "${BOLD}Example — Change to a green brand:${NC}"
+    echo -e "  ${CYAN}--color-primary: #16a34a;${NC}   /* green-600 */"
+    echo -e "  ${CYAN}--color-primary-foreground: #ffffff;${NC}\n"
+
+    echo -e "${RED}${BOLD}⚠️  RULE:${NC} Always use semantic tokens in components (e.g. ${CYAN}bg-primary${NC}, ${CYAN}text-foreground${NC})."
+    echo -e "         NEVER hardcode hex, rgba, or raw Tailwind palette colors in JSX.\n"
+
+    echo -e "📖 Full UI system guide: ${BLUE}docs/dannflow_docs/ui-system.md${NC}"
     echo ""
 }
 
@@ -286,6 +319,7 @@ case "$1" in
     supabase) show_supabase ;;
     vibe)     show_vibe ;;
     security) show_security ;;
+    ui)       show_ui ;;
     ready)    show_ready ;;
     deploy)   show_deploy ;;
     *)        show_main ;;
