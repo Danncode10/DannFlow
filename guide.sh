@@ -649,36 +649,345 @@ show_deploy() {
     step_footer
 }
 
+# UI helpers
+hex_to_rgb() {
+    local hex="${1#'#'}"
+    echo "$((16#${hex:0:2})) $((16#${hex:2:2})) $((16#${hex:4:2}))"
+}
+
+color_swatch() {
+    local hex="$1" label="$2"
+    local rgb r g b
+    rgb=$(hex_to_rgb "$hex")
+    read -r r g b <<< "$rgb"
+    printf "  \033[48;2;%d;%d;%dm     \033[0m  %s  %s\n" "$r" "$g" "$b" "$hex" "$label"
+}
+
+read_css_token() {
+    local token="$1"
+    grep -E "^\s*${token}:" src/app/globals.css 2>/dev/null \
+        | head -1 | sed 's/.*: *//;s/;.*//' | tr -d ' '
+}
+
+write_css_token() {
+    local token="$1" value="$2"
+    sed -i.bak "s|^\( *\)${token}:.*|\1${token}: ${value};|" src/app/globals.css
+    rm -f src/app/globals.css.bak
+}
+
 # UI Command
 show_ui() {
+    local ui_options=("Ask AI for colors" "Setup UI colors" "See current colors" "Reset to DannFlow defaults")
+    local ui_sel=0
+
+    while true; do
+        show_header
+        echo -e "${BOLD}🎨 Step 5 — Brand Theme & Colors${NC}\n"
+        echo -e "DannFlow uses Tailwind v4 CSS variables in ${CYAN}src/app/globals.css${NC}.\n"
+        echo -e "Use ${CYAN}↑ ↓${NC} to navigate  ${GREEN}Enter${NC} to select  ${YELLOW}g${NC} → menu  ${YELLOW}q${NC} → quit\n"
+        for i in "${!ui_options[@]}"; do
+            [ "$i" -eq "$ui_sel" ] && echo -e "  ${GREEN}${BOLD}› ${ui_options[$i]}${NC}" || echo -e "    ${ui_options[$i]}"
+        done
+        IFS= read -rsn1 key < /dev/tty
+        if [[ "$key" == $'\x1b' ]]; then
+            read -rsn2 key < /dev/tty
+            case "$key" in
+                '[A') ((ui_sel--)); [ "$ui_sel" -lt 0 ] && ui_sel=3 ;;
+                '[B') ((ui_sel++)); [ "$ui_sel" -gt 3 ] && ui_sel=0 ;;
+            esac
+        elif [[ "$key" == '' ]]; then break
+        elif [[ "$key" == 'g' || "$key" == 'G' ]]; then show_main; return
+        elif [[ "$key" == 'q' || "$key" == 'Q' ]]; then clear; exit 0
+        fi
+    done
+
+    # --- Ask AI for colors ---
+    if [ "$ui_sel" -eq 0 ]; then
+        show_header
+        echo -e "${BOLD}🤖 Ask AI for Color Suggestions${NC}\n"
+
+        # Read project context
+        local app_name description
+        app_name=$(grep '"name"' package.json 2>/dev/null | head -1 | sed 's/.*"name": *"//;s/".*//')
+        [ -z "$app_name" ] && app_name="my app"
+        description=$(grep -A2 "^#" README.md 2>/dev/null | head -6 | tr '\n' ' ' | sed 's/[#*`]//g' | cut -c1-300)
+        [ -z "$description" ] && description="a Next.js SaaS starter application"
+
+        echo -e "Project: ${CYAN}$app_name${NC}"
+        echo -e "Context: ${YELLOW}$description${NC}\n"
+
+        local ai_prompt="You are a UI/brand designer. Based on this project: \"$app_name — $description\", suggest a complete color theme for a modern web app. Return ONLY these 13 lines with no extra text or explanation:\nPRIMARY: #hexcode\nPRIMARY_FOREGROUND: #hexcode\nBACKGROUND: #hexcode\nFOREGROUND: #hexcode\nCARD: #hexcode\nCARD_FOREGROUND: #hexcode\nMUTED: #hexcode\nMUTED_FOREGROUND: #hexcode\nSECONDARY: #hexcode\nSECONDARY_FOREGROUND: #hexcode\nACCENT: #hexcode\nACCENT_FOREGROUND: #hexcode\nBORDER: #hexcode"
+
+        # Tool picker
+        local tool_opts=("Claude Code (auto-runs & applies)" "Antigravity (copy prompt to chat)")
+        local tool_sel=0
+        echo -e "Where should I ask?\n"
+        while true; do
+            for i in "${!tool_opts[@]}"; do
+                [ "$i" -eq "$tool_sel" ] && echo -e "  ${GREEN}${BOLD}› ${tool_opts[$i]}${NC}" || echo -e "    ${tool_opts[$i]}"
+            done
+            IFS= read -rsn1 k < /dev/tty
+            if [[ "$k" == $'\x1b' ]]; then
+                read -rsn2 k < /dev/tty
+                [[ "$k" == '[A' || "$k" == '[B' ]] && ((tool_sel = 1 - tool_sel))
+            elif [[ "$k" == '' ]]; then break
+            elif [[ "$k" == 'q' || "$k" == 'Q' ]]; then clear; exit 0
+            fi
+            printf "\033[2A\033[0J"
+        done
+        echo ""
+
+        # Antigravity: show prompt to copy
+        if [ "$tool_sel" -eq 1 ]; then
+            echo -e "${BOLD}Copy this prompt into Antigravity chat:${NC}\n"
+            echo -e "${CYAN}──────────────────────────────────────────────────${NC}"
+            echo -e "$ai_prompt"
+            echo -e "${CYAN}──────────────────────────────────────────────────${NC}\n"
+            echo -e "When the AI replies, come back and use ${GREEN}Setup UI colors${NC}"
+            echo -e "to enter the hex codes manually with live swatches.\n"
+            step_footer; return
+        fi
+
+        # Claude Code: run automatically
+        if ! command -v claude &>/dev/null; then
+            echo -e "${RED}❌ 'claude' CLI not found.${NC} Install from ${CYAN}claude.ai/code${NC}\n"
+            step_footer; return
+        fi
+
+        echo -e "${YELLOW}Asking Claude for color suggestions...${NC}\n"
+        local response
+        response=$(claude -p "$ai_prompt" 2>/dev/null)
+
+        if [ -z "$response" ]; then
+            echo -e "${RED}❌ No response from Claude. Check your connection.${NC}\n"
+            step_footer; return
+        fi
+
+        echo -e "${BOLD}Claude suggests:${NC}\n"
+
+        local suggest_labels=("PRIMARY" "PRIMARY_FOREGROUND" "BACKGROUND" "FOREGROUND" "CARD" "CARD_FOREGROUND" "MUTED" "MUTED_FOREGROUND" "SECONDARY" "SECONDARY_FOREGROUND" "ACCENT" "ACCENT_FOREGROUND" "BORDER")
+        local css_tokens=("--color-primary" "--color-primary-foreground" "--color-background" "--color-foreground" "--color-card" "--color-card-foreground" "--color-muted" "--color-muted-foreground" "--color-secondary" "--color-secondary-foreground" "--color-accent" "--color-accent-foreground" "--color-border")
+        local suggested_vals=()
+        local valid=0
+
+        for label in "${suggest_labels[@]}"; do
+            local val
+            val=$(echo "$response" | grep -i "^${label}:" | head -1 | sed 's/.*: *//' | tr -d ' \r\n')
+            [[ "$val" != \#* ]] && val="#$val"
+            if [[ "$val" =~ ^#[0-9a-fA-F]{6}$ ]]; then
+                suggested_vals+=("$val")
+                color_swatch "$val" "$label"
+                valid=1
+            else
+                suggested_vals+=("")
+                echo -e "  ${YELLOW}⚠️  $label: could not parse${NC}"
+            fi
+        done
+        echo ""
+
+        if [ "$valid" -eq 0 ]; then
+            echo -e "${RED}❌ Could not parse any colors from Claude's response.${NC}\n"
+            echo -e "Raw response:\n$response\n"
+            step_footer; return
+        fi
+
+        ask_yes_no "Apply these colors to src/app/globals.css?"
+        if [ "$?" -eq 0 ]; then
+            for i in "${!css_tokens[@]}"; do
+                [ -n "${suggested_vals[$i]}" ] && write_css_token "${css_tokens[$i]}" "${suggested_vals[$i]}"
+            done
+            echo -e "\n  ✅ ${GREEN}Colors applied!${NC} Run ${CYAN}npm run dev${NC} to preview your new theme.\n"
+        else
+            echo -e "  ${YELLOW}Cancelled — nothing written.${NC}\n"
+        fi
+        step_footer; return
+    fi
+
+    # --- See current colors (interactive picker) ---
+    if [ "$ui_sel" -eq 2 ]; then
+        local cur_tokens=(
+            "--color-primary:Primary (brand color — buttons, links)"
+            "--color-primary-foreground:Primary foreground (text on primary)"
+            "--color-background:Page background"
+            "--color-foreground:Body text"
+            "--color-card:Card / panel background"
+            "--color-card-foreground:Card text"
+            "--color-muted:Muted background (subtle areas)"
+            "--color-muted-foreground:Muted text (secondary labels)"
+            "--color-secondary:Secondary background (chips, badges)"
+            "--color-secondary-foreground:Secondary text"
+            "--color-accent:Accent / hover highlight"
+            "--color-accent-foreground:Accent text"
+            "--color-border:Borders and dividers"
+            "--color-destructive:Error / delete color"
+            "--color-ring:Focus ring"
+        )
+        local cur_sel=0
+        local cur_count=${#cur_tokens[@]}
+
+        while true; do
+            show_header
+            echo -e "${BOLD}🎨 Current Theme Colors${NC}\n"
+            echo -e "From ${CYAN}src/app/globals.css${NC}  —  ${CYAN}↑ ↓${NC} navigate  ${GREEN}Enter${NC} to edit  ${YELLOW}g${NC} → menu  ${YELLOW}q${NC} → quit\n"
+            for i in "${!cur_tokens[@]}"; do
+                local entry="${cur_tokens[$i]}"
+                local ctoken="${entry%%:*}"
+                local clabel="${entry#*:}"
+                local cval
+                cval=$(read_css_token "$ctoken")
+                local swatch_str
+                if [[ "$cval" =~ ^#[0-9a-fA-F]{6}$ ]]; then
+                    local cr=$((16#${cval:1:2}))
+                    local cg=$((16#${cval:3:2}))
+                    local cb=$((16#${cval:5:2}))
+                    swatch_str="\033[48;2;${cr};${cg};${cb}m   \033[0m ${cval}"
+                else
+                    swatch_str="${cval}"
+                fi
+                if [ "$i" -eq "$cur_sel" ]; then
+                    echo -e "  ${GREEN}${BOLD}› ${swatch_str}  ${clabel}${NC}"
+                else
+                    echo -e "    ${swatch_str}  ${clabel}"
+                fi
+            done
+            echo ""
+            IFS= read -rsn1 ckey < /dev/tty
+            if [[ "$ckey" == $'\x1b' ]]; then
+                read -rsn2 ckey < /dev/tty
+                case "$ckey" in
+                    '[A') ((cur_sel--)); [ "$cur_sel" -lt 0 ] && cur_sel=$((cur_count - 1)) ;;
+                    '[B') ((cur_sel++)); [ "$cur_sel" -ge "$cur_count" ] && cur_sel=0 ;;
+                esac
+            elif [[ "$ckey" == '' ]]; then
+                local eentry="${cur_tokens[$cur_sel]}"
+                local etoken="${eentry%%:*}"
+                local elabel="${eentry#*:}"
+                local ecurrent
+                ecurrent=$(read_css_token "$etoken")
+                echo -e "${BOLD}Editing: ${CYAN}$elabel${NC}"
+                [[ "$ecurrent" =~ ^#[0-9a-fA-F]{6}$ ]] && color_swatch "$ecurrent" "current"
+                while true; do
+                    printf "New hex (e.g. #16a34a) or blank to cancel: "
+                    IFS= read -r einput < /dev/tty
+                    einput=$(echo "$einput" | tr -d ' ')
+                    [[ -z "$einput" ]] && break
+                    [[ "$einput" != \#* ]] && einput="#$einput"
+                    if [[ "$einput" =~ ^#[0-9a-fA-F]{6}$ ]]; then
+                        color_swatch "$einput" "→ will be set"
+                        ask_yes_no "Apply $einput to $etoken?"
+                        if [ "$?" -eq 0 ]; then
+                            write_css_token "$etoken" "$einput"
+                            echo -e "  ✅ ${GREEN}Updated!${NC}\n"
+                        else
+                            echo -e "  ${YELLOW}Cancelled.${NC}\n"
+                        fi
+                        break
+                    else
+                        echo -e "  ${RED}Invalid hex. Use format #rrggbb${NC}"
+                    fi
+                done
+            elif [[ "$ckey" == 'g' || "$ckey" == 'G' ]]; then show_main; return
+            elif [[ "$ckey" == 'q' || "$ckey" == 'Q' ]]; then clear; exit 0
+            fi
+        done
+        return
+    fi
+
+    # --- Reset to defaults ---
+    if [ "$ui_sel" -eq 3 ]; then
+        show_header
+        echo -e "${BOLD}🔄 Reset to DannFlow Defaults${NC}\n"
+        ask_yes_no "This will overwrite your current theme. Continue?"
+        if [ "$?" -eq 0 ]; then
+            write_css_token "--color-primary" "#6C47FF"
+            write_css_token "--color-primary-foreground" "#ffffff"
+            write_css_token "--color-background" "#0A0A0F"
+            write_css_token "--color-foreground" "#F0EEFF"
+            write_css_token "--color-card" "#13131F"
+            write_css_token "--color-card-foreground" "#F0EEFF"
+            write_css_token "--color-muted" "#1A1A2E"
+            write_css_token "--color-muted-foreground" "#9490B5"
+            write_css_token "--color-secondary" "#1A1A2E"
+            write_css_token "--color-secondary-foreground" "#F0EEFF"
+            write_css_token "--color-accent" "#1E1640"
+            write_css_token "--color-accent-foreground" "#F0EEFF"
+            write_css_token "--color-border" "#2E2A4A"
+            write_css_token "--color-destructive" "#ef4444"
+            write_css_token "--color-destructive-foreground" "#ffffff"
+            write_css_token "--color-input" "#2E2A4A"
+            write_css_token "--color-ring" "#6C47FF"
+            write_css_token "--color-popover" "#13131F"
+            write_css_token "--color-popover-foreground" "#F0EEFF"
+            echo -e "  ✅ ${GREEN}Reset to DannFlow defaults.${NC}\n"
+            color_swatch "#6C47FF" "primary"
+            color_swatch "#0A0A0F" "background"
+            color_swatch "#F0EEFF" "foreground"
+            color_swatch "#13131F" "card"
+            color_swatch "#9490B5" "muted-foreground"
+        else
+            echo -e "  ${YELLOW}Cancelled.${NC}\n"
+        fi
+        step_footer; return
+    fi
+
+    # --- Setup UI colors ---
     show_header
-    echo -e "${BOLD}🎨 Brand Theme & Color System${NC}\n"
-    echo -e "DannFlow uses ${CYAN}Tailwind v4 CSS variables${NC} for theming."
-    echo -e "Edit ${YELLOW}src/app/globals.css${NC} inside the ${CYAN}@theme {}${NC} block to match your brand.\n"
+    echo -e "${BOLD}🎨 Setup UI Colors${NC}\n"
+    echo -e "Pick your colors at ${CYAN}coolors.co${NC} or ${CYAN}tailwindcss.com/docs/customizing-colors${NC}"
+    echo -e "Copy a hex code (e.g. ${YELLOW}#16a34a${NC}) and paste it below.\n"
+    echo -e "${RED}⚠️  Rule:${NC} Always use semantic tokens in components — never hardcode hex in JSX.\n"
 
-    echo -e "${BOLD}Key Tokens to Customize:${NC}"
-    echo -e "  ${CYAN}--color-primary${NC}             - Your brand's main action color (buttons, links)"
-    echo -e "  ${CYAN}--color-primary-foreground${NC}  - Text on top of primary (usually white)"
-    echo -e "  ${CYAN}--color-background${NC}          - Page background"
-    echo -e "  ${CYAN}--color-foreground${NC}          - Default body text"
-    echo -e "  ${CYAN}--color-card${NC}                - Card/panel background"
-    echo -e "  ${CYAN}--color-card-foreground${NC}     - Text inside cards"
-    echo -e "  ${CYAN}--color-secondary${NC}           - Muted backgrounds, chips, badges"
-    echo -e "  ${CYAN}--color-border${NC}              - Dividers, input borders\n"
+    local color_tokens=("--color-primary" "--color-primary-foreground" "--color-background" "--color-foreground" "--color-card" "--color-card-foreground" "--color-muted" "--color-muted-foreground" "--color-secondary" "--color-secondary-foreground" "--color-accent" "--color-accent-foreground" "--color-border")
+    local color_labels=("Primary brand color (buttons, links)" "Text on primary (usually white)" "Page background" "Body text" "Card / panel background" "Card text" "Muted background (subtle areas)" "Muted text (secondary labels)" "Secondary bg (chips, badges)" "Secondary text" "Accent / hover highlight" "Accent text" "Borders and dividers")
+    local color_defaults=("#6C47FF" "#ffffff" "#0A0A0F" "#F0EEFF" "#13131F" "#F0EEFF" "#1A1A2E" "#9490B5" "#1A1A2E" "#F0EEFF" "#1E1640" "#F0EEFF" "#2E2A4A")
+    local new_tokens=()
+    local new_vals=()
 
-    echo -e "${BOLD}Current Defaults (DannFlow Blue):${NC}"
-    echo -e "  primary:     ${BLUE}#2563eb${NC} (blue-600)"
-    echo -e "  background:  #ffffff (white)"
-    echo -e "  foreground:  #020617 (slate-950)\n"
+    local i
+    for i in "${!color_tokens[@]}"; do
+        local token="${color_tokens[$i]}"
+        local label="${color_labels[$i]}"
+        local default="${color_defaults[$i]}"
+        local current
+        current=$(read_css_token "$token")
+        [ -z "$current" ] && current="$default"
 
-    echo -e "${BOLD}Example — Change to a green brand:${NC}"
-    echo -e "  ${CYAN}--color-primary: #16a34a;${NC}   /* green-600 */"
-    echo -e "  ${CYAN}--color-primary-foreground: #ffffff;${NC}\n"
+        echo -e "${BOLD}$label${NC}"
+        [[ "$current" =~ ^#[0-9a-fA-F]{6}$ ]] && color_swatch "$current" "current"
+        read -p "  Enter hex (press Enter to keep current): " input < /dev/tty
+        input=$(echo "$input" | tr -d ' ')
+        if [ -n "$input" ]; then
+            [[ "$input" != \#* ]] && input="#$input"
+            if [[ "$input" =~ ^#[0-9a-fA-F]{6}$ ]]; then
+                new_tokens+=("$token")
+                new_vals+=("$input")
+                color_swatch "$input" "→ will be set"
+            else
+                echo -e "  ${RED}❌ Invalid hex — skipped.${NC}"
+            fi
+        else
+            echo -e "  ${YELLOW}Kept:${NC} $current"
+        fi
+        echo ""
+    done
 
-    echo -e "${RED}${BOLD}⚠️  RULE:${NC} Always use semantic tokens in components (e.g. ${CYAN}bg-primary${NC}, ${CYAN}text-foreground${NC})."
-    echo -e "         NEVER hardcode hex, rgba, or raw Tailwind palette colors in JSX.\n"
+    if [ "${#new_tokens[@]}" -eq 0 ]; then
+        echo -e "${YELLOW}No changes made.${NC}\n"
+        step_footer; return
+    fi
 
-    echo -e "📖 Full UI system guide: ${BLUE}docs/dannflow_docs/ui-system.md${NC}"
+    ask_yes_no "Apply these colors to src/app/globals.css?"
+    if [ "$?" -eq 0 ]; then
+        for i in "${!new_tokens[@]}"; do
+            write_css_token "${new_tokens[$i]}" "${new_vals[$i]}"
+        done
+        echo -e "\n  ✅ ${GREEN}Colors updated in src/app/globals.css${NC}"
+        echo -e "  Run ${CYAN}npm run dev${NC} to preview your new theme.\n"
+    else
+        echo -e "  ${YELLOW}Cancelled — no changes written.${NC}\n"
+    fi
+
+    echo -e "📖 ${BLUE}docs/dannflow_docs/ui-system.md${NC}"
     step_footer
 }
 
