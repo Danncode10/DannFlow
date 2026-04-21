@@ -1,0 +1,46 @@
+{
+  "_readme": [
+    "DannFlow MCP Configuration Example",
+    "",
+    "HOW TO USE:",
+    "  Antigravity → Chats → MCP Servers → Manage MCP Servers → View Raw Config → paste mcpServers block",
+    "  Claude Code  → run: claude mcp add-json <name> --scope user '<json>'",
+    "                --scope user = global (all projects). Manual: edit ~/.claude.json in your home folder.",
+    "  Cursor       → copy to .cursor/mcp.json in your project root",
+    "",
+    "SETUP STEPS:",
+    "  1. Supabase token  → supabase.com → Account → Access Tokens → Generate new token",
+    "  2. GitHub token    → github.com/settings/tokens → Generate new token (classic)",
+    "                       Scopes needed: repo, read:org",
+    "",
+    "Copy this file to mcp.json, fill in your tokens, then paste into your AI tool.",
+    "mcp.json is gitignored — your tokens will never be committed."
+  ],
+  "mcpServers": {
+    "supabase-mcp-server": {
+      "command": "/opt/homebrew/bin/node",
+      "args": [
+        "/opt/homebrew/bin/npx",
+        "-y",
+        "@supabase/mcp-server-supabase@latest",
+        "--access-token",
+        "YOUR_SUPABASE_ACCESS_TOKEN_HERE"
+      ],
+      "env": {
+        "PATH": "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+      }
+    },
+    "github-mcp-server": {
+      "command": "/opt/homebrew/bin/node",
+      "args": [
+        "/opt/homebrew/bin/npx",
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "YOUR_GITHUB_TOKEN_HERE",
+        "PATH": "/opt/homebrew/bin:/usr/local/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+      }
+    }
+  }
+}

@@ -164,31 +164,145 @@ show_supabase() {
     echo ""
 }
 
+# Yes/No selector — returns 0 for Yes, 1 for No
+ask_yes_no() {
+    local question="$1"
+    local selected=0
+    while true; do
+        printf "\n  ${BOLD}%s${NC}\n" "$question"
+        if [ "$selected" -eq 0 ]; then
+            printf "    ${GREEN}${BOLD}› Yes${NC}\n      No\n"
+        else
+            printf "      Yes\n    ${GREEN}${BOLD}› No${NC}\n"
+        fi
+        IFS= read -rsn1 key < /dev/tty
+        if [[ "$key" == $'\x1b' ]]; then
+            read -rsn2 key < /dev/tty
+            [[ "$key" == '[A' || "$key" == '[B' ]] && ((selected = 1 - selected))
+        elif [[ "$key" == '' ]]; then
+            printf "\033[4A\033[0J"
+            if [ "$selected" -eq 0 ]; then
+                echo -e "  ${BOLD}$question${NC} → ${GREEN}Yes${NC}\n"
+            else
+                echo -e "  ${BOLD}$question${NC} → ${YELLOW}No${NC}\n"
+            fi
+            return $selected
+        fi
+        printf "\033[4A\033[0J"
+    done
+}
+
 # Vibe Command
 show_vibe() {
     show_header
-    echo -e "${BOLD}🤖 AI-Native Development (Vibe Coding)${NC}\n"
-    echo -e "DannFlow isn't just a UI; it's a workflow built on the ${CYAN}Trinity Model${NC}:"
-    echo -e "  - ${BOLD}The Eyes (Types)${NC}: Auto-generated TypeScript mirroring your DB."
-    echo -e "  - ${BOLD}The Blueprint (SQL)${NC}: Snapshots for disaster recovery & agents."
-    echo -e "  - ${BOLD}The Action (Services)${NC}: Pure business logic away from the UI.\n"
-    
-    echo -e "${BOLD}Required Agent Tools (MCPs):${NC}"
-    echo -e "  1. ${YELLOW}Supabase MCP${NC}  - Grants AI the ability to see and edit your DB."
-    echo -e "  2. ${YELLOW}GitHub MCP${NC}    - Allows AI to handle PRs and history context."
-    echo -e "  3. ${YELLOW}Terminal MCP${NC}  - For 'npm run checkpoint' automation.\n"
-    
-    echo -e "🚩 Rule: Always point your agent (Cursor/Antigravity) to ${CYAN}AGENTS.md${NC} first.\n"
-    
-    echo -e "${BOLD}Automation Commands:${NC}"
-    echo -e "  - ${GREEN}npm run update-types${NC} : Refreshes ${CYAN}src/types/supabase.ts${NC} with live DB schema."
-    echo -e "  - ${GREEN}npm run checkpoint${NC}   : Snapshots your DB to ${CYAN}supabase/backups/${NC} for AI context.\n"
-    
-    echo -e "${BOLD}Verify Connection:${NC}"
-    echo -e "Copy and paste this to your AI to confirm the tools are linked:"
-    echo -e "  ${CYAN}\"Hey, do a Vibe Check: List my Supabase tables, check my current Git branch, and verify if we have a scripts folder.\"${NC}\n"
+    echo -e "${BOLD}🤖 MCP Setup Wizard${NC}\n"
+    echo -e "MCPs give your AI live access to your database and GitHub."
+    echo -e "Without them, your AI is guessing. With them, it ${GREEN}knows${NC}.\n"
 
-    echo -e "📖 Read the Methodology: ${BLUE}docs/dannflow_docs/methodology.md${NC} and ${BLUE}docs/dannflow_docs/the-holy-trinity.md${NC}"
+    echo -e "${BOLD}Step 1 — Get your tokens before continuing${NC}"
+    echo -e "  ${YELLOW}Supabase${NC} → supabase.com → Account (top right) → Access Tokens → Generate new token"
+    echo -e "  ${YELLOW}GitHub${NC}   → github.com/settings/tokens → Generate new token (classic)"
+    echo -e "           Scopes needed: ${CYAN}repo${NC}, ${CYAN}read:org${NC}\n"
+
+    read -p "  Paste your Supabase Access Token: " supabase_token < /dev/tty
+    echo ""
+    read -p "  Paste your GitHub Personal Access Token: " github_token < /dev/tty
+    echo ""
+
+    if [ -z "$supabase_token" ] || [ -z "$github_token" ]; then
+        echo -e "${RED}❌ Both tokens are required. Run ./guide.sh 3 again when ready.${NC}"
+        return
+    fi
+
+    # Detect node/npx paths
+    node_path=$(which node 2>/dev/null || echo "/opt/homebrew/bin/node")
+    npx_path=$(which npx 2>/dev/null || echo "/opt/homebrew/bin/npx")
+
+    ask_yes_no "Are you using Antigravity?"
+    use_antigravity=$?
+
+    ask_yes_no "Are you using Claude Code?"
+    use_claude=$?
+
+    if [ "$use_antigravity" -eq 1 ] && [ "$use_claude" -eq 1 ]; then
+        echo -e "${YELLOW}⚠️  No tools selected. Run ./guide.sh 3 again and select at least one.${NC}"
+        return
+    fi
+
+    echo -e "${BOLD}Configuring your tools...${NC}\n"
+
+    # --- Antigravity ---
+    if [ "$use_antigravity" -eq 0 ]; then
+        cat > mcp.json << MCPEOF
+{
+  "_readme": "Antigravity: Chats → MCP Servers → Manage MCP Servers → View Raw Config → paste the mcpServers block below",
+  "mcpServers": {
+    "supabase-mcp-server": {
+      "command": "$node_path",
+      "args": [
+        "$npx_path",
+        "-y",
+        "@supabase/mcp-server-supabase@latest",
+        "--access-token",
+        "$supabase_token"
+      ],
+      "env": {
+        "PATH": "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+      }
+    },
+    "github-mcp-server": {
+      "command": "$node_path",
+      "args": [
+        "$npx_path",
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "$github_token",
+        "PATH": "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+      }
+    }
+  }
+}
+MCPEOF
+        echo -e "  ✅ ${GREEN}mcp.json created with your tokens${NC}"
+        echo -e "     ${BOLD}Next:${NC} Antigravity → Chats → MCP Servers → Manage MCP Servers → View Raw Config"
+        echo -e "     Paste the ${CYAN}mcpServers${NC} block from ${CYAN}mcp.json${NC}\n"
+    fi
+
+    # --- Claude Code ---
+    if [ "$use_claude" -eq 0 ]; then
+        if ! command -v claude &>/dev/null; then
+            echo -e "  ${RED}❌ 'claude' CLI not found.${NC} Install it from ${CYAN}claude.ai/code${NC} first.\n"
+        else
+            supabase_json="{\"command\":\"$node_path\",\"args\":[\"$npx_path\",\"-y\",\"@supabase/mcp-server-supabase@latest\",\"--access-token\",\"$supabase_token\"],\"env\":{\"PATH\":\"/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin\"}}"
+            github_json="{\"command\":\"$node_path\",\"args\":[\"$npx_path\",\"-y\",\"@modelcontextprotocol/server-github\"],\"env\":{\"GITHUB_PERSONAL_ACCESS_TOKEN\":\"$github_token\",\"PATH\":\"/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin\"}}"
+
+            if claude mcp add-json supabase-mcp-server --scope user "$supabase_json" 2>/dev/null; then
+                echo -e "  ✅ ${GREEN}Supabase MCP added to Claude Code${NC}"
+            else
+                echo -e "  ${RED}❌ Failed to add Supabase MCP to Claude Code${NC}"
+            fi
+
+            if claude mcp add-json github-mcp-server --scope user "$github_json" 2>/dev/null; then
+                echo -e "  ✅ ${GREEN}GitHub MCP added to Claude Code${NC}"
+            else
+                echo -e "  ${RED}❌ Failed to add GitHub MCP to Claude Code${NC}"
+            fi
+            echo ""
+        fi
+    fi
+
+    echo -e "${BOLD}Verify your setup — paste this to your AI:${NC}\n"
+    echo -e "  ${CYAN}\"Vibe Check: List all tables in my Supabase public schema,"
+    echo -e "  check my current Git branch, and confirm the supabase/backups/"
+    echo -e "  folder exists. Report what you find for each.\"${NC}\n"
+    echo -e "${BOLD}Always start sessions with:${NC}"
+    echo -e "  ${CYAN}\"Read AGENTS.md before doing anything.\"${NC}\n"
+    echo -e "${BOLD}Automation commands:${NC}"
+    echo -e "  ${GREEN}npm run update-types${NC}  — Syncs src/types/supabase.ts with live DB schema"
+    echo -e "  ${GREEN}npm run checkpoint${NC}    — Snapshots DB schema to supabase/backups/\n"
+    echo -e "📖 ${BLUE}docs/dannflow_docs/mcp-setup.md${NC}"
     echo ""
 }
 

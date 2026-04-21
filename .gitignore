@@ -45,3 +45,6 @@ next-env.d.ts
 .claude/worktrees/
 .claude/plans/
 .claude/settings.local.json
+
+# MCP config (contains real tokens — never commit)
+mcp.json
