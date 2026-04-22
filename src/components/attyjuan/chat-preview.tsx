@@ -1,8 +1,19 @@
+'use client';
+
 import Link from 'next/link';
 
 export function ChatPreviewSection() {
   return (
     <section style={{ backgroundColor: '#F5F7FA', borderTop: '1px solid #D1DBE8', padding: '6rem 2rem' }}>
+      <style>{`
+        @keyframes typingBounce {
+          0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+          30% { transform: translateY(-5px); opacity: 1; }
+        }
+        .typing-dot { animation: typingBounce 1.2s infinite ease-in-out; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+      `}</style>
       <div className="mx-auto max-w-[1100px] grid md:grid-cols-2 gap-16 items-center">
         <div>
           <div style={{ fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.1em', color: '#1B4F8A', marginBottom: '0.75rem', textTransform: 'uppercase' }}>
@@ -46,21 +57,46 @@ export function ChatPreviewSection() {
             </div>
           </div>
           <div style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem', minHeight: '280px', backgroundColor: '#F5F7FA' }}>
-            {[
-              { ai: true, text: "Magandang araw! I'm Atty Juan. Tell me about your legal concern — I'm here to help guide you based on Philippine law. 🇵🇭", time: '9:01 AM' },
-              { ai: false, text: 'My landlord is keeping my security deposit even after I moved out 2 months ago. Is that legal?', time: '9:02 AM' },
-              { ai: true, text: 'Under Republic Act 9653 (Rent Control Act), your landlord is required to return your security deposit within 30 days after lease termination, minus deductions for damage.\n\nSince it\'s been 2 months, you may have grounds to file a complaint. Would you like me to generate a case report?', time: '9:02 AM' },
-            ].map((msg, i) => (
-              <div key={i} style={{ display: 'flex', gap: '0.6rem', alignItems: 'flex-end', flexDirection: msg.ai ? 'row' : 'row-reverse' }}>
-                <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: msg.ai ? '#1B4F8A' : '#C9A84C', color: msg.ai ? 'white' : '#0F1F2E', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 700, flexShrink: 0 }}>{msg.ai ? 'AJ' : 'JD'}</div>
-                <div>
-                  <div style={{ maxWidth: '78%', padding: '0.7rem 1rem', borderRadius: '1rem', fontSize: '0.82rem', lineHeight: 1.55, backgroundColor: msg.ai ? '#ffffff' : '#1B4F8A', border: msg.ai ? '1px solid #D1DBE8' : 'none', color: msg.ai ? '#0F1F2E' : 'white', borderBottomLeftRadius: msg.ai ? '4px' : '1rem', borderBottomRightRadius: msg.ai ? '1rem' : '4px' }}>
-                    {msg.text}
-                  </div>
-                  <div style={{ fontSize: '0.65rem', color: '#5A6B7D', marginTop: '0.25rem', textAlign: 'right' }}>{msg.time}</div>
+            {/* AI greeting */}
+            <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'flex-end' }}>
+              <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: '#1B4F8A', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 700, flexShrink: 0 }}>AJ</div>
+              <div>
+                <div style={{ maxWidth: '78%', padding: '0.7rem 1rem', borderRadius: '1rem', borderBottomLeftRadius: '4px', fontSize: '0.82rem', lineHeight: 1.55, backgroundColor: '#ffffff', border: '1px solid #D1DBE8', color: '#0F1F2E' }}>
+                  Magandang araw! I&apos;m Atty Juan. Tell me about your legal concern — I&apos;m here to help guide you based on Philippine law. 🇵🇭
                 </div>
+                <div style={{ fontSize: '0.65rem', color: '#5A6B7D', marginTop: '0.25rem' }}>9:01 AM</div>
               </div>
-            ))}
+            </div>
+            {/* User message */}
+            <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'flex-end', flexDirection: 'row-reverse' }}>
+              <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: '#C9A84C', color: '#0F1F2E', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 700, flexShrink: 0 }}>JD</div>
+              <div>
+                <div style={{ maxWidth: '78%', padding: '0.7rem 1rem', borderRadius: '1rem', borderBottomRightRadius: '4px', fontSize: '0.82rem', lineHeight: 1.55, backgroundColor: '#1B4F8A', color: 'white' }}>
+                  My landlord is keeping my security deposit even after I moved out 2 months ago. Is that legal?
+                </div>
+                <div style={{ fontSize: '0.65rem', color: '#5A6B7D', marginTop: '0.25rem', textAlign: 'right' }}>9:02 AM</div>
+              </div>
+            </div>
+            {/* AI legal response */}
+            <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'flex-end' }}>
+              <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: '#1B4F8A', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 700, flexShrink: 0 }}>AJ</div>
+              <div>
+                <div style={{ maxWidth: '78%', padding: '0.7rem 1rem', borderRadius: '1rem', borderBottomLeftRadius: '4px', fontSize: '0.82rem', lineHeight: 1.55, backgroundColor: '#ffffff', border: '1px solid #D1DBE8', color: '#0F1F2E' }}>
+                  Under <strong>Republic Act 9653</strong> (Rent Control Act), your landlord is required to return your security deposit within <strong>30 days</strong> after lease termination, minus any deductions for unpaid rent or damage beyond normal wear and tear.<br /><br />
+                  Since it&apos;s been 2 months, you may have grounds to file a complaint. Would you like me to generate a case report?
+                </div>
+                <div style={{ fontSize: '0.65rem', color: '#5A6B7D', marginTop: '0.25rem' }}>9:02 AM</div>
+              </div>
+            </div>
+            {/* Typing indicator */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', paddingBottom: '0.5rem' }}>
+              <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: '#1B4F8A', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 700, flexShrink: 0 }}>AJ</div>
+              <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                {[0, 1, 2].map((i) => (
+                  <span key={i} className="typing-dot" style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#5A6B7D', display: 'inline-block' }} />
+                ))}
+              </div>
+            </div>
           </div>
           <div style={{ padding: '1rem 1.25rem', borderTop: '1px solid #D1DBE8', display: 'flex', alignItems: 'center', gap: '0.75rem', backgroundColor: '#ffffff' }}>
             <div style={{ flex: 1, backgroundColor: '#F5F7FA', border: '1px solid #D1DBE8', borderRadius: '100px', padding: '0.6rem 1rem', fontSize: '0.82rem', color: '#5A6B7D' }}>Type your legal concern...</div>
