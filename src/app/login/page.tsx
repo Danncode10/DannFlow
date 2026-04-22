@@ -502,7 +502,7 @@ export default function AuthPage() {
               type="button"
               className="w-full py-3 bg-card border border-border rounded-lg text-foreground font-semibold text-sm flex items-center justify-center gap-2 hover:bg-muted transition-colors"
             >
-              <Github className="w-4 h-4" />
+              
               Continue with GitHub
             </button>
           </div>
