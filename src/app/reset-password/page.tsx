@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, Suspense } from 'react';
-import { Lock, Loader2, AlertCircle, RefreshCcw } from 'lucide-react';
+import { Lock, Loader2, AlertCircle, RefreshCcw, Eye, EyeOff } from 'lucide-react';
 import { resetPassword } from '@/services/auth';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
