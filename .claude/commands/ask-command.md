@@ -12,18 +12,24 @@ Do this:
 3. Match the user's intent against those descriptions. Pick the single best command.
 4. Identify 1–2 alternatives or follow-up commands that compose well (e.g. `/new-page` → then `/ui` to make it responsive).
 
-Then output exactly this format — nothing else, no preamble:
+Then output in this format:
+
+---
+
+**Best match: `/<command-name>`**
 
 ```
-Best match: /<command-name>
-Copy-paste this:
-  /<command-name> <suggested args if applicable>
-
-Why: <one sentence on why this fits>
-
-Alternatives:
-  /<other-command> — <one-line reason>
-  /<other-command> — <one-line reason>
+/<command-name> <suggested args if applicable>
 ```
 
-If no command fits well, say so plainly and suggest the closest match plus what a new command might be called. Don't invent commands that don't exist in `.claude/commands/`.
+Write 2–4 sentences explaining why this is the right command for the task. Be specific — reference what the command actually does (from its description), how it maps to what the user asked for, and what the user should expect to happen when they run it. If the command takes arguments, explain what to put there and give a concrete example based on the user's request.
+
+**Alternatives worth considering:**
+
+`/<other-command>` — Write 1–2 sentences on what this one does differently and when the user would pick it over the best match. Make it clear why it's second and not first.
+
+`/<other-command>` — Same format. Only include this if it genuinely composes well with the task (e.g. a follow-up step like running `/ui` after `/new-page`).
+
+---
+
+If no command fits well, say so in a short paragraph — explain what the closest command covers and where the gap is, then name what a new command could be called and suggest using `/make-command <description>` to create it. Don't invent commands that don't exist in `.claude/commands/`.
