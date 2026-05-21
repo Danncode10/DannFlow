@@ -1,0 +1,52 @@
+---
+description: Active rewrite — makes target file or current diff fully responsive. Mobile-first, 48px touch targets, labels above inputs, focus rings, semantic tokens only.
+argument-hint: <file-path or blank for current diff>
+---
+
+Target: **$ARGUMENTS** (if blank, target uncommitted changes in `src/components/` and `src/app/`).
+
+This is an **active rewrite**, not a check. Read the target, then edit it directly to comply with DannFlow's UI standards.
+
+**Rewrite rules:**
+
+1. **Mobile-first responsiveness**
+   - Layout must work at 375px width with no horizontal scroll
+   - Use Tailwind responsive prefixes correctly: base = mobile, `sm:` = ≥640px, `md:` = ≥768px, `lg:` = ≥1024px
+   - Flex/grid layouts collapse to single column on mobile
+
+2. **Touch targets ≥48px**
+   - Buttons, links, inputs, icon buttons → minimum `h-12` or `min-h-12` + adequate horizontal padding
+   - Icon-only buttons get `h-12 w-12`
+
+3. **Forms**
+   - Labels go ABOVE inputs (`<Label htmlFor=...>` on its own line, never placeholder-only)
+   - Every input has a visible focus ring via `focus-visible:ring-2 focus-visible:ring-ring` (or use Shadcn `<Input>` which has it built-in)
+   - Error states use `text-destructive` for messages and `border-destructive` for the input
+   - Required fields marked with a visible indicator
+
+4. **Semantic tokens ONLY**
+   - REPLACE any hex (`#ffffff`, `#000`), `rgb()`, `rgba()`, or hardcoded color words (`white`, `black`, `gray-500`, `slate-900`) with semantic tokens:
+     - Backgrounds → `bg-background`, `bg-card`, `bg-muted`
+     - Text → `text-foreground`, `text-muted-foreground`, `text-primary`
+     - Borders → `border`, `border-border`, `border-input`
+     - Brand → `bg-primary`, `text-primary-foreground`
+
+5. **Shadcn primitives**
+   - Replace raw `<button>` with `<Button variant="...">`
+   - Form pages wrapped in `<Card>` with `<CardHeader>` / `<CardContent>` / `<CardFooter>`
+
+6. **Spacing rhythm**
+   - Stick to the scale: `p-4`, `p-6`, `gap-4`, `gap-6`, `space-y-4`, `space-y-6`
+   - No `p-3.5`, `gap-2.5`, etc.
+
+7. **States**
+   - Buttons have a loading state when they trigger async ops (disable + show spinner)
+   - Empty list/data states show a centered icon + message, never blank
+
+**Procedure:**
+1. Read the target file(s).
+2. Identify every violation.
+3. Edit the file(s) in place.
+4. Report a concise diff summary at the end: "Fixed N violations across M files: <bullet list of fix categories>."
+
+If a file is already compliant, say so and skip it. Don't refactor unrelated logic — UI standards only.
