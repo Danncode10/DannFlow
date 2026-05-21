@@ -1,9 +1,18 @@
 ---
-description: Audit repo for conflicts between documentation and actual code — technology versions, features, commands, RLS, semantic tokens, folder structure.
-argument-hint: (optional --verbose for detailed findings)
+description: Audit repo for conflicts between documentation and actual code — technology versions, features, commands, RLS, semantic tokens, folder structure. Use --fix to auto-remediate.
+argument-hint: (optional --verbose for details, --fix to auto-patch violations)
 ---
 
-Scan the codebase and documentation to identify conflicts: mismatched technology versions, missing/obsolete features, undocumented commands, RLS gaps, hardcoded colors, and folder structure inconsistencies. Report only — never modifies code.
+Scan the codebase and documentation to identify conflicts: mismatched technology versions, missing/obsolete features, undocumented commands, RLS gaps, hardcoded colors, and folder structure inconsistencies. 
+
+Use `--fix` to automatically remediate conflicts (after confirmation):
+- Replace hardcoded colors with semantic tokens in auth pages
+- Update README with missing env vars documentation
+- Fix version mismatches (e.g., Next.js 15+ → 16+)
+- Add missing folders to project structure docs
+- Clean up outdated references
+
+Without `--fix`, reports findings only (read-only audit).
 
 ## Procedure
 
@@ -108,10 +117,36 @@ Recommended fixes
   4. Add Node.js version to README "Environment Variables" section
 ```
 
+## Auto-Fix Mode (`--fix`)
+
+When `--fix` is passed, automatically remediate:
+
+1. **Semantic tokens in auth pages** — Replace hardcoded colors with semantic tokens:
+   - `bg-[#0a0a0a]` → `bg-background`
+   - `#6C47FF` (primary) → use `bg-primary`, `text-primary`
+   - inline `rgba()` colors → move to CSS variables or use Tailwind semantic tokens
+   - Direct: edit src/app/login/page.tsx, src/app/forgot-password/page.tsx, src/app/reset-password/page.tsx, src/app/page.tsx
+
+2. **README environment variables** — Add missing Upstash vars to "Environment Variables" section:
+   ```env
+   UPSTASH_REDIS_REST_URL=...
+   UPSTASH_REDIS_REST_TOKEN=...
+   ```
+
+3. **README version mismatch** — Update Next.js claim from "15+" to "16+"
+
+4. **Folder documentation** — Add missing folders to "Project Structure":
+   - Add `src/hooks/` reference OR remove from README if directory doesn't exist
+   - Document `docs/dannflow_docs/` and `supabase/backups/`
+
+5. **Ask for confirmation** before writing any files — show exact changes to be made
+
 ## Constraints
 
-- Report only — never modify files
-- If `--verbose` passed, include file paths and line numbers for all violations
+- `--fix` always asks for confirmation before modifying files
+- Show file paths and line ranges for all changes
+- If `--verbose` passed with `--fix`, include before/after diffs
+- Report only (no `--fix`) — never modify files
 - Treat missing documentation as ⚠️ warning, not ❌ violation
 - Treat code-vs-docs mismatches as ❌ violation (actual conflicts)
 - RLS and semantic tokens violations are critical — highlight prominently

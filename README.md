@@ -1,13 +1,13 @@
 # 🚀 DannFlow (2026 Edition)
 
-**The Claude Code-Optimized SaaS Starter.** DannFlow is built specifically for AI-assisted development with Claude Code, Cursor, or Antigravity. It enforces a **Zero-Hallucination methodology** via `npm run checkpoint` and `update-types`—forcing your AI agent to always work from a live snapshot of your database schema, RLS policies, and TypeScript types. 
+**The Claude Code-Optimized SaaS Starter.** DannFlow is built specifically for AI-assisted development with Claude Code, Cursor, or Antigravity using Next.js 16+ & Supabase. It enforces a **Zero-Hallucination methodology** via `npm run checkpoint` and `update-types`—forcing your AI agent to always work from a live snapshot of your database schema, RLS policies, and TypeScript types. 
 
-With 16 built-in slash commands, a daily Vibe Coding loop, and an intelligent `./guide.sh` CLI optimized for Claude developers, DannFlow moves you from a blank terminal to a production-ready SaaS in minutes—with your AI staying in perfect sync the entire way.
+With 17 built-in slash commands, a daily Vibe Coding loop, and an intelligent `./guide.sh` CLI optimized for Claude developers, DannFlow moves you from a blank terminal to a production-ready SaaS in minutes—with your AI staying in perfect sync the entire way.
 
 > **Built for Speed. Structured for Agents. Optimized for the Vibe.**
 
 
-[![Next.js](https://img.shields.io/badge/Next.js-15+-black?logo=next.js)](https://nextjs.org)
+[![Next.js](https://img.shields.io/badge/Next.js-16+-black?logo=next.js)](https://nextjs.org)
 [![Supabase](https://img.shields.io/badge/Supabase-Auth%20%26%20DB-3ECF8E?logo=supabase)](https://supabase.com)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-06B6D4?logo=tailwindcss)](https://tailwindcss.com)
 [![Vercel](https://img.shields.io/badge/Deploy-Vercel-black?logo=vercel)](https://vercel.com)
@@ -65,6 +65,10 @@ SUPABASE_SERVICE_ROLE_KEY=sb_secret_...
 NEXT_PUBLIC_SITE_NAME=YourAppName
 NEXT_PUBLIC_SITE_URL=https://yourapp.vercel.app
 NEXT_PUBLIC_GITHUB_URL=https://github.com/yourusername
+
+# Rate Limiting (Upstash Redis) — get from console.upstash.com
+UPSTASH_REDIS_REST_URL=https://...upstash.io
+UPSTASH_REDIS_REST_TOKEN=AAAx...
 ```
 
 ---
@@ -191,11 +195,12 @@ src/
 │   ├── forgot-password/
 │   ├── reset-password/
 │   └── globals.css         # Theme tokens + browser icon suppression
-├── components/             # UI components
+├── components/             # UI components (Shadcn-based)
 │   ├── dashboard-shell.tsx # Main dashboard with all tabs
 │   ├── profile-form.tsx    # Profile settings form
 │   ├── security-form.tsx   # Password change with re-auth
-│   └── features-tabs.tsx   # Landing page feature showcase
+│   ├── features-tabs.tsx   # Landing page feature showcase
+│   └── ui/                 # Shadcn component primitives
 ├── services/               # Business logic (no UI code here)
 │   ├── auth.ts             # Login, logout, updatePassword
 │   ├── users.ts            # updateProfile
@@ -206,6 +211,16 @@ src/
 │   └── supabase.ts         # Auto-generated — never edit manually
 └── utils/
     └── supabase/           # Supabase client helpers
+
+supabase/
+└── backups/                # 📋 Schema snapshots from npm run checkpoint
+
+.claude/
+├── commands/               # 17 custom slash commands for Claude Code
+└── plans/                  # Implementation plans (worktree mode)
+
+docs/
+└── dannflow_docs/          # 📚 DannFlow documentation (separate from your /docs/)
 ```
 
 ---
