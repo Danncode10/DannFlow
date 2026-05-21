@@ -20,6 +20,7 @@ Drop `.md` files in this folder to add custom slash commands. Each file becomes 
 | `/review` | Pre-PR review: lint + typecheck + critique diff against `CLAUDE.md` guardrails. |
 | `/commit` | Stages changes + drafts a conventional commit message. |
 | `/cleanup` | Finds dead code, unused exports, orphaned components, stale files. |
+| `/sync-commands` | Audits `.claude/commands/` and validates against `claude-workflow.md` and `./guide.sh`. Reports orphaned commands, optionally auto-patches docs. |
 
 ## File format
 
