@@ -71,7 +71,8 @@ Run `/ask-command <what you want>` if you don't remember which command to use.
 | Command | What it does |
 |---|---|
 | `/ask-command <intent>` | Tells you which command to use for your task. Returns a copy-paste-ready prompt. |
-| `/init-claude` | Re-bootstraps `CLAUDE.md`, `SKILLS.md`, and the commands README from the current README + src + package.json. Add `--commands` to also rewrite individual command files. |
+| `/init-claude` | Rewrites the entire Claude environment (`CLAUDE.md`, `SKILLS.md`, commands README, individual commands, and this file's command tables) to match the current README + src + package.json. Plan-then-confirm flow. |
+| `/make-command <description>` | Creates a new custom slash command from a plain-English description. Auto-updates this file's tables and proposes conflict-avoidance edits to existing commands. |
 
 ### Security & quality
 | Command | What it does |
