@@ -5,9 +5,12 @@ argument-hint: (optional --fix to auto-patch claude-workflow.md)
 
 Scan the `.claude/commands/` directory and cross-reference command metadata against `claude-workflow.md` and `./guide.sh`. Identify any commands that exist on disk but are missing from these documentation/exposure sources, then produce a detailed report grouped by remediation type.
 
+> **Scope: DannFlow-curated commands only.** Ruflo (`npx ruflo@latest init wizard`) installs ~60+ commands into subdirectories of `.claude/commands/` (`agents/`, `analysis/`, `automation/`, `coordination/`, `github/`, `hive-mind/`, `hooks/`, `memory/`, `monitoring/`, `optimization/`, `sparc/`, `swarm/`, `workflows/`) plus three top-level files (`claude-flow-help.md`, `claude-flow-memory.md`, `claude-flow-swarm.md`). These belong to a separate, Ruflo-managed namespace and **must be excluded** from this audit. They are not "orphans" and must never be reported as missing from DannFlow docs.
+
 ## Procedure
 
-1. **Scan .claude/commands/ directory** — for each `.md` file (excluding `README.md`), extract the command name (filename without extension) and the `description:` field from YAML frontmatter.
+1. **Scan .claude/commands/ directory (top level only)** — for each `.md` file directly in `.claude/commands/`, extract the command name (filename without extension) and the `description:` field from YAML frontmatter.
+   - **Exclude:** `README.md`, every subdirectory, and the three Ruflo files `claude-flow-help.md`, `claude-flow-memory.md`, `claude-flow-swarm.md`.
 
 2. **Cross-reference against claude-workflow.md** — check if each command appears in one of the category tables (Discovery & setup, Security & quality, Supabase workflow, Scaffolding, Housekeeping). Note which commands are missing.
 

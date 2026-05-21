@@ -106,6 +106,42 @@ Run `/ask-command <what you want>` if you don't remember which command to use.
 
 ---
 
+## Ruflo command namespace (beta — separate from DannFlow)
+
+If you ran `npx ruflo@latest init wizard`, your `.claude/commands/` directory **also** contains a large set of Ruflo-installed commands organized by topic:
+
+```
+.claude/commands/
+├── <DannFlow commands>.md      ← curated, listed in the tables above
+├── claude-flow-help.md         ← Ruflo
+├── claude-flow-memory.md       ← Ruflo
+├── claude-flow-swarm.md        ← Ruflo
+├── agents/                     ← Ruflo (agent lifecycle: spawn, list, metrics…)
+├── analysis/                   ← Ruflo (bottleneck, token-usage, performance…)
+├── automation/                 ← Ruflo (auto-agent, smart-spawn, self-healing…)
+├── coordination/               ← Ruflo (orchestrate, task-orchestrate…)
+├── github/                     ← Ruflo (pr-manager, code-review-swarm, release-swarm…)
+├── hive-mind/                  ← Ruflo (hive-mind-spawn, consensus, memory…)
+├── hooks/                      ← Ruflo (pre-task, post-edit, session-end…)
+├── memory/                     ← Ruflo (memory-search, memory-persist, neural…)
+├── monitoring/                 ← Ruflo (swarm-monitor, agent-metrics, real-time…)
+├── optimization/               ← Ruflo (parallel-execute, topology-optimize…)
+├── sparc/                      ← Ruflo (SPARC modes: architect, coder, tester, debug…)
+├── swarm/                      ← Ruflo (swarm-init, swarm-spawn, strategies…)
+└── workflows/                  ← Ruflo (workflow-create, workflow-execute…)
+```
+
+**Rules of thumb:**
+
+- The tables above (Discovery & setup, Security & quality, Supabase workflow, Scaffolding, Housekeeping) document **DannFlow's commands only**. They will never list Ruflo commands.
+- `/sync-commands` is scoped to the top level of `.claude/commands/` and explicitly skips the Ruflo subdirectories and the three `claude-flow-*.md` files. Ruflo commands are **not** orphans.
+- Ruflo commands live and die with the Ruflo install. To update them, re-run `npx ruflo@latest init wizard`. To remove them, delete the relevant subdirectory (or uninstall Ruflo).
+- Don't move Ruflo commands up to the top level — that breaks `/sync-commands` scoping and Ruflo's own expectations.
+
+For what each Ruflo command does, run `/claude-flow-help` (top-level) or open the file directly.
+
+---
+
 ## When to use what
 
 **Building a new feature?**

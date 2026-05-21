@@ -46,5 +46,14 @@ next-env.d.ts
 .claude/plans/
 .claude/settings.local.json
 
+# Ruflo runtime data (beta — generated at runtime, churns constantly)
+# Keep .claude-flow/config.yaml, CAPABILITIES.md, agents/, hooks/, security/, workflows/.
+# Ignore the volatile dirs that fill up with logs / state / metrics.
+.claude-flow/data/
+.claude-flow/logs/
+.claude-flow/sessions/
+.claude-flow/metrics/
+.claude-flow/learning/
+
 # MCP config (contains real tokens — never commit)
 mcp.json

@@ -83,6 +83,22 @@ This wires swarms, hooks, agents, and a `CLAUDE.md`-aware setup into that specif
 
 > The DannFlow `install.sh` performs both steps automatically. Manual setups must follow the order: **global install → MCP register → `init wizard`**.
 
+### Ruflo file layout (what the wizard adds to your repo)
+
+The `init wizard` writes into two top-level locations. Knowing the split avoids confusion later:
+
+| Location | What it is | Commit it? |
+|---|---|---|
+| `.claude-flow/config.yaml`, `CAPABILITIES.md`, `agents/`, `hooks/`, `security/`, `workflows/` | Ruflo per-project configuration | ✅ Yes |
+| `.claude-flow/data/`, `logs/`, `sessions/`, `metrics/`, `learning/` | Ruflo runtime state (churns constantly) | ❌ Gitignored |
+| `.claude/agents/`, `.claude/skills/`, `.claude/helpers/` | Ruflo-installed agents, skills, hook handler | ✅ Yes |
+| `.claude/settings.json` | Pre/PostToolUse hooks wiring Ruflo into Claude Code | ✅ Yes |
+| `.claude/commands/<subdirs>/` + `claude-flow-*.md` | ~60 Ruflo-managed slash commands (separate namespace) | ✅ Yes |
+
+**Namespace rule:** DannFlow's 16 curated commands live as top-level `.md` files in `.claude/commands/`. Everything inside a subdirectory (`agents/`, `swarm/`, `sparc/`, `github/`, …) or named `claude-flow-*.md` belongs to **Ruflo** and is managed by re-running the wizard. `/sync-commands` explicitly skips the Ruflo namespace so it won't flag those as orphans. See [docs/dannflow_docs/claude-workflow.md](docs/dannflow_docs/claude-workflow.md) for the full breakdown.
+
+**Hook side-effect to know about:** `.claude/settings.json` adds Pre/PostToolUse hooks (5–10s timeouts) that route every Bash and Write/Edit through `.claude/helpers/hook-handler.cjs`. That's how Ruflo learns + coordinates. If you ever see a small lag on tool calls, that's why.
+
 ---
 
 ## 🔑 Environment Variables
@@ -250,8 +266,18 @@ supabase/
 └── backups/                # 📋 Schema snapshots from npm run checkpoint
 
 .claude/
-├── commands/               # 17 custom slash commands for Claude Code
+├── commands/               # 16 DannFlow slash commands + Ruflo subdirs (see Ruflo File Layout)
+├── agents/                 # Ruflo-installed agent definitions (browser, sparc, swarm, …)
+├── skills/                 # Ruflo-installed skills (agentdb-*, github-*, sparc-*, …)
+├── helpers/                # Ruflo hook-handler scripts (hook-handler.cjs)
+├── settings.json           # Ruflo Pre/PostToolUse hook wiring (committed)
 └── plans/                  # Implementation plans (worktree mode)
+
+.claude-flow/               # Ruflo per-project runtime — partially gitignored
+├── config.yaml             # Ruflo config (committed)
+├── CAPABILITIES.md         # What this Ruflo install can do (committed)
+├── agents/, hooks/, security/, workflows/   # curated state (committed)
+└── data/, logs/, sessions/, metrics/, learning/   # runtime state (gitignored)
 
 docs/
 └── dannflow_docs/          # 📚 DannFlow documentation (separate from your /docs/)
