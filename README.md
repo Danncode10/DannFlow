@@ -1,7 +1,10 @@
 # 🚀 DannFlow (2026 Edition)
 
-DannFlow is an open-source Next.js 15 & Supabase starter optimized for "Vibe Coding." It features my own "Zero-Hallucination" methodology—using npm run checkpoint and update-types to force AI agents to stay in sync with the live database schema. By providing the agent with a perfect snapshot of RLS policies, triggers, and types, it eliminates the guesswork that usually breaks AI-generated code. With a custom "Engineering Edge" UI and a tactical ./guide.sh CLI, it moves you from a blank terminal to a production-ready SaaS in minutes.
-> **The High-Performance AI-Native SaaS Starter.** Built with TanStack caching, Mobile-First Bento UI, and designed strictly for Vibe Coding.
+**The Claude Code-Optimized SaaS Starter.** DannFlow is built specifically for AI-assisted development with Claude Code, Cursor, or Antigravity. It enforces a **Zero-Hallucination methodology** via `npm run checkpoint` and `update-types`—forcing your AI agent to always work from a live snapshot of your database schema, RLS policies, and TypeScript types. 
+
+With 16 built-in slash commands, a daily Vibe Coding loop, and an intelligent `./guide.sh` CLI optimized for Claude developers, DannFlow moves you from a blank terminal to a production-ready SaaS in minutes—with your AI staying in perfect sync the entire way.
+
+> **Built for Speed. Structured for Agents. Optimized for the Vibe.**
 
 
 [![Next.js](https://img.shields.io/badge/Next.js-15+-black?logo=next.js)](https://nextjs.org)
@@ -20,6 +23,19 @@ curl -sSL https://raw.githubusercontent.com/Danncode10/DannFlow/main/install.sh 
 ```
 
 This automates the entire setup: clones the repo, installs dependencies, sets up environment variables, and interactive rebranding with a fresh Git history.
+
+### Quick Reference
+
+Once set up, use these commands to accelerate your workflow:
+
+```bash
+./guide.sh workflow     # Show daily Vibe Coding loop (checkpoint → build → sync-types → review → commit)
+./guide.sh vibe-check   # Health check: env, MCP, backups, types, CLI
+./guide.sh commands     # List all 16 Claude Code slash commands (grouped by category)
+npm run dev             # Start development server
+npm run checkpoint      # Snapshot your live DB schema to supabase/backups/
+npm run update-types    # Regenerate src/types/supabase.ts after schema changes
+```
 
 ### The Initial Commit
 
@@ -140,18 +156,28 @@ No custom domain? No problem. Use Gmail SMTP instead of Supabase's default maile
 
 ---
 
-## 🗃️ Database Workflow
+## 🗃️ Database Workflow (Zero-Hallucination Loop)
+
+The **Checkpoint → Build → Sync-Types → Review → Commit** loop ensures your AI agent never guesses about the database schema:
 
 ```bash
-# After changing schema in Supabase
-npm run update-types       # regenerates src/types/supabase.ts
+# Step 1: Before risky schema changes — save current state
+npm run checkpoint         # or /checkpoint in Claude Code
+                          # saves to supabase/backups/schema-MM-DD-YYYY-HH-MM.sql
 
-# Before big changes — snapshots your live schema
-npm run checkpoint         # saves to supabase/backups/schema-MM-DD-YYYY-HH-MM.sql
+# Step 2: Build your feature with Claude
+# Claude reads your CLAUDE.md + types + services + the prompt you give it
+
+# Step 3: After any schema change — regenerate types
+npm run update-types      # or /sync-types in Claude Code
+                          # regenerates src/types/supabase.ts from live schema
+
+# Step 4: Verify it's correct
+/review                   # Lint + typecheck + guardrail check
 ```
 
-### Row Level Security
-All queries respect RLS by default. Every service in `src/services/` includes `.eq('id', userId)` unless building a public endpoint.
+### Row Level Security (RLS-First Design)
+All queries respect RLS by default. Every service in `src/services/` includes `.eq('id', userId)` unless building a public endpoint. DannFlow enforces RLS in `CLAUDE.md` so Claude never forgets.
 
 ---
 
@@ -184,29 +210,80 @@ src/
 
 ---
 
-## 🤖 Vibe Coding Workflow (AI-Assisted Dev)
+## ⚡ Custom Slash Commands (Claude Code)
 
-DannFlow follows the **Trinity Model**:
+DannFlow ships with **16 built-in slash commands** that accelerate Vibe Coding. They live in `.claude/commands/` and are auto-exposed in Claude Code via the `/` prefix.
+
+### Essential Commands
+
+| Command | When to use |
+|---|---|
+| `/ask-command <what you want>` | Not sure which command fits your task? This routes you to the right one with a copy-paste prompt. |
+| `/checkpoint` | **Before risky DB schema changes** — snapshots your live schema to `supabase/backups/schema-*.sql` |
+| `/sync-types` | **After any schema change** — regenerates `src/types/supabase.ts` from live DB |
+| `/sync-commands` | **Validates command docs** — scans `.claude/commands/` and checks that all commands are documented in `claude-workflow.md` and `guide.sh`. Use `--fix` to auto-patch. |
+| `/new-feature <name>` | Scaffolds service + types + App Router page + form for a new feature |
+| `/review` | Pre-PR: runs lint + typecheck + guardrail check against `CLAUDE.md` |
+| `/commit` | Stages changes + drafts conventional commit message |
+
+Run `./guide.sh commands` to see all 16 commands grouped by category (Discovery, Security, Supabase, Scaffolding, Housekeeping).
+
+---
+
+## 🤖 Vibe Coding Workflow (Claude-Optimized AI-Assisted Dev)
+
+DannFlow is built **specifically for Claude Code, Cursor, and Antigravity**. It follows the **Trinity Model** — ensuring your AI agent always works from a perfect, up-to-date snapshot of your database.
 
 | Layer | What | Where |
 |---|---|---|
-| 👁️ **The Eyes** | TypeScript types mirroring your DB | `src/types/supabase.ts` |
-| 📋 **The Blueprint** | SQL snapshots for disaster recovery | `supabase/backups/` |
-| ⚡ **The Action** | Pure business logic, no UI leakage | `src/services/` |
+| 👁️ **The Eyes** | TypeScript types mirroring your DB (regenerated after schema changes) | `src/types/supabase.ts` |
+| 📋 **The Blueprint** | SQL snapshots for disaster recovery + zero hallucination | `supabase/backups/` |
+| ⚡ **The Action** | Pure business logic, no UI leakage, RLS-first | `src/services/` |
 
-### Daily loop:
+### The Daily Vibe Loop (Copy-Paste to Claude)
+
+**Session starter prompt** (always paste this first):
 ```
-1. npm run checkpoint          → save DB state
-2. Describe feature to your AI → AI reads types + services
-3. npm run update-types        → after any schema change
+Read CLAUDE.md before doing anything. Confirm my Supabase MCP is 
+connected by listing all tables in the public schema, and check that 
+src/types/supabase.ts is up to date with the live schema.
 ```
 
-### MCP Agent Setup (Antigravity/Cursor/Claude)
+**The loop:**
+```
+1. /checkpoint           → Snapshot your DB before risky schema changes
+2. Build with Claude     → Tell Claude what feature you want
+3. /sync-types           → After any schema change
+4. /review               → Pre-PR lint + typecheck + guardrails
+5. /commit               → Stage + draft conventional commit
+6. /sync-commands        → Validate command documentation stays in sync
+```
+
+Run `./guide.sh workflow` anytime to see the full loop with copy-paste prompts.
+
+### 16 Custom Slash Commands (Claude Code)
+
+All commands auto-generate via `npm run` or `/command` in Claude Code:
+
+**Discovery & Setup** | **Security & Quality** | **Supabase** | **Scaffolding** | **Housekeeping**
+---|---|---|---|---
+`/ask-command` | `/security-audit` | `/checkpoint` | `/new-feature` | `/commit`
+`/init-claude` | `/rls-check` | `/sync-types` | `/new-page` | `/cleanup`
+`/make-command` | `/rls` | `/explain-schema` | | `/sync-commands`
+ | `/ui` | | |
+ | `/review` | | |
+
+**Don't know which command to use?** Run `/ask-command <what you want>` in Claude Code for intelligent routing.
+
+### MCP Agent Setup (Antigravity/Cursor/Claude Code)
+
 DannFlow enforces the **AGENTS.md Standard**. When using AI tools:
-1. Connect the **Supabase MCP** (for schema live reads).
-2. Connect the **GitHub MCP** (for branch history and PRs).
-3. Connect the **Terminal MCP** (for running `npm run checkpoint`).
-4. **Always** point your AI to read `AGENTS.md` before it touches any code.
+1. **Connect the Supabase MCP** — live schema reads + type verification
+2. **Connect the GitHub MCP** — branch history and PR automation
+3. **Connect the Terminal MCP** — run `npm run checkpoint`, `npm run update-types`
+4. **Always start sessions** with the copy-paste prompt above
+
+See `./guide.sh vibe-check` for quick health verification that MCPs are working.
 
 ---
 
@@ -216,12 +293,13 @@ DannFlow enforces the **AGENTS.md Standard**. When using AI tools:
 
 | Doc | What it covers |
 |---|---|
-| [docs/dannflow_docs/methodology.md](docs/dannflow_docs/methodology.md) | Vibe Coding philosophy |
-| [docs/dannflow_docs/the-holy-trinity.md](docs/dannflow_docs/the-holy-trinity.md) | Eyes, Blueprint, Action explained |
-| [docs/dannflow_docs/mcp-setup.md](docs/dannflow_docs/mcp-setup.md) | Step-by-step MCP tool setup |
-| [docs/dannflow_docs/backups-and-sync.md](docs/dannflow_docs/backups-and-sync.md) | Checkpoint & schema sync loop |
-| [docs/dannflow_docs/production-features.md](docs/dannflow_docs/production-features.md) | Gmail SMTP, SEO, and Toasts |
-| [docs/dannflow_docs/ui-system.md](docs/dannflow_docs/ui-system.md) | Theme tokens & UI standards |
+| [docs/dannflow_docs/claude-workflow.md](docs/dannflow_docs/claude-workflow.md) | **START HERE** — Daily Vibe Coding loop, all 16 slash commands, when to use each |
+| [docs/dannflow_docs/methodology.md](docs/dannflow_docs/methodology.md) | Vibe Coding philosophy & Zero-Hallucination approach |
+| [docs/dannflow_docs/the-holy-trinity.md](docs/dannflow_docs/the-holy-trinity.md) | Eyes (types), Blueprint (schema), Action (services) |
+| [docs/dannflow_docs/mcp-setup.md](docs/dannflow_docs/mcp-setup.md) | Step-by-step Supabase + GitHub MCP setup for Claude Code |
+| [docs/dannflow_docs/backups-and-sync.md](docs/dannflow_docs/backups-and-sync.md) | Checkpoint & schema sync loop with verification |
+| [docs/dannflow_docs/production-features.md](docs/dannflow_docs/production-features.md) | Gmail SMTP, SEO, rate limiting, Toasts |
+| [docs/dannflow_docs/ui-system.md](docs/dannflow_docs/ui-system.md) | Theme tokens, semantic colors & UI standards |
 
 ---
 
