@@ -70,10 +70,10 @@ show_main() {
 
         echo ""
         echo -e "Other helpful commands:"
-        echo -e "  ${CYAN}./guide.sh commands${NC}  - List all Claude slash commands available in this repo"
+        echo -e "  ${CYAN}./guide.sh workflow${NC}   - Show the daily Vibe Coding loop"
+        echo -e "  ${CYAN}./guide.sh vibe-check${NC} - Quick health check (env, MCP, backups, types)"
+        echo -e "  ${CYAN}./guide.sh commands${NC}   - List all Claude slash commands"
         echo -e "  ${CYAN}npm run dev${NC}          - Start development server"
-        echo -e "  ${CYAN}npm run update-types${NC} - Sync TypeScript types with Supabase"
-        echo -e "  ${CYAN}npm run checkpoint${NC}   - Take a DB schema snapshot (SQL)"
 
         # Read keypress
         IFS= read -rsn1 key < /dev/tty
@@ -180,7 +180,15 @@ show_supabase() {
     echo -e "   4. Confirm the 'profiles' table and 'handle_new_user' function exist."
     echo -e "   Do not report success until you can see them in the live DB.\"${NC}\n"
 
-    echo -e "💡 Gmail SMTP setup is in ${CYAN}Step 4 → ./guide.sh security${NC}"
+    echo -e "${BOLD}5. Post-Provision Verification${NC}"
+    echo -e "   After the schema is applied, paste this to your AI:\n"
+    echo -e "   ${CYAN}\"Schema applied successfully. Now:"
+    echo -e "   1. Run /checkpoint to snapshot the current state."
+    echo -e "   2. Run npm run update-types to regenerate TypeScript types."
+    echo -e "   3. Confirm src/types/supabase.ts was regenerated."
+    echo -e "   Report the list of generated types.\"${NC}\n"
+
+    echo -e "💡 Gmail SMTP setup is in ${CYAN}Step 5 → ./guide.sh security${NC}"
     echo -e "📖 Full walkthrough: ${BLUE}docs/dannflow_docs/production-features.md${NC}"
     step_footer
 }
@@ -419,12 +427,17 @@ MCPEOF
     echo -e "  ${CYAN}claude mcp remove github-mcp-server${NC}    — remove GitHub MCP"
     echo -e "  ${CYAN}./guide.sh 3${NC}                           — re-run this wizard to reconfigure\n"
 
-    echo -e "${BOLD}Verify your setup — paste this to your AI:${NC}\n"
+    echo -e "${BOLD}One-time vibe check — paste this to your AI:${NC}\n"
     echo -e "  ${CYAN}\"Vibe Check: List all tables in my Supabase public schema,"
     echo -e "  check my current Git branch, and confirm the supabase/backups/"
     echo -e "  folder exists. Report what you find for each.\"${NC}\n"
-    echo -e "${BOLD}Always start sessions with:${NC}"
-    echo -e "  ${CYAN}\"Read AGENTS.md before doing anything.\"${NC}\n"
+    echo -e "${BOLD}Daily session starter — always paste this first:${NC}\n"
+    echo -e "  ${CYAN}\"Read CLAUDE.md. Then run a vibe check: list all tables"
+    echo -e "  in public schema, confirm src/types/supabase.ts is current,"
+    echo -e "  show me the last supabase/backups/ snapshot date, and check"
+    echo -e "  if there are any uncommitted changes.\"${NC}\n"
+    echo -e "${BOLD}Additional reference:${NC}"
+    echo -e "  ${CYAN}Read AGENTS.md${NC} before working with Claude Code.\n"
     echo -e "${BOLD}Automation commands:${NC}"
     echo -e "  ${GREEN}npm run update-types${NC}  — Syncs src/types/supabase.ts with live DB schema"
     echo -e "  ${GREEN}npm run checkpoint${NC}    — Snapshots DB schema to supabase/backups/\n"
@@ -684,11 +697,22 @@ show_claude() {
     echo -e "   ${CYAN}/review${NC}        Pre-PR lint + typecheck + guardrail check"
     echo -e "   ${CYAN}/commit${NC}        Stage + draft conventional commit\n"
 
+    echo -e "${BOLD}Session starter — always paste this first:${NC}\n"
+    echo -e "${CYAN}──────────────────────────────────────────────────${NC}"
+    echo -e "Read CLAUDE.md before doing anything. Confirm my"
+    echo -e "Supabase MCP is connected by listing all tables in the"
+    echo -e "public schema, and check that src/types/supabase.ts is"
+    echo -e "up to date with the live schema."
+    echo -e "${CYAN}──────────────────────────────────────────────────${NC}\n"
+
+    echo -e "For the full daily loop: ${CYAN}./guide.sh workflow${NC}"
+    echo -e "Quick health check: ${CYAN}./guide.sh vibe-check${NC}\n"
+
     echo -e "📖 Full walkthrough: ${BLUE}docs/dannflow_docs/claude-workflow.md${NC}"
     step_footer
 }
 
-# Commands Listing — dynamically reads .claude/commands/*.md
+# Commands Listing — dynamically reads .claude/commands/*.md, grouped by category
 show_commands() {
     show_header
     echo -e "${BOLD}🤖 Claude Code Slash Commands${NC}\n"
@@ -701,9 +725,22 @@ show_commands() {
         return
     fi
 
-    local count=0
+    # Function to get category for a command
+    get_category() {
+        case "$1" in
+            ask-command|init-claude|make-command) echo "Discovery & setup" ;;
+            security-audit|rls-check|rls|ui|review) echo "Security & quality" ;;
+            checkpoint|sync-types|explain-schema) echo "Supabase workflow" ;;
+            new-feature|new-page) echo "Scaffolding" ;;
+            commit|cleanup|sync-commands) echo "Housekeeping" ;;
+            *) echo "Other" ;;
+        esac
+    }
+
+    # Collect all commands with their metadata
+    local total_count=0
+    local cmd_list=""
     for file in "$commands_dir"/*.md; do
-        # Skip README and missing files
         [ -e "$file" ] || continue
         local name
         name=$(basename "$file" .md)
@@ -714,19 +751,40 @@ show_commands() {
         description=$(awk '/^---$/{f=!f; next} f && /^description:/{sub(/^description:[ ]*/, ""); print; exit}' "$file")
         argument_hint=$(awk '/^---$/{f=!f; next} f && /^argument-hint:/{sub(/^argument-hint:[ ]*/, ""); print; exit}' "$file")
 
-        # Build display name with arg hint
-        local display="/$name"
-        [ -n "$argument_hint" ] && display="$display $argument_hint"
+        # Get category
+        local cat
+        cat=$(get_category "$name")
 
-        echo -e "  ${CYAN}${BOLD}${display}${NC}"
-        if [ -n "$description" ]; then
-            echo -e "    ${description}"
-        fi
-        echo ""
-        count=$((count + 1))
+        # Store as pipe-separated line: category|name|description|hint
+        cmd_list="${cmd_list}${cat}|${name}|${description}|${argument_hint}"$'\n'
+        total_count=$((total_count + 1))
     done
 
-    echo -e "${BOLD}${count} commands available.${NC}\n"
+    # Sort by category, then by name
+    local sorted
+    sorted=$(echo "$cmd_list" | sort -t'|' -k1,1)
+
+    # Render grouped by category
+    local current_cat=""
+    echo "$sorted" | while IFS='|' read -r cat name desc hint; do
+        [ -z "$cat" ] && continue
+
+        # Print category header when it changes
+        if [ "$cat" != "$current_cat" ]; then
+            [ -n "$current_cat" ] && echo ""
+            echo -e "${BOLD}### $cat${NC}\n"
+            current_cat="$cat"
+        fi
+
+        # Build and print command line
+        local display="/$name"
+        [ -n "$hint" ] && display="$display $hint"
+        echo -e "  ${CYAN}${BOLD}${display}${NC}"
+        [ -n "$desc" ] && echo -e "    ${desc}"
+        echo ""
+    done
+
+    echo -e "${BOLD}${total_count} commands available.${NC}\n"
     echo -e "Usage: type ${CYAN}/<command-name>${NC} in Claude Code."
     echo -e "Not sure which one? Run ${CYAN}/ask-command <plain English>${NC}.\n"
     echo -e "📖 Full reference: ${BLUE}docs/dannflow_docs/claude-workflow.md${NC}"
@@ -1075,6 +1133,135 @@ show_ui() {
     step_footer
 }
 
+# Workflow Command — show daily Vibe Coding loop
+show_workflow() {
+    show_header
+    echo -e "${BOLD}🔄 Daily Vibe Coding Loop${NC}\n"
+
+    echo -e "${BOLD}Before risky schema changes:${NC}"
+    echo -e "  ${CYAN}npm run checkpoint${NC}  or  ${CYAN}/checkpoint${NC} in Claude Code\n"
+
+    echo -e "${BOLD}Build with Claude:${NC}"
+    echo -e "  Start each session with this copy-paste prompt:\n"
+    echo -e "${CYAN}──────────────────────────────────────────────────${NC}"
+    echo -e "Read CLAUDE.md before doing anything. Confirm my"
+    echo -e "Supabase MCP is connected by listing all tables in the"
+    echo -e "public schema, and check that src/types/supabase.ts"
+    echo -e "is up to date with the live schema."
+    echo -e "${CYAN}──────────────────────────────────────────────────${NC}\n"
+
+    echo -e "${BOLD}After any schema change:${NC}"
+    echo -e "  ${CYAN}npm run update-types${NC}  or  ${CYAN}/sync-types${NC} in Claude Code\n"
+
+    echo -e "${BOLD}Pre-PR validation:${NC}"
+    echo -e "  ${CYAN}/review${NC}        - Lint + typecheck + guardrail check"
+    echo -e "  ${CYAN}/sync-commands${NC} - Validate command docs are in sync\n"
+
+    echo -e "${BOLD}Ship it:${NC}"
+    echo -e "  ${CYAN}/commit${NC}        - Stage + draft conventional commit\n"
+
+    echo -e "${BOLD}Commands Quick Reference:${NC}"
+    echo -e "  ${CYAN}/checkpoint${NC}    → Snapshot DB before risky changes"
+    echo -e "  ${CYAN}/sync-types${NC}    → Regenerate types after schema change"
+    echo -e "  ${CYAN}/new-feature${NC}   → Scaffold service + types + page + form"
+    echo -e "  ${CYAN}/new-page${NC}      → New App Router page with layout"
+    echo -e "  ${CYAN}/ui${NC}            → Make code fully responsive (active rewrite)"
+    echo -e "  ${CYAN}/review${NC}        → Pre-PR lint + typecheck + guardrails"
+    echo -e "  ${CYAN}/commit${NC}        → Stage + draft conventional commit"
+    echo -e "  ${CYAN}/sync-commands${NC} → Validate command documentation\n"
+
+    echo -e "📖 Full reference: ${BLUE}docs/dannflow_docs/claude-workflow.md${NC}"
+    step_footer
+}
+
+# Vibe Check Command — quick health check
+show_vibe_check() {
+    show_header
+    echo -e "${BOLD}🔍 Quick Vibe Check${NC}\n"
+
+    local all_good=1
+
+    # Check 1: .env.local exists
+    if [ -f .env.local ]; then
+        echo -e "  ${GREEN}✅ .env.local${NC} exists"
+    else
+        echo -e "  ${RED}❌ .env.local${NC} missing — run ${CYAN}cp .env.example .env.local${NC}"
+        all_good=0
+    fi
+
+    # Check 2: Supabase keys filled
+    local url key
+    url=$(grep "^NEXT_PUBLIC_SUPABASE_URL=" .env.local 2>/dev/null | cut -d'=' -f2- | tr -d '"' | tr -d "'")
+    key=$(grep "^NEXT_PUBLIC_SUPABASE_ANON_KEY=" .env.local 2>/dev/null | cut -d'=' -f2- | tr -d '"' | tr -d "'")
+    if [ -n "$url" ] && [ -n "$key" ]; then
+        echo -e "  ${GREEN}✅ Supabase credentials${NC} set in .env.local"
+    else
+        echo -e "  ${RED}❌ Supabase credentials${NC} missing — fill in .env.local"
+        all_good=0
+    fi
+
+    # Check 3: Backups exist
+    if [ -d supabase/backups ] && [ -n "$(ls -1 supabase/backups/*.sql 2>/dev/null | head -1)" ]; then
+        local latest
+        latest=$(ls -1t supabase/backups/*.sql 2>/dev/null | head -1 | xargs basename)
+        echo -e "  ${GREEN}✅ DB backups${NC} found — latest: ${CYAN}$latest${NC}"
+    else
+        echo -e "  ${YELLOW}⚠️  No backups${NC} in supabase/backups/ — run ${CYAN}/checkpoint${NC} first"
+        all_good=0
+    fi
+
+    # Check 4: Types file exists
+    if [ -f src/types/supabase.ts ]; then
+        echo -e "  ${GREEN}✅ src/types/supabase.ts${NC} exists"
+    else
+        echo -e "  ${YELLOW}⚠️  src/types/supabase.ts${NC} missing — run ${CYAN}npm run update-types${NC}"
+        all_good=0
+    fi
+
+    # Check 5: Claude CLI
+    if command -v claude &>/dev/null; then
+        echo -e "  ${GREEN}✅ Claude CLI${NC} installed"
+    else
+        echo -e "  ${RED}❌ Claude CLI${NC} not found — install from ${BLUE}claude.ai/code${NC}"
+        all_good=0
+    fi
+
+    # Check 6: Commands directory
+    if [ -d .claude/commands ] && [ -n "$(ls -1 .claude/commands/*.md 2>/dev/null | head -1)" ]; then
+        local cmd_count
+        cmd_count=$(ls -1 .claude/commands/*.md 2>/dev/null | grep -v README | wc -l)
+        echo -e "  ${GREEN}✅ .claude/commands/${NC} ($cmd_count commands)"
+    else
+        echo -e "  ${RED}❌ .claude/commands${NC} missing or empty"
+        all_good=0
+    fi
+
+    # Check 7: Dependencies
+    if [ -d node_modules ]; then
+        echo -e "  ${GREEN}✅ node_modules${NC} installed"
+    else
+        echo -e "  ${YELLOW}⚠️  node_modules${NC} missing — run ${CYAN}npm install${NC}"
+        all_good=0
+    fi
+
+    echo ""
+    if [ "$all_good" -eq 1 ]; then
+        echo -e "${GREEN}✅ All checks passed!${NC} Ready to vibe code.\n"
+    else
+        echo -e "${YELLOW}⚠️  Some checks need attention (see above).${NC}\n"
+    fi
+
+    echo -e "${BOLD}Live vibe check — paste this to Claude:${NC}\n"
+    echo -e "${CYAN}──────────────────────────────────────────────────${NC}"
+    echo -e "Run a vibe check: List all tables in my Supabase"
+    echo -e "public schema, confirm src/types/supabase.ts is"
+    echo -e "current, show me the last supabase/backups/ snapshot"
+    echo -e "date, and check if there are any uncommitted changes."
+    echo -e "${CYAN}──────────────────────────────────────────────────${NC}\n"
+
+    step_footer
+}
+
 # Init Command
 show_init() {
     local passed_name="$1"
@@ -1152,15 +1339,17 @@ show_init() {
 
 # Routing logic
 case "$1" in
-    init)       show_init "$2" ;;
-    claude|1)   show_claude ;;
-    supabase|2) show_supabase ;;
-    env|3)      show_env ;;
-    vibe|4)     show_vibe ;;
-    security|5) show_security ;;
-    ui|6)       show_ui ;;
-    ready|7)    show_ready ;;
-    deploy|8)   show_deploy ;;
+    init)          show_init "$2" ;;
+    claude|1)      show_claude ;;
+    supabase|2)    show_supabase ;;
+    env|3)         show_env ;;
+    vibe|4)        show_vibe ;;
+    security|5)    show_security ;;
+    ui|6)          show_ui ;;
+    ready|7)       show_ready ;;
+    deploy|8)      show_deploy ;;
     commands|cmds) show_commands ;;
-    *)          show_main ;;
+    workflow)      show_workflow ;;
+    vibe-check|vibecheck) show_vibe_check ;;
+    *)             show_main ;;
 esac
