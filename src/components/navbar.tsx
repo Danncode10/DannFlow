@@ -6,19 +6,17 @@ import { siteConfig } from "@/lib/config";
 import { signOut } from "@/services/auth";
 import { useRouter } from "next/navigation";
 import { LogOut, User as UserIcon, LayoutDashboard, Settings, ChevronDown } from "lucide-react";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuLabel, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
-
-
-
+import type { User } from "@supabase/supabase-js";
 
 const navLinks = [
   { label: "Home", href: "/#home" },
@@ -27,7 +25,7 @@ const navLinks = [
   { label: "Pricing", href: "/#pricing" },
 ];
 
-export function Navbar({ user }: { user: any }) {
+export function Navbar({ user }: { user: User | null }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const router = useRouter();
 

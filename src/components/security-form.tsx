@@ -87,14 +87,15 @@ export function SecurityForm() {
       setCurrentPassword("");
       setPassword("");
       setConfirmPassword("");
-    } catch (err: any) {
-      if (err.message === "Incorrect current password") {
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : "Something went wrong.";
+      if (errorMsg === "Incorrect current password") {
         toast.error("Verification failed", {
           description: "Please enter your current password correctly.",
         });
       } else {
         toast.error("Update failed", {
-          description: err.message || "Something went wrong.",
+          description: errorMsg,
         });
       }
     } finally {

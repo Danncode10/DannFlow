@@ -9,6 +9,10 @@ import { cn } from "@/lib/utils"
  * that mimics the Shadcn appearance.
  */
 
+interface ComponentWithDisplayName extends React.ReactElement {
+  type: React.ComponentType & { displayName?: string };
+}
+
 export function DropdownMenu({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = React.useState(false)
   const containerRef = React.useRef<HTMLDivElement>(null)
@@ -26,15 +30,18 @@ export function DropdownMenu({ children }: { children: React.ReactNode }) {
   return (
     <div className="relative inline-block text-left" ref={containerRef}>
       {React.Children.map(children, (child) => {
-        if (React.isValidElement(child) && (child.type as any).displayName === "DropdownMenuTrigger") {
-          return React.cloneElement(child as any, { onClick: () => setOpen(!open) })
-        }
-        if (React.isValidElement(child) && (child.type as any).displayName === "DropdownMenuContent") {
-          return (
-            <AnimatePresence>
-              {open && React.cloneElement(child as any, { setOpen })}
-            </AnimatePresence>
-          )
+        if (React.isValidElement(child)) {
+          const element = child as ComponentWithDisplayName;
+          if (element.type.displayName === "DropdownMenuTrigger") {
+            return React.cloneElement(element, { onClick: () => setOpen(!open) } as React.ComponentProps<typeof element.type>)
+          }
+          if (element.type.displayName === "DropdownMenuContent") {
+            return (
+              <AnimatePresence key="dropdown-content">
+                {open && React.cloneElement(element, { setOpen } as React.ComponentProps<typeof element.type>)}
+              </AnimatePresence>
+            )
+          }
         }
         return child
       })}

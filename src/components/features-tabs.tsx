@@ -14,6 +14,7 @@ import {
   Code,
   Lock,
 } from "lucide-react";
+import type { Database as DatabaseType } from "@/types/supabase";
 
 
 
@@ -76,7 +77,13 @@ function GitHubIcon({ className }: { className?: string }) {
 
 const GITHUB_PER_PAGE = 5;
 
-function GithubRepoPaginated({ repos }: { repos: any[] }) {
+interface Repo {
+  name: string;
+  url: string;
+  description: string;
+}
+
+function GithubRepoPaginated({ repos }: { repos: Repo[] }) {
   const [page, setPage] = useState(0);
   const totalPages = Math.ceil(repos.length / GITHUB_PER_PAGE);
   const pageRepos = repos.slice(page * GITHUB_PER_PAGE, (page + 1) * GITHUB_PER_PAGE);
@@ -94,7 +101,7 @@ function GithubRepoPaginated({ repos }: { repos: any[] }) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-        {pageRepos.map((repo: any, i: number) => (
+        {pageRepos.map((repo, i) => (
           <a key={i} href={repo.url} target="_blank" rel="noreferrer" className="block group">
             <div className="group p-6 md:p-8 rounded-3xl md:rounded-5xl border border-border bg-card hover:border-primary/20 transition-all duration-300 flex flex-col h-full relative overflow-hidden hover:shadow-2xl hover:shadow-primary/5">
               <div className="flex items-center justify-between mb-5 md:mb-6">
@@ -155,13 +162,15 @@ function GithubRepoPaginated({ repos }: { repos: any[] }) {
   );
 }
 
+type Profile = DatabaseType["public"]["Tables"]["profiles"]["Row"];
+
 export function FeaturesTabs({
   profiles,
   repos,
   currentRole,
 }: {
-  profiles: any[];
-  repos: any[];
+  profiles: Profile[];
+  repos: Repo[];
   currentRole?: string;
 }) {
 

@@ -6,12 +6,15 @@ import { User, Calendar, CircleUser, Loader2, CheckCircle2 } from "lucide-react"
 import { Badge } from "@/components/ui/badge";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import type { Database } from "@/types/supabase";
+
+type Profile = Database["public"]["Tables"]["profiles"]["Row"] | null;
 
 // Reusable input class — semantic tokens only, consistent height
 const inputClass =
   "w-full bg-secondary border border-border rounded-2xl py-4 pl-12 pr-5 text-sm font-semibold text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/20 transition-all";
 
-export function ProfileForm({ profile }: { profile: any }) {
+export function ProfileForm({ profile }: { profile: Profile }) {
   const [success, setSuccess] = useState(false);
   const queryClient = useQueryClient();
 
@@ -49,7 +52,7 @@ export function ProfileForm({ profile }: { profile: any }) {
       setTimeout(() => setSuccess(false), 3000);
       return { previousProfiles };
     },
-    onError: (err: any, _newProfile, context) => {
+    onError: (err: Error, _newProfile, context) => {
       if (context?.previousProfiles) {
         queryClient.setQueryData(["profiles-db"], context.previousProfiles);
       }
