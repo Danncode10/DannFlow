@@ -102,6 +102,7 @@ Run `/ask-command <what you want>` if you don't remember which command to use.
 | `/commit` | Stages changes + drafts a conventional commit message. |
 | `/cleanup` | Finds dead code, unused exports, orphaned components. Reports only — never deletes. |
 | `/sync-commands` | Audits `.claude/commands/` and validates docs against `claude-workflow.md` + `./guide.sh`. Identifies orphaned commands, optionally auto-patches. |
+| `/no-conflict` | Audits repo for conflicts between documentation (README, CLAUDE.md) and actual code — versions, features, commands, RLS, semantic tokens, folder structure. Reports only. |
 
 ---
 

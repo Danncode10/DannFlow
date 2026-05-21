@@ -21,6 +21,7 @@ Drop `.md` files in this folder to add custom slash commands. Each file becomes 
 | `/commit` | Stages changes + drafts a conventional commit message. |
 | `/cleanup` | Finds dead code, unused exports, orphaned components, stale files. |
 | `/sync-commands` | Audits `.claude/commands/` and validates against `claude-workflow.md` and `./guide.sh`. Reports orphaned commands, optionally auto-patches docs. |
+| `/no-conflict` | Audits repo for conflicts between documentation (README, CLAUDE.md) and actual code — technology versions, features, commands, RLS enforcement, semantic tokens, folder structure. Reports only. |
 
 ## File format
 
