@@ -48,7 +48,30 @@ npm install
 echo -e "🔑 ${CYAN}Setting up environment variables...${NC}"
 cp .env.example .env.local
 
-# 4. Trigger Guide Initialization
+# 4. Install Ruflo (global, once per machine) + register MCP server
+# Ruflo is currently in BETA — the global install pins @latest so you always
+# pull the freshest build. Run this BEFORE the per-project `init wizard`.
+echo -e "🧠 ${CYAN}Installing Ruflo globally (beta)...${NC}"
+if ! npm install -g ruflo@latest; then
+    echo -e "${YELLOW}⚠️  Global ruflo install failed. You can retry later with:${NC}"
+    echo -e "   ${YELLOW}npm install -g ruflo@latest${NC}"
+fi
+
+if command -v claude >/dev/null 2>&1; then
+    echo -e "🔌 ${CYAN}Registering Ruflo MCP server with Claude Code...${NC}"
+    claude mcp add ruflo -- npx ruflo@latest mcp start || \
+        echo -e "${YELLOW}⚠️  Could not register ruflo MCP. Run manually:${NC} claude mcp add ruflo -- npx ruflo@latest mcp start"
+else
+    echo -e "${YELLOW}ℹ️  Claude Code CLI not found — skipping MCP registration.${NC}"
+    echo -e "   After installing Claude Code, run: ${YELLOW}claude mcp add ruflo -- npx ruflo@latest mcp start${NC}"
+fi
+
+# 5. Per-project Ruflo init (swarms, hooks, agents)
+echo -e "🌀 ${CYAN}Running Ruflo project init wizard...${NC}"
+npx ruflo@latest init wizard || \
+    echo -e "${YELLOW}⚠️  Ruflo init wizard did not finish. You can run it later with: npx ruflo@latest init wizard${NC}"
+
+# 6. Trigger Guide Initialization
 # This handles the branding and resetting of GIT history for the user.
 echo -e "✨ ${CYAN}Running project initialization...${NC}"
 chmod +x guide.sh

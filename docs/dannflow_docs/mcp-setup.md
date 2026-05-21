@@ -13,3 +13,20 @@ To make "DannFlow" work, the AI needs three sets of tools:
 ### 3. Terminal MCP (The Hands)
 - **Purpose**: Allows the AI to run commands like `npm install` or `npm run update-types` for you.
 - **Setup**: Enable "Terminal" or "Shell" access in Antigravity settings.
+
+### 4. Ruflo MCP (Memory + Orchestration) — Beta
+
+- **Purpose**: Adds persistent memory tools, swarms, hooks, and project agents to Claude Code.
+- **Status**: Currently in **beta** — we always install `ruflo@latest`.
+- **Global install (once per machine, required BEFORE any per-project init):**
+  ```bash
+  npm install -g ruflo@latest
+  claude mcp add ruflo -- npx ruflo@latest mcp start
+  ```
+- **Per-project init (run only after the global install above):**
+  ```bash
+  cd your-project
+  npx ruflo@latest init wizard
+  ```
+
+> The DannFlow `install.sh` runs both steps automatically. If you set up manually, follow the order strictly: **global install → MCP register → `init wizard`**.

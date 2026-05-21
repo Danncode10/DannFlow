@@ -22,7 +22,9 @@ Boot up your project and set your App Name with a single command:
 curl -sSL https://raw.githubusercontent.com/Danncode10/DannFlow/main/install.sh | bash
 ```
 
-This automates the entire setup: clones the repo, installs dependencies, sets up environment variables, and interactive rebranding with a fresh Git history.
+This automates the entire setup: clones the repo, installs dependencies, sets up environment variables, **installs Ruflo (beta) and registers its MCP server**, runs the Ruflo `init wizard` in the new project, and finishes with interactive rebranding + a fresh Git history.
+
+> **Ruflo is currently in beta.** The installer always pulls `ruflo@latest`, but features may shift between releases. If you set up DannFlow manually (without `install.sh`), you **must install Ruflo globally first** before running the project wizard — see [Ruflo Setup](#-ruflo-setup-beta) below.
 
 ### Quick Reference
 
@@ -48,6 +50,38 @@ git init
 git add .
 git commit -m "this projects initialized Dannflow"
 ```
+
+---
+
+## 🧠 Ruflo Setup (Beta)
+
+DannFlow ships with [Ruflo](https://www.npmjs.com/package/ruflo) wired into the install flow. Ruflo gives Claude Code persistent memory tools, an MCP server, and (per project) swarms, hooks, and agents that complement the Vibe Coding loop.
+
+> ⚠️ **Beta software.** Ruflo is still pre-1.0, so APIs and command surface can change. We always install `ruflo@latest` so you get the freshest build.
+
+### One-time global install (per machine)
+
+Do this **once, ever** — you must complete it **before** the per-project wizard. `install.sh` runs it for you; if you set things up manually, run:
+
+```bash
+npm install -g ruflo@latest
+claude mcp add ruflo -- npx ruflo@latest mcp start
+```
+
+This makes Ruflo's memory tools and MCP server available in every Claude Code session on your machine.
+
+### Per-project init (in each repo that wants full orchestration)
+
+After cloning DannFlow (or any new project) and *after* the global install above:
+
+```bash
+cd your-project
+npx ruflo@latest init wizard
+```
+
+This wires swarms, hooks, agents, and a `CLAUDE.md`-aware setup into that specific repo. **Don't run this before the global install** — the wizard expects the global `ruflo` binary to exist.
+
+> The DannFlow `install.sh` performs both steps automatically. Manual setups must follow the order: **global install → MCP register → `init wizard`**.
 
 ---
 
