@@ -29,26 +29,28 @@ EOF
 # Run a step by index (0-based)
 run_step() {
     case "$1" in
-        0) show_supabase ;;
-        1) show_env ;;
-        2) show_vibe ;;
-        3) show_security ;;
-        4) show_ui ;;
-        5) show_ready ;;
-        6) show_deploy ;;
+        0) show_claude ;;
+        1) show_supabase ;;
+        2) show_env ;;
+        3) show_vibe ;;
+        4) show_security ;;
+        5) show_ui ;;
+        6) show_ready ;;
+        7) show_deploy ;;
     esac
 }
 
 # Interactive Main Menu
 show_main() {
     local labels=(
-        "Step 1: Create Supabase project, Auth, and SMTP"
-        "Step 2: Set up environment variables (.env.local)"
-        "Step 3: Connect AI Agents (MCPs/Cursor/Antigravity)"
-        "Step 4: Setup Gmail security notifications"
-        "Step 5: Customize your brand theme & colors"
-        "Step 6: Final checklist & rebrand (resets Git history)"
-        "Step 7: Deploy to Vercel (Production)"
+        "Step 1: Set up Claude Code environment (CLAUDE.md + commands)"
+        "Step 2: Create Supabase project, Auth, and SMTP"
+        "Step 3: Set up environment variables (.env.local)"
+        "Step 4: Connect AI Agents (MCPs/Cursor/Antigravity)"
+        "Step 5: Setup Gmail security notifications"
+        "Step 6: Customize your brand theme & colors"
+        "Step 7: Final checklist & rebrand (resets Git history)"
+        "Step 8: Deploy to Vercel (Production)"
     )
     local count=${#labels[@]}
     local selected=0
@@ -68,6 +70,7 @@ show_main() {
 
         echo ""
         echo -e "Other helpful commands:"
+        echo -e "  ${CYAN}./guide.sh commands${NC}  - List all Claude slash commands available in this repo"
         echo -e "  ${CYAN}npm run dev${NC}          - Start development server"
         echo -e "  ${CYAN}npm run update-types${NC} - Sync TypeScript types with Supabase"
         echo -e "  ${CYAN}npm run checkpoint${NC}   - Take a DB schema snapshot (SQL)"
@@ -649,6 +652,87 @@ show_deploy() {
     step_footer
 }
 
+# Claude Code Setup Command
+show_claude() {
+    show_header
+    echo -e "${BOLD}🤖 Set Up Your Claude Code Environment${NC}\n"
+    echo -e "DannFlow ships with a full Claude Code setup: ${CYAN}CLAUDE.md${NC}, ${CYAN}SKILLS.md${NC},"
+    echo -e "and 14 custom slash commands in ${CYAN}.claude/commands/${NC}.\n"
+
+    echo -e "${BOLD}The 3-step setup:${NC}\n"
+
+    echo -e "${BOLD}1. Edit README.md${NC}"
+    echo -e "   Rewrite the intro to describe ${YELLOW}your${NC} project (not DannFlow)."
+    echo -e "   Update the feature table and project structure to match reality."
+    echo -e "   Don't polish it — Claude reads it to understand the project.\n"
+
+    echo -e "${BOLD}2. Run /init-claude in Claude Code${NC}"
+    echo -e "   This reads your README + package.json + src/ and rewrites:"
+    echo -e "   - ${CYAN}CLAUDE.md${NC}        (Claude's project config)"
+    echo -e "   - ${CYAN}SKILLS.md${NC}        (which skills are relevant)"
+    echo -e "   - ${CYAN}.claude/commands/README.md${NC} (command index)"
+    echo -e "   Add ${YELLOW}--commands${NC} to also propose individual command rewrites.\n"
+
+    echo -e "${BOLD}3. Start building with the commands${NC}"
+    echo -e "   Don't remember which to use? Run: ${CYAN}/ask-command <what you want>${NC}\n"
+
+    echo -e "${BOLD}Daily workflow:${NC}"
+    echo -e "   ${CYAN}/checkpoint${NC}    Snapshot DB before risky schema changes"
+    echo -e "   ${CYAN}/sync-types${NC}    After any schema change"
+    echo -e "   ${CYAN}/new-feature${NC}   Scaffold service + types + page + form"
+    echo -e "   ${CYAN}/ui${NC}            Make code fully responsive (active rewrite)"
+    echo -e "   ${CYAN}/review${NC}        Pre-PR lint + typecheck + guardrail check"
+    echo -e "   ${CYAN}/commit${NC}        Stage + draft conventional commit\n"
+
+    echo -e "📖 Full walkthrough: ${BLUE}docs/dannflow_docs/claude-workflow.md${NC}"
+    step_footer
+}
+
+# Commands Listing — dynamically reads .claude/commands/*.md
+show_commands() {
+    show_header
+    echo -e "${BOLD}🤖 Claude Code Slash Commands${NC}\n"
+
+    local commands_dir=".claude/commands"
+    if [ ! -d "$commands_dir" ]; then
+        echo -e "${RED}No .claude/commands/ directory found.${NC}"
+        echo -e "Run ${CYAN}./guide.sh claude${NC} to set up the Claude environment.\n"
+        step_footer
+        return
+    fi
+
+    local count=0
+    for file in "$commands_dir"/*.md; do
+        # Skip README and missing files
+        [ -e "$file" ] || continue
+        local name
+        name=$(basename "$file" .md)
+        [ "$name" = "README" ] && continue
+
+        # Extract description and argument-hint from YAML frontmatter
+        local description argument_hint
+        description=$(awk '/^---$/{f=!f; next} f && /^description:/{sub(/^description:[ ]*/, ""); print; exit}' "$file")
+        argument_hint=$(awk '/^---$/{f=!f; next} f && /^argument-hint:/{sub(/^argument-hint:[ ]*/, ""); print; exit}' "$file")
+
+        # Build display name with arg hint
+        local display="/$name"
+        [ -n "$argument_hint" ] && display="$display $argument_hint"
+
+        echo -e "  ${CYAN}${BOLD}${display}${NC}"
+        if [ -n "$description" ]; then
+            echo -e "    ${description}"
+        fi
+        echo ""
+        count=$((count + 1))
+    done
+
+    echo -e "${BOLD}${count} commands available.${NC}\n"
+    echo -e "Usage: type ${CYAN}/<command-name>${NC} in Claude Code."
+    echo -e "Not sure which one? Run ${CYAN}/ask-command <plain English>${NC}.\n"
+    echo -e "📖 Full reference: ${BLUE}docs/dannflow_docs/claude-workflow.md${NC}"
+    step_footer
+}
+
 # UI helpers
 hex_to_rgb() {
     local hex="${1#'#'}"
@@ -1068,13 +1152,15 @@ show_init() {
 
 # Routing logic
 case "$1" in
-    init)     show_init "$2" ;;
-    env|2)    show_env ;;
-    supabase|1) show_supabase ;;
-    vibe|3)   show_vibe ;;
-    security|4) show_security ;;
-    ui|5)     show_ui ;;
-    ready|6)  show_ready ;;
-    deploy|7) show_deploy ;;
-    *)        show_main ;;
+    init)       show_init "$2" ;;
+    claude|1)   show_claude ;;
+    supabase|2) show_supabase ;;
+    env|3)      show_env ;;
+    vibe|4)     show_vibe ;;
+    security|5) show_security ;;
+    ui|6)       show_ui ;;
+    ready|7)    show_ready ;;
+    deploy|8)   show_deploy ;;
+    commands|cmds) show_commands ;;
+    *)          show_main ;;
 esac
