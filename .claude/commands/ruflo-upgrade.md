@@ -1,10 +1,14 @@
 ---
-description: Re-applies Ruflo-aware patterns (memory check preamble, parallel agent hints, memory postamble) to the 5 core DannFlow commands. Safe to re-run after /init-update overwrites them.
+description: Re-applies Ruflo-aware patterns (memory check preamble, parallel agent hints, memory postamble) to the 8 core DannFlow commands. Safe to re-run after /init-update overwrites them.
 ---
 
-Re-apply Ruflo integration to the 5 core DannFlow commands that benefit most from memory and parallel agents: `/new-feature`, `/new-page`, `/security-audit`, `/seo-fix`, `/migrate`.
+Re-apply Ruflo integration to the 8 DannFlow commands that benefit most from memory and parallel agents:
 
-Run this when `/init-update` or `/init-claude` has regenerated those files and the Ruflo additions were lost.
+**Memory + parallel:** `/new-feature`, `/new-page`, `/security-audit`, `/seo-fix`, `/migrate`, `/review`, `/ui`, `/marketing-check`, `/seo-check`
+**Parallel only:** `/seed`, `/cleanup`, `/auto-docs`
+**Memory guard (pre-run safety):** `/init-update`
+
+Run this when `/init-update` or `/init-claude` has regenerated those files and the Ruflo additions were lost. Also run after adding a new command that should be Ruflo-aware.
 
 ## Procedure
 
@@ -18,24 +22,19 @@ Run this when `/init-update` or `/init-claude` has regenerated those files and t
    Already Ruflo-aware (no changes):
      ✓ .claude/commands/migrate.md
 
-   Will upgrade:
-     ~ .claude/commands/new-feature.md
-       + Step 0: check ruflo memory preamble
-       + Parallel agents hint for service/page/component/types
-       + Memory postamble after scaffolding
-
-     ~ .claude/commands/new-page.md
-       + Step 0: check ruflo memory preamble
-       + Parallel agents hint for multi-section pages
-
-     ~ .claude/commands/security-audit.md
-       + Parallel scan hint (by directory)
-       + Save CRITICAL findings to memory postamble
-
-     ~ .claude/commands/seo-fix.md
-       + Step 0: check ruflo memory preamble
-       + Parallel agents hint for "all" route case
-       + Save SEO decisions postamble
+   Will upgrade (if patterns missing):
+     ~ .claude/commands/new-feature.md     — memory + parallel (service/page/component/types) + postamble
+     ~ .claude/commands/new-page.md        — memory + parallel (multi-section pages)
+     ~ .claude/commands/security-audit.md  — parallel by directory + save CRITICAL findings
+     ~ .claude/commands/seo-fix.md         — memory + parallel per-route + save decisions
+     ~ .claude/commands/review.md          — memory (conventions) + parallel (lint/typecheck/guardrails) + postamble
+     ~ .claude/commands/ui.md              — memory (design decisions) + parallel (multi-component) + postamble
+     ~ .claude/commands/seo-check.md       — memory (prior SEO decisions) + parallel per-route
+     ~ .claude/commands/marketing-check.md — memory (brand voice) + parallel per-page
+     ~ .claude/commands/seed.md            — parallel per-table for "all" case
+     ~ .claude/commands/cleanup.md         — parallel scan (exports/components/services, routes/deps, backups/todos)
+     ~ .claude/commands/auto-docs.md       — parallel per-scope (commands/skills/scripts/env/stack/structure)
+     ~ .claude/commands/init-update.md     — memory guard: check customizations before overwriting
 
    Proceed? (y/n)
    ```

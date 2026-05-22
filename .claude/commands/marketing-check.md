@@ -9,9 +9,13 @@ Audit a landing or marketing page against conversion-fundamentals checklist. Thi
 
 ## Procedure
 
+0. **Check ruflo memory** — search for brand voice decisions, positioning choices, prior audit findings (e.g. "we lead with outcomes not features", "primary audience is indie hackers not enterprise", "last audit flagged weak social proof"). Apply these as additional criteria before scoring.
+
 1. **Determine scope** — if `$ARGUMENTS` is a route, audit that page. Otherwise default to `/` (src/app/page.tsx) and `/pricing` (src/app/pricing/page.tsx) if they exist.
 
-2. **For each page, read the rendered JSX** (top-to-bottom) and the components it imports. Treat what's at the top of the file as "above the fold." Score each fundamental as ✅ / ⚠️ / ❌ with one-line evidence.
+2. **If auditing multiple routes**, spawn one agent per page in parallel — scoring is independent per page. Merge into a single report.
+
+3. **For each page, read the rendered JSX** (top-to-bottom) and the components it imports. Treat what's at the top of the file as "above the fold." Score each fundamental as ✅ / ⚠️ / ❌ with one-line evidence.
 
 3. **Checklist — above the fold (first viewport):**
 
@@ -41,7 +45,7 @@ Audit a landing or marketing page against conversion-fundamentals checklist. Thi
    - **Feature comparison table** — for >2 tiers.
    - **"Talk to sales" tier** — for the enterprise option if there is one.
 
-6. **Generate the report** below. No fixes — that's the user's call once they see the audit.
+7. **Generate the report** below. No fixes — that's the user's call once they see the audit.
 
 ## Output format
 

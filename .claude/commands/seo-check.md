@@ -7,6 +7,8 @@ Per-route SEO audit for DannFlow's Next.js 15 App Router. Reports gaps — never
 
 ## Procedure
 
+0. **Check ruflo memory** — search for prior SEO decisions (canonical domain, OG image strategy, siteName, JSON-LD type choices per route). Apply these as expected values during the audit rather than flagging them as gaps.
+
 1. **Determine scope** — if `$ARGUMENTS` is a route like `/pricing`, audit only `src/app/pricing/page.tsx`. Otherwise audit every `page.tsx` under `src/app/` excluding API routes, layout files, and `(group)` segments unless they have their own metadata.
 
 2. **For each route, check the following:**
@@ -43,9 +45,11 @@ Per-route SEO audit for DannFlow's Next.js 15 App Router. Reports gaps — never
    - [ ] `next/font` used for custom fonts (no raw `<link rel="stylesheet">` to Google Fonts)
    - [ ] `loading="lazy"` on below-fold images (or implicit via `next/image`)
 
-3. **Generate the report** in the format below.
+3. **When auditing multiple routes**, spawn one agent per route in parallel — each route audit is fully independent. Merge all route reports before producing the final summary.
 
-4. **Do not modify any files.** This is a read-only audit.
+4. **Generate the report** in the format below.
+
+5. **Do not modify any files.** This is a read-only audit.
 
 ## Output format
 

@@ -24,22 +24,24 @@ By default audit all six surfaces. Use `--scope=<name>` to narrow.
 
 1. **Determine scope** — read `$ARGUMENTS`. Default to `all`. Parse `--fix` flag separately.
 
-2. **For each scope, build two sets:**
+2. **Run scopes in parallel** — each scope (commands, skills, scripts, env, stack, structure) reads different sources and writes to different doc sections. Spawn one agent per scope simultaneously. Merge results before generating the report.
+
+3. **For each scope, build two sets:**
    - **Reality set** — what exists on disk (commands, skills, scripts, deps, env vars, folders).
    - **Documented set** — what each doc claims exists.
 
-3. **Compute diffs:**
+4. **Compute diffs:**
    - `Reality - Documented` → missing from docs (orphans)
    - `Documented - Reality` → stale in docs (references things that no longer exist)
 
-4. **Skip Ruflo namespace** — same exclusions as `/sync-commands`:
+5. **Skip Ruflo namespace** — same exclusions as `/sync-commands`:
    - `.claude/commands/<subdirs>/` (agents, sparc, swarm, github, etc.)
    - `.claude/commands/claude-flow-*.md`
    - `.claude/skills/` entries that came from Ruflo install (anything under `.agents/` is fine; only flag drift for our 6 curated packs + their skills).
 
-5. **Generate the report** in the format below.
+6. **Generate the report** in the format below.
 
-6. **If `--fix` was passed**, ask for confirmation, then apply patches:
+7. **If `--fix` was passed**, ask for confirmation, then apply patches:
    - Add missing rows to tables (commands, skills, scripts, env vars).
    - Remove stale rows referring to deleted items.
    - For `stack` and `structure` drift, **never auto-patch** — only report. These changes need human judgment about how to phrase the docs.

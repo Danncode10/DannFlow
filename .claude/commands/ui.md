@@ -7,6 +7,8 @@ Target: **$ARGUMENTS** (if blank, target uncommitted changes in `src/components/
 
 This is an **active rewrite**, not a check. Read the target, then edit it directly to comply with DannFlow's UI standards.
 
+**Before rewriting** — check ruflo memory for design decisions specific to this project (e.g. "cards use rounded-xl", "spacing scale is p-6/gap-6 not p-4", "hero buttons are h-14 not h-12"). Apply these on top of the standard rules below.
+
 **Rewrite rules:**
 
 1. **Mobile-first responsiveness**
@@ -46,7 +48,9 @@ This is an **active rewrite**, not a check. Read the target, then edit it direct
 **Procedure:**
 1. Read the target file(s).
 2. Identify every violation.
-3. Edit the file(s) in place.
-4. Report a concise diff summary at the end: "Fixed N violations across M files: <bullet list of fix categories>."
+3. **If the target is multiple independent components**, spawn one agent per component in parallel — each has no shared state and can rewrite simultaneously. Merge results.
+4. Edit the file(s) in place.
+5. **Save any project-specific design decisions** made during the rewrite to ruflo memory (e.g. "chosen rounded-2xl for card corners on the dashboard").
+6. Report a concise diff summary at the end: "Fixed N violations across M files: <bullet list of fix categories>."
 
 If a file is already compliant, say so and skip it. Don't refactor unrelated logic — UI standards only.

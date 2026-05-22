@@ -11,7 +11,7 @@ Generate type-safe seed data for the table(s) named in `$ARGUMENTS`. Output as S
 
 2. **Read `src/types/supabase.ts`** — this is the source of truth for table shapes, column types, nullability, and enums. **Never** infer schema from anywhere else.
 
-3. **Resolve dependency order** — if seeding multiple tables, topologically sort by foreign key dependencies. Parent tables first.
+3. **Resolve dependency order** — if seeding multiple tables, topologically sort by foreign key dependencies. Parent tables first. Once the order is resolved, **spawn one agent per table in parallel** — each generates its SQL file independently. Collect all files, then write the dependency-ordered `seed-all-<ts>.sql` runner last.
    - If a circular FK is detected, stop and ask the user how to break the cycle.
 
 4. **Generate realistic values per column type:**

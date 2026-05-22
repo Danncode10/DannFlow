@@ -21,6 +21,8 @@ Shows diffs, asks which updates you want, and generates a clean commit for revie
 
 **Procedure:**
 
+0. **Guard ruflo customizations** — before pulling anything, search ruflo memory for project-specific customizations baked into commands, CLAUDE.md, or SKILLS.md (e.g. "ruflo memory protocol section added to CLAUDE.md", "new-feature upgraded with parallel agents"). List them. After the update completes, verify these customizations survived — if any were overwritten, re-apply them automatically or prompt the user to run `/ruflo-upgrade`.
+
 1. **Clone the latest DannFlow** to a temp directory:
    ```bash
    git clone --depth 1 https://github.com/Danncode10/DannFlow.git /tmp/dannflow-latest

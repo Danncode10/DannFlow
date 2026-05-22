@@ -6,12 +6,14 @@ Review the current branch before opening a PR.
 
 **Procedure:**
 
+0. **Check ruflo memory** — search for project-specific conventions, prior review decisions, or patterns the team has agreed on (e.g. "we use server actions, not API routes", "all forms need optimistic updates"). Apply these as additional guardrails during step 3.
+
 1. **Identify the diff** — `git diff main...HEAD` plus any uncommitted changes. If on `main` with uncommitted changes, review those.
 
-2. **Run automated checks** in parallel:
-   - `npm run lint`
-   - `npx tsc --noEmit` (typecheck)
-   - `git status` (uncommitted files)
+2. **Run automated checks + guardrail critique in parallel** — these three jobs are independent, spawn agents simultaneously:
+   - Agent A: `npm run lint` + `npx tsc --noEmit` + `git status`
+   - Agent B: Critique diff against `CLAUDE.md` guardrails (step 3 below)
+   - Agent C: Apply any project-specific patterns recalled from ruflo memory in step 0
 
 3. **Critique the diff** against `CLAUDE.md` guardrails:
 
@@ -53,3 +55,5 @@ Suggested commit message: <conventional commit one-liner>
 If lint or typecheck fails, list the actual errors (not just "X errors"). If everything passes, end with: `READY — run /commit to stage and draft the message.`
 
 Do not modify code. Report only.
+
+**After the report** — if new project conventions surface during the review (patterns the team is consistently applying that aren't in CLAUDE.md), save them to ruflo memory so future reviews enforce them automatically.

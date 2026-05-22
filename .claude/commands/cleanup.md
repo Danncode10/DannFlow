@@ -6,6 +6,13 @@ Scan the repo for cruft and report what's safe to remove.
 
 **Procedure:**
 
+**Parallel scan** — steps 1–5 are independent. Spawn agents simultaneously:
+- Agent A → steps 1–3 (unused exports, orphaned components, dead service functions)
+- Agent B → steps 4–5 (stale routes, unused dependencies)
+- Agent C → steps 6–7 (old backups, TODO/FIXME debt)
+
+Merge all findings before generating the report.
+
 1. **Unused exports** — for each `.ts` / `.tsx` file in `src/`, find exported symbols (functions, components, types, constants). For each, grep the rest of `src/` for imports. Anything imported zero times is a candidate.
 
 2. **Orphaned components** — files in `src/components/` not imported anywhere in `src/app/` or other components.
