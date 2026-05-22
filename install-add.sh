@@ -4,17 +4,25 @@
 # Usage: curl -sSL https://raw.githubusercontent.com/Danncode10/DannFlow/main/install-add.sh | bash
 #
 # What it does:
-#   - Downloads .claude/ (commands, CLAUDE.md, SKILLS.md), guide.sh,
-#     AGENTS.md, and PROJECT_CONTEXT.md into your existing project
-#   - Installs Ruflo globally and registers its MCP server
+#   - Downloads .claude/ (commands + config), guide.sh, SKILLS.md, AGENTS.md, PROJECT_CONTEXT.md
+#   - Installs Ruflo globally (skips if already installed) and registers its MCP server
 #   - Downloads all 8 skill packs
 #   - Does NOT touch src/, package.json, .env.local, or your database
-#
-# After running, open Claude Code and run:
-#   1. Edit README.md (describe YOUR project)
-#   2. /init-claude   (tailors CLAUDE.md + SKILLS.md + commands to your project)
-#   3. /ruflo-upgrade (adds memory + parallel patterns to commands)
-#   4. /no-conflict   (verify no drift)
+
+# ── Self-pipe fix ─────────────────────────────────────────────────────────────
+# When run as `curl | bash`, stdin is the pipe stream. Interactive subprocesses
+# (like the skills CLI TUI) consume that stream and break the rest of the script.
+# Fix: save ourselves to a temp file and re-execute with a real stdin.
+if [ -z "$INSTALL_ADD_RUNNING" ]; then
+    export INSTALL_ADD_RUNNING=1
+    SELF_TMP=$(mktemp /tmp/install-add-XXXX.sh)
+    cat > "$SELF_TMP"
+    bash "$SELF_TMP"
+    EXIT_CODE=$?
+    rm -f "$SELF_TMP"
+    exit $EXIT_CODE
+fi
+# ─────────────────────────────────────────────────────────────────────────────
 
 CYAN='\033[0;36m'
 GREEN='\033[0;32m'
@@ -24,7 +32,6 @@ BOLD='\033[1m'
 NC='\033[0m'
 
 DANNFLOW_REPO="https://github.com/Danncode10/DannFlow"
-RAW_BASE="https://raw.githubusercontent.com/Danncode10/DannFlow/main"
 TMP_DIR="/tmp/dannflow-add-$$"
 
 echo -e "${CYAN}${BOLD}"
@@ -60,99 +67,127 @@ fi
 
 echo -e "\n📥 ${CYAN}Fetching DannFlow files...${NC}"
 
-# Clone DannFlow to a temp dir (sparse, depth 1)
-if ! git clone --depth 1 --filter=blob:none --sparse "$DANNFLOW_REPO" "$TMP_DIR" 2>/dev/null; then
+# Plain shallow clone — no sparse/filter flags so all file contents are downloaded
+if ! git clone --depth 1 "$DANNFLOW_REPO" "$TMP_DIR" 2>/dev/null; then
     echo -e "${RED}❌ Failed to clone DannFlow. Check your internet connection.${NC}"
     exit 1
 fi
 
-cd "$TMP_DIR" || exit 1
-git sparse-checkout set .claude guide.sh SKILLS.md AGENTS.md PROJECT_CONTEXT.md 2>/dev/null
-cd - > /dev/null || exit 1
-
-# Copy .claude/ — merge, don't overwrite user's custom commands
+# ── Install .claude/ ──────────────────────────────────────────────────────────
 echo -e "📁 ${CYAN}Installing .claude/ (commands + config)...${NC}"
 if [ -d ".claude" ]; then
-    echo -e "   ${YELLOW}Existing .claude/ found — merging. Your custom commands will be preserved.${NC}"
+    echo -e "   ${YELLOW}Existing .claude/ found — merging (your custom files are preserved).${NC}"
+
+    # Copy everything non-destructively first
     cp -rn "$TMP_DIR/.claude/." ".claude/" 2>/dev/null || true
-    # Force-overwrite only the DannFlow command files (not user-created ones)
-    for f in "$TMP_DIR"/.claude/commands/*.md; do
-        fname=$(basename "$f")
-        cp "$f" ".claude/commands/$fname"
+
+    # Force-overwrite only DannFlow's own command files
+    if [ -d "$TMP_DIR/.claude/commands" ]; then
+        mkdir -p ".claude/commands"
+        for f in "$TMP_DIR/.claude/commands/"*.md; do
+            [ -f "$f" ] || continue
+            cp "$f" ".claude/commands/$(basename "$f")"
+        done
+    fi
+
+    # Overwrite subdirectory command packs (agents/, swarm/, memory/, etc.)
+    for subdir in "$TMP_DIR/.claude/commands/"/*/; do
+        [ -d "$subdir" ] || continue
+        dname=$(basename "$subdir")
+        mkdir -p ".claude/commands/$dname"
+        cp -r "$subdir"* ".claude/commands/$dname/" 2>/dev/null || true
     done
+
     echo -e "   ✅ .claude/ merged"
 else
     cp -r "$TMP_DIR/.claude" ".claude"
     echo -e "   ✅ .claude/ installed"
 fi
 
-# Copy guide.sh
+# ── Other files ───────────────────────────────────────────────────────────────
 echo -e "📋 ${CYAN}Installing guide.sh...${NC}"
-cp "$TMP_DIR/guide.sh" "./guide.sh"
-chmod +x "./guide.sh"
-echo -e "   ✅ guide.sh installed"
+cp "$TMP_DIR/guide.sh" "./guide.sh" && chmod +x "./guide.sh"
+echo -e "   ✅ guide.sh"
 
-# Copy SKILLS.md (overwrite — it's a reference doc)
 echo -e "📚 ${CYAN}Installing SKILLS.md...${NC}"
 cp "$TMP_DIR/SKILLS.md" "./SKILLS.md"
-echo -e "   ✅ SKILLS.md installed"
+echo -e "   ✅ SKILLS.md"
 
-# Copy AGENTS.md (overwrite)
-if [ -f "$TMP_DIR/AGENTS.md" ]; then
-    cp "$TMP_DIR/AGENTS.md" "./AGENTS.md"
-    echo -e "   ✅ AGENTS.md installed"
-fi
+[ -f "$TMP_DIR/AGENTS.md" ] && cp "$TMP_DIR/AGENTS.md" "./AGENTS.md" && echo -e "   ✅ AGENTS.md"
 
-# Copy PROJECT_CONTEXT.md (only if it doesn't exist — don't overwrite user's context)
 if [ ! -f "PROJECT_CONTEXT.md" ]; then
     cp "$TMP_DIR/PROJECT_CONTEXT.md" "./PROJECT_CONTEXT.md"
-    echo -e "   ✅ PROJECT_CONTEXT.md installed (fill this in after /init-claude)"
+    echo -e "   ✅ PROJECT_CONTEXT.md (fill this in after /init-claude)"
 else
     echo -e "   ℹ️  PROJECT_CONTEXT.md already exists — skipped"
 fi
 
-# Cleanup temp
+# Cleanup temp clone
 rm -rf "$TMP_DIR"
 
-# Install Ruflo (global + MCP)
-echo -e "\n🧠 ${CYAN}Installing Ruflo globally (beta)...${NC}"
-if ! npm install -g ruflo@latest; then
-    echo -e "${YELLOW}⚠️  Global ruflo install failed. Retry later: npm install -g ruflo@latest${NC}"
-fi
-
-if command -v claude >/dev/null 2>&1; then
-    echo -e "🔌 ${CYAN}Registering Ruflo MCP server with Claude Code...${NC}"
-    claude mcp add ruflo -- npx ruflo@latest mcp start || \
-        echo -e "${YELLOW}⚠️  Could not register ruflo MCP. Run manually: claude mcp add ruflo -- npx ruflo@latest mcp start${NC}"
+# ── Ruflo — install only if not already installed ─────────────────────────────
+echo -e "\n🧠 ${CYAN}Checking Ruflo...${NC}"
+if npm list -g ruflo 2>/dev/null | grep -q ruflo; then
+    echo -e "   ℹ️  Ruflo already installed globally — skipping npm install"
 else
-    echo -e "${YELLOW}ℹ️  Claude Code CLI not found — skipping MCP registration.${NC}"
-    echo -e "   After installing Claude Code, run: ${YELLOW}claude mcp add ruflo -- npx ruflo@latest mcp start${NC}"
+    echo -e "   Installing Ruflo globally (beta)..."
+    if ! npm install -g ruflo@latest; then
+        echo -e "${YELLOW}⚠️  Global ruflo install failed. Retry: npm install -g ruflo@latest${NC}"
+    else
+        echo -e "   ✅ Ruflo installed"
+    fi
 fi
 
-# Install skill packs
-echo -e "\n🎨 ${CYAN}Installing skill packs...${NC}"
+# Register MCP only if not already registered
+if command -v claude >/dev/null 2>&1; then
+    if claude mcp list 2>/dev/null | grep -q ruflo; then
+        echo -e "   ℹ️  Ruflo MCP already registered — skipping"
+    else
+        echo -e "   🔌 Registering Ruflo MCP server..."
+        claude mcp add ruflo -- npx ruflo@latest mcp start || \
+            echo -e "${YELLOW}⚠️  Could not register MCP. Run: claude mcp add ruflo -- npx ruflo@latest mcp start${NC}"
+        echo -e "   ✅ Ruflo MCP registered"
+    fi
+else
+    echo -e "   ${YELLOW}ℹ️  Claude Code CLI not found — skipping MCP registration.${NC}"
+    echo -e "   After installing Claude Code: ${YELLOW}claude mcp add ruflo -- npx ruflo@latest mcp start${NC}"
+fi
 
-npx -y skills add https://github.com/Leonxlnx/taste-skill --all    || echo -e "${YELLOW}⚠️  Leonxlnx/taste-skill failed — retry: ./guide.sh skills-update${NC}"
-npx -y skills add https://github.com/emilkowalski/skill --all       || echo -e "${YELLOW}⚠️  emilkowalski/skill failed — retry: ./guide.sh skills-update${NC}"
-npx -y skills add https://github.com/pbakaus/impeccable --all       || echo -e "${YELLOW}⚠️  pbakaus/impeccable failed — retry: ./guide.sh skills-update${NC}"
-npx -y skills add anthropics/skills@claude-api -y                  || echo -e "${YELLOW}⚠️  anthropics/claude-api failed — retry: ./guide.sh skills-update${NC}"
-npx -y skills add shadcn/ui@shadcn -y                               || echo -e "${YELLOW}⚠️  shadcn/ui@shadcn failed — retry: ./guide.sh skills-update${NC}"
-npx -y skills add alirezarezvani/claude-skills@a11y-audit -y        || echo -e "${YELLOW}⚠️  a11y-audit failed — retry: ./guide.sh skills-update${NC}"
-npx -y skills add coreyhaines31/marketingskills --all               || echo -e "${YELLOW}⚠️  marketingskills failed — retry: ./guide.sh skills-update${NC}"
-npx -y skills add addyosmani/web-quality-skills@seo -y              || echo -e "${YELLOW}⚠️  web-quality-skills@seo failed — retry: ./guide.sh skills-update${NC}"
+# ── Skill packs ───────────────────────────────────────────────────────────────
+echo -e "\n🎨 ${CYAN}Installing skill packs (this may take a minute)...${NC}"
 
-# Done
+install_skill() {
+    local label="$1"
+    local cmd="$2"
+    echo -e "   → ${label}"
+    if eval "$cmd" < /dev/null > /dev/null 2>&1; then
+        echo -e "   ✅ ${label}"
+    else
+        echo -e "   ${YELLOW}⚠️  ${label} failed — retry: ./guide.sh skills-update${NC}"
+    fi
+}
+
+install_skill "Leonxlnx/taste-skill (design taste)"         "npx -y skills add https://github.com/Leonxlnx/taste-skill --all -y"
+install_skill "emilkowalski/skill (animation craft)"         "npx -y skills add https://github.com/emilkowalski/skill --all -y"
+install_skill "pbakaus/impeccable (UI anti-patterns)"        "npx -y skills add https://github.com/pbakaus/impeccable --all -y"
+install_skill "anthropics/claude-api (SDK + caching)"        "npx -y skills add anthropics/skills@claude-api -y"
+install_skill "shadcn/ui (component guidance)"               "npx -y skills add shadcn/ui@shadcn -y"
+install_skill "alirezarezvani/a11y-audit (WCAG 2.2)"         "npx -y skills add alirezarezvani/claude-skills@a11y-audit -y"
+install_skill "coreyhaines31/marketingskills (30+ skills)"   "npx -y skills add coreyhaines31/marketingskills --all -y"
+install_skill "addyosmani/web-quality-skills (SEO)"          "npx -y skills add addyosmani/web-quality-skills@seo -y"
+
+# ── Done ──────────────────────────────────────────────────────────────────────
 echo -e "\n${GREEN}${BOLD}✅ DannFlow Claude tooling installed!${NC}\n"
-echo -e "${BOLD}Your next 4 steps (open Claude Code):${NC}\n"
+echo -e "${BOLD}Your next steps (open Claude Code):${NC}\n"
 echo -e "  ${CYAN}1.${NC} Edit ${YELLOW}README.md${NC} — describe YOUR project (not DannFlow)"
 echo -e "     Claude reads this to understand what you're building.\n"
-echo -e "  ${CYAN}2.${NC} Run ${YELLOW}/init-claude${NC} in Claude Code"
+echo -e "  ${CYAN}2.${NC} Run ${YELLOW}/init-claude${NC}"
 echo -e "     Rewrites CLAUDE.md + SKILLS.md + commands to match your project.\n"
-echo -e "  ${CYAN}3.${NC} Run ${YELLOW}/ruflo-upgrade${NC} in Claude Code"
+echo -e "  ${CYAN}3.${NC} Fill in ${YELLOW}PROJECT_CONTEXT.md${NC}"
+echo -e "     Add audience, stack decisions, design rules, anti-decisions.\n"
+echo -e "  ${CYAN}4.${NC} Run ${YELLOW}/ruflo-upgrade${NC}"
 echo -e "     Adds memory + parallel-agent patterns to your commands.\n"
-echo -e "  ${CYAN}4.${NC} Run ${YELLOW}/no-conflict${NC} in Claude Code"
+echo -e "  ${CYAN}5.${NC} Run ${YELLOW}/no-conflict${NC}"
 echo -e "     Verifies docs and code are in sync.\n"
-echo -e "${BOLD}Then fill in ${CYAN}PROJECT_CONTEXT.md${NC} with your audience, stack decisions, and design rules.${NC}"
-echo -e "Skills and commands read it before acting — no skill file editing needed.\n"
 echo -e "Run ${CYAN}./guide.sh${NC} at any time for the interactive setup wizard.\n"
 echo -e "Happy Vibe Coding! 🚢\n"
