@@ -71,7 +71,14 @@ echo -e "🌀 ${CYAN}Running Ruflo project init wizard...${NC}"
 npx ruflo@latest init wizard || \
     echo -e "${YELLOW}⚠️  Ruflo init wizard did not finish. You can run it later with: npx ruflo@latest init wizard${NC}"
 
-# 6. Trigger Guide Initialization
+# 6. Install Leonxlnx/taste-skill (design-taste skills for AI agents)
+# Idempotent: re-running pulls the latest skill definitions from the repo.
+# Installs 12 skills into .agents/skills/ and symlinks them into .claude/skills/.
+echo -e "🎨 ${CYAN}Installing taste-skill (design-taste skills, latest)...${NC}"
+npx -y skills add https://github.com/Leonxlnx/taste-skill || \
+    echo -e "${YELLOW}⚠️  taste-skill install failed. Retry later with:${NC} ./guide.sh taste-update"
+
+# 7. Trigger Guide Initialization
 # This handles the branding and resetting of GIT history for the user.
 echo -e "✨ ${CYAN}Running project initialization...${NC}"
 chmod +x guide.sh

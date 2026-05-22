@@ -23,6 +23,40 @@ npx skills add supabase/agent-skills
 
 This adds Supabase-specific guidance for migrations, RLS policy design, and edge functions. Recommended by the Supabase MCP server.
 
+## Design taste skills (Leonxlnx/taste-skill)
+
+`install.sh` runs this automatically. To pull the latest skill definitions in an existing project:
+
+```bash
+./guide.sh taste-update
+# or directly:
+npx skills add https://github.com/Leonxlnx/taste-skill
+```
+
+Skills land in `.agents/skills/<name>/` (sources) and are symlinked into `.claude/skills/<name>/` so Claude Code picks them up. Re-running is idempotent — it pulls the latest from the repo.
+
+| Skill | When to use |
+|---|---|
+| **`design-taste-frontend`** | Default. After `/ui` finishes responsive/a11y rewrites, run this to upgrade visual hierarchy, spacing rhythm, and component polish. |
+| **`redesign-existing-projects`** | Audit + upgrade an existing page. Pairs well with DannFlow's current dashboard/profile screens. |
+| **`high-end-visual-design`** | Landing pages, marketing surfaces, anywhere "expensive feel" matters. |
+| **`minimalist-ui`** | Editorial/clean style — usually the right default for a dev-tool starter. |
+| **`full-output-enforcement`** | Prevents Claude from truncating long file generations. Useful when scaffolding many components at once. |
+
+**Lower priority (skip unless the task demands them):**
+- `gpt-taste` — GPT/Codex-tuned, not Claude
+- `industrial-brutalist-ui` — off-brand for a SaaS starter
+- `stitch-design-taste` — Google Stitch DESIGN.md format
+- `brandkit`, `imagegen-frontend-web`, `imagegen-frontend-mobile`, `image-to-code` — require an image-generation model
+
+**How this composes with DannFlow's own commands:**
+
+1. `/ui` — hard rules pass (responsive, 48px targets, semantic tokens, a11y)
+2. `design-taste-frontend` skill — subjective polish pass
+3. `/review` — pre-PR lint + typecheck + CLAUDE.md guardrails
+
+Don't run the taste skill *before* `/ui` — you'll polish a layout that may get restructured.
+
 ## Skills NOT relevant to this project
 
 Skip these — they don't fit the stack:

@@ -101,6 +101,34 @@ The `init wizard` writes into two top-level locations. Knowing the split avoids 
 
 ---
 
+## 🎨 Design Taste Skills (Leonxlnx/taste-skill)
+
+DannFlow also ships with [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill) — a 12-skill pack that gives AI agents opinionated design taste (anti-generic UI, premium typography, motion discipline). `install.sh` runs this automatically after Ruflo.
+
+**Pull the latest skill definitions later:**
+
+```bash
+./guide.sh taste-update
+# or directly:
+npx skills add https://github.com/Leonxlnx/taste-skill
+```
+
+The install is idempotent — re-running fetches the freshest version from the repo. Sources land in `.agents/skills/<name>/` and are symlinked into `.claude/skills/<name>/`.
+
+**Most relevant to DannFlow:**
+
+| Skill | Use it when |
+|---|---|
+| `design-taste-frontend` | Default polish pass — runs **after** `/ui` |
+| `redesign-existing-projects` | Auditing existing pages (dashboard, profile, etc.) |
+| `high-end-visual-design` | Landing/marketing pages that need to feel premium |
+| `minimalist-ui` | Clean editorial style (good default for a dev-tool SaaS) |
+| `full-output-enforcement` | Prevents truncation on long generations |
+
+Full skill table + composition rules in [SKILLS.md](SKILLS.md).
+
+---
+
 ## 🔑 Environment Variables
 
 Copy `.env.example` to `.env.local` and fill in your values:
@@ -268,7 +296,7 @@ supabase/
 .claude/
 ├── commands/               # 16 DannFlow slash commands + Ruflo subdirs (see Ruflo File Layout)
 ├── agents/                 # Ruflo-installed agent definitions (browser, sparc, swarm, …)
-├── skills/                 # Ruflo-installed skills (agentdb-*, github-*, sparc-*, …)
+├── skills/                 # Ruflo-installed skills (agentdb-*, github-*, sparc-*) + taste-skill symlinks → ../../.agents/skills/
 ├── helpers/                # Ruflo hook-handler scripts (hook-handler.cjs)
 ├── settings.json           # Ruflo Pre/PostToolUse hook wiring (committed)
 └── plans/                  # Implementation plans (worktree mode)

@@ -142,14 +142,38 @@ For what each Ruflo command does, run `/claude-flow-help` (top-level) or open th
 
 ---
 
+## Design taste skills ([Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill))
+
+A separate skill pack installed by `install.sh` (and refreshable via `./guide.sh taste-update`). Sources live in `.agents/skills/<name>/` and are symlinked into `.claude/skills/<name>/`. These are **skills**, not slash commands — they're invoked by Claude when relevant, not typed with `/`.
+
+The pack ships 12 skills; the ones worth knowing for DannFlow:
+
+| Skill | Trigger |
+|---|---|
+| `design-taste-frontend` | Default polish pass after `/ui` |
+| `redesign-existing-projects` | Auditing/upgrading an existing screen |
+| `high-end-visual-design` | Premium landing/marketing surfaces |
+| `minimalist-ui` | Clean editorial style (good SaaS default) |
+| `full-output-enforcement` | Long generations that risk truncation |
+
+**Rule:** taste skills run *after* `/ui` (which handles hard rules: responsive, 48px, semantic tokens, a11y). Don't polish a layout that may still get restructured. Full table in [SKILLS.md](../../SKILLS.md).
+
+To pull the latest skill definitions:
+```bash
+./guide.sh taste-update
+```
+
+---
+
 ## When to use what
 
 **Building a new feature?**
 ```
-/new-feature <name>     # scaffold
-/ui                     # double-check responsiveness
-/review                 # before PR
-/commit                 # ship it
+/new-feature <name>             # scaffold
+/ui                             # responsive + a11y hard rules
+# (Claude may invoke design-taste-frontend here for polish)
+/review                         # before PR
+/commit                         # ship it
 ```
 
 **Changed the database?**

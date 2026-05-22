@@ -72,8 +72,9 @@ show_main() {
         echo -e "Other helpful commands:"
         echo -e "  ${CYAN}./guide.sh workflow${NC}   - Show the daily Vibe Coding loop"
         echo -e "  ${CYAN}./guide.sh vibe-check${NC} - Quick health check (env, MCP, backups, types)"
-        echo -e "  ${CYAN}./guide.sh commands${NC}   - List all Claude slash commands"
-        echo -e "  ${CYAN}npm run dev${NC}          - Start development server"
+        echo -e "  ${CYAN}./guide.sh commands${NC}     - List all Claude slash commands"
+        echo -e "  ${CYAN}./guide.sh taste-update${NC} - Pull latest Leonxlnx/taste-skill updates"
+        echo -e "  ${CYAN}npm run dev${NC}            - Start development server"
 
         # Read keypress
         IFS= read -rsn1 key < /dev/tty
@@ -706,9 +707,34 @@ show_claude() {
     echo -e "${CYAN}──────────────────────────────────────────────────${NC}\n"
 
     echo -e "For the full daily loop: ${CYAN}./guide.sh workflow${NC}"
-    echo -e "Quick health check: ${CYAN}./guide.sh vibe-check${NC}\n"
+    echo -e "Quick health check: ${CYAN}./guide.sh vibe-check${NC}"
+    echo -e "Refresh design-taste skills: ${CYAN}./guide.sh taste-update${NC}\n"
 
     echo -e "📖 Full walkthrough: ${BLUE}docs/dannflow_docs/claude-workflow.md${NC}"
+    step_footer
+}
+
+# Taste-skill updater — pulls latest from Leonxlnx/taste-skill
+show_taste() {
+    show_header
+    echo -e "${BOLD}🎨 Update Design Taste Skills${NC}\n"
+    echo -e "Fetching the latest skill definitions from"
+    echo -e "${CYAN}https://github.com/Leonxlnx/taste-skill${NC}\n"
+    echo -e "This is idempotent — re-running pulls the freshest version."
+    echo -e "Skills land in ${CYAN}.agents/skills/${NC} and are symlinked into ${CYAN}.claude/skills/${NC}.\n"
+
+    if ! command -v npx >/dev/null 2>&1; then
+        echo -e "❌ ${RED}npx not found. Install Node.js first.${NC}\n"
+        step_footer
+        return
+    fi
+
+    if npx -y skills add https://github.com/Leonxlnx/taste-skill; then
+        echo -e "\n${GREEN}${BOLD}✓ taste-skill updated.${NC}"
+        echo -e "See ${BLUE}SKILLS.md${NC} for which skills to invoke and when.\n"
+    else
+        echo -e "\n❌ ${RED}Update failed.${NC} Check your network and retry.\n"
+    fi
     step_footer
 }
 
@@ -1351,5 +1377,6 @@ case "$1" in
     commands|cmds) show_commands ;;
     workflow)      show_workflow ;;
     vibe-check|vibecheck) show_vibe_check ;;
+    taste-update|taste) show_taste ;;
     *)             show_main ;;
 esac
