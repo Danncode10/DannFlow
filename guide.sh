@@ -672,46 +672,73 @@ show_claude() {
     show_header
     echo -e "${BOLD}🤖 Set Up Your Claude Code Environment${NC}\n"
     echo -e "DannFlow ships with a full Claude Code setup: ${CYAN}CLAUDE.md${NC}, ${CYAN}SKILLS.md${NC},"
-    echo -e "and 14 custom slash commands in ${CYAN}.claude/commands/${NC}.\n"
+    echo -e "22 custom slash commands, Ruflo MCP tools, and 8 skill packs.\n"
 
-    echo -e "${BOLD}The 3-step setup:${NC}\n"
+    # ── New project flow ──────────────────────────────────────────────────────
+    echo -e "${BOLD}━━━ New Project Setup (run once) ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n"
 
     echo -e "${BOLD}1. Edit README.md${NC}"
-    echo -e "   Rewrite the intro to describe ${YELLOW}your${NC} project (not DannFlow)."
+    echo -e "   Rewrite the intro to describe ${YELLOW}your${NC} project — not DannFlow."
     echo -e "   Update the feature table and project structure to match reality."
-    echo -e "   Don't polish it — Claude reads it to understand the project.\n"
+    echo -e "   ${YELLOW}Don't polish it.${NC} Claude reads it to understand what you're building.\n"
 
     echo -e "${BOLD}2. Run /init-claude in Claude Code${NC}"
-    echo -e "   This reads your README + package.json + src/ and rewrites:"
+    echo -e "   Reads README + package.json + src/ and tailors everything to your project:"
     echo -e "   - ${CYAN}CLAUDE.md${NC}        (Claude's project config)"
     echo -e "   - ${CYAN}SKILLS.md${NC}        (which skills are relevant)"
-    echo -e "   - ${CYAN}.claude/commands/README.md${NC} (command index)"
-    echo -e "   Add ${YELLOW}--commands${NC} to also propose individual command rewrites.\n"
+    echo -e "   - ${CYAN}.claude/commands/${NC} (command files updated to match your stack)\n"
 
-    echo -e "${BOLD}3. Start building with the commands${NC}"
-    echo -e "   Don't remember which to use? Run: ${CYAN}/ask-command <what you want>${NC}\n"
+    echo -e "${BOLD}3. Fill in PROJECT_CONTEXT.md${NC}"
+    echo -e "   Created at your project root. Add your:"
+    echo -e "   - Target audience + what they care about"
+    echo -e "   - Stack decisions (e.g. 'Resend for email, not SendGrid')"
+    echo -e "   - Design decisions (e.g. 'rounded-2xl, h-14 buttons')"
+    echo -e "   - Anti-decisions (e.g. 'NOT adding Stripe yet')"
+    echo -e "   Skills and commands read this file — no skill editing needed.\n"
 
-    echo -e "${BOLD}Daily workflow:${NC}"
+    echo -e "${BOLD}4. Run /ruflo-upgrade in Claude Code${NC}"
+    echo -e "   Adds memory + parallel-agent patterns to your 12 core commands.\n"
+
+    echo -e "${BOLD}5. Run /no-conflict in Claude Code${NC}"
+    echo -e "   Verifies docs and code are in sync. Fix any drift before building.\n"
+
+    echo -e "${GREEN}✅ Setup complete. Start with: ${CYAN}/ask-command <what you want to build>${NC}\n"
+
+    # ── After an update ───────────────────────────────────────────────────────
+    echo -e "${BOLD}━━━ After Running /init-update ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n"
+    echo -e "   ${CYAN}/ruflo-upgrade${NC}   Restore memory + parallel patterns (may have been overwritten)"
+    echo -e "   ${CYAN}/no-conflict${NC}     Verify no documentation drift from the update\n"
+
+    # ── Old / existing project ────────────────────────────────────────────────
+    echo -e "${BOLD}━━━ Existing Project (no DannFlow tooling yet) ━━━━━━━━━━━━━━━━━${NC}\n"
+    echo -e "   Run this from your project root to install all Claude tooling"
+    echo -e "   without touching ${YELLOW}src/${NC}, ${YELLOW}package.json${NC}, or your database:\n"
+    echo -e "   ${CYAN}curl -sSL https://raw.githubusercontent.com/Danncode10/DannFlow/main/install-add.sh | bash${NC}\n"
+    echo -e "   Then follow the 5 steps above (edit README → /init-claude → etc.)\n"
+
+    # ── Daily workflow ────────────────────────────────────────────────────────
+    echo -e "${BOLD}━━━ Daily Workflow ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n"
     echo -e "   ${CYAN}/checkpoint${NC}    Snapshot DB before risky schema changes"
     echo -e "   ${CYAN}/sync-types${NC}    After any schema change"
-    echo -e "   ${CYAN}/new-feature${NC}   Scaffold service + types + page + form"
+    echo -e "   ${CYAN}/new-feature${NC}   Scaffold service + types + page + form (uses swarms)"
     echo -e "   ${CYAN}/ui${NC}            Make code fully responsive (active rewrite)"
     echo -e "   ${CYAN}/review${NC}        Pre-PR lint + typecheck + guardrail check"
     echo -e "   ${CYAN}/commit${NC}        Stage + draft conventional commit\n"
 
     echo -e "${BOLD}Session starter — always paste this first:${NC}\n"
     echo -e "${CYAN}──────────────────────────────────────────────────${NC}"
-    echo -e "Read CLAUDE.md before doing anything. Confirm my"
-    echo -e "Supabase MCP is connected by listing all tables in the"
-    echo -e "public schema, and check that src/types/supabase.ts is"
-    echo -e "up to date with the live schema."
+    echo -e "Read CLAUDE.md and PROJECT_CONTEXT.md before doing"
+    echo -e "anything. Confirm my Supabase MCP is connected by"
+    echo -e "listing all tables in the public schema, and check that"
+    echo -e "src/types/supabase.ts is up to date with the live schema."
     echo -e "${CYAN}──────────────────────────────────────────────────${NC}\n"
 
-    echo -e "For the full daily loop: ${CYAN}./guide.sh workflow${NC}"
-    echo -e "Quick health check: ${CYAN}./guide.sh vibe-check${NC}"
+    echo -e "Full daily loop: ${CYAN}./guide.sh workflow${NC}"
+    echo -e "Health check: ${CYAN}./guide.sh vibe-check${NC}"
     echo -e "Refresh skill packs: ${CYAN}./guide.sh skills-update${NC}\n"
 
-    echo -e "📖 Full walkthrough: ${BLUE}docs/dannflow_docs/claude-workflow.md${NC}"
+    echo -e "📖 Setup flows: ${BLUE}docs/dannflow_docs/setup-flow.md${NC}"
+    echo -e "📖 Commands reference: ${BLUE}docs/dannflow_docs/claude-workflow.md${NC}"
     step_footer
 }
 

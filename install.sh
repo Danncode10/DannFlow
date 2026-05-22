@@ -127,8 +127,18 @@ chmod +x guide.sh
 ./guide.sh init "$app_name"
 
 echo -e "\n${GREEN}${BOLD}Setup Complete!${NC}"
-echo -e "Your project is ready in: ${CYAN}$folder_name${NC}"
-echo -e "\nTo start developing:"
-echo -e "  1. ${YELLOW}cd $folder_name${NC}"
-echo -e "  2. ${YELLOW}npm run dev${NC}\n"
+echo -e "Your project is ready in: ${CYAN}$folder_name${NC}\n"
+
+echo -e "${BOLD}Next: Tailor Claude to YOUR project (do this before building)${NC}\n"
+echo -e "  ${CYAN}1.${NC} ${YELLOW}cd $folder_name${NC}"
+echo -e "  ${CYAN}2.${NC} Open ${YELLOW}README.md${NC} and rewrite it to describe YOUR app — not DannFlow"
+echo -e "  ${CYAN}3.${NC} Open Claude Code and run ${YELLOW}/init-claude${NC}"
+echo -e "     → Rewrites CLAUDE.md + SKILLS.md + commands to match your project"
+echo -e "  ${CYAN}4.${NC} Fill in ${YELLOW}PROJECT_CONTEXT.md${NC} (audience, stack decisions, design rules)"
+echo -e "  ${CYAN}5.${NC} Run ${YELLOW}/ruflo-upgrade${NC} → adds memory + parallel-agent patterns to commands"
+echo -e "  ${CYAN}6.${NC} Run ${YELLOW}/no-conflict${NC} → verifies docs and code are in sync\n"
+
+echo -e "Then: ${CYAN}npm run dev${NC} to start the dev server.\n"
+echo -e "Run ${CYAN}./guide.sh claude${NC} at any time for the full setup wizard."
+echo -e "Full setup guide: ${CYAN}docs/dannflow_docs/setup-flow.md${NC}\n"
 echo -e "Happy Vibe Coding! 🚢\n"
