@@ -173,6 +173,20 @@ To pull the latest skill definitions:
 
 ---
 
+## Quality skill packs (three utility sources)
+
+`install.sh` also installs three non-visual skill packs alongside the taste packs. Same `./guide.sh skills-update` refreshes them all.
+
+| Skill | Source | Auto-triggers when |
+|---|---|---|
+| `claude-api` | [anthropics/skills](https://github.com/anthropics/skills) | A file imports `@anthropic-ai/sdk` or you ask about prompt caching / model migration. Use if/when DannFlow grows AI features. |
+| `shadcn` | [shadcn/ui](https://github.com/shadcn-ui/ui) | Project has `components.json` (DannFlow does). Provides current Shadcn component docs + composition guidance. |
+| `a11y-audit` | [alirezarezvani/claude-skills](https://github.com/alirezarezvani/claude-skills) | You ask for WCAG 2.2 A/AA compliance, contrast checks, ARIA review, or alt-text passes. |
+
+All three are Low Risk. They complement `/ui` (hard responsive/touch-target rules) by adding domain knowledge `/ui` doesn't carry.
+
+---
+
 ## When to use what
 
 **Building a new feature?**

@@ -73,7 +73,7 @@ show_main() {
         echo -e "  ${CYAN}./guide.sh workflow${NC}   - Show the daily Vibe Coding loop"
         echo -e "  ${CYAN}./guide.sh vibe-check${NC} - Quick health check (env, MCP, backups, types)"
         echo -e "  ${CYAN}./guide.sh commands${NC}     - List all Claude slash commands"
-        echo -e "  ${CYAN}./guide.sh skills-update${NC} - Pull latest design-taste skills (Leonxlnx + Emil + Impeccable)"
+        echo -e "  ${CYAN}./guide.sh skills-update${NC} - Pull latest skill packs (3 taste + 3 quality)"
         echo -e "  ${CYAN}npm run dev${NC}            - Start development server"
 
         # Read keypress
@@ -708,20 +708,25 @@ show_claude() {
 
     echo -e "For the full daily loop: ${CYAN}./guide.sh workflow${NC}"
     echo -e "Quick health check: ${CYAN}./guide.sh vibe-check${NC}"
-    echo -e "Refresh design-taste skills: ${CYAN}./guide.sh skills-update${NC}\n"
+    echo -e "Refresh skill packs: ${CYAN}./guide.sh skills-update${NC}\n"
 
     echo -e "📖 Full walkthrough: ${BLUE}docs/dannflow_docs/claude-workflow.md${NC}"
     step_footer
 }
 
-# Design-taste skill updater — pulls latest from all three packs
+# Skill updater — pulls latest from all installed packs (taste + quality)
 show_taste() {
     show_header
-    echo -e "${BOLD}🎨 Update Design Taste Skills${NC}\n"
-    echo -e "Fetching the latest skill definitions from three upstream packs:"
+    echo -e "${BOLD}🎨 Update Skill Packs${NC}\n"
+    echo -e "Fetching the latest skill definitions from upstream packs.\n"
+    echo -e "${BOLD}Design taste:${NC}"
     echo -e "  ${CYAN}1.${NC} Leonxlnx/taste-skill    — 12 broad design-taste skills"
     echo -e "  ${CYAN}2.${NC} emilkowalski/skill      — Emil Kowalski's animation/UI craft"
-    echo -e "  ${CYAN}3.${NC} pbakaus/impeccable      — anti-pattern detector + vocabulary\n"
+    echo -e "  ${CYAN}3.${NC} pbakaus/impeccable      — anti-pattern detector + vocabulary"
+    echo -e "${BOLD}Quality:${NC}"
+    echo -e "  ${CYAN}4.${NC} anthropics/skills       — claude-api (SDK + prompt caching)"
+    echo -e "  ${CYAN}5.${NC} shadcn/ui               — official shadcn component guidance"
+    echo -e "  ${CYAN}6.${NC} alirezarezvani/claude-skills — a11y-audit (WCAG 2.2 A/AA)\n"
     echo -e "Idempotent — re-running pulls the freshest versions."
     echo -e "Skills land in ${CYAN}.agents/skills/${NC} and are symlinked into ${CYAN}.claude/skills/${NC}.\n"
 
@@ -742,8 +747,17 @@ show_taste() {
     echo -e "\n${CYAN}→ pbakaus/impeccable${NC}"
     npx -y skills add https://github.com/pbakaus/impeccable --all || fail=1
 
+    echo -e "\n${CYAN}→ anthropics/skills@claude-api${NC}"
+    npx -y skills add anthropics/skills@claude-api -y || fail=1
+
+    echo -e "\n${CYAN}→ shadcn/ui@shadcn${NC}"
+    npx -y skills add shadcn/ui@shadcn -y || fail=1
+
+    echo -e "\n${CYAN}→ alirezarezvani/claude-skills@a11y-audit${NC}"
+    npx -y skills add alirezarezvani/claude-skills@a11y-audit -y || fail=1
+
     if [ "$fail" -eq 0 ]; then
-        echo -e "\n${GREEN}${BOLD}✓ All three skill packs updated.${NC}"
+        echo -e "\n${GREEN}${BOLD}✓ All six skill packs updated.${NC}"
         echo -e "See ${BLUE}SKILLS.md${NC} for which skills to invoke and when.\n"
     else
         echo -e "\n${YELLOW}⚠️  One or more packs failed to update. Check the logs above and your network.${NC}\n"

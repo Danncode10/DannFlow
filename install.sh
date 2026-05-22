@@ -88,7 +88,24 @@ npx -y skills add https://github.com/emilkowalski/skill --all || \
 npx -y skills add https://github.com/pbakaus/impeccable --all || \
     echo -e "${YELLOW}⚠️  pbakaus/impeccable install failed. Retry later with:${NC} ./guide.sh skills-update"
 
-# 7. Trigger Guide Initialization
+# 7. Install quality skills (idempotent — re-runs pull latest)
+# These are non-visual: API correctness, accessibility, component-library guidance.
+#
+#   anthropics/skills@claude-api  — Anthropic SDK / prompt caching / model migration
+#   shadcn/ui@shadcn              — official shadcn component docs + composition
+#   alirezarezvani@a11y-audit     — WCAG 2.2 A/AA scanning + fixes for React/Next/etc.
+echo -e "🧰 ${CYAN}Installing quality skills (claude-api + shadcn + a11y-audit)...${NC}"
+
+npx -y skills add anthropics/skills@claude-api -y || \
+    echo -e "${YELLOW}⚠️  anthropics/skills@claude-api install failed. Retry later with:${NC} ./guide.sh skills-update"
+
+npx -y skills add shadcn/ui@shadcn -y || \
+    echo -e "${YELLOW}⚠️  shadcn/ui@shadcn install failed. Retry later with:${NC} ./guide.sh skills-update"
+
+npx -y skills add alirezarezvani/claude-skills@a11y-audit -y || \
+    echo -e "${YELLOW}⚠️  alirezarezvani/claude-skills@a11y-audit install failed. Retry later with:${NC} ./guide.sh skills-update"
+
+# 8. Trigger Guide Initialization
 # This handles the branding and resetting of GIT history for the user.
 echo -e "✨ ${CYAN}Running project initialization...${NC}"
 chmod +x guide.sh

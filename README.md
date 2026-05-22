@@ -135,6 +135,20 @@ Pick by surface: static page → Leonxlnx alone; animated component → add Emil
 
 ---
 
+## 🧰 Quality Skills (three utility packs)
+
+`install.sh` also installs three non-visual skills that handle code correctness, accessibility compliance, and component-library guidance.
+
+| Skill | Source | What it does |
+|---|---|---|
+| `claude-api` | [anthropics/skills](https://github.com/anthropics/skills) | Anthropic SDK guidance — prompt caching, correct model IDs, tool use, model migration. Auto-triggers on files importing `@anthropic-ai/sdk`. |
+| `shadcn` | [shadcn/ui](https://github.com/shadcn-ui/ui) | Official Shadcn component docs + composition. Auto-triggers in projects with `components.json` (DannFlow has one). |
+| `a11y-audit` | [alirezarezvani/claude-skills](https://github.com/alirezarezvani/claude-skills) | WCAG 2.2 A/AA scanning + fixes for React/Next/Vue/Svelte. Complements `/ui` (which handles touch targets and focus rings but not contrast). |
+
+All three are Low Risk. Refresh alongside the taste packs via `./guide.sh skills-update` — same command pulls latest for all six.
+
+---
+
 ## 🔑 Environment Variables
 
 Copy `.env.example` to `.env.local` and fill in your values:

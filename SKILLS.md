@@ -9,9 +9,26 @@
 | **`init`** | Re-bootstrap `CLAUDE.md` from scratch. Use when the project pivots significantly or after a major refactor. Prefer `/init-claude` (project-specific custom command) for routine refreshes. |
 | **`review`** | Run before opening a PR. Critiques the current branch's diff against project conventions in `CLAUDE.md`. |
 | **`security-review`** | **Always run** before merging changes that touch: auth (`src/services/auth.ts`), RLS policies, Supabase queries, environment variables, or anything in `src/utils/supabase/`. Catches RLS bypasses and key leaks that `/security-audit` may miss. |
-| **`claude-api`** | Use if/when DannFlow adds AI features (chat assistants, embeddings, agents). Enforces prompt caching, correct model IDs, and SDK patterns. |
 | **`simplify`** | Run after a feature lands. Reviews changed code for reuse, dead code, and over-engineering. |
 | **`fewer-permission-prompts`** | Run once per fresh clone to auto-allowlist common Bash/MCP calls in `.claude/settings.json`. Reduces permission noise during normal dev. |
+
+## Quality skill packs (installed by `install.sh`)
+
+Three utility-oriented packs auto-installed on fresh clones. Refresh with `./guide.sh skills-update`.
+
+| Skill | Source | When it auto-triggers |
+|---|---|---|
+| **`claude-api`** | [anthropics/skills](https://github.com/anthropics/skills) | Any file importing `@anthropic-ai/sdk` or `anthropic`. Enforces prompt caching, correct model IDs (Opus 4.7 / Sonnet 4.6 / Haiku 4.5), tool-use patterns, model migration. Install if/when DannFlow adds chat assistants, embeddings, or agents. |
+| **`shadcn`** | [shadcn/ui](https://github.com/shadcn-ui/ui) | Any project with `components.json` (DannFlow has one). Provides up-to-date Shadcn component docs + composition patterns. Prevents the "raw `<button>` instead of `<Button>`" drift CLAUDE.md warns about. |
+| **`a11y-audit`** | [alirezarezvani/claude-skills](https://github.com/alirezarezvani/claude-skills) | WCAG 2.2 Level A/AA audits — color contrast, focus order, ARIA, alt text. Complements `/ui` (which enforces 48px targets + focus rings but doesn't check contrast/semantics). |
+
+Manual install (idempotent):
+
+```bash
+npx skills add anthropics/skills@claude-api -y
+npx skills add shadcn/ui@shadcn -y
+npx skills add alirezarezvani/claude-skills@a11y-audit -y
+```
 
 ## Supabase agent skills (install separately)
 
