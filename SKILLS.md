@@ -29,10 +29,10 @@ This adds Supabase-specific guidance for migrations, RLS policy design, and edge
 
 ```bash
 ./guide.sh skills-update
-# or individually:
-npx skills add https://github.com/Leonxlnx/taste-skill
-npx skills add https://github.com/emilkowalski/skill
-npx skills add https://github.com/pbakaus/impeccable
+# or individually (--all skips the interactive picker):
+npx skills add https://github.com/Leonxlnx/taste-skill --all
+npx skills add https://github.com/emilkowalski/skill --all
+npx skills add https://github.com/pbakaus/impeccable --all
 ```
 
 All three install into `.agents/skills/<name>/` and symlink into `.claude/skills/<name>/`. Re-running is idempotent.

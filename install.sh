@@ -79,13 +79,13 @@ npx ruflo@latest init wizard || \
 # Pack 3: pbakaus/impeccable    — anti-pattern detector + 23-command vocabulary (Med Risk; review SKILL.md before relying on it)
 echo -e "🎨 ${CYAN}Installing design-taste skill packs (Leonxlnx + Emil Kowalski + Impeccable)...${NC}"
 
-npx -y skills add https://github.com/Leonxlnx/taste-skill || \
+npx -y skills add https://github.com/Leonxlnx/taste-skill --all || \
     echo -e "${YELLOW}⚠️  Leonxlnx/taste-skill install failed. Retry later with:${NC} ./guide.sh skills-update"
 
-npx -y skills add https://github.com/emilkowalski/skill || \
+npx -y skills add https://github.com/emilkowalski/skill --all || \
     echo -e "${YELLOW}⚠️  emilkowalski/skill install failed. Retry later with:${NC} ./guide.sh skills-update"
 
-npx -y skills add https://github.com/pbakaus/impeccable || \
+npx -y skills add https://github.com/pbakaus/impeccable --all || \
     echo -e "${YELLOW}⚠️  pbakaus/impeccable install failed. Retry later with:${NC} ./guide.sh skills-update"
 
 # 7. Trigger Guide Initialization

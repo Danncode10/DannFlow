@@ -117,10 +117,10 @@ The `init wizard` writes into two top-level locations. Knowing the split avoids 
 
 ```bash
 ./guide.sh skills-update
-# or individually:
-npx skills add https://github.com/Leonxlnx/taste-skill
-npx skills add https://github.com/emilkowalski/skill
-npx skills add https://github.com/pbakaus/impeccable
+# or individually (--all skips the interactive picker):
+npx skills add https://github.com/Leonxlnx/taste-skill --all
+npx skills add https://github.com/emilkowalski/skill --all
+npx skills add https://github.com/pbakaus/impeccable --all
 ```
 
 Idempotent — re-running fetches the freshest version. Sources land in `.agents/skills/<name>/` and are symlinked into `.claude/skills/<name>/`.

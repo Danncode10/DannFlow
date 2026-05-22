@@ -734,13 +734,13 @@ show_taste() {
     local fail=0
 
     echo -e "${CYAN}→ Leonxlnx/taste-skill${NC}"
-    npx -y skills add https://github.com/Leonxlnx/taste-skill || fail=1
+    npx -y skills add https://github.com/Leonxlnx/taste-skill --all || fail=1
 
     echo -e "\n${CYAN}→ emilkowalski/skill${NC}"
-    npx -y skills add https://github.com/emilkowalski/skill || fail=1
+    npx -y skills add https://github.com/emilkowalski/skill --all || fail=1
 
     echo -e "\n${CYAN}→ pbakaus/impeccable${NC}"
-    npx -y skills add https://github.com/pbakaus/impeccable || fail=1
+    npx -y skills add https://github.com/pbakaus/impeccable --all || fail=1
 
     if [ "$fail" -eq 0 ]; then
         echo -e "\n${GREEN}${BOLD}✓ All three skill packs updated.${NC}"
