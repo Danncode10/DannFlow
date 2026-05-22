@@ -55,5 +55,8 @@ next-env.d.ts
 .claude-flow/metrics/
 .claude-flow/learning/
 
+# Ruflo memory (local, session-specific, may contain sensitive context)
+.swarm/
+
 # MCP config (contains real tokens — never commit)
 mcp.json
