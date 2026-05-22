@@ -787,20 +787,90 @@ show_commands() {
         return
     fi
 
-    # Function to get category for a command
+    # Category for a command — returns "sortKey|emoji label"
     get_category() {
         case "$1" in
-            ask-command|init-claude|make-command) echo "Discovery & setup" ;;
-            security-audit|rls-check|rls|ui|review) echo "Security & quality" ;;
-            checkpoint|sync-types|explain-schema|migrate|seed) echo "Supabase workflow" ;;
-            new-feature|new-page) echo "Scaffolding" ;;
-            seo-check|seo-fix|marketing-check) echo "SEO & marketing" ;;
-            commit|cleanup|sync-commands|auto-docs|no-conflict) echo "Housekeeping" ;;
-            *) echo "Other" ;;
+            ask-command|init-claude|make-command) echo "1|🚀 Discovery & setup" ;;
+            checkpoint|sync-types|explain-schema|migrate|seed) echo "2|🗄️  Supabase workflow" ;;
+            new-feature|new-page) echo "3|🧱 Scaffolding" ;;
+            seo-check|seo-fix|marketing-check) echo "4|📈 SEO & marketing" ;;
+            security-audit|rls-check|rls|ui|review) echo "5|🛡️  Security & quality" ;;
+            commit|cleanup|sync-commands|auto-docs|no-conflict) echo "6|🧹 Housekeeping" ;;
+            *) echo "9|📦 Other" ;;
         esac
     }
 
-    # Collect all commands with their metadata
+    # Terminal width — capped between 80 and 140
+    local term_width
+    term_width=$(tput cols 2>/dev/null || echo 100)
+    [ "$term_width" -lt 80 ] && term_width=80
+    [ "$term_width" -gt 140 ] && term_width=140
+
+    # Column widths: 2 padding + lw + 3 separator (" │ ") + rw + 2 padding = term_width
+    # So lw + rw = term_width - 7
+    local lw=32
+    local rw=$(( term_width - lw - 7 ))
+    local total_inner=$(( lw + rw + 3 ))   # inner width between │ │
+
+    # Build horizontal lines once
+    local h_top h_mid h_bot h_full
+    h_top=$(printf '─%.0s' $(seq 1 $(( lw + 2 )) ))
+    h_top="┌${h_top}┬$(printf '─%.0s' $(seq 1 $(( rw + 2 )) ))┐"
+    h_bot=$(printf '─%.0s' $(seq 1 $(( lw + 2 )) ))
+    h_bot="└${h_bot}┴$(printf '─%.0s' $(seq 1 $(( rw + 2 )) ))┘"
+    h_full=$(printf '─%.0s' $(seq 1 $(( total_inner + 2 )) ))
+    h_mid="├$(printf '─%.0s' $(seq 1 $(( lw + 2 )) ))┼$(printf '─%.0s' $(seq 1 $(( rw + 2 )) ))┤"
+    local h_split="├${h_full}┤"
+
+    # Word-wrap text to N chars per line via fold; outputs lines on stdout
+    wrap_text() {
+        local text="$1" width="$2"
+        if [ -z "$text" ]; then
+            echo ""
+            return
+        fi
+        echo "$text" | fold -s -w "$width"
+    }
+
+    # Pad a string to exactly N chars (right-pad with spaces). Assumes ASCII.
+    pad_right() {
+        printf "%-${2}s" "$1"
+    }
+
+    # Print a 2-column row: left + right, both wrapped to fit
+    print_row() {
+        local left="$1" right="$2"
+        local left_lines=() right_lines=()
+        while IFS= read -r line; do left_lines+=("$line"); done < <(wrap_text "$left" "$lw")
+        while IFS= read -r line; do right_lines+=("$line"); done < <(wrap_text "$right" "$rw")
+
+        local lcount=${#left_lines[@]} rcount=${#right_lines[@]}
+        local max=$(( lcount > rcount ? lcount : rcount ))
+
+        local i
+        for (( i=0; i<max; i++ )); do
+            local l="${left_lines[$i]:-}" r="${right_lines[$i]:-}"
+            local padded_l padded_r
+            padded_l=$(pad_right "$l" "$lw")
+            padded_r=$(pad_right "$r" "$rw")
+            # Color only the left cell (command name)
+            if [ "$i" -eq 0 ] && [ -n "$l" ]; then
+                echo -e "${CYAN}│${NC} ${CYAN}${BOLD}${padded_l}${NC} ${CYAN}│${NC} ${padded_r} ${CYAN}│${NC}"
+            else
+                echo -e "${CYAN}│${NC} ${CYAN}${padded_l}${NC} ${CYAN}│${NC} ${padded_r} ${CYAN}│${NC}"
+            fi
+        done
+    }
+
+    # Print a section header row (single cell spanning both columns)
+    print_section_header() {
+        local label="$1"
+        local padded
+        padded=$(pad_right " $label" "$total_inner")
+        echo -e "${CYAN}│${NC}${BOLD}${padded}${NC}${CYAN}│${NC}"
+    }
+
+    # Collect commands → "sortKey|category|name|desc|hint"
     local total_count=0
     local cmd_list=""
     for file in "$commands_dir"/*.md; do
@@ -809,48 +879,77 @@ show_commands() {
         name=$(basename "$file" .md)
         [ "$name" = "README" ] && continue
 
-        # Extract description and argument-hint from YAML frontmatter
         local description argument_hint
         description=$(awk '/^---$/{f=!f; next} f && /^description:/{sub(/^description:[ ]*/, ""); print; exit}' "$file")
         argument_hint=$(awk '/^---$/{f=!f; next} f && /^argument-hint:/{sub(/^argument-hint:[ ]*/, ""); print; exit}' "$file")
 
-        # Get category
-        local cat
-        cat=$(get_category "$name")
+        local cat_full sort_key cat_label
+        cat_full=$(get_category "$name")
+        sort_key="${cat_full%%|*}"
+        cat_label="${cat_full#*|}"
 
-        # Store as pipe-separated line: category|name|description|hint
-        cmd_list="${cmd_list}${cat}|${name}|${description}|${argument_hint}"$'\n'
+        cmd_list="${cmd_list}${sort_key}|${cat_label}|${name}|${description}|${argument_hint}"$'\n'
         total_count=$((total_count + 1))
     done
 
-    # Sort by category, then by name
+    # Sort by category sort_key (numeric), then by command name
     local sorted
-    sorted=$(echo "$cmd_list" | sort -t'|' -k1,1)
+    sorted=$(echo "$cmd_list" | sort -t'|' -k1,1n -k3,3)
 
-    # Render grouped by category
-    local current_cat=""
-    echo "$sorted" | while IFS='|' read -r cat name desc hint; do
+    # Group commands by category, render one bordered table per section
+    local prev_cat=""
+    local pending_rows=""
+    local pending_label=""
+
+    flush_table() {
+        [ -z "$pending_label" ] && return
+        echo -e "${CYAN}${h_top}${NC}"
+        print_section_header "$pending_label"
+        echo -e "${CYAN}${h_mid}${NC}"
+        # Print all rows for this section, separated by mid lines
+        local first=1
+        while IFS=$'\x1f' read -r left right; do
+            [ -z "$left$right" ] && continue
+            if [ "$first" -eq 0 ]; then
+                echo -e "${CYAN}${h_mid}${NC}"
+            fi
+            print_row "$left" "$right"
+            first=0
+        done <<< "$pending_rows"
+        echo -e "${CYAN}${h_bot}${NC}"
+        echo ""
+        pending_rows=""
+        pending_label=""
+    }
+
+    while IFS='|' read -r sort_key cat name desc hint; do
         [ -z "$cat" ] && continue
 
-        # Print category header when it changes
-        if [ "$cat" != "$current_cat" ]; then
-            [ -n "$current_cat" ] && echo ""
-            echo -e "${BOLD}### $cat${NC}\n"
-            current_cat="$cat"
+        if [ "$cat" != "$prev_cat" ]; then
+            flush_table
+            pending_label="$cat"
+            prev_cat="$cat"
         fi
 
-        # Build and print command line
-        local display="/$name"
-        [ -n "$hint" ] && display="$display $hint"
-        echo -e "  ${CYAN}${BOLD}${display}${NC}"
-        [ -n "$desc" ] && echo -e "    ${desc}"
-        echo ""
-    done
+        # Build left cell: command + optional hint
+        local left="/$name"
+        [ -n "$hint" ] && left="$left $hint"
 
-    echo -e "${BOLD}${total_count} commands available.${NC}\n"
-    echo -e "Usage: type ${CYAN}/<command-name>${NC} in Claude Code."
-    echo -e "Not sure which one? Run ${CYAN}/ask-command <plain English>${NC}.\n"
-    echo -e "📖 Full reference: ${BLUE}docs/dannflow_docs/claude-workflow.md${NC}"
+        # Build right cell: description (or empty)
+        local right="${desc:-—}"
+
+        # Use \x1f as field sep so it can't appear in cell text
+        pending_rows="${pending_rows}${left}"$'\x1f'"${right}"$'\n'
+    done <<< "$sorted"
+    flush_table
+
+    # Footer summary box
+    local footer_text="  ${total_count} commands available  •  Type /<command-name> in Claude Code  •  /ask-command routes you to the right one"
+    echo -e "${CYAN}╭${h_full}╮${NC}"
+    echo -e "${CYAN}│${NC}${BOLD}$(pad_right "$footer_text" "$total_inner")${NC}${CYAN}│${NC}"
+    echo -e "${CYAN}╰${h_full}╯${NC}\n"
+
+    echo -e "📖 Full reference: ${BLUE}docs/dannflow_docs/claude-workflow.md${NC}\n"
     step_footer
 }
 
