@@ -1,4 +1,4 @@
-import { ArrowRight, Check, Star } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 import { getUserProfile, getVibeCheckData } from "@/services/dashboard";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
@@ -31,18 +31,18 @@ export default async function Home() {
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-24 md:py-36 text-center">
           {/* Badge */}
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5">
-            <Star className="h-3.5 w-3.5 text-accent" fill="currentColor" />
-            <span className="text-xs font-semibold text-primary">
-              Built for builders, by builders
+            <div className="h-1.5 w-1.5 rounded-full bg-primary" />
+            <span className="text-xs font-medium text-primary/80">
+              Built for builders
             </span>
           </div>
 
           <h1 className="mx-auto max-w-4xl text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-foreground">
-            Ship Your Next{" "}
-            <span className="bg-gradient-to-r from-primary via-blue-400 to-accent bg-clip-text text-transparent">
-              Big Idea
+            Ship your next{" "}
+            <span className="text-primary">
+              big idea
             </span>{" "}
-            in Record Time
+            in record time
           </h1>
 
 
@@ -56,7 +56,7 @@ export default async function Home() {
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
             <a
               href={user ? "/dashboard" : "/login"}
-              className="inline-flex items-center gap-2 px-8 py-3.5 text-sm font-semibold rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_4px_14px_0_rgba(37,99,235,0.39),0_0_0_1px_rgba(255,255,255,0.1)] transition-all hover:shadow-[0_6px_20px_rgba(37,99,235,0.45),0_0_0_1px_rgba(255,255,255,0.2)] hover:-translate-y-0.5"
+              className="inline-flex items-center gap-2 px-8 py-3.5 text-sm font-semibold rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_4px_14px_0_rgba(108,71,255,0.35),0_0_0_1px_rgba(255,255,255,0.08)] transition-all hover:shadow-[0_6px_20px_rgba(108,71,255,0.45),0_0_0_1px_rgba(255,255,255,0.1)] hover:-translate-y-0.5"
             >
               Get Started Free
               <ArrowRight className="h-4 w-4" />
@@ -88,8 +88,8 @@ export default async function Home() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-32">
 
           <div className="text-center mb-16">
-            <span className="text-sm font-semibold text-primary uppercase tracking-wider">
-              Features & Integrations
+            <span className="text-xs font-medium text-primary/70 tracking-wide">
+              Features & integrations
             </span>
             <h2 className="mt-3 text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
               Everything you need to launch
@@ -115,8 +115,8 @@ export default async function Home() {
       <section id="how-it-works" className="bg-background border-t border-border">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-24">
           <div className="text-center mb-16">
-            <span className="text-sm font-semibold text-primary uppercase tracking-wider">
-              How It Works
+            <span className="text-xs font-medium text-primary/70 tracking-wide">
+              How it works
             </span>
             <h2 className="mt-3 text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
               Three steps to your next project
@@ -146,7 +146,7 @@ export default async function Home() {
               },
             ].map((item) => (
               <div key={item.step} className="text-center md:text-left">
-                <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-blue-400 text-primary-foreground text-xl font-bold mb-5 shadow-[0_4px_10px_rgba(37,99,235,0.25),0_0_0_1px_rgba(255,255,255,0.1)]">
+                <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 border border-primary/20 text-primary text-sm font-bold mb-5 tabular-nums">
                   {item.step}
                 </div>
 
@@ -168,7 +168,7 @@ export default async function Home() {
       <section id="pricing" className="bg-card border-t border-border">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-24">
           <div className="text-center mb-16">
-            <span className="text-sm font-semibold text-primary uppercase tracking-wider">
+            <span className="text-xs font-medium text-primary/70 tracking-wide">
               Pricing
             </span>
             <h2 className="mt-3 text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
@@ -215,8 +215,8 @@ export default async function Home() {
 
             {/* Pro — highlighted */}
             <div className="rounded-2xl border-2 border-primary bg-background p-8 flex flex-col relative shadow-xl shadow-primary/10">
-              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-accent text-accent-foreground text-xs font-bold uppercase">
-                Most Popular
+              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-primary text-primary-foreground text-xs font-medium">
+                Most popular
               </div>
               <h3 className="text-lg font-semibold text-foreground">Pro</h3>
               <p className="mt-1 text-sm text-muted-foreground">
@@ -267,7 +267,7 @@ export default async function Home() {
                   "White-label options",
                 ].map((f) => (
                   <li key={f} className="flex items-start gap-2 text-sm text-muted-foreground">
-                    <Check className="h-4 w-4 text-accent mt-0.5 shrink-0" />
+                    <Check className="h-4 w-4 text-primary/60 mt-0.5 shrink-0" />
                     {f}
                   </li>
                 ))}
@@ -286,23 +286,24 @@ export default async function Home() {
       {/* =============================
           CTA BANNER
           ============================= */}
-      <section className="bg-gradient-to-r from-primary to-blue-400 border-t border-primary/20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-primary-foreground mb-4">
+      <section className="bg-card border-t border-border relative overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <div className="h-[500px] w-[900px] rounded-full bg-primary/8 blur-[120px]" />
+        </div>
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 text-center">
+          <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
             Ready to build something great?
           </h2>
-          <p className="text-primary-foreground/80 max-w-xl mx-auto mb-8">
-            Join builders who use {siteConfig.name} to ship websites, apps, and startup
-            MVPs faster than ever.
+          <p className="text-muted-foreground max-w-xl mx-auto mb-8">
+            Join builders using {siteConfig.name} to ship websites, apps, and startup MVPs faster.
           </p>
           <a
             href={user ? "/dashboard" : "/login"}
-            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-white text-primary font-semibold hover:bg-white/90 shadow-lg transition-all hover:-translate-y-0.5"
+            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-primary text-primary-foreground font-semibold hover:bg-primary/90 shadow-[0_4px_14px_rgba(108,71,255,0.35)] transition-all hover:-translate-y-0.5"
           >
             Start Building
             <ArrowRight className="h-4 w-4" />
           </a>
-
         </div>
       </section>
 
