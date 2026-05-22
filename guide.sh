@@ -783,9 +783,9 @@ show_commands() {
         case "$1" in
             ask-command|init-claude|make-command) echo "Discovery & setup" ;;
             security-audit|rls-check|rls|ui|review) echo "Security & quality" ;;
-            checkpoint|sync-types|explain-schema) echo "Supabase workflow" ;;
+            checkpoint|sync-types|explain-schema|migrate|seed) echo "Supabase workflow" ;;
             new-feature|new-page) echo "Scaffolding" ;;
-            commit|cleanup|sync-commands) echo "Housekeeping" ;;
+            commit|cleanup|sync-commands|auto-docs|no-conflict) echo "Housekeeping" ;;
             *) echo "Other" ;;
         esac
     }

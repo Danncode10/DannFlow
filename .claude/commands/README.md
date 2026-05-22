@@ -21,7 +21,10 @@ Drop `.md` files in this folder to add custom slash commands. Each file becomes 
 | `/commit` | Stages changes + drafts a conventional commit message. |
 | `/cleanup` | Finds dead code, unused exports, orphaned components, stale files. |
 | `/sync-commands` | Audits `.claude/commands/` and validates against `claude-workflow.md` and `./guide.sh`. Reports orphaned commands, optionally auto-patches docs. |
+| `/auto-docs` | Broader superset of `/sync-commands`. Audits commands, skills, npm scripts, env vars, tech stack, and folder structure for documentation drift. `--fix` auto-patches the safe categories. |
 | `/no-conflict` | Audits repo for conflicts between documentation (README, CLAUDE.md) and actual code — technology versions, features, commands, RLS enforcement, semantic tokens, folder structure. Reports only. |
+| `/seed <table\|all>` | Generates realistic, type-safe seed data from `src/types/supabase.ts`. Respects FK order and RLS ownership. Writes to `supabase/seeds/`. |
+| `/migrate <description>` | Wraps the full migration flow — checkpoint → SQL draft → `apply_migration` (MCP) → `/sync-types` → verify. Plan-then-confirm; destructive ops require explicit `yes`. |
 
 ## File format
 

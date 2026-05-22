@@ -89,6 +89,8 @@ Run `/ask-command <what you want>` if you don't remember which command to use.
 | `/checkpoint` | Snapshots live schema (tables, RLS, triggers, functions) to `supabase/backups/schema-MM-DD-YYYY-HH-MM.sql`. |
 | `/sync-types` | Runs `npm run update-types`, diffs `src/types/supabase.ts` before/after, summarizes schema drift. |
 | `/explain-schema` | Plain-English summary of your live Supabase schema. |
+| `/migrate <description>` | One-shot migration: checkpoint → SQL draft → `apply_migration` (MCP) → `/sync-types` → verify. Plan-then-confirm; destructive ops require explicit `yes`. Every new table gets RLS automatically. |
+| `/seed <table\|all>` | Generates type-safe seed data from `src/types/supabase.ts`. Respects FK dependency order and RLS ownership. Writes to `supabase/seeds/`. Never auto-applies. |
 
 ### Scaffolding
 | Command | What it does |
@@ -102,6 +104,7 @@ Run `/ask-command <what you want>` if you don't remember which command to use.
 | `/commit` | Stages changes + drafts a conventional commit message. |
 | `/cleanup` | Finds dead code, unused exports, orphaned components. Reports only — never deletes. |
 | `/sync-commands` | Audits `.claude/commands/` and validates docs against `claude-workflow.md` + `./guide.sh`. Identifies orphaned commands, optionally auto-patches. |
+| `/auto-docs` | Broader superset of `/sync-commands`. Audits commands, skills, npm scripts, env vars, tech stack, and folder structure for drift. `--fix` auto-patches the safe categories (commands/skills/scripts/env); stack and structure are report-only. |
 | `/no-conflict` | Audits repo for conflicts between documentation (README, CLAUDE.md) and actual code — versions, features, commands, RLS, semantic tokens, folder structure. Reports only. |
 
 ---
@@ -203,10 +206,15 @@ All three are Low Risk. They complement `/ui` (hard responsive/touch-target rule
 
 **Changed the database?**
 ```
+# Fastest path — one command chains all four steps:
+/migrate "add bio text column to profiles"
+
+# Manual path (if you prefer per-step control):
 /checkpoint             # snapshot first
 # (apply your migration via Supabase MCP)
 /sync-types             # regenerate types
 /rls <new-table>        # verify RLS on any new tables
+/seed <new-table>       # optional: generate type-safe test data
 ```
 
 **Auditing security?**
