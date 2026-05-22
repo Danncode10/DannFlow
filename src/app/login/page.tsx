@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { signInWithEmail, signUpWithEmail } from '@/services/auth';
+import { signUpWithEmail } from '@/services/auth';
+import { signInWithEmailRateLimited, signUpWithEmailRateLimited } from '@/services/auth-server';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import Link from 'next/link';
@@ -47,7 +48,7 @@ export default function AuthPage() {
 
     try {
       if (mode === 'login') {
-        const result = await signInWithEmail(email, password);
+        const result = await signInWithEmailRateLimited(email, password);
         if (result.requiresMFA) {
           router.push('/auth/mfa');
         } else {
@@ -59,7 +60,7 @@ export default function AuthPage() {
           }, 800);
         }
       } else {
-        await signUpWithEmail(email, password);
+        await signUpWithEmailRateLimited(email, password);
         setSuccess(true);
         setTimeout(() => {
           toast.success('Account created!', { description: 'Check your email for confirmation.' });
@@ -90,7 +91,6 @@ export default function AuthPage() {
         inset: 0,
         pointerEvents: 'none',
         zIndex: 0,
-        opacity: 0.5,
         backgroundImage: `linear-gradient(var(--color-primary) 1px, transparent 1px), linear-gradient(90deg, var(--color-primary) 1px, transparent 1px)`,
         backgroundSize: '48px 48px',
         opacity: 0.025,

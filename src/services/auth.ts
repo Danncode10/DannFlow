@@ -1,8 +1,11 @@
+'use client';
+
 import { createClient } from '@/utils/supabase/client';
 
 /**
- * Auth Service
+ * Auth Service (Client-side)
  * Strictly contains all business logic and Supabase queries for authentication.
+ * Rate limiting checks must be performed via server actions before calling these functions.
  */
 
 export async function signInWithEmail(email: string, password: string) {

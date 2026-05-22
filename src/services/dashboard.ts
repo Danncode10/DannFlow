@@ -7,9 +7,13 @@ export async function getVibeCheckDataPaginated({ pageParam = 0 }: { pageParam?:
   try {
     const limit = 5; // default page scale
     const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return [];
+
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
+      .eq('id', user.id)
       .range(pageParam * limit, (pageParam + 1) * limit - 1);
 
     if (error) {
@@ -27,9 +31,13 @@ export async function getVibeCheckDataPaginated({ pageParam = 0 }: { pageParam?:
 export async function getVibeCheckData() {
   try {
     const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return [];
+
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
+      .eq('id', user.id)
       .limit(3);
 
     if (error) {

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Mail, Loader2, ArrowLeft } from 'lucide-react';
-import { forgotPassword } from '@/services/auth';
+import { forgotPasswordRateLimited } from '@/services/auth-server';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import Link from 'next/link';
@@ -17,11 +17,10 @@ export default function ForgotPasswordPage() {
     setLoading(true);
 
     try {
-      await forgotPassword(email);
+      await forgotPasswordRateLimited(email, `${window.location.origin}/reset-password`);
       toast.success('Reset email sent!', {
         description: 'Check your inbox for the password reset link.',
       });
-      // Optionally redirect back to login
       router.push('/login');
     } catch (err: any) {
       toast.error('Error sending reset email', {

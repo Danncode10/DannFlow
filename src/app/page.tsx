@@ -8,7 +8,7 @@ import { siteConfig, creatorRepos } from "@/lib/config";
 
 export default async function Home() {
   const session = await getUserProfile();
-  const user = session?.user;
+  const user = session?.user || null;
   const profile = session?.profile;
   const profiles = await getVibeCheckData() || [];
   const repos = creatorRepos;
