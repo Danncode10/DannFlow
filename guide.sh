@@ -73,7 +73,7 @@ show_main() {
         echo -e "  ${CYAN}./guide.sh workflow${NC}   - Show the daily Vibe Coding loop"
         echo -e "  ${CYAN}./guide.sh vibe-check${NC} - Quick health check (env, MCP, backups, types)"
         echo -e "  ${CYAN}./guide.sh commands${NC}     - List all Claude slash commands"
-        echo -e "  ${CYAN}./guide.sh skills-update${NC} - Pull latest skill packs (3 taste + 3 quality)"
+        echo -e "  ${CYAN}./guide.sh skills-update${NC} - Pull latest skill packs (3 taste + 3 quality + 2 marketing)"
         echo -e "  ${CYAN}npm run dev${NC}            - Start development server"
 
         # Read keypress
@@ -726,7 +726,10 @@ show_taste() {
     echo -e "${BOLD}Quality:${NC}"
     echo -e "  ${CYAN}4.${NC} anthropics/skills       — claude-api (SDK + prompt caching)"
     echo -e "  ${CYAN}5.${NC} shadcn/ui               — official shadcn component guidance"
-    echo -e "  ${CYAN}6.${NC} alirezarezvani/claude-skills — a11y-audit (WCAG 2.2 A/AA)\n"
+    echo -e "  ${CYAN}6.${NC} alirezarezvani/claude-skills — a11y-audit (WCAG 2.2 A/AA)"
+    echo -e "${BOLD}SEO + Marketing:${NC}"
+    echo -e "  ${CYAN}7.${NC} coreyhaines31/marketingskills — 30+ growth skills (SEO, copy, CRO, launch…)"
+    echo -e "  ${CYAN}8.${NC} addyosmani/web-quality-skills — technical SEO + Core Web Vitals\n"
     echo -e "Idempotent — re-running pulls the freshest versions."
     echo -e "Skills land in ${CYAN}.agents/skills/${NC} and are symlinked into ${CYAN}.claude/skills/${NC}.\n"
 
@@ -756,8 +759,14 @@ show_taste() {
     echo -e "\n${CYAN}→ alirezarezvani/claude-skills@a11y-audit${NC}"
     npx -y skills add alirezarezvani/claude-skills@a11y-audit -y || fail=1
 
+    echo -e "\n${CYAN}→ coreyhaines31/marketingskills${NC}"
+    npx -y skills add coreyhaines31/marketingskills --all || fail=1
+
+    echo -e "\n${CYAN}→ addyosmani/web-quality-skills@seo${NC}"
+    npx -y skills add addyosmani/web-quality-skills@seo -y || fail=1
+
     if [ "$fail" -eq 0 ]; then
-        echo -e "\n${GREEN}${BOLD}✓ All six skill packs updated.${NC}"
+        echo -e "\n${GREEN}${BOLD}✓ All eight skill packs updated.${NC}"
         echo -e "See ${BLUE}SKILLS.md${NC} for which skills to invoke and when.\n"
     else
         echo -e "\n${YELLOW}⚠️  One or more packs failed to update. Check the logs above and your network.${NC}\n"
@@ -785,6 +794,7 @@ show_commands() {
             security-audit|rls-check|rls|ui|review) echo "Security & quality" ;;
             checkpoint|sync-types|explain-schema|migrate|seed) echo "Supabase workflow" ;;
             new-feature|new-page) echo "Scaffolding" ;;
+            seo-check|seo-fix|marketing-check) echo "SEO & marketing" ;;
             commit|cleanup|sync-commands|auto-docs|no-conflict) echo "Housekeeping" ;;
             *) echo "Other" ;;
         esac

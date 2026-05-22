@@ -30,6 +30,39 @@ npx skills add shadcn/ui@shadcn -y
 npx skills add alirezarezvani/claude-skills@a11y-audit -y
 ```
 
+## SEO + Marketing skill packs (installed by `install.sh`)
+
+DannFlow is a SaaS starter, so it ships with two upstream packs covering everything from technical SEO to conversion optimization. Together they install **30+ auto-invoked skills**.
+
+| Pack | Source | Highlights |
+|---|---|---|
+| **coreyhaines31/marketingskills** | [skills.sh](https://skills.sh/coreyhaines31/marketingskills) | `seo-audit` (116K+ installs), `programmatic-seo`, `ai-seo`, `schema`, `copywriting`, `copy-editing`, `cro`, `pricing`, `paywalls`, `signup`, `onboarding`, `churn-prevention`, `launch`, `ads`, `ad-creative`, `emails`, `cold-email`, `social`, `sms`, `referrals`, `directory-submissions`, `marketing-psychology`, `marketing-ideas`, `content-strategy`, `customer-research`, `competitor-profiling`, `competitors`, `site-architecture`, `popups`, `lead-magnets`, `sales-enablement`, `analytics`, `ab-testing`, `image`, `video`, `aso`, `revops`, `co-marketing`, `community-marketing`, `free-tools`, `product-marketing` |
+| **addyosmani/web-quality-skills** | [skills.sh](https://skills.sh/addyosmani/web-quality-skills) | `seo` — Google Chrome team's technical SEO + Core Web Vitals patterns |
+
+**Most relevant for a SaaS landing page:**
+
+| Skill | Trigger |
+|---|---|
+| `seo-audit` (coreyhaines31) | "audit SEO", "why am I not ranking", "meta tags review" |
+| `seo` (addyosmani) | technical SEO, Core Web Vitals, page-speed, indexing |
+| `copywriting` (coreyhaines31) | "write copy for", "improve this headline", landing-page copy |
+| `cro` (coreyhaines31) | conversion rate optimization, A/B test ideas, page-level lift |
+| `pricing` (coreyhaines31) | pricing-page strategy, tier design, anchor pricing |
+| `launch` (coreyhaines31) | Product Hunt, waitlist, GTM plan |
+| `marketing-psychology` (coreyhaines31) | persuasion principles, cognitive biases applied to copy |
+| `programmatic-seo` (coreyhaines31) | SEO pages at scale, comparison/alternative pages |
+
+**Tip — start here:** run `product-marketing` (coreyhaines31) on a fresh project to create `.agents/product-marketing.md` (ICP + positioning + value props). All the other Corey skills reference it, so you avoid repeating positioning context in every prompt.
+
+These skills pair with the `/seo-check`, `/seo-fix`, and `/marketing-check` slash commands — commands enforce deterministic per-route checks; skills bring strategic judgment.
+
+Manual install (idempotent):
+
+```bash
+npx skills add coreyhaines31/marketingskills --all
+npx skills add addyosmani/web-quality-skills@seo -y
+```
+
 ## Supabase agent skills (install separately)
 
 Install once per machine:

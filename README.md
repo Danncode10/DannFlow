@@ -149,6 +149,29 @@ All three are Low Risk. Refresh alongside the taste packs via `./guide.sh skills
 
 ---
 
+## 📈 SEO + Marketing Skills (two growth-focused packs)
+
+DannFlow ships as a SaaS starter, so `install.sh` also installs two upstream packs covering the entire growth surface — technical SEO, copy, conversion, launch, pricing, ads, lifecycle, and more. **30+ auto-invoked skills** across the two packs.
+
+| Pack | Source | What it covers |
+|---|---|---|
+| `coreyhaines31/marketingskills` | [skills.sh](https://skills.sh/coreyhaines31/marketingskills) | `seo-audit`, `programmatic-seo`, `ai-seo`, `schema`, `copywriting`, `cro`, `pricing`, `paywalls`, `signup`, `onboarding`, `launch`, `ads`, `emails`, `cold-email`, `marketing-psychology`, `competitor-profiling`, and ~20 more |
+| `addyosmani/web-quality-skills` | [skills.sh](https://skills.sh/addyosmani/web-quality-skills) | `seo` — technical SEO + Core Web Vitals (from Google Chrome team) |
+
+These skills auto-trigger when you ask things like "audit my SEO," "rewrite this hero copy," or "design a pricing page." They pair with the three project commands `/seo-check`, `/seo-fix`, and `/marketing-check`:
+
+```
+/seo-check                        # per-route audit (metadata, OG, JSON-LD, alt text…)
+/seo-fix /pricing                 # active rewrite — adds missing essentials
+/marketing-check                  # conversion-fundamentals audit on landing pages
+```
+
+> **Tip:** start a fresh project by triggering the `product-marketing` skill — it scaffolds `.agents/product-marketing.md` (ICP + positioning + value props) that all other Corey skills reference. Saves you re-explaining your product in every prompt.
+
+All Low Risk. Refresh with `./guide.sh skills-update` (same command pulls latest for all eight packs).
+
+---
+
 ## 🔑 Environment Variables
 
 Copy `.env.example` to `.env.local` and fill in your values:

@@ -105,7 +105,22 @@ npx -y skills add shadcn/ui@shadcn -y || \
 npx -y skills add alirezarezvani/claude-skills@a11y-audit -y || \
     echo -e "${YELLOW}⚠️  alirezarezvani/claude-skills@a11y-audit install failed. Retry later with:${NC} ./guide.sh skills-update"
 
-# 8. Trigger Guide Initialization
+# 8. Install SEO + marketing skill packs (idempotent — re-runs pull latest)
+# These cover everything from technical SEO to copy, CRO, launch, and pricing.
+#
+#   coreyhaines31/marketingskills  — 30+ growth/marketing skills (seo-audit, copywriting,
+#                                    cro, pricing, launch, ads, emails, signup, etc.)
+#                                    Top install: seo-audit (116K+)
+#   addyosmani/web-quality-skills  — Addy Osmani's technical SEO + Core Web Vitals
+echo -e "📈 ${CYAN}Installing SEO + marketing skill packs (coreyhaines31 + addyosmani)...${NC}"
+
+npx -y skills add coreyhaines31/marketingskills --all || \
+    echo -e "${YELLOW}⚠️  coreyhaines31/marketingskills install failed. Retry later with:${NC} ./guide.sh skills-update"
+
+npx -y skills add addyosmani/web-quality-skills@seo -y || \
+    echo -e "${YELLOW}⚠️  addyosmani/web-quality-skills@seo install failed. Retry later with:${NC} ./guide.sh skills-update"
+
+# 9. Trigger Guide Initialization
 # This handles the branding and resetting of GIT history for the user.
 echo -e "✨ ${CYAN}Running project initialization...${NC}"
 chmod +x guide.sh

@@ -98,6 +98,13 @@ Run `/ask-command <what you want>` if you don't remember which command to use.
 | `/new-feature <name>` | Scaffolds service + types + App Router page + Shadcn form for a new feature. |
 | `/new-page <route>` | Scaffolds an App Router page (Server Component) with `loading.tsx` + `error.tsx`. |
 
+### SEO & marketing
+| Command | What it does |
+|---|---|
+| `/seo-check [route]` | Per-route SEO audit — metadata, OG, canonical, sitemap.ts, robots.ts, JSON-LD, alt text, heading hierarchy. Reports gaps only. |
+| `/seo-fix <route\|all>` | Active rewrite — adds missing metadata, OG, canonical, JSON-LD, sitemap/robots files. Plan-then-confirm. |
+| `/marketing-check [route]` | Conversion-fundamentals audit for landing/pricing pages — headline clarity, CTA, social proof, friction, pricing legibility. Opinionated. Reports only. |
+
 ### Housekeeping
 | Command | What it does |
 |---|---|
@@ -187,6 +194,27 @@ To pull the latest skill definitions:
 | `a11y-audit` | [alirezarezvani/claude-skills](https://github.com/alirezarezvani/claude-skills) | You ask for WCAG 2.2 A/AA compliance, contrast checks, ARIA review, or alt-text passes. |
 
 All three are Low Risk. They complement `/ui` (hard responsive/touch-target rules) by adding domain knowledge `/ui` doesn't carry.
+
+---
+
+## SEO + Marketing skill packs (two upstream sources, 30+ skills)
+
+`install.sh` also installs two growth-focused packs since DannFlow targets SaaS use cases. Same `./guide.sh skills-update` refreshes them with everything else.
+
+| Pack | Source | Highlights |
+|---|---|---|
+| `coreyhaines31/marketingskills` | [skills.sh](https://skills.sh/coreyhaines31/marketingskills) | 30+ skills: SEO (`seo-audit`, `programmatic-seo`, `ai-seo`, `schema`), copy (`copywriting`, `copy-editing`, `cold-email`, `emails`), CRO (`cro`, `pricing`, `paywalls`, `signup`, `onboarding`), GTM (`launch`, `referrals`, `directory-submissions`), channels (`ads`, `social`, `sms`, `video`), strategy (`marketing-psychology`, `customer-research`, `competitor-profiling`, `analytics`, `ab-testing`) |
+| `addyosmani/web-quality-skills` | [skills.sh](https://skills.sh/addyosmani/web-quality-skills) | `seo` skill — technical SEO + Core Web Vitals from Google Chrome team |
+
+These pair with three DannFlow slash commands that enforce per-route checks:
+
+| Command | Skills it composes with |
+|---|---|
+| `/seo-check` | `seo-audit`, `seo` (addy), `schema`, `site-architecture` |
+| `/seo-fix` | `seo-audit`, `schema`, `copywriting` (for titles/descriptions) |
+| `/marketing-check` | `cro`, `pricing`, `copywriting`, `marketing-psychology` |
+
+**Workflow order for new SaaS:** trigger `product-marketing` once to scaffold positioning context → use the other skills as needed for execution.
 
 ---
 
