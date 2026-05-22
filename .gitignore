@@ -57,6 +57,7 @@ next-env.d.ts
 
 # Ruflo memory (local, session-specific, may contain sensitive context)
 .swarm/
+@ruvector.db
 
 # MCP config (contains real tokens — never commit)
 mcp.json
