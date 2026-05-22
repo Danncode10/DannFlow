@@ -131,7 +131,8 @@ If you don't know which custom command fits a task, run `/ask-command <your inte
 
 ## Memory & docs
 
-- Project context in `docs/dannflow_docs/` (methodology, trinity model, MCP setup, backups, UI system)
+- **`PROJECT_CONTEXT.md`** (root) — project-specific decisions that override or extend this file: audience, stack choices, design rules, tone, anti-decisions. Read this before any feature work, UI rewrite, or marketing command. Fill it in once after running `/init-claude`.
+- Project methodology in `docs/dannflow_docs/` (methodology, trinity model, MCP setup, backups, UI system)
 - Central config: `src/lib/config.ts`
 - Auto-generated types: `src/types/supabase.ts` (read-only)
 
