@@ -950,61 +950,8 @@ show_commands() {
     echo -e "${CYAN}│${NC}${BOLD}$(pad_right "$footer_text" "$total_inner")${NC}${CYAN}│${NC}"
     echo -e "${CYAN}╰${h_full}╯${NC}\n"
 
-    echo -e "📖 Full reference: ${BLUE}docs/dannflow_docs/claude-workflow.md${NC}\n"
-
-    # Ruflo MCP Tools Section
-    echo -e "${BOLD}🧠 Ruflo MCP Tools${NC} ${CYAN}(Intelligent agent coordination, memory, swarms)${NC}\n"
-
-    local ruflo_data="🧠 Memory|memory-store|Persistent key-value store. Save decisions, patterns, configurations across sessions.
-🧠 Memory|memory-search|Semantic search across stored memories. Find conceptually-related entries by meaning.
-🧠 Memory|memory-retrieve|Read back a specific stored memory by exact key.
-👥 Agents|agent-spawn|Spawn a tracked agent with cost attribution and swarm coordination.
-👥 Agents|agent-list|List all active agents with their status and task count.
-👥 Agents|agent-status|Get lifecycle state of a single agent.
-🐝 Swarms|swarm-init|Initialize a swarm with persistent state tracking.
-🐝 Swarms|swarm-status|Get swarm status from persistent state.
-🐝 Swarms|swarm-health|Check swarm health status with real state inspection.
-⚙️  Hooks|hooks-route|Intelligent model routing (haiku/sonnet/opus) based on task complexity.
-⚙️  Hooks|hooks-pre-task|Get context and agent suggestions before starting a task.
-⚙️  Hooks|hooks-post-task|Record task completion for cross-session learning.
-💾 Sessions|session-save|Save current session state for persistence.
-💾 Sessions|session-restore|Restore a previous session with agents, tasks, and memory.
-💾 Sessions|session-list|List all saved sessions.
-🔗 Coordination|coordination-consensus|Manage consensus protocol with BFT, Raft, or Quorum.
-🔗 Coordination|coordination-orchestrate|Orchestrate multi-agent coordination across parallel tasks.
-🔗 Coordination|coordination-sync|Synchronize state across nodes.
-📊 Embeddings|embeddings-generate|Generate embeddings for text (Euclidean or hyperbolic).
-📊 Embeddings|embeddings-search|Semantic search across stored embeddings.
-📊 Embeddings|embeddings-init|Initialize ONNX embedding subsystem.
-⚡ Workflows|workflow-create|Create a workflow with step dependencies and execution strategies.
-⚡ Workflows|workflow-execute|Execute a workflow with optional variable injection.
-⚡ Workflows|workflow-validate|Structurally validate a workflow definition file."
-
-    local prev_cat="" ruflo_count=0
-    while IFS='|' read -r category name description; do
-        [ -z "$category" ] && continue
-
-        if [ "$category" != "$prev_cat" ]; then
-            [ -n "$prev_cat" ] && echo -e "${CYAN}${h_bot}${NC}\n"
-            echo -e "${CYAN}${h_top}${NC}"
-            print_section_header "$category"
-            echo -e "${CYAN}${h_mid}${NC}"
-            prev_cat="$category"
-        else
-            echo -e "${CYAN}${h_mid}${NC}"
-        fi
-
-        print_row "/$name" "$description"
-        ruflo_count=$((ruflo_count + 1))
-    done <<< "$ruflo_data"
-    echo -e "${CYAN}${h_bot}${NC}\n"
-
-    echo -e "${CYAN}╭${h_full}╮${NC}"
-    echo -e "${CYAN}│${NC}${BOLD}$(pad_right "  ${total_count} DannFlow commands + ${ruflo_count} Ruflo tools" "$total_inner")${NC}${CYAN}│${NC}"
-    echo -e "${CYAN}╰${h_full}╯${NC}\n"
-
-    echo -e "📖 DannFlow reference: ${BLUE}docs/dannflow_docs/claude-workflow.md${NC}"
-    echo -e "📖 Ruflo docs: ${BLUE}https://github.com/anthropics/claude-code-docs${NC}\n"
+    echo -e "📖 Full reference: ${BLUE}docs/dannflow_docs/claude-workflow.md${NC}"
+    echo -e "${CYAN}💡 Tip:${NC} Run ${CYAN}./guide.sh ruflo-commands${NC} to see Ruflo MCP tools (agents, memory, swarms, etc.)\n"
     step_footer
 }
 
