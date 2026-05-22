@@ -4,6 +4,17 @@ description: Rewrites the entire Claude environment (CLAUDE.md, SKILLS.md, comma
 
 Re-bootstrap the **entire** Claude environment so it perfectly matches what this project actually is. This is the full rewrite — touch everything.
 
+## Step 0 — Guard ruflo customizations
+
+Before touching any file, search ruflo memory for project-specific customizations added to CLAUDE.md, SKILLS.md, or individual commands (search: "ruflo", "protocol", "memory protocol", the project name). List what you find.
+
+During the rewrite in Steps 4–5, **preserve these additions** rather than overwriting them. Specifically:
+- The "## Ruflo memory protocol" section in CLAUDE.md must survive the rewrite
+- Any Step 0 memory-check preambles added to individual commands must survive
+- Any parallel-agent hints added to commands must survive
+
+After the rewrite completes, run `/ruflo-upgrade` mentally to verify Ruflo patterns are still intact in the 12 target commands. If any were lost, restore them before reporting.
+
 ## Step 1 — Read source-of-truth files
 
 Read in parallel:
@@ -100,6 +111,13 @@ Commands:
   + created: /<name>, /<name>
   - removed: /<name>
   ~ rewritten: /<name>
+
+Ruflo integrity: ✅ all 12 Ruflo-upgraded commands intact  /  ⚠️ N commands need /ruflo-upgrade
+
+Next steps:
+  1. If PROJECT_CONTEXT.md exists at root, verify CLAUDE.md references it.
+  2. If Ruflo integrity shows ⚠️, run /ruflo-upgrade now.
+  3. Run /no-conflict to verify no documentation drift.
 
 Suggested commit: chore: re-bootstrap Claude environment after <reason>
 ```
