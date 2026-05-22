@@ -238,6 +238,29 @@ UPSTASH_REDIS_REST_TOKEN=AAAx...
 
 ---
 
+## 🗺️ Setup Flows
+
+Three paths depending on where you're starting from:
+
+| Situation | Command |
+|---|---|
+| **New project** | `curl -sSL .../install.sh \| bash` |
+| **Existing project** (no DannFlow) | `curl -sSL .../install-add.sh \| bash` |
+| **Update existing DannFlow** | `/init-update` in Claude Code |
+
+**After any install or update, run these 5 steps in Claude Code:**
+```
+1. Edit README.md         → describe YOUR project (Claude reads this)
+2. /init-claude           → tailors CLAUDE.md + SKILLS.md + commands to your project
+3. Fill PROJECT_CONTEXT.md → audience, stack choices, design rules, anti-decisions
+4. /ruflo-upgrade         → adds memory + parallel-agent patterns to commands
+5. /no-conflict           → verify docs and code are in sync
+```
+
+> Full guide: [docs/dannflow_docs/setup-flow.md](docs/dannflow_docs/setup-flow.md)
+
+---
+
 ## 🎨 Personalize It (5 Steps)
 
 ### 1. Site name & branding
