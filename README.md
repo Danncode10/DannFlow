@@ -101,31 +101,37 @@ The `init wizard` writes into two top-level locations. Knowing the split avoids 
 
 ---
 
-## 🎨 Design Taste Skills (Leonxlnx/taste-skill)
+## 🎨 Design Taste Skills (three upstream packs)
 
-DannFlow also ships with [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill) — a 12-skill pack that gives AI agents opinionated design taste (anti-generic UI, premium typography, motion discipline). `install.sh` runs this automatically after Ruflo.
+`install.sh` installs three complementary design-taste skill packs after Ruflo. They give AI agents opinionated design taste covering broad style, motion craft, and anti-pattern detection.
 
-**Pull the latest skill definitions later:**
+| Pack | What it adds | Risk |
+|---|---|---|
+| [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill) | 12 skills — broad design taste (`design-taste-frontend`, `minimalist-ui`, `high-end-visual-design`, `redesign-existing-projects`, `full-output-enforcement` + 7 more) | Low |
+| [emilkowalski/skill](https://github.com/emilkowalski/skill) | 1 skill — `emil-design-eng` — animation + micro-interaction craft. Pairs with Sonner/Vaul (already in stack) and Framer Motion. | Low |
+| [pbakaus/impeccable](https://github.com/pbakaus/impeccable) | 1 skill — `impeccable` — broad UI critique + 27 anti-pattern rules + 23 invocation commands. Also ships `npx impeccable detect <path>` CLI scanner. | ⚠️ Med |
+
+> ⚠️ `impeccable` was flagged Medium Risk by both Gen and Snyk scanners (the other two are Low Risk). Skim `.agents/skills/impeccable/SKILL.md` before letting it make autonomous changes.
+
+**Pull the latest of all three later:**
 
 ```bash
-./guide.sh taste-update
-# or directly:
+./guide.sh skills-update
+# or individually:
 npx skills add https://github.com/Leonxlnx/taste-skill
+npx skills add https://github.com/emilkowalski/skill
+npx skills add https://github.com/pbakaus/impeccable
 ```
 
-The install is idempotent — re-running fetches the freshest version from the repo. Sources land in `.agents/skills/<name>/` and are symlinked into `.claude/skills/<name>/`.
+Idempotent — re-running fetches the freshest version. Sources land in `.agents/skills/<name>/` and are symlinked into `.claude/skills/<name>/`.
 
-**Most relevant to DannFlow:**
+**Composition order** (don't fire taste skills before `/ui` — you'll polish a layout that may get restructured):
 
-| Skill | Use it when |
-|---|---|
-| `design-taste-frontend` | Default polish pass — runs **after** `/ui` |
-| `redesign-existing-projects` | Auditing existing pages (dashboard, profile, etc.) |
-| `high-end-visual-design` | Landing/marketing pages that need to feel premium |
-| `minimalist-ui` | Clean editorial style (good default for a dev-tool SaaS) |
-| `full-output-enforcement` | Prevents truncation on long generations |
+```
+/ui  →  design-taste-frontend  →  emil-design-eng  →  impeccable  →  /review  →  /commit
+```
 
-Full skill table + composition rules in [SKILLS.md](SKILLS.md).
+Pick by surface: static page → Leonxlnx alone; animated component → add Emil; pre-merge audit → run Impeccable last. Full skill triage in [SKILLS.md](SKILLS.md).
 
 ---
 
@@ -296,7 +302,7 @@ supabase/
 .claude/
 ├── commands/               # 16 DannFlow slash commands + Ruflo subdirs (see Ruflo File Layout)
 ├── agents/                 # Ruflo-installed agent definitions (browser, sparc, swarm, …)
-├── skills/                 # Ruflo-installed skills (agentdb-*, github-*, sparc-*) + taste-skill symlinks → ../../.agents/skills/
+├── skills/                 # Ruflo-installed skills (agentdb-*, github-*, sparc-*) + design-taste symlinks → ../../.agents/skills/ (Leonxlnx + Emil + Impeccable)
 ├── helpers/                # Ruflo hook-handler scripts (hook-handler.cjs)
 ├── settings.json           # Ruflo Pre/PostToolUse hook wiring (committed)
 └── plans/                  # Implementation plans (worktree mode)

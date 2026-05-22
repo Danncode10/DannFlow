@@ -142,25 +142,33 @@ For what each Ruflo command does, run `/claude-flow-help` (top-level) or open th
 
 ---
 
-## Design taste skills ([Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill))
+## Design taste skill packs (three upstream sources)
 
-A separate skill pack installed by `install.sh` (and refreshable via `./guide.sh taste-update`). Sources live in `.agents/skills/<name>/` and are symlinked into `.claude/skills/<name>/`. These are **skills**, not slash commands — they're invoked by Claude when relevant, not typed with `/`.
+`install.sh` installs three complementary design-taste skill packs (refreshable via `./guide.sh skills-update`). Sources live in `.agents/skills/<name>/` and are symlinked into `.claude/skills/<name>/`. These are **skills**, not slash commands — they're invoked by Claude when relevant, not typed with `/`.
 
-The pack ships 12 skills; the ones worth knowing for DannFlow:
+| Pack | Repo | Skills | Risk |
+|---|---|---|---|
+| Leonxlnx | [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill) | 12 broad design-taste skills | Low |
+| Emil Kowalski | [emilkowalski/skill](https://github.com/emilkowalski/skill) | `emil-design-eng` (animation/UI craft) | Low |
+| Impeccable | [pbakaus/impeccable](https://github.com/pbakaus/impeccable) | `impeccable` (anti-pattern critique, 23 commands) | ⚠️ Med |
+
+**Most relevant skills for DannFlow work:**
 
 | Skill | Trigger |
 |---|---|
-| `design-taste-frontend` | Default polish pass after `/ui` |
-| `redesign-existing-projects` | Auditing/upgrading an existing screen |
-| `high-end-visual-design` | Premium landing/marketing surfaces |
-| `minimalist-ui` | Clean editorial style (good SaaS default) |
-| `full-output-enforcement` | Long generations that risk truncation |
+| `design-taste-frontend` (Leonxlnx) | Default polish pass after `/ui` |
+| `redesign-existing-projects` (Leonxlnx) | Auditing/upgrading an existing screen |
+| `high-end-visual-design` (Leonxlnx) | Premium landing/marketing surfaces |
+| `minimalist-ui` (Leonxlnx) | Clean editorial style (good SaaS default) |
+| `full-output-enforcement` (Leonxlnx) | Long generations that risk truncation |
+| `emil-design-eng` (Emil) | Any animation/interaction surface — drawers, modals, popovers, hovers, press states |
+| `impeccable` (pbakaus) | Pre-merge audit + anti-pattern scan on big visual changes |
 
-**Rule:** taste skills run *after* `/ui` (which handles hard rules: responsive, 48px, semantic tokens, a11y). Don't polish a layout that may still get restructured. Full table in [SKILLS.md](../../SKILLS.md).
+**Rule:** taste skills run *after* `/ui` (which handles hard rules: responsive, 48px, semantic tokens, a11y). Don't polish a layout that may still get restructured. Full table + risk notes in [SKILLS.md](../../SKILLS.md).
 
 To pull the latest skill definitions:
 ```bash
-./guide.sh taste-update
+./guide.sh skills-update
 ```
 
 ---
@@ -171,7 +179,10 @@ To pull the latest skill definitions:
 ```
 /new-feature <name>             # scaffold
 /ui                             # responsive + a11y hard rules
-# (Claude may invoke design-taste-frontend here for polish)
+# Claude may then invoke:
+#   design-taste-frontend       (broad polish)
+#   emil-design-eng             (if the feature involves animation/interaction)
+#   impeccable                  (final critique pass)
 /review                         # before PR
 /commit                         # ship it
 ```

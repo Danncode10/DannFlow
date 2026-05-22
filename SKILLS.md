@@ -23,39 +23,67 @@ npx skills add supabase/agent-skills
 
 This adds Supabase-specific guidance for migrations, RLS policy design, and edge functions. Recommended by the Supabase MCP server.
 
-## Design taste skills (Leonxlnx/taste-skill)
+## Design taste skill packs (three upstream sources)
 
-`install.sh` runs this automatically. To pull the latest skill definitions in an existing project:
+`install.sh` installs three complementary design-taste skill packs. Refresh them anytime with:
 
 ```bash
-./guide.sh taste-update
-# or directly:
+./guide.sh skills-update
+# or individually:
 npx skills add https://github.com/Leonxlnx/taste-skill
+npx skills add https://github.com/emilkowalski/skill
+npx skills add https://github.com/pbakaus/impeccable
 ```
 
-Skills land in `.agents/skills/<name>/` (sources) and are symlinked into `.claude/skills/<name>/` so Claude Code picks them up. Re-running is idempotent — it pulls the latest from the repo.
+All three install into `.agents/skills/<name>/` and symlink into `.claude/skills/<name>/`. Re-running is idempotent.
+
+### Pack 1: Leonxlnx/taste-skill (12 skills, Low Risk)
+
+Broad design-taste enforcement. Most relevant for DannFlow:
 
 | Skill | When to use |
 |---|---|
-| **`design-taste-frontend`** | Default. After `/ui` finishes responsive/a11y rewrites, run this to upgrade visual hierarchy, spacing rhythm, and component polish. |
-| **`redesign-existing-projects`** | Audit + upgrade an existing page. Pairs well with DannFlow's current dashboard/profile screens. |
-| **`high-end-visual-design`** | Landing pages, marketing surfaces, anywhere "expensive feel" matters. |
-| **`minimalist-ui`** | Editorial/clean style — usually the right default for a dev-tool starter. |
-| **`full-output-enforcement`** | Prevents Claude from truncating long file generations. Useful when scaffolding many components at once. |
+| **`design-taste-frontend`** | Default polish pass after `/ui`. Upgrades visual hierarchy, spacing rhythm, component polish. |
+| **`redesign-existing-projects`** | Audit + upgrade an existing page (dashboard, profile, settings). |
+| **`high-end-visual-design`** | Landing pages, marketing surfaces, "expensive feel". |
+| **`minimalist-ui`** | Editorial/clean style — good default for a dev-tool starter. |
+| **`full-output-enforcement`** | Prevents truncation on long generations (scaffolding many components). |
 
-**Lower priority (skip unless the task demands them):**
-- `gpt-taste` — GPT/Codex-tuned, not Claude
-- `industrial-brutalist-ui` — off-brand for a SaaS starter
-- `stitch-design-taste` — Google Stitch DESIGN.md format
-- `brandkit`, `imagegen-frontend-web`, `imagegen-frontend-mobile`, `image-to-code` — require an image-generation model
+Lower priority: `gpt-taste` (GPT-tuned), `industrial-brutalist-ui` (off-brand), `stitch-design-taste` (Google Stitch format), `brandkit` / `imagegen-*` / `image-to-code` (need image-gen model).
 
-**How this composes with DannFlow's own commands:**
+### Pack 2: emilkowalski/skill (1 skill, Low Risk)
 
-1. `/ui` — hard rules pass (responsive, 48px targets, semantic tokens, a11y)
-2. `design-taste-frontend` skill — subjective polish pass
-3. `/review` — pre-PR lint + typecheck + CLAUDE.md guardrails
+| Skill | When to use |
+|---|---|
+| **`emil-design-eng`** | Animation + micro-interaction craft. Use when adding/reviewing transitions, hover states, popovers, drawers, sheets. Enforces `ease-out` over `ease-in`, `scale(0.95)+opacity:0` over `scale(0)`, `:active` press states, popover transform-origin. Outputs Before/After/Why markdown table on review. |
 
-Don't run the taste skill *before* `/ui` — you'll polish a layout that may get restructured.
+Pairs naturally with Sonner + Vaul (in stack) and Framer Motion.
+
+### Pack 3: pbakaus/impeccable (1 skill, ⚠️ Med Risk)
+
+| Skill | When to use |
+|---|---|
+| **`impeccable`** | Broad UI critique covering design, redesign, audit, polish, animate, clarify, distill, harden. 27 deterministic anti-pattern rules (overused fonts, gray-on-color text, excessive cards) plus 23 invocation commands documented in its SKILL.md. Also ships an `npx impeccable detect <path>` CLI scanner. |
+
+> ⚠️ **Security scanners flagged this pack as Medium Risk** (Gen + Snyk; the other two were Low Risk). Skim `.agents/skills/impeccable/SKILL.md` before relying on it for autonomous changes. Risk likely stems from the breadth of permissions its 23 commands request, not malware — but worth eyeballing.
+
+### How the three packs compose
+
+Don't fire taste skills before `/ui` — you'll polish a layout that may get restructured.
+
+```
+/ui                       # hard rules: responsive, 48px targets, semantic tokens, a11y
+design-taste-frontend     # broad visual polish (Leonxlnx)
+emil-design-eng           # motion + interaction craft (Emil) — for animated/interactive surfaces
+impeccable                # critique pass with anti-pattern checks (pbakaus)
+/review                   # pre-PR lint + typecheck + CLAUDE.md guardrails
+/commit
+```
+
+Pick by surface — you don't need all four taste skills on every change:
+- **Static page** → `design-taste-frontend` alone
+- **Animated component** (drawer, modal, dropdown) → add `emil-design-eng`
+- **Pre-merge audit of a big visual change** → run `impeccable` last
 
 ## Skills NOT relevant to this project
 

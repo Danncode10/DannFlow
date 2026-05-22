@@ -71,12 +71,22 @@ echo -e "🌀 ${CYAN}Running Ruflo project init wizard...${NC}"
 npx ruflo@latest init wizard || \
     echo -e "${YELLOW}⚠️  Ruflo init wizard did not finish. You can run it later with: npx ruflo@latest init wizard${NC}"
 
-# 6. Install Leonxlnx/taste-skill (design-taste skills for AI agents)
-# Idempotent: re-running pulls the latest skill definitions from the repo.
-# Installs 12 skills into .agents/skills/ and symlinks them into .claude/skills/.
-echo -e "🎨 ${CYAN}Installing taste-skill (design-taste skills, latest)...${NC}"
+# 6. Install design-taste skill packs (all idempotent — re-runs pull latest from upstream)
+# Sources land in .agents/skills/<name>/ and are symlinked into .claude/skills/<name>/.
+#
+# Pack 1: Leonxlnx/taste-skill  — 12 broad design-taste skills (Low Risk)
+# Pack 2: emilkowalski/skill    — Emil Kowalski's animation/UI craft (Low Risk)
+# Pack 3: pbakaus/impeccable    — anti-pattern detector + 23-command vocabulary (Med Risk; review SKILL.md before relying on it)
+echo -e "🎨 ${CYAN}Installing design-taste skill packs (Leonxlnx + Emil Kowalski + Impeccable)...${NC}"
+
 npx -y skills add https://github.com/Leonxlnx/taste-skill || \
-    echo -e "${YELLOW}⚠️  taste-skill install failed. Retry later with:${NC} ./guide.sh taste-update"
+    echo -e "${YELLOW}⚠️  Leonxlnx/taste-skill install failed. Retry later with:${NC} ./guide.sh skills-update"
+
+npx -y skills add https://github.com/emilkowalski/skill || \
+    echo -e "${YELLOW}⚠️  emilkowalski/skill install failed. Retry later with:${NC} ./guide.sh skills-update"
+
+npx -y skills add https://github.com/pbakaus/impeccable || \
+    echo -e "${YELLOW}⚠️  pbakaus/impeccable install failed. Retry later with:${NC} ./guide.sh skills-update"
 
 # 7. Trigger Guide Initialization
 # This handles the branding and resetting of GIT history for the user.
