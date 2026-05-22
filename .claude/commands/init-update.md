@@ -1,98 +1,121 @@
 ---
-description: Update your DannFlow project to the latest version—pulls new commands, merges skill packs, and preserves your customizations.
-argument-hint: "[--no-confirm]"
+description: Update your DannFlow project to the latest version—pull new commands, scripts, guide, skills, and more while preserving your code.
+argument-hint: "[--all] [--no-confirm]"
 ---
 
 Update an older DannFlow project to the latest version without losing your work.
 
 **What it does:**
 
-1. Clones the latest `.claude/` directory from the main DannFlow repo to a temporary folder
-2. Shows you a diff of what will change (new commands, updated SKILLS.md, etc.)
-3. Merges updates into your project, preserving your customizations
-4. Lists newly available skills and commands
-5. Generates a commit ready to review
+Pulls the latest from the DannFlow repo and selectively merges updates across:
+- `.claude/` (commands, CLAUDE.md, SKILLS.md, skill packs)
+- Shell scripts (install.sh, guide.sh)
+- Package.json (new npm scripts like `npm run setup`)
+- Docs (dannflow_docs/ and README sections)
+
+Shows diffs, asks which updates you want, and generates a clean commit for review.
+
+**Flags:**
+- `--all` — update everything without asking (sensible defaults)
+- `--no-confirm` — skip the final "apply changes?" prompt
 
 **Procedure:**
 
-1. **Ask the user to confirm they want to update** their project. If `--no-confirm` is passed, skip the prompt.
-
-2. **Clone the latest `.claude/` from the repo** to a temp directory:
+1. **Clone the latest DannFlow** to a temp directory:
    ```bash
-   git clone --depth 1 https://github.com/Danncode10/DannFlow.git /tmp/dannflow-update
-   cp -r /tmp/dannflow-update/.claude/commands /tmp/dannflow-update-commands
+   git clone --depth 1 https://github.com/Danncode10/DannFlow.git /tmp/dannflow-latest
    ```
 
-3. **Diff the commands** — show user which files are new, changed, or deleted:
+2. **Ask the user what they want to update** (unless `--all` is passed).
+   Show menu:
+   ```
+   ✅ .claude/        (commands, CLAUDE.md, SKILLS.md, skill packs)
+   ✅ Shell scripts   (install.sh, guide.sh)
+   ✅ npm scripts     (package.json scripts)
+   ✅ Docs            (README.md sections, dannflow_docs/)
+   ```
+   Default: all checked. User can uncheck any category.
+
+3. **For each selected category, show a diff:**
+
+   **A) .claude/ updates:**
+   - Diff `.claude/commands/` → show new, changed, deleted commands
+   - Diff `.claude/CLAUDE.md` → show changes to project config
+   - Show which skill packs are new/updated
+   - Ask: "Merge .claude/ updates?" (yes/no)
+
+   **B) Shell scripts:**
+   - Diff `install.sh` and `guide.sh` against latest
+   - Highlight new features (e.g., "guide.sh now has ./guide.sh skills-update")
+   - Ask: "Update install.sh and guide.sh?" (yes/no)
+
+   **C) npm scripts:**
+   - Show new scripts being added (e.g., `npm run setup`, `npm run setup:env`, etc.)
+   - Merge into package.json intelligently (preserve user-defined scripts)
+   - Ask: "Add new npm scripts?" (yes/no)
+
+   **D) Docs:**
+   - Diff README.md → show new sections (e.g., Windows Setup, Quick Reference updates)
+   - Offer to merge dannflow_docs/ changes (new files, updated tutorials)
+   - Ask: "Update README and docs?" (yes/no)
+
+4. **Merge all approved updates:**
+   - Copy files from `/tmp/dannflow-latest/` into the project
+   - For `.claude/CLAUDE.md`, `.env.example`, `package.json`: use smart merge (show conflicts, ask user to resolve)
+   - Preserve user edits to `src/`, `.env.local`, custom commands, and project-specific config
+
+5. **Generate a single commit** with a clear summary:
    ```bash
-   diff -r .claude/commands /tmp/dannflow-update-commands
-   ```
-   Print the diff in a readable format (color-coded: new in green, deleted in red, changed in yellow).
-
-4. **Merge updated files** (preserve user edits to CLAUDE.md, SKILLS.md):
-   - Copy all `.md` files from `/tmp/dannflow-update-commands/` into `.claude/commands/` EXCEPT:
-     - `README.md` (regenerate from the new template if requested)
-     - Skip any files user has marked as "do not overwrite"
-   - If `.claude/CLAUDE.md` exists locally, diff it against the new version and show the user. Ask if they want to merge (often it auto-merges cleanly).
-   - If `SKILLS.md` exists, parse it and add any new skill references from the updated version.
-
-5. **Copy skill packs** (if `.claude/skills/` exists in the updated version):
-   ```bash
-   cp -r /tmp/dannflow-update/.claude/skills/* .claude/skills/ 2>/dev/null || true
-   ```
-
-6. **Update package.json scripts** (if the user's `npm run setup` is outdated):
-   - Show the diff of new scripts
-   - Ask: "Apply updated npm scripts?" (yes/no)
-   - If yes, merge them carefully (don't overwrite user-defined scripts)
-
-7. **Generate a commit** ready to review:
-   ```bash
-   git add .claude/
-   git status
-   ```
-   Draft a commit message:
-   ```
-   chore(dannflow): update to latest commands, skills, and configuration
+   git add .claude/ install.sh guide.sh package.json README.md docs/ 2>/dev/null || true
+   git commit -m "chore(dannflow): update to latest version
    
-   Updated files:
-   - New commands: [list]
-   - Updated commands: [list]
-   - New skill packs: [list]
+   Updated:
+   - .claude/: 3 new commands, 2 updated, 5 new skill packs
+   - Shell scripts: guide.sh + install.sh enhancements
+   - npm scripts: added npm run setup and helpers
+   - Docs: Windows setup guide, updated tutorial
    
-   Review the diff in .claude/commands/ before merging.
+   Review changes with: git diff HEAD~1
+   Revert with: git reset --hard HEAD~1"
    ```
 
-8. **Cleanup** — remove temp directories:
-   ```bash
-   rm -rf /tmp/dannflow-update /tmp/dannflow-update-commands
-   ```
-
-9. **Report success** with a summary:
+6. **Report what changed:**
    ```
    ✅ Update complete!
    
-   New commands available:
-     - /command-1
-     - /command-2
+   .claude/ updates:
+     New commands: /init-update, /new-feature
+     Updated: /checkpoint (better error handling)
+     New skill packs: claude-api, shadcn, a11y-audit
    
-   Updated commands:
-     - /command-3
+   Shell script improvements:
+     install.sh: now supports PowerShell
+     guide.sh: added skills-update, vibe-check commands
    
-   New skill packs registered:
-     - skill-pack-1
+   npm scripts added:
+     npm run setup          (one-command setup for Windows)
+     npm run setup:env      (cross-platform .env.local init)
+     npm run setup:ruflo    (Ruflo global + project init)
+     npm run setup:skills   (install all 8 skill packs)
    
-   Next: Review .claude/commands/ diff, run /review, then git push.
+   Docs updated:
+     README.md: Windows Setup guide added
+     docs/dannflow_docs/: 2 new tutorials, 1 updated
+   
+   Next: Review the commit, test with npm run dev, then git push.
    ```
 
 **Output on failure:**
 - If git clone fails: "❌ Failed to fetch latest DannFlow. Check your internet connection."
-- If merge conflicts arise: "⚠️  Conflicts detected in [file]. Resolve manually or run: git checkout --theirs .claude/[file]"
+- If merge conflicts arise: "⚠️  Conflicts detected in [file]. Manually resolve or skip this file."
 - If user cancels: "Update cancelled. No changes made."
 
 **Notes:**
 
-- This command preserves user edits to CLAUDE.md, .env.local, and src/ — it only touches `.claude/`
-- If your project is git-clean, the update is reversible: `git reset --hard HEAD` undoes it
-- Rerun this command anytime to get the latest version
-- For major version upgrades, always review CLAUDE.md changes — architecture may shift
+- **Comprehensive update:** Pulls new commands, guides, scripts, npm helpers, and docs—everything your old project needs to match the latest DannFlow
+- **Preserves your work:** User code in `src/`, `.env.local`, custom env vars, and any personal config remain untouched
+- **Reversible:** If your repo is clean before running, undo with `git reset --hard HEAD` if something breaks
+- **Safe merging:** Shows all diffs before applying, asks permission for each category
+- **Fastest path to modern DannFlow:** One command replaces manual edits across 5+ files
+- Use `--all` to skip the menu and update everything at once (sensible defaults)
+- Rerun anytime DannFlow releases new features
