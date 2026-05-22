@@ -89,7 +89,7 @@ Run `/ask-command <what you want>` if you don't remember which command to use.
 | `/checkpoint` | Snapshots live schema (tables, RLS, triggers, functions) to `supabase/backups/schema-MM-DD-YYYY-HH-MM.sql`. |
 | `/sync-types` | Runs `npm run update-types`, diffs `src/types/supabase.ts` before/after, summarizes schema drift. |
 | `/explain-schema` | Plain-English summary of your live Supabase schema. |
-| `/migrate <description>` | One-shot migration: checkpoint → SQL draft → `apply_migration` (MCP) → `/sync-types` → verify. Plan-then-confirm; destructive ops require explicit `yes`. Every new table gets RLS automatically. |
+| `/migrate <description>` | Wraps the full migration flow — checkpoint → apply_migration → sync-types — into one step. Plain-English description in, type-safe code out. |
 | `/seed <table\|all>` | Generates type-safe seed data from `src/types/supabase.ts`. Respects FK dependency order and RLS ownership. Writes to `supabase/seeds/`. Never auto-applies. |
 
 ### Scaffolding
@@ -112,6 +112,7 @@ Run `/ask-command <what you want>` if you don't remember which command to use.
 | `/cleanup` | Finds dead code, unused exports, orphaned components. Reports only — never deletes. |
 | `/sync-commands` | Audits `.claude/commands/` and validates docs against `claude-workflow.md` + `./guide.sh`. Identifies orphaned commands, optionally auto-patches. |
 | `/auto-docs` | Broader superset of `/sync-commands`. Audits commands, skills, npm scripts, env vars, tech stack, and folder structure for drift. `--fix` auto-patches the safe categories (commands/skills/scripts/env); stack and structure are report-only. |
+| `/init-update` | Update your DannFlow project to the latest version — pull new commands, scripts, guide, skills, and more while preserving your code. Interactive menu or `--all` for one-command full update. |
 | `/no-conflict` | Audits repo for conflicts between documentation (README, CLAUDE.md) and actual code — versions, features, commands, RLS, semantic tokens, folder structure. Reports only. |
 
 ---
