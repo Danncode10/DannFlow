@@ -8,7 +8,11 @@
     "start": "next start",
     "lint": "eslint",
     "update-types": "bash scripts/update-types.sh",
-    "checkpoint": "bash scripts/checkpoint.sh"
+    "checkpoint": "bash scripts/checkpoint.sh",
+    "setup": "npm run setup:env && npm run setup:ruflo && npm run setup:skills",
+    "setup:env": "node -e \"const fs=require('fs');!fs.existsSync('.env.local')&&fs.copyFileSync('.env.example','.env.local');console.log('✅ .env.local ready');\"",
+    "setup:ruflo": "npm install -g ruflo@latest && npx ruflo@latest init wizard",
+    "setup:skills": "npx -y skills add https://github.com/Leonxlnx/taste-skill --all && npx -y skills add https://github.com/emilkowalski/skill --all && npx -y skills add https://github.com/pbakaus/impeccable --all && npx -y skills add anthropics/skills@claude-api -y && npx -y skills add shadcn/ui@shadcn -y && npx -y skills add alirezarezvani/claude-skills@a11y-audit -y && npx -y skills add coreyhaines31/marketingskills --all && npx -y skills add addyosmani/web-quality-skills@seo -y"
   },
   "dependencies": {
     "@radix-ui/react-tabs": "^1.1.13",

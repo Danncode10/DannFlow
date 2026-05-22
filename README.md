@@ -26,6 +26,30 @@ This automates the entire setup: clones the repo, installs dependencies, sets up
 
 > **Ruflo is currently in beta.** The installer always pulls `ruflo@latest`, but features may shift between releases. If you set up DannFlow manually (without `install.sh`), you **must install Ruflo globally first** before running the project wizard — see [Ruflo Setup](#-ruflo-setup-beta) below.
 
+#### 🪟 Windows Setup
+
+The shell-based `install.sh` works on **macOS, Linux, and Windows (with WSL or Git Bash)**. Choose your approach:
+
+**Option 1: WSL / Git Bash (Recommended)**
+1. Install [Windows Subsystem for Linux](https://learn.microsoft.com/en-us/windows/wsl/install) or [Git Bash](https://git-scm.com/download/win)
+2. Open WSL terminal or Git Bash and run the same command:
+   ```bash
+   curl -sSL https://raw.githubusercontent.com/Danncode10/DannFlow/main/install.sh | bash
+   ```
+
+**Option 2: Native Windows (PowerShell)**
+PowerShell version coming soon. For now, use Option 1 or set up manually:
+```powershell
+# Manual setup steps (run these in PowerShell)
+git clone https://github.com/Danncode10/DannFlow my-dannflow-app
+cd my-dannflow-app
+npm install
+cp .env.example .env.local
+npm run setup  # Installs Ruflo, skills, and more
+```
+
+For the full step-by-step guide (after cloning), run `./guide.sh` in WSL/Git Bash or see [docs/dannflow_docs/](docs/dannflow_docs/) for manual Supabase + MCP setup instructions.
+
 ### Quick Reference
 
 Once set up, use these commands to accelerate your workflow:
