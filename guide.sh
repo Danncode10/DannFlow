@@ -70,11 +70,12 @@ show_main() {
 
         echo ""
         echo -e "Other helpful commands:"
-        echo -e "  ${CYAN}./guide.sh workflow${NC}   - Show the daily Vibe Coding loop"
-        echo -e "  ${CYAN}./guide.sh vibe-check${NC} - Quick health check (env, MCP, backups, types)"
-        echo -e "  ${CYAN}./guide.sh commands${NC}     - List all Claude slash commands"
-        echo -e "  ${CYAN}./guide.sh skills-update${NC} - Pull latest skill packs (3 taste + 3 quality + 2 marketing)"
-        echo -e "  ${CYAN}npm run dev${NC}            - Start development server"
+        echo -e "  ${CYAN}./guide.sh commands${NC}        - List all DannFlow slash commands"
+        echo -e "  ${CYAN}./guide.sh ruflo-commands${NC}  - Show Ruflo MCP tools (agents, memory, swarms)"
+        echo -e "  ${CYAN}./guide.sh workflow${NC}        - Show the daily Vibe Coding loop"
+        echo -e "  ${CYAN}./guide.sh vibe-check${NC}      - Quick health check (env, MCP, backups, types)"
+        echo -e "  ${CYAN}./guide.sh skills-update${NC}   - Pull latest skill packs (3 taste + 3 quality + 2 marketing)"
+        echo -e "  ${CYAN}npm run dev${NC}               - Start development server"
 
         # Read keypress
         IFS= read -rsn1 key < /dev/tty
@@ -953,6 +954,132 @@ show_commands() {
     step_footer
 }
 
+show_ruflo_commands() {
+    show_header
+    echo -e "${BOLD}🧠 Ruflo MCP Tools${NC}"
+    echo -e "${CYAN}(Intelligent agent coordination, memory, and automation)${NC}\n"
+
+    # Terminal width — capped between 80 and 140
+    local term_width
+    term_width=$(tput cols 2>/dev/null || echo 100)
+    [ "$term_width" -lt 80 ] && term_width=80
+    [ "$term_width" -gt 140 ] && term_width=140
+
+    # Column widths
+    local lw=32
+    local rw=$(( term_width - lw - 7 ))
+    local total_inner=$(( lw + rw + 3 ))
+
+    # Build horizontal lines
+    local h_top h_mid h_bot h_full
+    h_top=$(printf '─%.0s' $(seq 1 $(( lw + 2 )) ))
+    h_top="┌${h_top}┬$(printf '─%.0s' $(seq 1 $(( rw + 2 )) ))┐"
+    h_bot=$(printf '─%.0s' $(seq 1 $(( lw + 2 )) ))
+    h_bot="└${h_bot}┴$(printf '─%.0s' $(seq 1 $(( rw + 2 )) ))┘"
+    h_full=$(printf '─%.0s' $(seq 1 $(( total_inner + 2 )) ))
+    h_mid="├$(printf '─%.0s' $(seq 1 $(( lw + 2 )) ))┼$(printf '─%.0s' $(seq 1 $(( rw + 2 )) ))┤"
+
+    # Word-wrap and padding helpers
+    wrap_text() {
+        local text="$1" width="$2"
+        [ -z "$text" ] && echo "" && return
+        echo "$text" | fold -s -w "$width"
+    }
+
+    pad_right() {
+        printf "%-${2}s" "$1"
+    }
+
+    print_row() {
+        local left="$1" right="$2"
+        local left_lines right_lines
+        left_lines=$(wrap_text "$left" "$lw")
+        right_lines=$(wrap_text "$right" "$rw")
+        local lcount=$(echo "$left_lines" | wc -l)
+        local rcount=$(echo "$right_lines" | wc -l)
+        [ "$lcount" -eq 0 ] && lcount=1
+        [ "$rcount" -eq 0 ] && rcount=1
+        local max=$(( lcount > rcount ? lcount : rcount ))
+        local i j=1
+        while [ $j -le $max ]; do
+            local l=$(echo "$left_lines" | sed -n "${j}p")
+            local r=$(echo "$right_lines" | sed -n "${j}p")
+            local padded_l padded_r
+            padded_l=$(pad_right "$l" "$lw")
+            padded_r=$(pad_right "$r" "$rw")
+            if [ "$j" -eq 1 ] && [ -n "$l" ]; then
+                echo -e "${CYAN}│${NC} ${CYAN}${BOLD}${padded_l}${NC} ${CYAN}│${NC} ${padded_r} ${CYAN}│${NC}"
+            else
+                echo -e "${CYAN}│${NC} ${CYAN}${padded_l}${NC} ${CYAN}│${NC} ${padded_r} ${CYAN}│${NC}"
+            fi
+            j=$((j + 1))
+        done
+    }
+
+    print_section_header() {
+        local label="$1"
+        local padded
+        padded=$(pad_right " $label" "$total_inner")
+        echo -e "${CYAN}│${NC}${BOLD}${padded}${NC}${CYAN}│${NC}"
+    }
+
+    # Ruflo commands: category|name|description
+    local ruflo_data="🧠 Memory|memory-store|Persistent key-value store. Save decisions, patterns, configurations across sessions.
+🧠 Memory|memory-search|Semantic search across stored memories. Find conceptually-related entries by meaning.
+🧠 Memory|memory-retrieve|Read back a specific stored memory by exact key.
+👥 Agents|agent-spawn|Spawn a tracked agent with cost attribution and swarm coordination.
+👥 Agents|agent-list|List all active agents with their status and task count.
+👥 Agents|agent-status|Get lifecycle state of a single agent.
+🐝 Swarms|swarm-init|Initialize a swarm with persistent state tracking.
+🐝 Swarms|swarm-status|Get swarm status from persistent state.
+🐝 Swarms|swarm-health|Check swarm health status with real state inspection.
+⚙️  Hooks|hooks-route|Intelligent model routing (haiku/sonnet/opus) based on task complexity.
+⚙️  Hooks|hooks-pre-task|Get context and agent suggestions before starting a task.
+⚙️  Hooks|hooks-post-task|Record task completion for cross-session learning.
+💾 Sessions|session-save|Save current session state for persistence.
+💾 Sessions|session-restore|Restore a previous session with agents, tasks, and memory.
+💾 Sessions|session-list|List all saved sessions.
+🔗 Coordination|coordination-consensus|Manage consensus protocol with BFT, Raft, or Quorum.
+🔗 Coordination|coordination-orchestrate|Orchestrate multi-agent coordination across parallel tasks.
+🔗 Coordination|coordination-sync|Synchronize state across nodes.
+📊 Embeddings|embeddings-generate|Generate embeddings for text (Euclidean or hyperbolic).
+📊 Embeddings|embeddings-search|Semantic search across stored embeddings.
+📊 Embeddings|embeddings-init|Initialize ONNX embedding subsystem.
+⚡ Workflows|workflow-create|Create a workflow with step dependencies and execution strategies.
+⚡ Workflows|workflow-execute|Execute a workflow with optional variable injection.
+⚡ Workflows|workflow-validate|Structurally validate a workflow definition file."
+
+    local prev_cat="" total_count=0
+    while IFS='|' read -r category name description; do
+        [ -z "$category" ] && continue
+
+        if [ "$category" != "$prev_cat" ]; then
+            [ -n "$prev_cat" ] && echo -e "${CYAN}${h_bot}${NC}\n"
+            echo -e "${CYAN}${h_top}${NC}"
+            print_section_header "$category"
+            echo -e "${CYAN}${h_mid}${NC}"
+            prev_cat="$category"
+            first=1
+        else
+            echo -e "${CYAN}${h_mid}${NC}"
+        fi
+
+        print_row "/$name" "$description"
+        total_count=$((total_count + 1))
+    done <<< "$ruflo_data"
+    echo -e "${CYAN}${h_bot}${NC}\n"
+
+    # Footer
+    local footer_text="  ${total_count} Ruflo tools available  •  Use via Claude Code  •  Part of npm init wizard setup"
+    echo -e "${CYAN}╭${h_full}╮${NC}"
+    echo -e "${CYAN}│${NC}${BOLD}$(pad_right "$footer_text" "$total_inner")${NC}${CYAN}│${NC}"
+    echo -e "${CYAN}╰${h_full}╯${NC}\n"
+
+    echo -e "📖 Full Ruflo docs: ${BLUE}https://github.com/anthropics/claude-code-docs${NC}"
+    echo -e "   Install: ${CYAN}npm install -g ruflo@latest${NC}\n"
+    step_footer
+}
+
 # UI helpers
 hex_to_rgb() {
     local hex="${1#'#'}"
@@ -1511,6 +1638,7 @@ case "$1" in
     ready|7)       show_ready ;;
     deploy|8)      show_deploy ;;
     commands|cmds) show_commands ;;
+    ruflo-commands|ruflo) show_ruflo_commands ;;
     workflow)      show_workflow ;;
     vibe-check|vibecheck) show_vibe_check ;;
     skills-update|taste-update|taste) show_taste ;;
