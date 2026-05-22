@@ -951,7 +951,7 @@ show_commands() {
     echo -e "${CYAN}╰${h_full}╯${NC}\n"
 
     echo -e "📖 Full reference: ${BLUE}docs/dannflow_docs/claude-workflow.md${NC}"
-    echo -e "${CYAN}💡 Tip:${NC} Run ${CYAN}./guide.sh ruflo-commands${NC} to see Ruflo MCP tools (agents, memory, swarms, etc.)\n"
+    echo -e "${CYAN}💡 Tip:${NC} Run ${CYAN}./guide.sh ruflo-commands${NC} to see Ruflo MCP tools (invoked by Claude, not typed as slash commands)\n"
     step_footer
 }
 
@@ -959,6 +959,10 @@ show_ruflo_commands() {
     show_header
     echo -e "${BOLD}🧠 Ruflo MCP Tools${NC}"
     echo -e "${CYAN}(Intelligent agent coordination, memory, and automation)${NC}\n"
+    echo -e "${YELLOW}⚠️  These are MCP tools, NOT slash commands.${NC}"
+    echo -e "   You don't type them. Ask Claude in plain English"
+    echo -e "   (e.g. ${CYAN}\"save this to ruflo memory\"${NC} or ${CYAN}\"search ruflo for X\"${NC})"
+    echo -e "   and Claude invokes the tool (real name: ${CYAN}mcp__ruflo__<tool>${NC}).\n"
 
     # Terminal width — capped between 80 and 140
     local term_width
@@ -1065,13 +1069,13 @@ show_ruflo_commands() {
             echo -e "${CYAN}${h_mid}${NC}"
         fi
 
-        print_row "/$name" "$description"
+        print_row "$name" "$description"
         total_count=$((total_count + 1))
     done <<< "$ruflo_data"
     echo -e "${CYAN}${h_bot}${NC}\n"
 
     # Footer
-    local footer_text="  ${total_count} Ruflo tools available  •  Use via Claude Code  •  Part of npm init wizard setup"
+    local footer_text="  ${total_count} Ruflo MCP tools available  •  Invoked by Claude, not typed  •  Ask in natural language"
     echo -e "${CYAN}╭${h_full}╮${NC}"
     echo -e "${CYAN}│${NC}${BOLD}$(pad_right "$footer_text" "$total_inner")${NC}${CYAN}│${NC}"
     echo -e "${CYAN}╰${h_full}╯${NC}\n"

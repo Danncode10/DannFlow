@@ -29,6 +29,7 @@ Drop `.md` files in this folder to add custom slash commands. Each file becomes 
 | `/seo-check [route]` | Per-route SEO audit: metadata, OG, canonical, sitemap.ts, robots.ts, JSON-LD, alt text, heading hierarchy. Reports only. |
 | `/seo-fix <route\|all>` | Active rewrite — adds missing SEO essentials. Scaffolds `sitemap.ts`, `robots.ts`, metadata blocks, JSON-LD. Plan-then-confirm. |
 | `/marketing-check [route]` | Conversion-fundamentals audit for landing/marketing pages — headline, CTA, social proof, friction, pricing legibility. Opinionated, judgement-heavy. Reports only. |
+| `/ruflo-upgrade` | Re-applies Ruflo memory + parallel-agent patterns to the 5 core commands. Safe to re-run after `/init-update`. |
 
 ## File format
 

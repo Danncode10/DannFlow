@@ -7,6 +7,8 @@ Apply the fixes flagged by `/seo-check` for the route(s) named in `$ARGUMENTS`. 
 
 ## Procedure
 
+0. **Check ruflo memory** — search for any SEO decisions already made (canonical domain, OG image strategy, siteName, JSON-LD type choices). Apply stored decisions rather than re-inventing them.
+
 1. **Run `/seo-check` internally** on the target scope to get a fresh gap list. Do not show its full output to the user — just collect the gaps.
 
 2. **Build a fix plan grouped by file**, e.g.:
@@ -135,6 +137,10 @@ Apply the fixes flagged by `/seo-check` for the route(s) named in `$ARGUMENTS`. 
    Suggested commit:
      feat(seo): add metadata, sitemap, robots, JSON-LD for /pricing
    ```
+
+**When fixing `all` routes** — spawn one agent per route in parallel; they don't share state and can write simultaneously. Merge reports at the end.
+
+**After fixes** — save any SEO-level decisions to ruflo memory (e.g. "OG images are dynamic via opengraph-image.tsx, not static PNGs", "canonical domain is https://example.com").
 
 ## Constraints
 

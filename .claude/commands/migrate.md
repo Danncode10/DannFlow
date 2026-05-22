@@ -7,6 +7,10 @@ Execute a complete, safe Supabase migration described by `$ARGUMENTS`. Chains `/
 
 ## Procedure
 
+### Step 0 — Check ruflo memory
+
+Before drafting SQL, search ruflo memory for prior decisions related to this table or domain (e.g. if adding a column to `profiles`, search "profiles", the column topic, or the feature name). Retrieve any relevant schema decisions, naming conventions, or "why not" context.
+
 ### Step 1 — Understand the request
 
 Parse `$ARGUMENTS` into a concrete schema change. Examples:
@@ -97,6 +101,8 @@ Next steps:
   - Run /rls <new-table>  (if a table was created)
   - Run /seed <new-table>  (if you want test data)
 ```
+
+**Save to ruflo memory** after a successful migration — one concise entry capturing the decision and its reason, e.g.: `"schema: added bio text column to profiles — needed for user cards feature"`. This prevents re-explaining the decision next session.
 
 ## Constraints
 

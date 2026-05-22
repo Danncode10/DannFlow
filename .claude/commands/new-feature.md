@@ -7,6 +7,8 @@ Scaffold a new feature: **$ARGUMENTS**
 
 **Procedure:**
 
+0. **Check ruflo memory** — search for any prior decisions related to `$ARGUMENTS` or its domain (e.g. if scaffolding "billing", search "billing", "stripe", "payments"). Surface relevant choices (library picks, schema decisions, design patterns) before writing any code.
+
 1. **Check for a blueprint** — list `src/prompts/features/` and look for a file matching `$ARGUMENTS` or close to it. If one exists, follow it. If not, proceed with the default scaffolding below.
 
 2. **Confirm requirements** with the user before writing files. Ask (briefly):
@@ -14,7 +16,13 @@ Scaffold a new feature: **$ARGUMENTS**
    - Does it need a new Supabase table? If yes, suggest running `/checkpoint` first and creating the table via Supabase MCP.
    - Should it be a protected route (under `src/app/dashboard/`) or public?
 
-3. **Scaffold these files** (use feature name in kebab-case for paths, PascalCase for components):
+3. **Scaffold these files** (use feature name in kebab-case for paths, PascalCase for components). These four artifacts are independent — **spawn parallel agents** for service, page, component, and types simultaneously when the feature scope is clear:
+   - Agent A → `src/services/<feature-name>.ts`
+   - Agent B → `src/app/<route>/page.tsx` + `loading.tsx` + `error.tsx`
+   - Agent C → `src/components/<FeatureName>Form.tsx`
+   - Agent D → any new type definitions needed
+
+   (Skip the parallel split for small or ambiguous features — use judgement.)
 
    - **`src/services/<feature-name>.ts`** — service layer
      - Import typed Supabase client from `src/utils/supabase/server.ts`
@@ -39,7 +47,9 @@ Scaffold a new feature: **$ARGUMENTS**
 
 5. **After scaffolding, run `/ui`** mentally on what you just wrote — verify semantic tokens, no hex, no raw `<button>`.
 
-6. **Report** what was created with file paths, then suggest:
+6. **Save to ruflo memory** — store key decisions made during scaffolding: library choices, schema shape, auth approach, any "why not" decisions. One entry per distinct decision.
+
+7. **Report** what was created with file paths, then suggest:
    - Running `npm run dev` to test
    - Running `/review` before committing
    - The conventional commit message

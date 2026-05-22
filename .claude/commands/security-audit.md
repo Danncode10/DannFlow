@@ -4,6 +4,8 @@ description: Full security scan of the working tree or current branch diff. Catc
 
 Run a thorough security audit on this repo.
 
+**Parallel scan** — the 7 check categories below are independent. For full-tree scans, spawn parallel agents scoped by directory (`src/services/`, `src/app/`, `src/components/`) and merge their findings. For branch-diff scans, a single pass is fine.
+
 **Scope** — default to the current branch diff against `main`. If there are uncommitted changes, include those too. If the branch IS `main`, scan the whole `src/` tree.
 
 **Check for:**
@@ -56,3 +58,5 @@ Summary: <n critical, n warnings, n info>
 If zero issues found in a tier, omit that tier. End with a one-line verdict: SAFE TO MERGE / NEEDS FIXES / BLOCK.
 
 Do NOT auto-fix. Report only.
+
+**After reporting** — if any CRITICAL issues are found, save a ruflo memory entry summarizing the finding and its location so it can be recalled next session: e.g. `"security: service-role key exposed in src/app/api/users/route.ts — fix pending"`.

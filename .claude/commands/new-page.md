@@ -7,6 +7,8 @@ Create a new App Router page at: **$ARGUMENTS** (e.g. `dashboard/billing` → `s
 
 **Procedure:**
 
+0. **Check ruflo memory** — search for layout decisions, design patterns, or prior context related to `$ARGUMENTS` (e.g. "dashboard layout", "card style", the page topic). Apply any stored decisions before writing.
+
 1. **Decide scope** — if the route is under `dashboard/`, it's a protected page (auth-gated). Otherwise public.
 
 2. **Create the directory** `src/app/$ARGUMENTS/` and these three files:
@@ -30,7 +32,9 @@ Create a new App Router page at: **$ARGUMENTS** (e.g. `dashboard/billing` → `s
 
 4. **Mobile-first.** Test the layout mentally at 375px width — single column, touch targets ≥48px.
 
-5. **Report** the created files and suggest:
+5. **If the page has multiple independent sections** (hero, features, pricing, FAQ, CTA), spawn one agent per section in parallel — they can write simultaneously since each is an isolated component.
+
+6. **Report** the created files and suggest:
    - Adding a nav entry if appropriate
    - Running `/ui` if you want to double-check responsiveness
    - Running `npm run dev` to verify

@@ -137,4 +137,20 @@ If you don't know which custom command fits a task, run `/ask-command <your inte
 
 ---
 
+## Ruflo memory protocol
+
+Before starting any DannFlow command or multi-file task, search ruflo memory (`mcp__ruflo__memory_search`) for relevant prior decisions — use the feature name, table name, or technology as the search term.
+
+After any non-trivial decision is made, store it in ruflo memory (`mcp__ruflo__memory_store`) **without being asked**. Good candidates:
+
+- **Tech choices**: "We use Resend for email, not SendGrid"
+- **Schema decisions**: "posts table uses soft deletes via deleted_at, not hard deletes"
+- **Design decisions**: "Cards use rounded-xl, never rounded-md"
+- **Anti-decisions**: "We're NOT using Zustand — TanStack Query handles all server state"
+- **"Why" context**: "billing is behind a feature flag until Stripe goes live"
+
+Auto-memory (`~/.claude/projects/.../memory/`) stores human-readable facts for future conversations. Ruflo memory enables semantic recall as the project grows past ~50 decisions. Use both.
+
+---
+
 **Be concise. Be proactive. Respect the guardrails. Default to Server Components. Never skip RLS.**
