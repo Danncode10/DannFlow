@@ -103,7 +103,8 @@ export function Pricing({ isAuthed }: PricingProps) {
                 delay: i * 0.06,
                 ease: [0.16, 1, 0.3, 1],
               }}
-              className="relative group"
+              style={{ willChange: "transform" }}
+              className="relative group transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] hover:-translate-y-1"
             >
               {/* Animated border for highlighted plan */}
               {plan.highlight && (

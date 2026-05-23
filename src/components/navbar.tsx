@@ -79,15 +79,20 @@ export function Navbar({ user }: { user: User | null }) {
             </span>
           </Link>
 
-          {/* Desktop nav */}
+          {/* Desktop nav — with sliding underline reveal on hover */}
           <nav className="hidden md:flex items-center">
             {navLinks.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
-                className="px-3.5 py-1.5 text-[13px] font-medium text-muted-foreground rounded-full hover:text-foreground hover:bg-white/[0.03] transition-all duration-300"
+                className="group relative px-3.5 py-1.5 text-[13px] font-medium text-muted-foreground hover:text-foreground transition-colors duration-200"
               >
                 {link.label}
+                {/* Underline reveal — scales in from left on hover */}
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute left-3.5 right-3.5 bottom-0.5 h-[1px] bg-gradient-to-r from-primary/70 via-primary to-primary/70 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]"
+                />
               </a>
             ))}
           </nav>

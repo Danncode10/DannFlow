@@ -1,7 +1,15 @@
 "use client";
 
+import { useRef, MouseEvent } from "react";
 import { motion } from "framer-motion";
-import { ArrowUpRight, Sparkles, Terminal, Database, Shield, Zap } from "lucide-react";
+import {
+  ArrowUpRight,
+  ArrowRight,
+  Terminal,
+  Database,
+  Shield,
+  Zap,
+} from "lucide-react";
 import { siteConfig } from "@/lib/config";
 
 interface HeroProps {
@@ -12,52 +20,46 @@ export function Hero({ isAuthed }: HeroProps) {
   return (
     <section
       id="home"
-      className="relative overflow-hidden pt-12 pb-32 md:pt-20 md:pb-44"
+      className="relative overflow-hidden pt-16 pb-32 md:pt-24 md:pb-44"
       style={{
-        // Single section-level radial gradient replaces the blurred orb.
-        // Pure paint, no filter:blur compositing — Chromium handles it cheaply.
         background:
-          "radial-gradient(ellipse 600px 500px at 50% 0%, rgba(124,92,255,0.18), transparent 60%), var(--color-background)",
+          "radial-gradient(ellipse 800px 600px at 80% 0%, rgba(124,92,255,0.16), transparent 60%), var(--color-background)",
       }}
     >
-      {/* Static dot grid background */}
+      {/* Static dot grid */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-grid opacity-50"
+        className="pointer-events-none absolute inset-0 bg-grid opacity-40"
       />
-      {/* Paint-only radial fade */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 grid-fade-overlay"
       />
 
-      <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 text-center">
-        {/* Eyebrow badge */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Microcopy link above headline — Linear/Stripe pattern */}
+        <motion.a
+          href="/#features"
+          initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-8 inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.02] px-3.5 py-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
+          className="group inline-flex items-center gap-2 text-[13px] text-muted-foreground hover:text-foreground transition-colors"
         >
-          <Sparkles className="h-3 w-3 text-primary" />
-          <span className="text-[11px] font-medium text-foreground/80 uppercase tracking-[0.18em]">
-            AI-native starter · v1.0
+          <span className="flex items-center gap-1.5 rounded-full bg-primary/10 border border-primary/20 px-2 py-0.5 text-[10px] font-semibold text-primary uppercase tracking-[0.15em]">
+            New
           </span>
-        </motion.div>
+          <span>Multi-tenant RLS templates for client websites</span>
+          <ArrowRight className="h-3 w-3 transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:translate-x-1" />
+        </motion.a>
 
-        {/* Headline */}
+        {/* Headline — LEFT-aligned, no italic accent (anti-vibe-coded) */}
         <motion.h1
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
-          className="mx-auto max-w-4xl text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-semibold tracking-[-0.03em] leading-[0.95] text-foreground"
+          className="mt-8 max-w-[18ch] text-[2.75rem] sm:text-6xl md:text-7xl lg:text-[5rem] font-semibold tracking-[-0.035em] leading-[0.98] text-foreground"
         >
-          Ship your next{" "}
-          <span className="gradient-text-primary italic font-medium">
-            big idea
-          </span>
-          <br />
-          in record time
+          The AI-native starter for shipping faster.
         </motion.h1>
 
         {/* Subtitle */}
@@ -65,64 +67,78 @@ export function Hero({ isAuthed }: HeroProps) {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.18, ease: [0.16, 1, 0.3, 1] }}
-          className="mx-auto mt-8 max-w-xl text-[17px] text-muted-foreground leading-relaxed"
+          className="mt-8 max-w-xl text-[17px] text-muted-foreground leading-relaxed"
         >
-          {siteConfig.name} is the AI-native starter for websites, management
-          systems, and startup MVPs. Stop building boilerplate — start shipping.
+          A production-grade Next.js + Supabase template with multi-tenant
+          RLS, type-safe services, and an AI-driven workflow that turns
+          natural language into shipped features.
         </motion.p>
 
-        {/* CTAs */}
+        {/* CTAs — primary + inline text link (Linear pattern) */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.28, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-3"
+          className="mt-10 flex flex-col sm:flex-row items-start sm:items-center gap-5 sm:gap-7"
         >
-          {/* Primary CTA with nested icon circle */}
-          <a
-            href={isAuthed ? "/dashboard" : "/login"}
-            className="group flex items-center gap-2 pl-6 pr-2 py-2 text-sm font-medium rounded-full bg-foreground text-background active:scale-[0.97] transition-transform duration-200 shadow-[0_4px_20px_rgba(124,92,255,0.3),inset_0_1px_0_rgba(255,255,255,0.2)]"
-          >
+          <MagneticCTA href={isAuthed ? "/dashboard" : "/login"}>
             Get started free
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-background/10 group-hover:bg-background/20 group-hover:translate-x-0.5 group-hover:-translate-y-[1px] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]">
-              <ArrowUpRight className="h-3.5 w-3.5" />
-            </span>
-          </a>
+          </MagneticCTA>
 
-          {/* Secondary CTA — no backdrop-blur (perf) */}
           <a
             href={siteConfig.githubUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="group flex items-center gap-2.5 px-6 py-3 text-sm font-medium rounded-full border border-white/[0.08] bg-white/[0.02] text-foreground/90 hover:bg-white/[0.05] hover:border-white/[0.12] active:scale-[0.97] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] inner-highlight"
+            className="group inline-flex items-center gap-2 text-[14px] font-medium text-foreground/90 hover:text-foreground transition-colors"
           >
             <GitHubIcon className="h-3.5 w-3.5" />
-            Star on GitHub
+            <span className="border-b border-white/[0.15] group-hover:border-white/[0.4] transition-colors pb-0.5">
+              View on GitHub
+            </span>
+            <ArrowUpRight className="h-3.5 w-3.5 transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           </a>
         </motion.div>
 
-        {/* Social proof */}
-        <motion.p
+        {/* Customer logo strip — replaces "trusted by" copy */}
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-          className="mt-10 text-[12px] text-muted-foreground/70 font-mono uppercase tracking-[0.2em]"
+          transition={{ duration: 0.6, delay: 0.5 }}
+          className="mt-16 flex flex-col gap-5"
         >
-          Trusted by solo devs · startup teams · agencies
-        </motion.p>
+          <p className="text-[11px] font-mono uppercase tracking-[0.2em] text-muted-foreground/60">
+            Built for teams shipping production software
+          </p>
+          <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
+            {[
+              "Vercel",
+              "Supabase",
+              "Tailwind",
+              "Shadcn",
+              "TanStack",
+              "Upstash",
+            ].map((logo) => (
+              <span
+                key={logo}
+                className="text-[15px] font-semibold tracking-tight text-foreground/40 hover:text-foreground/70 transition-colors duration-300 cursor-default"
+              >
+                {logo}
+              </span>
+            ))}
+          </div>
+        </motion.div>
 
-        {/* Floating product preview — double-bezel terminal/dashboard mockup */}
+        {/* Product preview — with 3D tilt on hover */}
         <motion.div
           initial={{ opacity: 0, y: 32 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
-          className="relative mt-20 mx-auto max-w-5xl"
+          className="relative mt-24"
+          style={{ perspective: "1500px" }}
         >
-          {/* Outer bezel — smaller shadow spread (was 80px causing scroll paint cost) */}
-          <div className="relative p-1.5 rounded-[2rem] bg-gradient-to-b from-white/[0.08] to-white/[0.02] border border-white/[0.06] shadow-[0_12px_40px_-12px_rgba(0,0,0,0.6),0_0_0_1px_rgba(255,255,255,0.04)]">
-            {/* Inner core */}
+          <TiltCard>
             <div className="relative rounded-[calc(2rem-0.375rem)] bg-card overflow-hidden border border-white/[0.04] inner-highlight">
-              {/* Top bar — fake window chrome */}
+              {/* Top bar */}
               <div className="flex items-center justify-between px-5 py-3 border-b border-white/[0.04] bg-background/40">
                 <div className="flex items-center gap-1.5">
                   <div className="h-2.5 w-2.5 rounded-full bg-white/10" />
@@ -138,14 +154,13 @@ export function Hero({ isAuthed }: HeroProps) {
                 <div className="w-12" />
               </div>
 
-              {/* Fake dashboard grid */}
+              {/* Dashboard grid */}
               <div className="grid grid-cols-12 gap-3 p-5">
-                {/* Sidebar */}
                 <div className="col-span-3 space-y-2">
                   {[Terminal, Database, Shield, Zap].map((Icon, i) => (
                     <div
                       key={i}
-                      className={`flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] ${
+                      className={`flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] transition-colors duration-200 ${
                         i === 0
                           ? "bg-primary/10 border border-primary/20 text-primary"
                           : "text-muted-foreground hover:bg-white/[0.02]"
@@ -159,14 +174,12 @@ export function Hero({ isAuthed }: HeroProps) {
                   ))}
                 </div>
 
-                {/* Main */}
                 <div className="col-span-9 space-y-3">
-                  {/* Stat row */}
                   <div className="grid grid-cols-3 gap-3">
                     {[
-                      { label: "Requests", val: "12.4k", delta: "+24%" },
-                      { label: "Users", val: "1,247", delta: "+8.2%" },
-                      { label: "Uptime", val: "99.9%", delta: "30d" },
+                      { label: "MRR", val: "$48.2k", delta: "+12.4%" },
+                      { label: "Active orgs", val: "1,247", delta: "+8.2%" },
+                      { label: "Uptime", val: "99.99%", delta: "30d" },
                     ].map((s) => (
                       <div
                         key={s.label}
@@ -185,10 +198,9 @@ export function Hero({ isAuthed }: HeroProps) {
                     ))}
                   </div>
 
-                  {/* Chart — static bars, no animation (perf) */}
                   <div className="relative h-32 rounded-xl bg-white/[0.02] border border-white/[0.04] overflow-hidden p-3">
                     <p className="text-[9px] uppercase tracking-[0.15em] text-muted-foreground mb-2">
-                      Activity
+                      Revenue by tenant · last 12 weeks
                     </p>
                     <div className="flex items-end justify-between h-16 gap-1">
                       {[40, 60, 35, 75, 55, 85, 70, 90, 65, 80, 50, 95].map(
@@ -203,25 +215,22 @@ export function Hero({ isAuthed }: HeroProps) {
                     </div>
                   </div>
 
-                  {/* Activity row */}
                   <div className="space-y-1.5">
                     {[
-                      { user: "lester@dann.co", action: "Created project" },
-                      { user: "maria@studio.io", action: "Updated schema" },
-                      { user: "alex@kit.dev", action: "Deployed v1.2.0" },
+                      { user: "stripe-checkout", action: "POST /api/webhooks · 200 OK" },
+                      { user: "auth.signIn", action: "INSERT auth.sessions · RLS pass" },
+                      { user: "pages.update", action: "UPDATE pages · org_id matched" },
                     ].map((row, i) => (
                       <div
                         key={i}
                         className="flex items-center justify-between p-2.5 rounded-lg bg-white/[0.015] border border-white/[0.03]"
                       >
                         <div className="flex items-center gap-2.5">
-                          <div className="h-5 w-5 rounded-full bg-gradient-to-br from-primary to-[#5B3FE0] flex items-center justify-center">
-                            <span className="text-[8px] font-bold text-primary-foreground">
-                              {row.user[0].toUpperCase()}
-                            </span>
-                          </div>
+                          <span className="px-1.5 py-0.5 rounded text-[8px] font-mono uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                            ok
+                          </span>
                           <div>
-                            <p className="text-[10px] font-medium text-foreground">
+                            <p className="text-[10px] font-mono text-foreground">
                               {row.user}
                             </p>
                             <p className="text-[9px] text-muted-foreground">
@@ -230,7 +239,7 @@ export function Hero({ isAuthed }: HeroProps) {
                           </div>
                         </div>
                         <span className="text-[9px] font-mono text-muted-foreground">
-                          just now
+                          {12 + i}ms
                         </span>
                       </div>
                     ))}
@@ -238,10 +247,109 @@ export function Hero({ isAuthed }: HeroProps) {
                 </div>
               </div>
             </div>
-          </div>
+          </TiltCard>
         </motion.div>
       </div>
     </section>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   Magnetic CTA — button gently follows the cursor
+   GPU-only (transform), rAF-throttled, no shadow animation.
+   ───────────────────────────────────────────── */
+function MagneticCTA({ href, children }: { href: string; children: React.ReactNode }) {
+  const ref = useRef<HTMLAnchorElement>(null);
+  const frame = useRef<number | null>(null);
+
+  const handleMove = (e: MouseEvent<HTMLAnchorElement>) => {
+    if (frame.current !== null) return;
+    const cx = e.clientX;
+    const cy = e.clientY;
+    frame.current = requestAnimationFrame(() => {
+      frame.current = null;
+      const el = ref.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const x = cx - (rect.left + rect.width / 2);
+      const y = cy - (rect.top + rect.height / 2);
+      // Move at 18% of distance from center — subtle magnetism
+      el.style.transform = `translate3d(${x * 0.18}px, ${y * 0.18}px, 0)`;
+    });
+  };
+
+  const handleLeave = () => {
+    if (frame.current !== null) {
+      cancelAnimationFrame(frame.current);
+      frame.current = null;
+    }
+    if (ref.current) ref.current.style.transform = "translate3d(0,0,0)";
+  };
+
+  return (
+    <a
+      ref={ref}
+      href={href}
+      onMouseMove={handleMove}
+      onMouseLeave={handleLeave}
+      style={{ willChange: "transform" }}
+      className="group inline-flex items-center gap-2 pl-6 pr-2 py-2 text-sm font-medium rounded-full bg-foreground text-background active:scale-[0.97] transition-transform duration-[400ms] ease-[cubic-bezier(0.23,1,0.32,1)] shadow-[0_4px_20px_rgba(124,92,255,0.3),inset_0_1px_0_rgba(255,255,255,0.2)]"
+    >
+      {children}
+      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-background/10 group-hover:bg-background/20 transition-colors duration-200">
+        <ArrowUpRight className="h-3.5 w-3.5 transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+      </span>
+    </a>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   TiltCard — subtle 3D perspective tilt on mouse position.
+   GPU-only, rAF-throttled. Resets on mouseleave.
+   ───────────────────────────────────────────── */
+function TiltCard({ children }: { children: React.ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const frame = useRef<number | null>(null);
+
+  const handleMove = (e: MouseEvent<HTMLDivElement>) => {
+    if (frame.current !== null) return;
+    const cx = e.clientX;
+    const cy = e.clientY;
+    frame.current = requestAnimationFrame(() => {
+      frame.current = null;
+      const el = ref.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const x = (cx - rect.left) / rect.width - 0.5;
+      const y = (cy - rect.top) / rect.height - 0.5;
+      const rotX = -y * 4; // max ±2deg
+      const rotY = x * 4;
+      el.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+    });
+  };
+
+  const handleLeave = () => {
+    if (frame.current !== null) {
+      cancelAnimationFrame(frame.current);
+      frame.current = null;
+    }
+    if (ref.current) ref.current.style.transform = "rotateX(0deg) rotateY(0deg)";
+  };
+
+  return (
+    <div
+      ref={ref}
+      onMouseMove={handleMove}
+      onMouseLeave={handleLeave}
+      style={{
+        willChange: "transform",
+        transformStyle: "preserve-3d",
+        transition: "transform 600ms cubic-bezier(0.23, 1, 0.32, 1)",
+      }}
+      className="relative p-1.5 rounded-[2rem] bg-gradient-to-b from-white/[0.08] to-white/[0.02] border border-white/[0.06] shadow-[0_12px_40px_-12px_rgba(0,0,0,0.6),0_0_0_1px_rgba(255,255,255,0.04)]"
+    >
+      {children}
+    </div>
   );
 }
 

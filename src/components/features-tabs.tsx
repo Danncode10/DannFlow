@@ -105,7 +105,8 @@ function BentoCard({
         delay: index * 0.04,
         ease: [0.16, 1, 0.3, 1],
       }}
-      className={`group relative overflow-hidden rounded-3xl border border-white/[0.06] bg-white/[0.015] p-1.5 inner-highlight transition-colors duration-300 hover:border-white/[0.12] ${feature.span}`}
+      style={{ willChange: "transform" }}
+      className={`group relative overflow-hidden rounded-3xl border border-white/[0.06] bg-white/[0.015] p-1.5 inner-highlight transition-all duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] hover:border-white/[0.14] hover:-translate-y-1 ${feature.span}`}
     >
       {/* Mouse-follow glow */}
       <div
@@ -126,9 +127,9 @@ function BentoCard({
           style={{ background: feature.glow }}
         />
 
-        <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-white/[0.04] border border-white/[0.06] mb-6 group-hover:bg-white/[0.06] transition-colors">
+        <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-white/[0.04] border border-white/[0.06] mb-6 transition-all duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:bg-white/[0.08] group-hover:scale-105 group-hover:rotate-[-3deg]">
           <Icon
-            className="h-4 w-4 text-foreground"
+            className="h-4 w-4 text-foreground transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:scale-110"
             strokeWidth={1.5}
           />
         </div>
