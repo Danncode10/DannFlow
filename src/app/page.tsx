@@ -21,21 +21,26 @@ export default async function Home() {
       <Hero isAuthed={!!user} />
 
       {/* =============================
-          FEATURES SECTION (WITH TABS)
+          FEATURES SECTION (BENTO + TABS)
           ============================= */}
-      <section id="features" className="bg-card border-t border-border isolate">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-32">
+      <section id="features" className="relative bg-background isolate overflow-hidden">
+        {/* Section dot grid */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-grid-sm mask-vertical-fade opacity-50"
+        />
 
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-32">
           <div className="text-center mb-16">
-            <span className="text-xs font-medium text-primary/70 tracking-wide">
-              Features & integrations
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/[0.06] bg-white/[0.02] px-3 py-1 text-[10px] font-medium text-foreground/70 uppercase tracking-[0.2em]">
+              Features
             </span>
-            <h2 className="mt-3 text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
-              Everything you need to launch
+            <h2 className="mt-6 text-4xl sm:text-5xl font-semibold text-foreground tracking-[-0.02em]">
+              Everything you need <span className="gradient-text-primary italic font-medium">to launch</span>
             </h2>
 
-            <p className="mt-4 text-muted-foreground max-w-2xl mx-auto">
-              One template. Every essential built in. Check out our active integrations below.
+            <p className="mt-5 text-[15px] text-muted-foreground max-w-xl mx-auto leading-relaxed">
+              One template. Every essential built in.
             </p>
           </div>
 
@@ -44,7 +49,6 @@ export default async function Home() {
             repos={repos}
             currentRole={profile?.role}
           />
-
         </div>
       </section>
 

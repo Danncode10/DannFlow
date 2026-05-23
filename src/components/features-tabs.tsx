@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, MouseEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Database,
@@ -16,56 +16,123 @@ import {
 } from "lucide-react";
 import type { Database as DatabaseType } from "@/types/supabase";
 
-
-
-/**
- * Modern Dashboard System
- * Designed to be robust even in complex environments.
- */
 const FEATURES = [
   {
     icon: Database,
     title: "Supabase integration",
-    description: "Auth, database, and real-time built in. Type-safe queries powered by auto-generated TypeScript definitions.",
-    color: "text-primary",
-    bg: "bg-primary/10",
-  },
-  {
-    icon: Shield,
-    title: "Auth & RLS ready",
-    description: "Login, signup, and role-based access out of the box. Row Level Security policies baked into every service.",
-    color: "text-primary",
-    bg: "bg-primary/10",
-  },
-  {
-    icon: GitBranch,
-    title: "Git-first workflow",
-    description: "Structured for clean commits, branch strategies, and AI-assisted code reviews via GitHub MCP.",
-    color: "text-violet-400",
-    bg: "bg-violet-500/10",
+    description:
+      "Auth, database, and real-time built in. Type-safe queries powered by auto-generated TypeScript definitions.",
+    span: "lg:col-span-2 lg:row-span-2",
+    accent: "from-primary/20 via-primary/5 to-transparent",
   },
   {
     icon: Zap,
     title: "AI-native architecture",
-    description: "Built for Vibe Coding. Describe what you want, and your AI builds it using your typed services and schema.",
-    color: "text-amber-400",
-    bg: "bg-amber-500/10",
+    description:
+      "Built for Vibe Coding. Describe what you want — your AI builds it using your typed services.",
+    span: "lg:col-span-2",
+    accent: "from-amber-500/15 via-amber-500/5 to-transparent",
+  },
+  {
+    icon: Shield,
+    title: "Auth & RLS ready",
+    description: "Login, signup, and role-based access out of the box.",
+    span: "",
+    accent: "from-emerald-500/15 via-emerald-500/5 to-transparent",
   },
   {
     icon: Terminal,
     title: "Checkpoint system",
-    description: "One command to snapshot your database. Instant disaster recovery and environment cloning.",
-    color: "text-orange-400",
-    bg: "bg-orange-500/10",
+    description: "One command to snapshot your database. Instant rollback.",
+    span: "",
+    accent: "from-orange-500/15 via-orange-500/5 to-transparent",
+  },
+  {
+    icon: GitBranch,
+    title: "Git-first workflow",
+    description:
+      "Clean commits, branch strategies, and AI-assisted reviews via GitHub MCP.",
+    span: "lg:col-span-2",
+    accent: "from-violet-500/15 via-violet-500/5 to-transparent",
   },
   {
     icon: Layers,
     title: "Clean architecture",
-    description: "Separation of concerns by design. UI, services, types, and prompts — each in its own lane.",
-    color: "text-emerald-400",
-    bg: "bg-emerald-500/10",
+    description:
+      "UI, services, types, prompts — each in its own lane.",
+    span: "lg:col-span-2",
+    accent: "from-pink-500/15 via-pink-500/5 to-transparent",
   },
 ];
+
+function BentoCard({
+  feature,
+  index,
+}: {
+  feature: (typeof FEATURES)[number];
+  index: number;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  const handleMove = (e: MouseEvent<HTMLDivElement>) => {
+    const el = ref.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    el.style.setProperty("--x", `${e.clientX - rect.left}px`);
+    el.style.setProperty("--y", `${e.clientY - rect.top}px`);
+  };
+
+  const Icon = feature.icon;
+
+  return (
+    <motion.div
+      ref={ref}
+      onMouseMove={handleMove}
+      initial={{ opacity: 0, y: 40, filter: "blur(8px)" }}
+      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+      viewport={{ once: true, margin: "-80px" }}
+      transition={{
+        duration: 0.8,
+        delay: index * 0.06,
+        ease: [0.16, 1, 0.3, 1],
+      }}
+      className={`group relative overflow-hidden rounded-3xl border border-white/[0.06] bg-white/[0.015] p-1.5 inner-highlight transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:border-white/[0.12] ${feature.span}`}
+    >
+      {/* Mouse-follow glow */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+        style={{
+          background:
+            "radial-gradient(360px circle at var(--x) var(--y), rgba(124,92,255,0.15), transparent 70%)",
+        }}
+      />
+
+      {/* Inner core */}
+      <div className="relative h-full rounded-[calc(1.5rem-0.375rem)] bg-card/80 backdrop-blur-xl p-7 md:p-8 flex flex-col">
+        {/* Accent gradient blob in card corner */}
+        <div
+          aria-hidden
+          className={`pointer-events-none absolute -top-12 -right-12 h-40 w-40 rounded-full bg-gradient-to-br ${feature.accent} blur-3xl opacity-70`}
+        />
+
+        <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-white/[0.04] border border-white/[0.06] mb-6 group-hover:bg-white/[0.06] transition-colors">
+          <Icon
+            className="h-4 w-4 text-foreground"
+            strokeWidth={1.5}
+          />
+        </div>
+
+        <h3 className="relative text-[15px] font-semibold text-foreground tracking-tight mb-2">
+          {feature.title}
+        </h3>
+        <p className="relative text-[13px] text-muted-foreground leading-relaxed">
+          {feature.description}
+        </p>
+      </div>
+    </motion.div>
+  );
+}
 
 function GitHubIcon({ className }: { className?: string }) {
   return (
@@ -198,9 +265,9 @@ export function FeaturesTabs({
 
   return (
     <div className="w-full">
-      {/* ── Tabs Navigation ── */}
-      <div className="flex justify-center mb-8 md:mb-16">
-        <div className="flex p-1.5 rounded-full bg-secondary border border-border shadow-inner backdrop-blur-md relative overflow-x-auto no-scrollbar max-w-[calc(100vw-2rem)]">
+      {/* ── Tabs Navigation — refined glass pill ── */}
+      <div className="flex justify-center mb-12 md:mb-16">
+        <div className="flex p-1 rounded-full bg-white/[0.02] border border-white/[0.06] backdrop-blur-xl inner-highlight relative overflow-x-auto no-scrollbar max-w-[calc(100vw-2rem)]">
           {TABS_CONFIG.map((tab) => {
             const TabIcon = tab.icon;
             const isActive = active === tab.id;
@@ -211,37 +278,38 @@ export function FeaturesTabs({
                 onClick={() => setActive(tab.id)}
                 onMouseEnter={() => setHovered(tab.id)}
                 onMouseLeave={() => setHovered(null)}
-                className={`relative flex items-center gap-2 md:gap-3 px-4 md:px-8 py-2.5 md:py-3.5 rounded-full text-sm font-medium transition-all duration-300 whitespace-nowrap ${isActive
-                  ? "text-primary scale-[1.02]"
-                  : "text-muted-foreground hover:text-foreground"
-                  }`}
+                className={`relative flex items-center gap-2 px-4 md:px-5 py-2 md:py-2.5 rounded-full text-[13px] font-medium transition-colors duration-300 whitespace-nowrap ${
+                  isActive
+                    ? "text-foreground"
+                    : "text-muted-foreground hover:text-foreground/80"
+                }`}
               >
                 {isActive && (
                   <motion.div
                     layoutId="modern-pill"
-                    className="absolute inset-0 bg-card rounded-full shadow-[0_4px_10px_rgba(0,0,0,0.3),0_0_0_1px_rgba(255,255,255,0.05),0_10px_20px_-5px_rgba(0,0,0,0.5)] z-0"
+                    className="absolute inset-0 bg-white/[0.06] rounded-full border border-white/[0.08] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] z-0"
                     transition={{ type: "spring", bounce: 0.15, duration: 0.6 }}
                   />
-
                 )}
                 {isHovered && !isActive && (
                   <motion.div
                     layoutId="hover-pill"
-                    className="absolute inset-0 bg-primary/10 rounded-full z-0"
+                    className="absolute inset-0 bg-white/[0.02] rounded-full z-0"
                     transition={{ type: "spring", bounce: 0.15, duration: 0.4 }}
                   />
                 )}
-                <span className="relative z-10 flex items-center gap-3">
+                <span className="relative z-10 flex items-center gap-2">
                   <TabIcon
-                    className={`w-4 h-4 ${isActive ? "text-primary" : "text-muted-foreground"
-                      } transition-colors duration-300`}
+                    className="w-3.5 h-3.5"
+                    strokeWidth={1.5}
                   />
                   {tab.label}
                   <span
-                    className={`ml-1 px-2 py-0.5 rounded-full text-[9px] font-black tracking-normal transition-all duration-500 ${isActive
-                      ? "bg-primary text-primary-foreground shadow-sm shadow-primary/20"
-                      : "bg-border text-muted-foreground"
-                      }`}
+                    className={`ml-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-mono tracking-wide transition-colors duration-500 ${
+                      isActive
+                        ? "bg-primary/20 text-primary border border-primary/30"
+                        : "bg-white/[0.04] text-muted-foreground border border-white/[0.04]"
+                    }`}
                   >
                     {tab.count}
                   </span>
@@ -254,38 +322,17 @@ export function FeaturesTabs({
 
       <div className="min-h-[500px] relative px-4">
         <AnimatePresence mode="wait">
-          {/* Section: Features Grid */}
+          {/* Section: Features Bento Grid */}
           {active === "features" && (
             <motion.div
               key="features-view"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 auto-rows-[minmax(180px,auto)]"
             >
               {FEATURES.map((feature, i) => (
-                <div
-                  key={i}
-                  className={`group bg-card p-6 md:p-10 rounded-3xl md:rounded-5xl border border-border shadow-[0_10px_30px_-15px_rgba(0,0,0,0.3),0_0_0_1px_rgba(255,255,255,0.05)] hover:border-primary/20 hover:shadow-[0_20px_50px_-20px_rgba(0,0,0,0.5),0_0_0_1px_rgba(255,255,255,0.1)] transition-all duration-500 relative overflow-hidden h-full flex flex-col ${i === 0 || i === 5 ? "lg:col-span-2" : ""
-                    }`}
-                >
-                  <div
-                    className={`h-12 w-12 rounded-xl ${feature.bg} flex items-center justify-center mb-8 group-hover:scale-105 transition-transform duration-300`}
-                  >
-                    <feature.icon className={`w-6 h-6 ${feature.color}`} />
-                  </div>
-                  <h3 className="text-lg font-semibold text-foreground mb-3 tracking-tight">
-                    {feature.title}
-                  </h3>
-                  <p className="text-muted-foreground text-[15px] leading-relaxed">
-                    {feature.description}
-                  </p>
-
-                  {/* Premium Accents */}
-                  <div className="absolute top-0 right-0 p-8 opacity-0 group-hover:opacity-100 transition-opacity duration-500 translate-x-4 group-hover:translate-x-0">
-                    <div className="h-1.5 w-1.5 rounded-full bg-primary/30" />
-                  </div>
-                </div>
+                <BentoCard key={i} feature={feature} index={i} />
               ))}
             </motion.div>
           )}
