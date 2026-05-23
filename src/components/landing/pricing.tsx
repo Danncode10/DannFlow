@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Check, ArrowUpRight } from "lucide-react";
+import { Typewriter } from "./typewriter";
 
 const PLANS = [
   {
@@ -83,7 +84,7 @@ export function Pricing({ isAuthed }: PricingProps) {
             Pricing
           </span>
           <h2 className="mt-6 text-4xl sm:text-5xl font-semibold text-foreground tracking-[-0.02em]">
-            Simple, <span className="gradient-text-primary italic font-medium">transparent</span> pricing
+            <Typewriter text="Simple, transparent pricing" speed={40} />
           </h2>
           <p className="mt-5 text-[15px] text-muted-foreground max-w-md mx-auto">
             Start free. Scale when you&apos;re ready.

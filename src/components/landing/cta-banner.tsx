@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { siteConfig } from "@/lib/config";
+import { Typewriter } from "./typewriter";
 
 interface CtaBannerProps {
   isAuthed: boolean;
@@ -40,10 +41,7 @@ export function CtaBanner({ isAuthed }: CtaBannerProps) {
           </span>
 
           <h2 className="mt-6 text-4xl sm:text-5xl md:text-6xl font-semibold text-foreground tracking-[-0.03em] leading-[1]">
-            Ready to build <br />
-            <span className="gradient-text-primary italic font-medium">
-              something great?
-            </span>
+            <Typewriter text="Ready to build something great?" speed={45} />
           </h2>
           <p className="mt-6 text-[15px] text-muted-foreground max-w-md mx-auto leading-relaxed">
             Join builders using {siteConfig.name} to ship websites, apps, and

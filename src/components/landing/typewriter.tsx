@@ -8,37 +8,53 @@ interface TypewriterProps {
   speed?: number; // ms per character
   delay?: number; // ms before typing starts (after coming into view)
   className?: string;
-  cursorClassName?: string;
   onComplete?: () => void;
 }
 
 /**
  * Character-by-character typing reveal triggered when scrolled into view.
- * GPU-friendly (only updates a single text node + cursor). The cursor
- * disappears once typing completes (no infinite animation cost after that).
+ *
+ * Layout-stable: the FULL text is always rendered (with the unshown
+ * portion at opacity 0), so word wrap is computed from the complete
+ * string from the very first frame. Characters fade in by toggling
+ * opacity rather than appearing/disappearing — no reflow during typing.
+ *
+ * Idempotent: a startedRef guard prevents Strict Mode (or parent
+ * re-renders that change onComplete identity) from restarting typing.
+ *
+ * Honors prefers-reduced-motion (jumps to complete state immediately).
  */
 export function Typewriter({
   text,
   speed = 35,
   delay = 0,
   className,
-  cursorClassName,
   onComplete,
 }: TypewriterProps) {
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, margin: "-40px" });
   const [shown, setShown] = useState(0);
+  const startedRef = useRef(false);
   const completedRef = useRef(false);
+
+  // Stash onComplete in a ref so it doesn't invalidate the typing effect
+  // when the parent re-renders (which would restart typing — bug).
+  const onCompleteRef = useRef(onComplete);
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  });
 
   useEffect(() => {
     if (!inView) return;
+    if (startedRef.current) return; // already started — Strict Mode guard
+    startedRef.current = true;
 
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce) {
       setShown(text.length);
       if (!completedRef.current) {
         completedRef.current = true;
-        onComplete?.();
+        onCompleteRef.current?.();
       }
       return;
     }
@@ -58,28 +74,38 @@ export function Typewriter({
         raf = requestAnimationFrame(tick);
       } else if (!completedRef.current) {
         completedRef.current = true;
-        onComplete?.();
+        onCompleteRef.current?.();
       }
     };
     raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [inView, text, speed, delay, onComplete]);
+
+    return () => {
+      cancelAnimationFrame(raf);
+    };
+  }, [inView, text, speed, delay]); // intentionally NOT depending on onComplete
 
   const done = shown >= text.length;
 
   return (
     <span ref={ref} className={className}>
+      {/* Revealed portion */}
       <span aria-hidden>{text.slice(0, shown)}</span>
-      {!done && (
-        <span
-          aria-hidden
-          className={
-            cursorClassName ??
-            "inline-block w-[0.08em] h-[0.85em] translate-y-[0.06em] ml-[0.04em] bg-primary blinking-cursor"
-          }
-        />
-      )}
-      {/* SR-only full text for accessibility */}
+
+      {/* Cursor — between visible and invisible text, sits at typing position.
+          Hidden via visibility (not unmounted) so width stays in the layout. */}
+      <span
+        aria-hidden
+        className={done ? "typewriter-cursor-done" : "typewriter-cursor"}
+        style={{ visibility: done ? "hidden" : "visible" }}
+      />
+
+      {/* Unrevealed portion at opacity 0 — reserves layout space so word wrap
+          is computed from the full string. Nothing reflows as chars reveal. */}
+      <span aria-hidden style={{ opacity: 0 }}>
+        {text.slice(shown)}
+      </span>
+
+      {/* Accessible full text for screen readers */}
       <span className="sr-only">{text}</span>
     </span>
   );

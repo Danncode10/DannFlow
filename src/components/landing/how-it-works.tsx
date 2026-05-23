@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { GitBranch, Sparkles, Rocket } from "lucide-react";
+import { Typewriter } from "./typewriter";
 
 const STEPS = [
   {
@@ -59,7 +60,7 @@ export function HowItWorks() {
             How it works
           </span>
           <h2 className="mt-6 text-4xl sm:text-5xl font-semibold text-foreground tracking-[-0.02em]">
-            Three steps to your <span className="gradient-text-primary italic font-medium">next project</span>
+            <Typewriter text="Three steps to your next project" speed={40} />
           </h2>
         </motion.div>
 

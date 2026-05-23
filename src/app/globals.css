@@ -135,14 +135,43 @@
   }
 }
 
-/* Blinking cursor for Typewriter — bounded by component lifetime
-   (cursor element unmounts when typing completes, so no infinite cost) */
+/* Blinking cursor for Typewriter — bounded by typing duration.
+   When typing completes the component swaps to .typewriter-cursor-done
+   which has no animation, so the keyframe stops consuming CPU. */
 @keyframes blink-cursor {
   0%, 50% { opacity: 1; }
   50.01%, 100% { opacity: 0; }
 }
-.blinking-cursor {
+.typewriter-cursor,
+.typewriter-cursor-done {
+  display: inline-block;
+  width: 0.08em;
+  height: 0.85em;
+  background: var(--color-primary);
+  vertical-align: baseline;
+  margin-left: 0.04em;
+  transform: translateY(0.08em);
+}
+.typewriter-cursor {
   animation: blink-cursor 0.8s steps(1) infinite;
+}
+
+/* Intro phase — the body gets .intro-active while the hero typewriter
+   is running. Lock scroll + blur all non-hero sections + footer so the
+   user's attention is focused on the typing reveal. */
+body.intro-active {
+  overflow: hidden;
+}
+body section:not(#home),
+body footer {
+  transition: filter 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+body.intro-active section:not(#home),
+body.intro-active footer {
+  filter: blur(8px);
+  opacity: 0.25;
+  pointer-events: none;
 }
 
 /* Respect user motion preferences */
