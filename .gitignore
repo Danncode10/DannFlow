@@ -54,6 +54,7 @@ next-env.d.ts
 .claude-flow/sessions/
 .claude-flow/metrics/
 .claude-flow/learning/
+.claude-flow/embeddings.json
 
 # Ruflo memory (local, session-specific, may contain sensitive context)
 .swarm/
