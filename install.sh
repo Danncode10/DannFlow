@@ -187,6 +187,21 @@ run_step "Skill: addyosmani/web-quality-skills (SEO)" \
 chmod +x guide.sh 2>/dev/null
 run_step "Initialize project (guide.sh init)" ./guide.sh init "$app_name"
 
+# ── 16. Add DannFlow upstream remote ──────────────────────────────────────────
+# guide.sh init wiped git history and recreated a fresh repo with no remotes.
+# Add the original DannFlow repo as `upstream` so users can later pull selective
+# updates via the /sync-upstream slash command (file-level diff, not merge).
+if [ -d .git ]; then
+    if git remote get-url upstream >/dev/null 2>&1; then
+        mark_skip "Add DannFlow upstream remote" "Already configured"
+    else
+        run_step "Add DannFlow upstream remote" \
+            git remote add upstream https://github.com/Danncode10/DannFlow.git
+    fi
+else
+    mark_skip "Add DannFlow upstream remote" "No .git directory found (guide.sh init may have failed)"
+fi
+
 # ── Summary ───────────────────────────────────────────────────────────────────
 echo ""
 echo -e "${BOLD}═══════════════════ Installation Summary ═══════════════════${NC}"
