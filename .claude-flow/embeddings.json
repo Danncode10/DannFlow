@@ -1,0 +1,18 @@
+{
+  "model": "Xenova/all-MiniLM-L6-v2",
+  "modelPath": "/Users/lesterdannlopez/Desktop/Dann Folder/MyProjects/Work/templates/business-template/.claude-flow/models",
+  "dimension": 384,
+  "cacheSize": 256,
+  "hyperbolic": {
+    "enabled": true,
+    "curvature": -1,
+    "epsilon": 1e-15,
+    "maxNorm": 0.99999
+  },
+  "neural": {
+    "enabled": true,
+    "driftThreshold": 0.3,
+    "decayRate": 0.01
+  },
+  "initialized": "2026-05-23T11:03:49.610Z"
+}
