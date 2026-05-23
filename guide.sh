@@ -1652,10 +1652,8 @@ show_init() {
     fi
 
     echo -e "\n${GREEN}Initialization complete!${NC} Your app is now named ${BOLD}$app_name${NC}."
-    echo -e "🚀 ${CYAN}Starting development server...${NC}"
-    echo -e "${YELLOW}Note: Configure your Supabase keys in .env.local to fix 'fetch failed' errors.${NC}\n"
-    
-    npm run dev
+    echo -e "${YELLOW}Note: Configure your Supabase keys in .env.local to fix 'fetch failed' errors.${NC}"
+    echo -e "When you're ready, start the dev server with: ${CYAN}npm run dev${NC}\n"
 }
 
 # Routing logic

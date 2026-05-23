@@ -50,13 +50,15 @@ run_step() {
     echo -e "${CYAN}${BOLD}[$STEP_NUM] ${name}${NC}"
     echo -e "${DIM}    \$ $*${NC}"
 
-    if "$@"; then
+    "$@"
+    local code=$?
+
+    if [ $code -eq 0 ]; then
         echo -e "  ${GREEN}✅ PASS — ${name}${NC}"
         PASS_COUNT=$((PASS_COUNT + 1))
         SUMMARY+=("${GREEN}✅${NC} [$STEP_NUM] $name")
         return 0
     fi
-    local code=$?
     echo -e "  ${RED}❌ FAIL — ${name} (exit $code)${NC}"
     echo -e "  ${YELLOW}↳ See output above for the actual error.${NC}"
     FAIL_COUNT=$((FAIL_COUNT + 1))
@@ -125,8 +127,12 @@ run_step "Install Ruflo globally (beta)" npm install -g ruflo@latest
 
 # ── 5. Register Ruflo MCP with Claude Code ────────────────────────────────────
 if command -v claude >/dev/null 2>&1; then
-    run_step "Register Ruflo MCP server with Claude Code" \
-        claude mcp add ruflo -- npx ruflo@latest mcp start
+    if claude mcp list 2>/dev/null | grep -q ruflo; then
+        mark_skip "Register Ruflo MCP server" "Already registered for this project scope"
+    else
+        run_step "Register Ruflo MCP server with Claude Code" \
+            claude mcp add ruflo -- npx ruflo@latest mcp start
+    fi
 else
     mark_skip "Register Ruflo MCP server" \
         "Claude Code CLI not found on PATH — run later: claude mcp add ruflo -- npx ruflo@latest mcp start"
