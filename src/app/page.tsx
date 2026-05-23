@@ -4,6 +4,7 @@ import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { FeaturesTabs } from "@/components/features-tabs";
 import { Hero } from "@/components/landing/hero";
+import { HowItWorks } from "@/components/landing/how-it-works";
 import { siteConfig, creatorRepos } from "@/lib/config";
 
 
@@ -52,58 +53,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* =============================
-          HOW IT WORKS SECTION
-          ============================= */}
-      <section id="how-it-works" className="bg-background border-t border-border">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-24">
-          <div className="text-center mb-16">
-            <span className="text-xs font-medium text-primary/70 tracking-wide">
-              How it works
-            </span>
-            <h2 className="mt-3 text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
-              Three steps to your next project
-            </h2>
-
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8">
-            {[
-              {
-                step: "01",
-                title: "Clone & Configure",
-                description:
-                  "Fork the repo, add your Supabase credentials to .env.local, and you are live in under 2 minutes.",
-              },
-              {
-                step: "02",
-                title: "Describe Your Vision",
-                description:
-                  "Use feature prompts in src/prompts/features/ to steer your AI. It reads your schema, types, and services automatically.",
-              },
-              {
-                step: "03",
-                title: "Ship & Scale",
-                description:
-                  "Deploy to Vercel with one click. Your checkpoint system ensures you can always roll back safely.",
-              },
-            ].map((item) => (
-              <div key={item.step} className="text-center md:text-left">
-                <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 border border-primary/20 text-primary text-sm font-bold mb-5 tabular-nums">
-                  {item.step}
-                </div>
-
-                <h3 className="text-xl font-semibold text-foreground mb-3">
-                  {item.title}
-                </h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  {item.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <HowItWorks />
 
       {/* =============================
           PRICING SECTION
