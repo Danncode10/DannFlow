@@ -23,7 +23,8 @@ const FEATURES = [
     description:
       "Auth, database, and real-time built in. Type-safe queries powered by auto-generated TypeScript definitions.",
     span: "lg:col-span-2 lg:row-span-2",
-    accent: "from-primary/20 via-primary/5 to-transparent",
+    // Paint-only radial corner glow — no filter:blur cost on scroll
+    glow: "radial-gradient(circle at 80% 20%, rgba(124,92,255,0.18), transparent 50%)",
   },
   {
     icon: Zap,
@@ -31,21 +32,21 @@ const FEATURES = [
     description:
       "Built for Vibe Coding. Describe what you want — your AI builds it using your typed services.",
     span: "lg:col-span-2",
-    accent: "from-amber-500/15 via-amber-500/5 to-transparent",
+    glow: "radial-gradient(circle at 80% 20%, rgba(245,158,11,0.15), transparent 50%)",
   },
   {
     icon: Shield,
     title: "Auth & RLS ready",
     description: "Login, signup, and role-based access out of the box.",
     span: "",
-    accent: "from-emerald-500/15 via-emerald-500/5 to-transparent",
+    glow: "radial-gradient(circle at 80% 20%, rgba(16,185,129,0.15), transparent 50%)",
   },
   {
     icon: Terminal,
     title: "Checkpoint system",
     description: "One command to snapshot your database. Instant rollback.",
     span: "",
-    accent: "from-orange-500/15 via-orange-500/5 to-transparent",
+    glow: "radial-gradient(circle at 80% 20%, rgba(249,115,22,0.15), transparent 50%)",
   },
   {
     icon: GitBranch,
@@ -53,7 +54,7 @@ const FEATURES = [
     description:
       "Clean commits, branch strategies, and AI-assisted reviews via GitHub MCP.",
     span: "lg:col-span-2",
-    accent: "from-violet-500/15 via-violet-500/5 to-transparent",
+    glow: "radial-gradient(circle at 80% 20%, rgba(139,92,246,0.15), transparent 50%)",
   },
   {
     icon: Layers,
@@ -61,7 +62,7 @@ const FEATURES = [
     description:
       "UI, services, types, prompts — each in its own lane.",
     span: "lg:col-span-2",
-    accent: "from-pink-500/15 via-pink-500/5 to-transparent",
+    glow: "radial-gradient(circle at 80% 20%, rgba(236,72,153,0.15), transparent 50%)",
   },
 ];
 
@@ -117,11 +118,12 @@ function BentoCard({
       />
 
       {/* Inner core — no backdrop-blur (perf) */}
-      <div className="relative h-full rounded-[calc(1.5rem-0.375rem)] bg-card p-7 md:p-8 flex flex-col">
-        {/* Accent gradient blob in card corner */}
+      <div className="relative h-full rounded-[calc(1.5rem-0.375rem)] bg-card p-7 md:p-8 flex flex-col overflow-hidden">
+        {/* Paint-only corner accent (no filter:blur cost) */}
         <div
           aria-hidden
-          className={`pointer-events-none absolute -top-12 -right-12 h-40 w-40 rounded-full bg-gradient-to-br ${feature.accent} blur-3xl opacity-70`}
+          className="pointer-events-none absolute inset-0"
+          style={{ background: feature.glow }}
         />
 
         <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-white/[0.04] border border-white/[0.06] mb-6 group-hover:bg-white/[0.06] transition-colors">

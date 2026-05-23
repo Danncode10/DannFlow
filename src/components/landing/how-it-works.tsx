@@ -11,7 +11,8 @@ const STEPS = [
     description:
       "Fork the repo, drop your Supabase credentials into .env.local, and you're live in under two minutes.",
     snippet: "git clone dannflow && npm i",
-    accent: "from-primary/30 via-primary/5 to-transparent",
+    // Paint-only radial gradient (no filter:blur cost during scroll)
+    glow: "radial-gradient(ellipse at 70% 50%, rgba(124,92,255,0.25), transparent 60%)",
   },
   {
     step: "02",
@@ -20,7 +21,7 @@ const STEPS = [
     description:
       "Use feature prompts in src/prompts/features/. Your AI reads schema, types, and services automatically.",
     snippet: "/new-feature lead-capture",
-    accent: "from-amber-500/30 via-amber-500/5 to-transparent",
+    glow: "radial-gradient(ellipse at 70% 50%, rgba(245,158,11,0.22), transparent 60%)",
   },
   {
     step: "03",
@@ -29,7 +30,7 @@ const STEPS = [
     description:
       "Deploy to Vercel with one click. Checkpoint system means you can always roll back safely.",
     snippet: "vercel deploy --prod",
-    accent: "from-emerald-500/30 via-emerald-500/5 to-transparent",
+    glow: "radial-gradient(ellipse at 70% 50%, rgba(16,185,129,0.22), transparent 60%)",
   },
 ];
 
@@ -105,10 +106,11 @@ export function HowItWorks() {
 
                 {/* Visual side — double-bezel terminal card */}
                 <div className="relative">
-                  {/* Glow behind card */}
+                  {/* Paint-only glow behind card (no filter:blur cost) */}
                   <div
                     aria-hidden
-                    className={`pointer-events-none absolute inset-0 rounded-3xl bg-gradient-to-br ${step.accent} blur-3xl opacity-60`}
+                    className="pointer-events-none absolute inset-0 rounded-3xl"
+                    style={{ background: step.glow }}
                   />
 
                   {/* Outer bezel */}

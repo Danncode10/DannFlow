@@ -12,23 +12,23 @@ export function Hero({ isAuthed }: HeroProps) {
   return (
     <section
       id="home"
-      className="relative overflow-hidden bg-background pt-12 pb-32 md:pt-20 md:pb-44"
+      className="relative overflow-hidden pt-12 pb-32 md:pt-20 md:pb-44"
+      style={{
+        // Single section-level radial gradient replaces the blurred orb.
+        // Pure paint, no filter:blur compositing — Chromium handles it cheaply.
+        background:
+          "radial-gradient(ellipse 600px 500px at 50% 0%, rgba(124,92,255,0.18), transparent 60%), var(--color-background)",
+      }}
     >
       {/* Static dot grid background */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 bg-grid opacity-50"
       />
-      {/* Paint-only radial fade — no mask-image cost on Chromium */}
+      {/* Paint-only radial fade */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 grid-fade-overlay"
-      />
-
-      {/* Single static ambient orb */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 h-[600px] w-[600px] rounded-full bg-primary/10 blur-[100px]"
       />
 
       <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 text-center">
@@ -81,7 +81,7 @@ export function Hero({ isAuthed }: HeroProps) {
           {/* Primary CTA with nested icon circle */}
           <a
             href={isAuthed ? "/dashboard" : "/login"}
-            className="group flex items-center gap-2 pl-6 pr-2 py-2 text-sm font-medium rounded-full bg-foreground text-background active:scale-[0.97] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] shadow-[0_4px_20px_rgba(124,92,255,0.25),inset_0_1px_0_rgba(255,255,255,0.2)] hover:shadow-[0_6px_24px_rgba(124,92,255,0.35),inset_0_1px_0_rgba(255,255,255,0.25)]"
+            className="group flex items-center gap-2 pl-6 pr-2 py-2 text-sm font-medium rounded-full bg-foreground text-background active:scale-[0.97] transition-transform duration-200 shadow-[0_4px_20px_rgba(124,92,255,0.3),inset_0_1px_0_rgba(255,255,255,0.2)]"
           >
             Get started free
             <span className="flex h-8 w-8 items-center justify-center rounded-full bg-background/10 group-hover:bg-background/20 group-hover:translate-x-0.5 group-hover:-translate-y-[1px] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]">
@@ -118,8 +118,8 @@ export function Hero({ isAuthed }: HeroProps) {
           transition={{ duration: 0.7, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
           className="relative mt-20 mx-auto max-w-5xl"
         >
-          {/* Outer bezel */}
-          <div className="relative p-1.5 rounded-[2rem] bg-gradient-to-b from-white/[0.08] to-white/[0.02] border border-white/[0.06] shadow-[0_24px_80px_-20px_rgba(124,92,255,0.3),0_0_0_1px_rgba(255,255,255,0.04)]">
+          {/* Outer bezel — smaller shadow spread (was 80px causing scroll paint cost) */}
+          <div className="relative p-1.5 rounded-[2rem] bg-gradient-to-b from-white/[0.08] to-white/[0.02] border border-white/[0.06] shadow-[0_12px_40px_-12px_rgba(0,0,0,0.6),0_0_0_1px_rgba(255,255,255,0.04)]">
             {/* Inner core */}
             <div className="relative rounded-[calc(2rem-0.375rem)] bg-card overflow-hidden border border-white/[0.04] inner-highlight">
               {/* Top bar — fake window chrome */}
