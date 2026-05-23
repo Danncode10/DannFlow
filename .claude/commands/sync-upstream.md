@@ -63,9 +63,6 @@ CLAUDE.md
 AGENTS.md
 PROJECT_CONTEXT.md
 guide.sh
-install.sh
-install-add.sh
-install.ps1
 docs/dannflow_docs/
 scripts/
 src/prompts/features/
