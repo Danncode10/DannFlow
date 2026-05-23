@@ -82,7 +82,7 @@ export function Pricing({ isAuthed }: PricingProps) {
             Simple, <span className="gradient-text-primary italic font-medium">transparent</span> pricing
           </h2>
           <p className="mt-5 text-[15px] text-muted-foreground max-w-md mx-auto">
-            Start free. Scale when you're ready.
+            Start free. Scale when you&apos;re ready.
           </p>
         </motion.div>
 

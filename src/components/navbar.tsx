@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
 import { siteConfig } from "@/lib/config";
 import { signOut } from "@/services/auth";
 import { useRouter } from "next/navigation";
@@ -65,7 +66,7 @@ export function Navbar({ user }: { user: User | null }) {
           }`}
         >
           {/* Logo */}
-          <a
+          <Link
             href="/#home"
             className="group flex items-center gap-2 pl-3 pr-4 py-1.5 rounded-full hover:bg-white/[0.03] transition-colors"
           >
@@ -75,7 +76,7 @@ export function Navbar({ user }: { user: User | null }) {
             <span className="text-sm font-semibold tracking-tight text-foreground">
               {siteConfig.name}
             </span>
-          </a>
+          </Link>
 
           {/* Desktop nav */}
           <nav className="hidden md:flex items-center">
