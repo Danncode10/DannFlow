@@ -89,11 +89,19 @@ export function Hero({ isAuthed }: HeroProps) {
           />
         </h1>
 
-        {/* Subtitle — appears after typing finishes */}
+        {/* Subtitle — visible but blurred during typing, clears after */}
         <motion.p
-          initial={{ opacity: 0, y: 16 }}
-          animate={typingDone ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
-          transition={{ duration: 0.6, delay: 0.05, ease: [0.34, 1.4, 0.64, 1] }}
+          initial={{ opacity: 0.35, filter: "blur(10px)" }}
+          animate={
+            typingDone
+              ? { opacity: 1, filter: "blur(0px)" }
+              : { opacity: 0.35, filter: "blur(10px)" }
+          }
+          transition={{
+            duration: 0.8,
+            delay: typingDone ? 0.05 : 0,
+            ease: [0.16, 1, 0.3, 1],
+          }}
           className="mt-8 max-w-xl text-[17px] text-muted-foreground leading-relaxed"
         >
           A production-grade Next.js + Supabase template with multi-tenant
@@ -101,11 +109,19 @@ export function Hero({ isAuthed }: HeroProps) {
           natural language into shipped features.
         </motion.p>
 
-        {/* CTAs — pops in after typing finishes (slight cascade after subtitle) */}
+        {/* CTAs — visible but blurred during typing, pops in after */}
         <motion.div
-          initial={{ opacity: 0, y: 18 }}
-          animate={typingDone ? { opacity: 1, y: 0 } : { opacity: 0, y: 18 }}
-          transition={{ duration: 0.6, delay: 0.2, ease: [0.34, 1.4, 0.64, 1] }}
+          initial={{ opacity: 0.35, filter: "blur(10px)" }}
+          animate={
+            typingDone
+              ? { opacity: 1, filter: "blur(0px)" }
+              : { opacity: 0.35, filter: "blur(10px)" }
+          }
+          transition={{
+            duration: 0.8,
+            delay: typingDone ? 0.18 : 0,
+            ease: [0.16, 1, 0.3, 1],
+          }}
           className="mt-10 flex flex-col sm:flex-row items-start sm:items-center gap-5 sm:gap-7"
         >
           <MagneticCTA href={isAuthed ? "/dashboard" : "/login"}>
@@ -126,11 +142,19 @@ export function Hero({ isAuthed }: HeroProps) {
           </a>
         </motion.div>
 
-        {/* Customer logo strip — cascades in after typing */}
+        {/* Customer logo strip — blurred during typing, clears after */}
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={typingDone ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
-          transition={{ duration: 0.6, delay: 0.35, ease: [0.34, 1.4, 0.64, 1] }}
+          initial={{ opacity: 0.3, filter: "blur(10px)" }}
+          animate={
+            typingDone
+              ? { opacity: 1, filter: "blur(0px)" }
+              : { opacity: 0.3, filter: "blur(10px)" }
+          }
+          transition={{
+            duration: 0.8,
+            delay: typingDone ? 0.32 : 0,
+            ease: [0.16, 1, 0.3, 1],
+          }}
           className="mt-16 flex flex-col gap-5"
         >
           <p className="text-[11px] font-mono uppercase tracking-[0.2em] text-muted-foreground/60">
@@ -156,11 +180,19 @@ export function Hero({ isAuthed }: HeroProps) {
           </div>
         </motion.div>
 
-        {/* Product preview — final element in the cascade */}
+        {/* Product preview — blurred during typing, fully revealed after */}
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={typingDone ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
-          transition={{ duration: 0.85, delay: 0.55, ease: [0.34, 1.3, 0.64, 1] }}
+          initial={{ opacity: 0.2, filter: "blur(14px)" }}
+          animate={
+            typingDone
+              ? { opacity: 1, filter: "blur(0px)" }
+              : { opacity: 0.2, filter: "blur(14px)" }
+          }
+          transition={{
+            duration: 1.0,
+            delay: typingDone ? 0.5 : 0,
+            ease: [0.34, 1.3, 0.64, 1],
+          }}
           className="relative mt-24"
           style={{ perspective: "1500px" }}
         >

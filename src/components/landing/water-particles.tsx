@@ -139,19 +139,19 @@ export function WaterParticles({ active, count = 120 }: WaterParticlesProps) {
           }
         }
 
-        // Ambient drift — small random impulse each frame keeps particles
-        // visibly moving even without any mouse input
-        p.vx += (Math.random() - 0.5) * 0.025;
-        p.vy += (Math.random() - 0.5) * 0.025;
-        p.angle += (Math.random() - 0.5) * 0.012;
+        // Ambient drift — medium impulse each frame so particles drift
+        // visibly even with no mouse activity
+        p.vx += (Math.random() - 0.5) * 0.1;
+        p.vy += (Math.random() - 0.5) * 0.1;
+        p.angle += (Math.random() - 0.5) * 0.03;
 
-        // Gentle attraction back to base position — water settling
-        p.vx += (p.baseX - p.x) * 0.0012;
-        p.vy += (p.baseY - p.y) * 0.0012;
+        // Very gentle spring back toward base position
+        p.vx += (p.baseX - p.x) * 0.0005;
+        p.vy += (p.baseY - p.y) * 0.0005;
 
-        // Damping (viscosity) — reduced so ambient drift stays visible
-        p.vx *= 0.97;
-        p.vy *= 0.97;
+        // Damping — light so ambient drift stays visible
+        p.vx *= 0.98;
+        p.vy *= 0.98;
 
         p.x += p.vx;
         p.y += p.vy;
