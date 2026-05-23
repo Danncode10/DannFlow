@@ -1,19 +1,25 @@
-# CLAUDE.md — DannFlow
+# CLAUDE.md — Business Template (Built on DannFlow)
 
 > **Start here.** This file is Claude Code's authoritative config for this project. Read it before doing anything.
 
-## What is DannFlow?
+## What is the Business Template?
 
-A Next.js 15 + Supabase starter optimized for **Vibe Coding** — an AI-native dev workflow where the agent stays in sync with the live database via a "Zero-Hallucination" loop:
+A multi-tenant client website platform built on DannFlow — optimized for **Vibe Coding** (AI-native dev workflow) with a Zero-Hallucination loop:
 
 ```
 npm run checkpoint   →  snapshot live schema (RLS, triggers, enums) to supabase/backups/
 npm run update-types →  regenerate src/types/supabase.ts from the live schema
 ```
 
-The agent reads those two artifacts before touching code, so it never guesses schema shape.
+**Architecture:** One shared Supabase database serving all clients via Row Level Security. Each client = one `organization_id` with complete data isolation. One Next.js codebase, separate Vercel deployment per client.
 
-For the full marketing/setup story, see [README.md](README.md). For deeper docs, see [docs/dannflow_docs/](docs/dannflow_docs/).
+**Three core pillars:** (1) Public landing pages with blog, (2) SEO layer with editable meta/JSON-LD, (3) Admin dashboard for site editing, lead inbox, CMS, settings, team roles.
+
+**Pluggable verticals:** Restaurant, service business, retail, real estate, education — add modules as needed per client.
+
+The agent reads checkpoint + types before touching code, so it never guesses schema shape or tenant boundaries.
+
+For the full story, see [README.md](README.md). For deeper docs, see [docs/dannflow_docs/](docs/dannflow_docs/).
 
 ## Tech stack
 
@@ -34,7 +40,7 @@ src/
 ├── components/         # UI components (Shadcn-based)
 ├── services/           # ⚡ ALL business logic + Supabase queries live here
 ├── lib/
-│   └── config.ts       # siteConfig + creatorRepos (central config)
+│   └── config.ts       # siteConfig (central config)
 ├── types/
 │   └── supabase.ts     # 👁️ AUTO-GENERATED — never edit manually
 └── utils/
@@ -44,6 +50,17 @@ supabase/
 └── backups/            # 📋 Timestamped DDL snapshots from npm run checkpoint
 ```
 
+**Core schema** (multi-tenant):
+- `organizations` — clients (tenants), each with unique `id` used as RLS boundary
+- `pages` — landing page sections (hero, about, services, pricing, contact, blog)
+- `sections` — editable content blocks (title, description, CTA, images)
+- `blog_posts` — blog articles with SEO controls (title, slug, meta, content)
+- `media` — images + files (offloaded to Cloudinary/R2)
+- `leads` — form submissions + inquiry tracking
+- `site_settings` — org-level config (logo, colors, NAP, hours, socials)
+- `team_members` — users + roles per org
+- `audit_log` — change tracking (who, what, when)
+
 ## Architectural guardrails (non-negotiable)
 
 1. **Separation of concerns** — UI components MUST NOT contain DB logic or direct API calls.
@@ -52,9 +69,30 @@ supabase/
 4. **Server-first** — Default to Server Components. Only use `'use client'` when you need state, events, or browser APIs.
 5. **Feature blueprints** — Before scaffolding a new feature, check `src/prompts/features/` for an existing blueprint.
 
-## RLS security constraint
+## RLS security constraint (CRITICAL — Multi-Tenant)
 
-Assume **Row Level Security is active on every table.** Every `select`/`update`/`delete` in `src/services/` MUST include `.eq('id', userId)` (or equivalent ownership filter) unless it's an explicitly public endpoint. Skipping this is a security vulnerability, not a style issue.
+Assume **Row Level Security is active on every table.** This is a SECURITY BOUNDARY between clients.
+
+Every `select`/`update`/`delete` in `src/services/` MUST include:
+- `.eq('organization_id', tenantId)` (tenant isolation), OR
+- `.eq('user_id', userId)` (within a tenant, user ownership)
+
+Examples:
+```ts
+// ✅ Correct — filters by org
+const pages = await supabase
+  .from('pages')
+  .select('*')
+  .eq('organization_id', tenantId)
+
+// ❌ WRONG — leaks data to other clients
+const pages = await supabase
+  .from('pages')
+  .select('*')
+  // Missing tenant filter!
+```
+
+**NEVER skip the tenant filter**, even if "it's just a query." One bad policy leaks client data across the entire database. This is a SECURITY VULNERABILITY, not a style issue.
 
 ## UI quality standards
 
@@ -77,12 +115,13 @@ Use ONLY Tailwind/Shadcn semantic tokens. **Stating hex codes, `rgba()`, or hard
 
 Theme variables live in `src/app/globals.css` under `@theme`.
 
-## Supabase workflow (MCP-driven)
+## Supabase workflow (MCP-driven, Multi-Tenant)
 
 1. **Live schema first** — use the Supabase MCP to query tables/types/RLS before assuming structure.
 2. **Schema changes** — apply migrations via MCP (`apply_migration`), not manual SQL entry.
 3. **Sync types** — after any schema change, run `npm run update-types` to refresh `src/types/supabase.ts`.
 4. **Checkpoint first** — before destructive schema changes, run `npm run checkpoint` to snapshot.
+5. **RLS audits** — after adding a new table, verify RLS policies enforce `organization_id` filters. Use `/rls-check` before merging.
 
 ### Checkpoint protocol
 When the user runs `npm run checkpoint` and provides the generated prompt:
@@ -90,13 +129,20 @@ When the user runs `npm run checkpoint` and provides the generated prompt:
 2. Read live schema (tables, enums, RLS policies, triggers, functions) for the specified project ID.
 3. Generate full DDL and save it to the timestamped `.sql` file in `supabase/backups/`.
 
-### Project provisioning
-When asked to create a new Supabase project + apply schema:
-1. `list_organizations` → let user choose.
-2. Ask for Project Name and Organization ID.
-3. `get_cost` → `confirm_cost` BEFORE `create_project`.
-4. After init, read latest backup from `supabase/backups/` and apply via `apply_migration`.
-5. **Mandatory verification**: list tables and functions in `public` schema. Confirm `profiles` table and `handle_new_user` function exist. Do not report success until verified.
+### Schema design for multi-tenancy
+When designing new tables:
+1. **Always add** `organization_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE`
+2. **Always create** RLS policies enforcing `.eq('organization_id', auth.jwt() ->> 'organization_id')`
+3. **Test** the policy with `/rls <table-name>` to confirm it blocks cross-tenant reads
+4. For user-level ownership, also add `user_id UUID NOT NULL REFERENCES auth.users(id)` + RLS enforcing both filters
+
+### Tenant migrations (client upgrade)
+When a client outgrows the shared tier and moves to their own Supabase:
+1. **Export**: run `npm run checkpoint` for the shared DB
+2. **Filter**: extract DDL + data for just that organization_id
+3. **Import**: apply to the client's new Supabase project
+4. Update env vars (`NEXT_PUBLIC_SUPABASE_URL`, keys) to point to their Supabase
+5. No code changes needed — RLS policies automatically apply to their isolated DB
 
 ## Required MCP tools
 
