@@ -13,9 +13,9 @@
 # Fix: save ourselves to a temp file and re-execute with a real stdin.
 if [ -z "$INSTALL_RUNNING" ]; then
     export INSTALL_RUNNING=1
-    SELF_TMP=$(mktemp /tmp/dannflow-install-XXXX.sh)
+    SELF_TMP=$(mktemp -t dannflow-install 2>/dev/null) || SELF_TMP="/tmp/dannflow-install-$$-$RANDOM.sh"
     cat > "$SELF_TMP"
-    bash "$SELF_TMP"
+    bash "$SELF_TMP" < /dev/tty
     EXIT_CODE=$?
     rm -f "$SELF_TMP"
     exit $EXIT_CODE
