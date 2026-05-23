@@ -109,7 +109,8 @@ export function Hero({ isAuthed }: HeroProps) {
           <p className="text-[11px] font-mono uppercase tracking-[0.2em] text-muted-foreground/60">
             Built for teams shipping production software
           </p>
-          <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
+          {/* Grid (not flex) for universal gap support across browsers */}
+          <div className="grid grid-cols-3 sm:grid-cols-6 gap-x-8 gap-y-4 max-w-2xl">
             {[
               "Vercel",
               "Supabase",
@@ -120,7 +121,7 @@ export function Hero({ isAuthed }: HeroProps) {
             ].map((logo) => (
               <span
                 key={logo}
-                className="text-[15px] font-semibold tracking-tight text-foreground/40 hover:text-foreground/70 transition-colors duration-300 cursor-default"
+                className="text-[15px] font-semibold tracking-tight text-foreground/40 hover:text-foreground/70 transition-colors duration-300 cursor-default text-center sm:text-left"
               >
                 {logo}
               </span>
