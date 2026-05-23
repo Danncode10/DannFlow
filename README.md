@@ -1,16 +1,76 @@
-# 🚀 DannFlow (2026 Edition)
+# 🚀 Business Template (Built on DannFlow)
 
-**The Claude Code-Optimized SaaS Starter.** DannFlow is built specifically for AI-assisted development with Claude Code, Cursor, or Antigravity using Next.js 16+ & Supabase. It enforces a **Zero-Hallucination methodology** via `npm run checkpoint` and `update-types`—forcing your AI agent to always work from a live snapshot of your database schema, RLS policies, and TypeScript types. 
+**A reusable client website template for web commissions.** This template is built on top of DannFlow—the Claude Code-optimized SaaS starter—and adds a multi-tenant architecture, SEO-first design, and a site management system for running client websites at scale.
 
-With 17 built-in slash commands, a daily Vibe Coding loop, and an intelligent `./guide.sh` CLI optimized for Claude developers, DannFlow moves you from a blank terminal to a production-ready SaaS in minutes—with your AI staying in perfect sync the entire way.
+Each client gets an isolated site (via Row Level Security) served from a shared Supabase database. All sites share the same Next.js codebase; you fork this template once, customize it, and deploy one Vercel app per client. When clients outgrow the shared tier, swap them to their own Supabase via environment variables.
 
-> **Built for Speed. Structured for Agents. Optimized for the Vibe.**
+**Start at ~80% done:** landing pages, blog CMS, lead inbox, admin dashboard, SEO controls, and pluggable vertical modules (restaurant menus, service booking, retail checkout, real estate listings, courses).
+
+> **For commissions. For speed. Built on DannFlow's Zero-Hallucination methodology.**
 
 
 [![Next.js](https://img.shields.io/badge/Next.js-16+-black?logo=next.js)](https://nextjs.org)
 [![Supabase](https://img.shields.io/badge/Supabase-Auth%20%26%20DB-3ECF8E?logo=supabase)](https://supabase.com)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-06B6D4?logo=tailwindcss)](https://tailwindcss.com)
 [![Vercel](https://img.shields.io/badge/Deploy-Vercel-black?logo=vercel)](https://vercel.com)
+
+---
+
+## 🏗️ Architecture at a Glance
+
+### Multi-Tenant Model
+- **One shared Supabase project** (free tier) serving all client sites via Row Level Security
+- **One `organization_id` per client** — data isolation enforced at the RLS policy layer
+- **Separate Vercel deployment per client** — all apps point to the same Supabase, allowing per-client code flexibility
+- **Migration path:** When a client outgrows the free tier, swap them to their own Supabase via env vars (zero code changes)
+
+### Three Core Pillars
+
+**1. Public Landing Page**
+- Hero, about, services/products, pricing, portfolio, testimonials, FAQ
+- Contact form + business hours/location widget
+- Blog with SEO controls per post
+
+**2. SEO Layer**
+- Editable meta/OG tags per page
+- JSON-LD structured data (LocalBusiness, Organization, etc.)
+- Auto-generated sitemap + robots.txt
+- Alt text enforcement on images
+- Core Web Vitals monitoring integration
+- Local SEO features for Philippines-based businesses
+
+**3. Admin Management System**
+- **Site Editor** — edit landing page sections without code (hero copy, images, pricing)
+- **Lead Inbox** — capture form submissions with status tracking
+- **Blog CMS** — write + publish + schedule posts
+- **Media Library** — image upload (backed by Cloudinary/R2 for scale)
+- **Site Settings** — logo, colors, NAP data, social links, business hours
+- **Per-Page SEO Controls** — title, description, OG image, keywords
+- **Team & Roles** — manage who can edit what
+- **Analytics Embed** — view traffic from your dashboard
+- **Audit Log** — track who changed what and when
+
+### Pluggable Vertical Modules (Add as Needed)
+Choose modules based on client type—each adds 1-2 tables + components:
+- **Restaurant** — menu management, reservations, hours
+- **Service Business** — booking calendar, service listings, packages
+- **Retail** — product cart, checkout, inventory
+- **Real Estate** — property listings, inquiry capture, map integration
+- **Education** — course catalog, enrollment, progress tracking
+
+### ⚠️ Key Risks & Constraints
+
+- **RLS discipline is non-negotiable** — one bad policy leaks client data across tenants. Every `SELECT`/`UPDATE`/`DELETE` must include the tenant filter.
+- **Supabase free tier storage fills fast** — offload media to Cloudinary/R2 early to avoid billing surprises.
+- **Noisy neighbor risk** — one client running expensive queries can slow other clients. Monitor and add query indices proactively.
+- **Tenant migrations** — when a client outgrows shared hosting, you need a tenant-export script to safely move their data to their own Supabase.
+
+### 📋 Next Planning Steps
+
+Choose what to lock down first:
+1. **Multi-tenancy model** — Option A (all shared Supabase) vs Option B (per-client Supabase on billing upgrade)
+2. **Core schema** — Design `organizations`, `pages`, `sections`, `blog_posts`, `media`, `leads`, `site_settings`, + any vertical-specific tables
+3. **Vertical specialization** — Pick the first vertical to build (restaurant, service, retail, real estate, or education) and design its schema
 
 ---
 
