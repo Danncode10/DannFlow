@@ -98,107 +98,20 @@ read -p "Enter your App Name [My DannFlow App]: " app_name < /dev/tty
 app_name=${app_name:-"My DannFlow App"}
 folder_name=$(echo "$app_name" | tr '[:upper:]' '[:lower:]' | sed 's/ /-/g' | sed 's/[^a-z0-9-]//g')
 
-# ── 0a. Visibility mode (public fork vs private mirror) ───────────────────────
-# DannFlow upstream is PUBLIC. GitHub does not allow forking a public repo as
-# private, so we offer two paths:
-#   public  → `gh repo fork` (real fork, Network graph link, "forked from" label)
-#   private → bare-clone + mirror push to a new private repo (history preserved,
-#             but no GitHub fork relationship — /sync-upstream still works)
-echo ""
-echo -e "${BOLD}Project visibility:${NC}"
-echo -e "  ${CYAN}1)${NC} Public   ${DIM}(real fork via gh CLI — appears in DannFlow's Network graph)${NC}"
-echo -e "  ${CYAN}2)${NC} Private  ${DIM}(mirror copy — no fork link, but /sync-upstream still works)${NC}"
-read -p "Pick [1]: " visibility_choice < /dev/tty
-visibility_choice=${visibility_choice:-1}
-if [ "$visibility_choice" = "2" ] || [ "$visibility_choice" = "private" ]; then
-    VISIBILITY="private"
-else
-    VISIBILITY="public"
-fi
-echo -e "${CYAN}→ Mode: ${BOLD}$VISIBILITY${NC}"
+echo -e "\n🚀 ${CYAN}Creating ${BOLD}$app_name${NC}${CYAN} in ${BOLD}$folder_name${NC}${CYAN}...${NC}"
 
-# ── 0b. Verify gh CLI is installed (required for both paths) ──────────────────
-if ! command -v gh >/dev/null 2>&1; then
-    echo ""
-    echo -e "${RED}${BOLD}❌ GitHub CLI (gh) is required but not installed.${NC}"
-    echo -e "${YELLOW}Install it first:${NC}"
-    echo -e "  macOS:   ${CYAN}brew install gh${NC}"
-    echo -e "  Linux:   see ${CYAN}https://github.com/cli/cli/blob/trunk/docs/install_linux.md${NC}"
-    echo -e "  Windows: ${CYAN}winget install --id GitHub.cli${NC}"
-    echo -e "\nThen run: ${CYAN}gh auth login${NC} and re-run this installer.\n"
+# ── 1. Clone DannFlow ─────────────────────────────────────────────────────────
+UPSTREAM_URL="https://github.com/Danncode10/DannFlow.git"
+
+run_step "Clone DannFlow repository" git clone "$UPSTREAM_URL" "$folder_name"
+if [ $? -ne 0 ]; then
+    echo -e "\n${RED}${BOLD}Fatal: clone failed. Cannot continue.${NC}"
     exit 1
 fi
+cd "$folder_name" || { echo -e "${RED}Cannot cd into $folder_name${NC}"; exit 1; }
 
-if ! gh auth status >/dev/null 2>&1; then
-    echo ""
-    echo -e "${RED}${BOLD}❌ gh CLI is not authenticated.${NC}"
-    echo -e "${YELLOW}Run:${NC} ${CYAN}gh auth login${NC} and re-run this installer.\n"
-    exit 1
-fi
-
-echo -e "\n🚀 ${CYAN}Creating ${BOLD}$app_name${NC}${CYAN} in ${BOLD}$folder_name${NC}${CYAN} (${VISIBILITY})...${NC}"
-
-# ── 1. Create local working copy from DannFlow ────────────────────────────────
-# PUBLIC path: gh repo fork — real fork, both remotes auto-configured
-# PRIVATE path: gh repo create --private + bare-clone mirror push
-UPSTREAM_REPO="Danncode10/DannFlow"
-UPSTREAM_URL="https://github.com/${UPSTREAM_REPO}.git"
-
-if [ "$VISIBILITY" = "public" ]; then
-    run_step "Fork DannFlow to your GitHub account and clone" \
-        gh repo fork "$UPSTREAM_REPO" \
-            --clone \
-            --fork-name="$folder_name" \
-            --remote-name=upstream
-    fork_exit=$?
-    if [ $fork_exit -ne 0 ]; then
-        echo -e "\n${RED}${BOLD}Fatal: fork/clone failed. Cannot continue.${NC}"
-        exit 1
-    fi
-    cd "$folder_name" || { echo -e "${RED}Cannot cd into $folder_name${NC}"; exit 1; }
-else
-    # PRIVATE path
-    GH_USER=$(gh api user --jq .login)
-    if [ -z "$GH_USER" ]; then
-        echo -e "${RED}Could not resolve your GitHub username via gh CLI.${NC}"
-        exit 1
-    fi
-    TARGET_REPO="${GH_USER}/${folder_name}"
-
-    run_step "Create private repo ${TARGET_REPO} on GitHub" \
-        gh repo create "$TARGET_REPO" --private --description "Private fork of DannFlow ($app_name)"
-
-    # Bare-clone DannFlow and mirror-push to the new private repo
-    BARE_DIR="/tmp/dannflow-bare-$$"
-    run_step "Bare-clone DannFlow (preserves full history)" \
-        git clone --bare "$UPSTREAM_URL" "$BARE_DIR"
-
-    (cd "$BARE_DIR" && git push --mirror "https://github.com/${TARGET_REPO}.git")
-    mirror_exit=$?
-    STEP_NUM=$((STEP_NUM + 1))
-    if [ $mirror_exit -eq 0 ]; then
-        echo -e "  ${GREEN}✅ PASS — Mirror-push DannFlow history into ${TARGET_REPO}${NC}"
-        PASS_COUNT=$((PASS_COUNT + 1))
-        SUMMARY+=("${GREEN}✅${NC} [$STEP_NUM] Mirror-push DannFlow history into ${TARGET_REPO}")
-    else
-        echo -e "  ${RED}❌ FAIL — Mirror-push (exit $mirror_exit)${NC}"
-        FAIL_COUNT=$((FAIL_COUNT + 1))
-        FAILED_STEPS+=("[$STEP_NUM] Mirror-push (exit $mirror_exit)")
-        SUMMARY+=("${RED}❌${NC} [$STEP_NUM] Mirror-push (exit $mirror_exit)")
-        rm -rf "$BARE_DIR"
-        exit 1
-    fi
-    rm -rf "$BARE_DIR"
-
-    # Clone the new private repo locally as the working copy
-    run_step "Clone your new private repo locally" \
-        git clone "https://github.com/${TARGET_REPO}.git" "$folder_name"
-    cd "$folder_name" || { echo -e "${RED}Cannot cd into $folder_name${NC}"; exit 1; }
-
-    # Add DannFlow as upstream remote (gh fork did this automatically in public path)
-    run_step "Add DannFlow as upstream remote" \
-        git remote add upstream "$UPSTREAM_URL"
-fi
+# Add upstream remote so /sync-upstream works
+git remote rename origin upstream 2>/dev/null || true
 
 # Remove installer scripts from the new project to avoid clutter
 rm -f install.sh install.ps1 install-add.sh
@@ -279,9 +192,6 @@ chmod +x guide.sh 2>/dev/null
 run_step "Initialize project (guide.sh init)" ./guide.sh init "$app_name"
 
 # ── 16. Verify upstream remote is configured ──────────────────────────────────
-# `gh repo fork` (public path) auto-configures upstream. Private path does it
-# manually in step 1. This step just verifies the result so we fail loudly if
-# something went wrong earlier.
 if git remote get-url upstream >/dev/null 2>&1; then
     STEP_NUM=$((STEP_NUM + 1))
     UPSTREAM_URL_CHECK=$(git remote get-url upstream)
