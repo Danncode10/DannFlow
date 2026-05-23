@@ -1631,13 +1631,30 @@ show_init() {
         echo -e "✅ Updated ${CYAN}src/lib/config.ts${NC} name fallback"
     fi
 
-    # 4. Reset Git History
-    echo -e "📦 ${YELLOW}Resetting Git History...${NC}"
-    rm -rf .git
-    git init > /dev/null
-    git add .
-    git commit -m "DannFlow: Initialized fresh repository and rebranded project" > /dev/null
-    echo -e "✅ Git history reset and project initialized"
+    # 4. Commit rebrand on top of existing history
+    # NOTE: We intentionally KEEP DannFlow's git history so that:
+    #   - GitHub fork relationship survives (Network graph, "forked from" label)
+    #   - /sync-upstream has a real common ancestor for accurate diffs
+    #   - Provenance and attribution are preserved
+    # If you want a clean-slate repo instead, run: rm -rf .git && git init && git add . && git commit -m "init"
+    echo -e "📦 ${YELLOW}Committing rebrand on top of upstream history...${NC}"
+    if [ -d .git ]; then
+        # Stage only the rebrand-touched files (avoid sweeping in user changes)
+        git add package.json src/lib/config.ts .env.local 2>/dev/null || true
+        if ! git diff --cached --quiet 2>/dev/null; then
+            git commit -m "chore: rebrand project to $app_name" > /dev/null
+            echo -e "✅ Rebrand commit added (DannFlow history preserved)"
+        else
+            echo -e "ℹ️  No rebrand changes to commit (already aligned)"
+        fi
+    else
+        # No git directory at all — initialize one as a fallback so downstream tooling works
+        echo -e "${YELLOW}⚠️  No .git directory found — initializing fresh repo as fallback${NC}"
+        git init > /dev/null
+        git add .
+        git commit -m "chore: initialize $app_name" > /dev/null
+        echo -e "✅ Fresh git repo initialized"
+    fi
 
     # 5. Rename Folder (Last step)
     current_dir_name=$(basename "$PWD")
