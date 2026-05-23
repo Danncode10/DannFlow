@@ -73,13 +73,21 @@ function BentoCard({
   index: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const frameRef = useRef<number | null>(null);
 
   const handleMove = (e: MouseEvent<HTMLDivElement>) => {
     const el = ref.current;
     if (!el) return;
-    const rect = el.getBoundingClientRect();
-    el.style.setProperty("--x", `${e.clientX - rect.left}px`);
-    el.style.setProperty("--y", `${e.clientY - rect.top}px`);
+    if (frameRef.current !== null) return; // already a frame queued — skip
+    const clientX = e.clientX;
+    const clientY = e.clientY;
+    frameRef.current = requestAnimationFrame(() => {
+      frameRef.current = null;
+      if (!ref.current) return;
+      const rect = ref.current.getBoundingClientRect();
+      ref.current.style.setProperty("--x", `${clientX - rect.left}px`);
+      ref.current.style.setProperty("--y", `${clientY - rect.top}px`);
+    });
   };
 
   const Icon = feature.icon;

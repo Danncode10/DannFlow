@@ -6,7 +6,11 @@ export function Footer() {
       {/* Subtle background grid */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-grid-sm mask-vertical-fade opacity-30"
+        className="pointer-events-none absolute inset-0 bg-grid-sm opacity-30"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 grid-fade-overlay-v"
       />
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">

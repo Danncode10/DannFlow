@@ -63,7 +63,11 @@ export function Pricing({ isAuthed }: PricingProps) {
       {/* Background dot grid */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-grid-sm mask-radial-fade opacity-50"
+        className="pointer-events-none absolute inset-0 bg-grid-sm opacity-50"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 grid-fade-overlay"
       />
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-32">

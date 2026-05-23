@@ -17,7 +17,12 @@ export function Hero({ isAuthed }: HeroProps) {
       {/* Static dot grid background */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-grid mask-radial-fade opacity-50"
+        className="pointer-events-none absolute inset-0 bg-grid opacity-50"
+      />
+      {/* Paint-only radial fade — no mask-image cost on Chromium */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 grid-fade-overlay"
       />
 
       {/* Single static ambient orb */}

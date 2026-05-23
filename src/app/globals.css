@@ -97,7 +97,7 @@
       inset 0 0 0 1px rgba(255, 255, 255, 0.04);
   }
 
-  /* Radial fade mask — for grid edges */
+  /* Radial fade mask — for grid edges (small elements only) */
   .mask-radial-fade {
     mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
     -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
@@ -105,6 +105,26 @@
   .mask-vertical-fade {
     mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent);
     -webkit-mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent);
+  }
+
+  /* Paint-only radial fade overlay — cheaper than mask-image on large sections.
+     Use as a stacked div above bg-grid to fade dots to background at edges. */
+  .grid-fade-overlay {
+    background: radial-gradient(
+      ellipse at center,
+      transparent 30%,
+      var(--color-background) 80%
+    );
+  }
+  /* Vertical version */
+  .grid-fade-overlay-v {
+    background: linear-gradient(
+      to bottom,
+      var(--color-background) 0%,
+      transparent 20%,
+      transparent 80%,
+      var(--color-background) 100%
+    );
   }
 }
 

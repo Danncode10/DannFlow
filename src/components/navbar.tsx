@@ -59,10 +59,11 @@ export function Navbar({ user }: { user: User | null }) {
           initial={{ y: -16, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className={`pointer-events-auto mt-4 flex items-center gap-1 rounded-full border border-white/[0.06] bg-background/75 px-1.5 py-1.5 backdrop-blur-md transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] inner-highlight ${
+          style={{ transform: "translateZ(0)" }}
+          className={`pointer-events-auto mt-4 flex items-center gap-1 rounded-full border border-white/[0.08] bg-[#0A0A12]/95 px-1.5 py-1.5 transition-shadow duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] inner-highlight ${
             scrolled
-              ? "shadow-[0_8px_32px_-8px_rgba(0,0,0,0.6),0_0_0_1px_rgba(124,92,255,0.08)]"
-              : "shadow-[0_4px_16px_-4px_rgba(0,0,0,0.4)]"
+              ? "shadow-[0_8px_32px_-8px_rgba(0,0,0,0.7),0_0_0_1px_rgba(124,92,255,0.1)]"
+              : "shadow-[0_4px_16px_-4px_rgba(0,0,0,0.5)]"
           }`}
         >
           {/* Logo */}
