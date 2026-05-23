@@ -24,19 +24,41 @@ const HERO_TYPING_SPEED = 70; // ~3s total for 42-char headline
 export function Hero({ isAuthed }: HeroProps) {
   const [typingDone, setTypingDone] = useState(false);
 
-  // Lock scroll + blur sections below the hero until the typing reveal
-  // finishes. Class is removed on unmount as a safety net.
+  // Blur the fixed navbar directly — CSS `body.intro-active header` can be
+  // unreliable for fixed+z-indexed elements; inline styles guarantee it.
+  const blurHeader = () => {
+    const el = document.querySelector<HTMLElement>("header");
+    if (!el) return;
+    el.style.transition =
+      "filter 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1)";
+    el.style.filter = "blur(8px)";
+    el.style.opacity = "0.25";
+    el.style.pointerEvents = "none";
+  };
+  const clearHeader = () => {
+    const el = document.querySelector<HTMLElement>("header");
+    if (!el) return;
+    el.style.filter = "";
+    el.style.opacity = "";
+    el.style.pointerEvents = "";
+  };
+
   useEffect(() => {
     document.body.classList.add("intro-active");
+    blurHeader();
     return () => {
       document.body.classList.remove("intro-active");
+      clearHeader();
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     if (typingDone) {
       document.body.classList.remove("intro-active");
+      clearHeader();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [typingDone]);
 
   return (
@@ -63,12 +85,20 @@ export function Hero({ isAuthed }: HeroProps) {
       <WaterParticles active={true} count={140} />
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Microcopy link above headline — Linear/Stripe pattern */}
+        {/* Microcopy link — blurred while typing, clears after */}
         <motion.a
           href="/#features"
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          initial={{ opacity: 0.35, filter: "blur(8px)" }}
+          animate={
+            typingDone
+              ? { opacity: 1, filter: "blur(0px)" }
+              : { opacity: 0.35, filter: "blur(8px)" }
+          }
+          transition={{
+            duration: 0.7,
+            delay: typingDone ? 0 : 0,
+            ease: [0.16, 1, 0.3, 1],
+          }}
           className="group inline-flex items-center gap-2 text-[13px] text-muted-foreground hover:text-foreground transition-colors"
         >
           <span className="flex items-center gap-1.5 rounded-full bg-primary/10 border border-primary/20 px-2 py-0.5 text-[10px] font-semibold text-primary uppercase tracking-[0.15em]">
