@@ -1,8 +1,9 @@
-import { ArrowRight, Check } from "lucide-react";
+import { Check, ArrowRight } from "lucide-react";
 import { getUserProfile, getVibeCheckData } from "@/services/dashboard";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { FeaturesTabs } from "@/components/features-tabs";
+import { Hero } from "@/components/landing/hero";
 import { siteConfig, creatorRepos } from "@/lib/config";
 
 
@@ -17,69 +18,7 @@ export default async function Home() {
     <>
       <Navbar user={user} />
 
-      {/* =============================
-          HERO SECTION
-          ============================= */}
-      <section
-        id="home"
-        className="relative overflow-hidden bg-background"
-      >
-        {/* Gradient blobs — capped to stay inside hero */}
-        <div className="pointer-events-none absolute -top-40 -right-40 h-[600px] w-[600px] rounded-full bg-primary/10 blur-[120px] -z-10" />
-        <div className="pointer-events-none absolute -bottom-40 -left-40 h-[500px] w-[500px] rounded-full bg-accent/10 blur-[120px] -z-10" />
-
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-24 md:py-36 text-center">
-          {/* Badge */}
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5">
-            <div className="h-1.5 w-1.5 rounded-full bg-primary" />
-            <span className="text-xs font-medium text-primary/80">
-              Built for builders
-            </span>
-          </div>
-
-          <h1 className="mx-auto max-w-4xl text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-foreground">
-            Ship your next{" "}
-            <span className="text-primary">
-              big idea
-            </span>{" "}
-            in record time
-          </h1>
-
-
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground leading-relaxed">
-            {siteConfig.name} is the AI-native starter template for websites, management
-            systems, apps, and startup ideas. Stop building boilerplate — start
-            building your vision.
-          </p>
-
-          {/* CTA Buttons */}
-          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a
-              href={user ? "/dashboard" : "/login"}
-              className="inline-flex items-center gap-2 px-8 py-3.5 text-sm font-semibold rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_4px_14px_0_rgba(108,71,255,0.35),0_0_0_1px_rgba(255,255,255,0.08)] transition-all hover:shadow-[0_6px_20px_rgba(108,71,255,0.45),0_0_0_1px_rgba(255,255,255,0.1)] hover:-translate-y-0.5"
-            >
-              Get Started Free
-              <ArrowRight className="h-4 w-4" />
-            </a>
-
-
-            <a
-              href={siteConfig.githubUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-8 py-3.5 text-sm font-semibold rounded-xl border border-border text-foreground hover:bg-secondary transition-all"
-            >
-              <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-              View on GitHub
-            </a>
-          </div>
-
-          {/* Social proof */}
-          <p className="mt-12 text-sm text-muted-foreground">
-            Trusted by solo devs and startup teams shipping real products
-          </p>
-        </div>
-      </section>
+      <Hero isAuthed={!!user} />
 
       {/* =============================
           FEATURES SECTION (WITH TABS)
