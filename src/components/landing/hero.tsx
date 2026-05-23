@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, MouseEvent } from "react";
+import { useRef, useState, MouseEvent } from "react";
 import { motion } from "framer-motion";
 import {
   ArrowUpRight,
@@ -11,12 +11,19 @@ import {
   Zap,
 } from "lucide-react";
 import { siteConfig } from "@/lib/config";
+import { Typewriter } from "./typewriter";
+import { WaterParticles } from "./water-particles";
 
 interface HeroProps {
   isAuthed: boolean;
 }
 
+const HERO_HEADLINE = "The AI-native starter for shipping faster.";
+const HERO_TYPING_SPEED = 70; // ~3s total for 42-char headline
+
 export function Hero({ isAuthed }: HeroProps) {
+  const [typingDone, setTypingDone] = useState(false);
+
   return (
     <section
       id="home"
@@ -36,6 +43,9 @@ export function Hero({ isAuthed }: HeroProps) {
         className="pointer-events-none absolute inset-0 grid-fade-overlay"
       />
 
+      {/* Water-particle field — fades in once typewriter completes */}
+      <WaterParticles active={typingDone} count={140} />
+
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Microcopy link above headline — Linear/Stripe pattern */}
         <motion.a
@@ -52,21 +62,21 @@ export function Hero({ isAuthed }: HeroProps) {
           <ArrowRight className="h-3 w-3 transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:translate-x-1" />
         </motion.a>
 
-        {/* Headline — LEFT-aligned, no italic accent (anti-vibe-coded) */}
-        <motion.h1
+        {/* Headline — typewriter reveal (~3s total) */}
+        <h1 className="mt-8 max-w-[18ch] text-[2.75rem] sm:text-6xl md:text-7xl lg:text-[5rem] font-semibold tracking-[-0.035em] leading-[0.98] text-foreground">
+          <Typewriter
+            text={HERO_HEADLINE}
+            speed={HERO_TYPING_SPEED}
+            delay={200}
+            onComplete={() => setTypingDone(true)}
+          />
+        </h1>
+
+        {/* Subtitle — pops in mid-typing */}
+        <motion.p
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-8 max-w-[18ch] text-[2.75rem] sm:text-6xl md:text-7xl lg:text-[5rem] font-semibold tracking-[-0.035em] leading-[0.98] text-foreground"
-        >
-          The AI-native starter for shipping faster.
-        </motion.h1>
-
-        {/* Subtitle */}
-        <motion.p
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.18, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.7, delay: 1.5, ease: [0.34, 1.4, 0.64, 1] }}
           className="mt-8 max-w-xl text-[17px] text-muted-foreground leading-relaxed"
         >
           A production-grade Next.js + Supabase template with multi-tenant
@@ -74,11 +84,11 @@ export function Hero({ isAuthed }: HeroProps) {
           natural language into shipped features.
         </motion.p>
 
-        {/* CTAs — primary + inline text link (Linear pattern) */}
+        {/* CTAs — pops in late-typing with spring overshoot */}
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.28, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.7, delay: 2.1, ease: [0.34, 1.4, 0.64, 1] }}
           className="mt-10 flex flex-col sm:flex-row items-start sm:items-center gap-5 sm:gap-7"
         >
           <MagneticCTA href={isAuthed ? "/dashboard" : "/login"}>
@@ -99,11 +109,11 @@ export function Hero({ isAuthed }: HeroProps) {
           </a>
         </motion.div>
 
-        {/* Customer logo strip — replaces "trusted by" copy */}
+        {/* Customer logo strip — appears just after typing finishes */}
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.5 }}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 2.6, ease: [0.34, 1.4, 0.64, 1] }}
           className="mt-16 flex flex-col gap-5"
         >
           <p className="text-[11px] font-mono uppercase tracking-[0.2em] text-muted-foreground/60">
@@ -129,11 +139,11 @@ export function Hero({ isAuthed }: HeroProps) {
           </div>
         </motion.div>
 
-        {/* Product preview — with 3D tilt on hover */}
+        {/* Product preview — pops in after the typing sequence */}
         <motion.div
-          initial={{ opacity: 0, y: 32 }}
+          initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.9, delay: 3.0, ease: [0.34, 1.3, 0.64, 1] }}
           className="relative mt-24"
           style={{ perspective: "1500px" }}
         >

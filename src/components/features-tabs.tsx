@@ -97,13 +97,13 @@ function BentoCard({
     <motion.div
       ref={ref}
       onMouseMove={handleMove}
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, y: 28, scale: 0.96 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true, margin: "-60px" }}
       transition={{
-        duration: 0.5,
-        delay: index * 0.04,
-        ease: [0.16, 1, 0.3, 1],
+        duration: 0.65,
+        delay: index * 0.06,
+        ease: [0.34, 1.35, 0.64, 1],
       }}
       style={{ willChange: "transform" }}
       className={`group relative overflow-hidden rounded-3xl border border-white/[0.06] bg-white/[0.015] p-1.5 inner-highlight transition-all duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] hover:border-white/[0.14] hover:-translate-y-1 ${feature.span}`}

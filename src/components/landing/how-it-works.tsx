@@ -71,12 +71,12 @@ export function HowItWorks() {
             return (
               <motion.div
                 key={step.step}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: 32, scale: 0.97 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
                 viewport={{ once: true, margin: "-60px" }}
                 transition={{
-                  duration: 0.55,
-                  ease: [0.16, 1, 0.3, 1],
+                  duration: 0.75,
+                  ease: [0.34, 1.3, 0.64, 1],
                 }}
                 className={`relative grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center ${
                   !isEven ? "lg:[&>*:first-child]:order-2" : ""
