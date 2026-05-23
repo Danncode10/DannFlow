@@ -46,11 +46,6 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable}`}
     >
       <body className="min-h-screen flex flex-col antialiased relative">
-        {/* Fixed film-grain noise overlay — pointer-events-none so it never blocks interaction */}
-        <div
-          aria-hidden
-          className="pointer-events-none fixed inset-0 z-[100] bg-noise opacity-[0.025] mix-blend-overlay"
-        />
         <QueryProvider>
           {children}
           <Toaster

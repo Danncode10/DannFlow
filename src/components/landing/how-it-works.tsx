@@ -48,10 +48,10 @@ export function HowItWorks() {
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-32">
         {/* Section header */}
         <motion.div
-          initial={{ opacity: 0, y: 24, filter: "blur(8px)" }}
-          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           className="text-center mb-24"
         >
           <span className="inline-flex items-center gap-2 rounded-full border border-white/[0.06] bg-white/[0.02] px-3 py-1 text-[10px] font-medium text-foreground/70 uppercase tracking-[0.2em]">
@@ -70,21 +70,11 @@ export function HowItWorks() {
             return (
               <motion.div
                 key={step.step}
-                initial={{
-                  opacity: 0,
-                  y: 60,
-                  filter: "blur(12px)",
-                  x: isEven ? -20 : 20,
-                }}
-                whileInView={{
-                  opacity: 1,
-                  y: 0,
-                  filter: "blur(0px)",
-                  x: 0,
-                }}
-                viewport={{ once: true, margin: "-100px" }}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-60px" }}
                 transition={{
-                  duration: 1,
+                  duration: 0.55,
                   ease: [0.16, 1, 0.3, 1],
                 }}
                 className={`relative grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center ${
@@ -148,13 +138,7 @@ export function HowItWorks() {
                         <div className="flex items-center gap-2">
                           <span className="text-primary">→</span>
                           <span className="text-foreground/90">{step.snippet}</span>
-                          <motion.span
-                            animate={{ opacity: [1, 0, 1] }}
-                            transition={{
-                              duration: 1.2,
-                              repeat: Infinity,
-                              ease: "linear",
-                            }}
+                          <span
                             className="inline-block h-3.5 w-[6px] bg-primary"
                           />
                         </div>

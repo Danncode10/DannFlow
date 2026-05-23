@@ -88,15 +88,15 @@ function BentoCard({
     <motion.div
       ref={ref}
       onMouseMove={handleMove}
-      initial={{ opacity: 0, y: 40, filter: "blur(8px)" }}
-      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-      viewport={{ once: true, margin: "-80px" }}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-60px" }}
       transition={{
-        duration: 0.8,
-        delay: index * 0.06,
+        duration: 0.5,
+        delay: index * 0.04,
         ease: [0.16, 1, 0.3, 1],
       }}
-      className={`group relative overflow-hidden rounded-3xl border border-white/[0.06] bg-white/[0.015] p-1.5 inner-highlight transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:border-white/[0.12] ${feature.span}`}
+      className={`group relative overflow-hidden rounded-3xl border border-white/[0.06] bg-white/[0.015] p-1.5 inner-highlight transition-colors duration-300 hover:border-white/[0.12] ${feature.span}`}
     >
       {/* Mouse-follow glow */}
       <div
@@ -108,8 +108,8 @@ function BentoCard({
         }}
       />
 
-      {/* Inner core */}
-      <div className="relative h-full rounded-[calc(1.5rem-0.375rem)] bg-card/80 backdrop-blur-xl p-7 md:p-8 flex flex-col">
+      {/* Inner core — no backdrop-blur (perf) */}
+      <div className="relative h-full rounded-[calc(1.5rem-0.375rem)] bg-card p-7 md:p-8 flex flex-col">
         {/* Accent gradient blob in card corner */}
         <div
           aria-hidden
@@ -267,7 +267,7 @@ export function FeaturesTabs({
     <div className="w-full">
       {/* ── Tabs Navigation — refined glass pill ── */}
       <div className="flex justify-center mb-12 md:mb-16">
-        <div className="flex p-1 rounded-full bg-white/[0.02] border border-white/[0.06] backdrop-blur-xl inner-highlight relative overflow-x-auto no-scrollbar max-w-[calc(100vw-2rem)]">
+        <div className="flex p-1 rounded-full bg-white/[0.02] border border-white/[0.06] inner-highlight relative overflow-x-auto no-scrollbar max-w-[calc(100vw-2rem)]">
           {TABS_CONFIG.map((tab) => {
             const TabIcon = tab.icon;
             const isActive = active === tab.id;

@@ -14,38 +14,25 @@ export function Hero({ isAuthed }: HeroProps) {
       id="home"
       className="relative overflow-hidden bg-background pt-12 pb-32 md:pt-20 md:pb-44"
     >
-      {/* Animated dot grid background — masked to fade at edges */}
+      {/* Static dot grid background */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-grid mask-radial-fade opacity-60"
-      />
-      {/* Linear-style horizontal/vertical line grid layered on top */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 bg-lines mask-radial-fade opacity-40"
+        className="pointer-events-none absolute inset-0 bg-grid mask-radial-fade opacity-50"
       />
 
-      {/* Ambient gradient orbs — slowly floating */}
+      {/* Single static ambient orb */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 h-[800px] w-[800px] rounded-full bg-primary/15 blur-[140px] animate-pulse-glow"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute top-1/3 -left-40 h-[400px] w-[400px] rounded-full bg-[#5B3FE0]/10 blur-[120px]"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute top-1/4 -right-40 h-[400px] w-[400px] rounded-full bg-[#9F7BFF]/8 blur-[120px]"
+        className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 h-[600px] w-[600px] rounded-full bg-primary/10 blur-[100px]"
       />
 
       <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 text-center">
         {/* Eyebrow badge */}
         <motion.div
-          initial={{ opacity: 0, y: 16, filter: "blur(8px)" }}
-          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-8 inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.02] backdrop-blur-xl px-3.5 py-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          className="mb-8 inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.02] px-3.5 py-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
         >
           <Sparkles className="h-3 w-3 text-primary" />
           <span className="text-[11px] font-medium text-foreground/80 uppercase tracking-[0.18em]">
@@ -55,9 +42,9 @@ export function Hero({ isAuthed }: HeroProps) {
 
         {/* Headline */}
         <motion.h1
-          initial={{ opacity: 0, y: 24, filter: "blur(12px)" }}
-          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          transition={{ duration: 1, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
           className="mx-auto max-w-4xl text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-semibold tracking-[-0.03em] leading-[0.95] text-foreground"
         >
           Ship your next{" "}
@@ -70,9 +57,9 @@ export function Hero({ isAuthed }: HeroProps) {
 
         {/* Subtitle */}
         <motion.p
-          initial={{ opacity: 0, y: 16, filter: "blur(8px)" }}
-          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          transition={{ duration: 0.8, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.18, ease: [0.16, 1, 0.3, 1] }}
           className="mx-auto mt-8 max-w-xl text-[17px] text-muted-foreground leading-relaxed"
         >
           {siteConfig.name} is the AI-native starter for websites, management
@@ -81,28 +68,28 @@ export function Hero({ isAuthed }: HeroProps) {
 
         {/* CTAs */}
         <motion.div
-          initial={{ opacity: 0, y: 16, filter: "blur(8px)" }}
-          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          transition={{ duration: 0.8, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.28, ease: [0.16, 1, 0.3, 1] }}
           className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-3"
         >
           {/* Primary CTA with nested icon circle */}
           <a
             href={isAuthed ? "/dashboard" : "/login"}
-            className="group flex items-center gap-2 pl-6 pr-2 py-2 text-sm font-medium rounded-full bg-foreground text-background active:scale-[0.97] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] shadow-[0_4px_20px_rgba(124,92,255,0.25),0_0_0_1px_rgba(255,255,255,0.05),inset_0_1px_0_rgba(255,255,255,0.2)] hover:shadow-[0_8px_32px_rgba(124,92,255,0.4),0_0_0_1px_rgba(255,255,255,0.08),inset_0_1px_0_rgba(255,255,255,0.25)]"
+            className="group flex items-center gap-2 pl-6 pr-2 py-2 text-sm font-medium rounded-full bg-foreground text-background active:scale-[0.97] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] shadow-[0_4px_20px_rgba(124,92,255,0.25),inset_0_1px_0_rgba(255,255,255,0.2)] hover:shadow-[0_6px_24px_rgba(124,92,255,0.35),inset_0_1px_0_rgba(255,255,255,0.25)]"
           >
             Get started free
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-background/10 group-hover:bg-background/20 group-hover:translate-x-0.5 group-hover:-translate-y-[1px] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]">
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-background/10 group-hover:bg-background/20 group-hover:translate-x-0.5 group-hover:-translate-y-[1px] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]">
               <ArrowUpRight className="h-3.5 w-3.5" />
             </span>
           </a>
 
-          {/* Secondary CTA */}
+          {/* Secondary CTA — no backdrop-blur (perf) */}
           <a
             href={siteConfig.githubUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="group flex items-center gap-2.5 px-6 py-3 text-sm font-medium rounded-full border border-white/[0.08] bg-white/[0.02] backdrop-blur-xl text-foreground/90 hover:bg-white/[0.05] hover:border-white/[0.12] active:scale-[0.97] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] inner-highlight"
+            className="group flex items-center gap-2.5 px-6 py-3 text-sm font-medium rounded-full border border-white/[0.08] bg-white/[0.02] text-foreground/90 hover:bg-white/[0.05] hover:border-white/[0.12] active:scale-[0.97] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] inner-highlight"
           >
             <GitHubIcon className="h-3.5 w-3.5" />
             Star on GitHub
@@ -113,7 +100,7 @@ export function Hero({ isAuthed }: HeroProps) {
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
           className="mt-10 text-[12px] text-muted-foreground/70 font-mono uppercase tracking-[0.2em]"
         >
           Trusted by solo devs · startup teams · agencies
@@ -121,13 +108,13 @@ export function Hero({ isAuthed }: HeroProps) {
 
         {/* Floating product preview — double-bezel terminal/dashboard mockup */}
         <motion.div
-          initial={{ opacity: 0, y: 60, filter: "blur(16px)" }}
-          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          transition={{ duration: 1.2, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          initial={{ opacity: 0, y: 32 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
           className="relative mt-20 mx-auto max-w-5xl"
         >
           {/* Outer bezel */}
-          <div className="relative p-1.5 rounded-[2rem] bg-gradient-to-b from-white/[0.08] to-white/[0.02] border border-white/[0.06] shadow-[0_40px_120px_-20px_rgba(124,92,255,0.4),0_0_0_1px_rgba(255,255,255,0.04)]">
+          <div className="relative p-1.5 rounded-[2rem] bg-gradient-to-b from-white/[0.08] to-white/[0.02] border border-white/[0.06] shadow-[0_24px_80px_-20px_rgba(124,92,255,0.3),0_0_0_1px_rgba(255,255,255,0.04)]">
             {/* Inner core */}
             <div className="relative rounded-[calc(2rem-0.375rem)] bg-card overflow-hidden border border-white/[0.04] inner-highlight">
               {/* Top bar — fake window chrome */}
@@ -138,7 +125,7 @@ export function Hero({ isAuthed }: HeroProps) {
                   <div className="h-2.5 w-2.5 rounded-full bg-white/10" />
                 </div>
                 <div className="flex items-center gap-2 px-3 py-1 rounded-md bg-white/[0.03] border border-white/[0.04]">
-                  <div className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <div className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
                   <span className="text-[10px] font-mono text-muted-foreground">
                     {siteConfig.name}.app/dashboard
                   </span>
@@ -159,7 +146,7 @@ export function Hero({ isAuthed }: HeroProps) {
                           : "text-muted-foreground hover:bg-white/[0.02]"
                       }`}
                     >
-                      <Icon className="h-3 w-3" />
+                      <Icon className="h-3 w-3" strokeWidth={1.5} />
                       <span className="font-medium">
                         {["Overview", "Database", "Auth", "API"][i]}
                       </span>
@@ -193,24 +180,17 @@ export function Hero({ isAuthed }: HeroProps) {
                     ))}
                   </div>
 
-                  {/* Chart placeholder */}
+                  {/* Chart — static bars, no animation (perf) */}
                   <div className="relative h-32 rounded-xl bg-white/[0.02] border border-white/[0.04] overflow-hidden p-3">
                     <p className="text-[9px] uppercase tracking-[0.15em] text-muted-foreground mb-2">
                       Activity
                     </p>
-                    {/* Animated bar chart */}
                     <div className="flex items-end justify-between h-16 gap-1">
                       {[40, 60, 35, 75, 55, 85, 70, 90, 65, 80, 50, 95].map(
                         (h, i) => (
-                          <motion.div
+                          <div
                             key={i}
-                            initial={{ height: "0%" }}
-                            animate={{ height: `${h}%` }}
-                            transition={{
-                              duration: 1,
-                              delay: 1.2 + i * 0.04,
-                              ease: [0.16, 1, 0.3, 1],
-                            }}
+                            style={{ height: `${h}%` }}
                             className="flex-1 rounded-sm bg-gradient-to-t from-primary/40 to-primary/80"
                           />
                         )
@@ -254,12 +234,6 @@ export function Hero({ isAuthed }: HeroProps) {
               </div>
             </div>
           </div>
-
-          {/* Gradient glow under preview */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute -bottom-20 left-1/2 -translate-x-1/2 h-40 w-[80%] rounded-full bg-primary/30 blur-[100px]"
-          />
         </motion.div>
       </div>
     </section>

@@ -69,10 +69,10 @@ export function Pricing({ isAuthed }: PricingProps) {
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-32">
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 24, filter: "blur(8px)" }}
-          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           className="text-center mb-20"
         >
           <span className="inline-flex items-center gap-2 rounded-full border border-white/[0.06] bg-white/[0.02] px-3 py-1 text-[10px] font-medium text-foreground/70 uppercase tracking-[0.2em]">
@@ -91,12 +91,12 @@ export function Pricing({ isAuthed }: PricingProps) {
           {PLANS.map((plan, i) => (
             <motion.div
               key={plan.name}
-              initial={{ opacity: 0, y: 40, filter: "blur(8px)" }}
-              whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              viewport={{ once: true, margin: "-80px" }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
               transition={{
-                duration: 0.9,
-                delay: i * 0.08,
+                duration: 0.55,
+                delay: i * 0.06,
                 ease: [0.16, 1, 0.3, 1],
               }}
               className="relative group"
@@ -121,14 +121,14 @@ export function Pricing({ isAuthed }: PricingProps) {
                 {plan.highlight && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
                     <div className="flex items-center gap-1.5 rounded-full bg-foreground text-background px-3 py-1 text-[10px] font-semibold tracking-wide shadow-[0_4px_16px_rgba(124,92,255,0.4)]">
-                      <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+                      <span className="h-1.5 w-1.5 rounded-full bg-primary" />
                       Most popular
                     </div>
                   </div>
                 )}
 
-                {/* Inner core */}
-                <div className="rounded-[calc(2rem-0.375rem)] bg-card/80 backdrop-blur-xl p-7 md:p-8 flex flex-col h-full">
+                {/* Inner core — no backdrop-blur (perf) */}
+                <div className="rounded-[calc(2rem-0.375rem)] bg-card p-7 md:p-8 flex flex-col h-full">
                   {/* Plan header */}
                   <div className="mb-6">
                     <h3 className="text-base font-semibold text-foreground">

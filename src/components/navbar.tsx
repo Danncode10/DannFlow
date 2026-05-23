@@ -56,10 +56,10 @@ export function Navbar({ user }: { user: User | null }) {
     <>
       <header className="fixed top-0 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
         <motion.div
-          initial={{ y: -24, opacity: 0 }}
+          initial={{ y: -16, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          className={`pointer-events-auto mt-4 flex items-center gap-1 rounded-full border border-white/[0.06] bg-background/60 px-1.5 py-1.5 backdrop-blur-2xl transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] inner-highlight ${
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          className={`pointer-events-auto mt-4 flex items-center gap-1 rounded-full border border-white/[0.06] bg-background/75 px-1.5 py-1.5 backdrop-blur-md transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] inner-highlight ${
             scrolled
               ? "shadow-[0_8px_32px_-8px_rgba(0,0,0,0.6),0_0_0_1px_rgba(124,92,255,0.08)]"
               : "shadow-[0_4px_16px_-4px_rgba(0,0,0,0.4)]"
@@ -107,7 +107,7 @@ export function Navbar({ user }: { user: User | null }) {
                   <ChevronDown className="w-3 h-3 text-muted-foreground group-hover:text-foreground transition-colors" />
                 </DropdownMenuTrigger>
 
-                <DropdownMenuContent className="w-64 mt-3 rounded-2xl shadow-2xl border-white/[0.06] bg-card/95 backdrop-blur-xl">
+                <DropdownMenuContent className="w-64 mt-3 rounded-2xl shadow-2xl border-white/[0.06] bg-card">
                   <DropdownMenuLabel>
                     <div className="flex flex-col gap-0.5 py-1">
                       <p className="text-[10px] font-bold text-foreground uppercase tracking-[0.15em] truncate">
@@ -190,7 +190,7 @@ export function Navbar({ user }: { user: User | null }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
-            className="md:hidden fixed inset-0 z-40 bg-background/90 backdrop-blur-2xl pt-24 px-6"
+            className="md:hidden fixed inset-0 z-40 bg-background/95 pt-24 px-6"
           >
             <nav className="flex flex-col gap-1">
               {navLinks.map((link, i) => (
@@ -198,12 +198,12 @@ export function Navbar({ user }: { user: User | null }) {
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileOpen(false)}
-                  initial={{ opacity: 0, y: 24, filter: "blur(6px)" }}
-                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                  exit={{ opacity: 0, y: 12, filter: "blur(4px)" }}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 8 }}
                   transition={{
-                    duration: 0.6,
-                    delay: 0.1 + i * 0.06,
+                    duration: 0.35,
+                    delay: 0.05 + i * 0.04,
                     ease: [0.16, 1, 0.3, 1],
                   }}
                   className="flex items-center justify-between px-5 py-5 rounded-2xl border border-white/[0.04] hover:border-white/10 hover:bg-white/[0.02] transition-colors"
@@ -216,9 +216,9 @@ export function Navbar({ user }: { user: User | null }) {
               ))}
 
               <motion.div
-                initial={{ opacity: 0, y: 24, filter: "blur(6px)" }}
-                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                transition={{ duration: 0.6, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
                 className="mt-6 flex flex-col gap-3"
               >
                 {user ? (
