@@ -58,8 +58,9 @@ export function Hero({ isAuthed }: HeroProps) {
         className="pointer-events-none absolute inset-0 grid-fade-overlay"
       />
 
-      {/* Water-particle field — fades in once typewriter completes */}
-      <WaterParticles active={typingDone} count={140} />
+      {/* Water-particle field — visible and moving immediately so it's
+          present during the typewriter reveal, not only after it */}
+      <WaterParticles active={true} count={140} />
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Microcopy link above headline — Linear/Stripe pattern */}
@@ -84,6 +85,7 @@ export function Hero({ isAuthed }: HeroProps) {
             speed={HERO_TYPING_SPEED}
             delay={200}
             onComplete={() => setTypingDone(true)}
+            highlight={{ start: 4, end: 21, delay: 350 }}
           />
         </h1>
 

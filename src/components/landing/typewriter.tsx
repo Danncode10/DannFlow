@@ -9,6 +9,12 @@ interface TypewriterProps {
   delay?: number; // ms before typing starts (after coming into view)
   className?: string;
   onComplete?: () => void;
+  /** After typing completes, smoothly tint chars [start, end) to primary color */
+  highlight?: {
+    start: number;
+    end: number;
+    delay?: number; // ms after completion before color transition (default 300)
+  };
 }
 
 /**
@@ -30,12 +36,15 @@ export function Typewriter({
   delay = 0,
   className,
   onComplete,
+  highlight,
 }: TypewriterProps) {
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, margin: "-40px" });
   const [shown, setShown] = useState(0);
+  const [highlightActive, setHighlightActive] = useState(false);
   const startedRef = useRef(false);
   const completedRef = useRef(false);
+  const highlightTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Stash onComplete in a ref so it doesn't invalidate the typing effect
   // when the parent re-renders (which would restart typing — bug).
@@ -55,6 +64,7 @@ export function Typewriter({
       if (!completedRef.current) {
         completedRef.current = true;
         onCompleteRef.current?.();
+        if (highlight) setHighlightActive(true);
       }
       return;
     }
@@ -75,21 +85,53 @@ export function Typewriter({
       } else if (!completedRef.current) {
         completedRef.current = true;
         onCompleteRef.current?.();
+        if (highlight) {
+          highlightTimerRef.current = setTimeout(
+            () => setHighlightActive(true),
+            highlight.delay ?? 300
+          );
+        }
       }
     };
     raf = requestAnimationFrame(tick);
 
     return () => {
       cancelAnimationFrame(raf);
+      if (highlightTimerRef.current) clearTimeout(highlightTimerRef.current);
     };
-  }, [inView, text, speed, delay]); // intentionally NOT depending on onComplete
+  }, [inView, text, speed, delay]); // intentionally NOT depending on onComplete / highlight
 
   const done = shown >= text.length;
 
+  // Render visible portion — split around the highlight range when done
+  const renderVisible = () => {
+    if (!highlight || !done) {
+      return <span aria-hidden>{text.slice(0, shown)}</span>;
+    }
+    const { start, end } = highlight;
+    return (
+      <span aria-hidden>
+        {text.slice(0, start)}
+        <span
+          style={{
+            transition:
+              "color 0.9s cubic-bezier(0.16, 1, 0.3, 1), text-shadow 0.9s cubic-bezier(0.16, 1, 0.3, 1)",
+            color: highlightActive ? "var(--color-primary)" : "inherit",
+            textShadow: highlightActive
+              ? "0 0 32px rgba(124,92,255,0.45)"
+              : "0 0 0px transparent",
+          }}
+        >
+          {text.slice(start, end)}
+        </span>
+        {text.slice(end)}
+      </span>
+    );
+  };
+
   return (
     <span ref={ref} className={className}>
-      {/* Revealed portion */}
-      <span aria-hidden>{text.slice(0, shown)}</span>
+      {renderVisible()}
 
       {/* Cursor — between visible and invisible text, sits at typing position.
           Hidden via visibility (not unmounted) so width stays in the layout. */}
