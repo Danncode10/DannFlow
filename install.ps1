@@ -1,6 +1,53 @@
 # DannFlow Elite Installer for Windows (PowerShell)
 # Run: powershell -ExecutionPolicy Bypass -Command "iex (irm https://raw.githubusercontent.com/Danncode10/DannFlow/main/install.ps1)"
+#
+# Every step prints a clear PASS/FAIL status. A summary at the end lists
+# exactly which steps succeeded, which failed, and which (if any) were skipped.
 
+# ── Step tracking ─────────────────────────────────────────────────────────────
+$Global:StepNum     = 0
+$Global:PassCount   = 0
+$Global:FailCount   = 0
+$Global:SkipCount   = 0
+$Global:Summary     = @()
+$Global:FailedSteps = @()
+
+function Invoke-Step {
+    param(
+        [Parameter(Mandatory=$true)][string]$Name,
+        [Parameter(Mandatory=$true)][scriptblock]$Action
+    )
+    $Global:StepNum++
+    Write-Host ""
+    Write-Host "[$Global:StepNum] $Name" -ForegroundColor Cyan
+    try {
+        & $Action
+        $code = $LASTEXITCODE
+        if ($null -eq $code) { $code = 0 }
+        if ($code -ne 0) { throw "Exit code $code" }
+        Write-Host "  ✅ PASS — $Name" -ForegroundColor Green
+        $Global:PassCount++
+        $Global:Summary += "✅ [$Global:StepNum] $Name"
+    } catch {
+        Write-Host "  ❌ FAIL — $Name" -ForegroundColor Red
+        Write-Host "  ↳ Error: $_" -ForegroundColor Yellow
+        $Global:FailCount++
+        $Global:FailedSteps += "[$Global:StepNum] $Name — $_"
+        $Global:Summary += "❌ [$Global:StepNum] $Name"
+    }
+}
+
+function Mark-Skip {
+    param([string]$Name, [string]$Reason)
+    $Global:StepNum++
+    Write-Host ""
+    Write-Host "[$Global:StepNum] $Name — SKIPPED" -ForegroundColor Yellow
+    Write-Host "  ↳ Reason: $Reason" -ForegroundColor Yellow
+    $Global:SkipCount++
+    $Global:Summary += "⏭  [$Global:StepNum] $Name (skipped: $Reason)"
+}
+
+# ── Banner ────────────────────────────────────────────────────────────────────
 Write-Host "`n" -ForegroundColor Cyan
 Write-Host @"
   _____                   ______ _
@@ -12,88 +59,99 @@ Write-Host @"
 "@ -ForegroundColor Cyan
 
 Write-Host "Welcome to the DannFlow 'Elite' Installer!`n" -ForegroundColor Cyan -NoNewline
-Write-Host "The high-performance AI-Native Next.js SaaS Starter.`n`n" -ForegroundColor White
+Write-Host "The high-performance AI-Native Next.js SaaS Starter.`n" -ForegroundColor White
 
-# 1. Prompt for App Name
+# 0. Prompt for App Name
 $app_name = Read-Host "Enter your App Name [My DannFlow App]"
 if ([string]::IsNullOrWhiteSpace($app_name)) { $app_name = "My DannFlow App" }
-
 $folder_name = ($app_name.ToLower() -replace ' ', '-') -replace '[^a-z0-9-]', ''
 
 Write-Host "`n🚀 Creating $app_name in $folder_name...`n" -ForegroundColor Cyan
 
-# 2. Clone the Repository
-if (git clone https://github.com/Danncode10/DannFlow $folder_name 2>$null) {
-    Set-Location $folder_name
-    Remove-Item install.ps1 -ErrorAction SilentlyContinue
-    Write-Host "✅ Repository cloned`n" -ForegroundColor Green
-} else {
-    Write-Host "❌ Failed to clone the repository.`n" -ForegroundColor Red
+# 1. Clone repo
+Invoke-Step "Clone DannFlow repository" {
+    git clone https://github.com/Danncode10/DannFlow $folder_name
+}
+if ($Global:FailCount -gt 0) {
+    Write-Host "`nFatal: clone failed. Cannot continue.`n" -ForegroundColor Red
     exit 1
 }
+Set-Location $folder_name
+Remove-Item install.ps1, install.sh -ErrorAction SilentlyContinue
 
-# 3. Environment Setup
-Write-Host "📦 Installing dependencies...`n" -ForegroundColor Cyan
-npm install
+# 2. npm install
+Invoke-Step "Install npm dependencies" { npm install }
 
-Write-Host "🔑 Setting up environment variables...`n" -ForegroundColor Cyan
-if (!(Test-Path .env.local) -and (Test-Path .env.example)) {
-    Copy-Item .env.example .env.local
-    Write-Host "✅ .env.local created`n" -ForegroundColor Green
-}
-
-# 4. Install Ruflo (global, once per machine)
-Write-Host "🧠 Installing Ruflo globally (beta)...`n" -ForegroundColor Cyan
-npm install -g ruflo@latest 2>$null | Out-Null
-if ($?) {
-    Write-Host "✅ Ruflo installed globally`n" -ForegroundColor Green
-} else {
-    Write-Host "⚠️  Global ruflo install failed. You can retry later with: npm install -g ruflo@latest`n" -ForegroundColor Yellow
-}
-
-# 5. Register Ruflo MCP if Claude CLI exists
-$claude_exists = (Get-Command claude -ErrorAction SilentlyContinue) -ne $null
-if ($claude_exists) {
-    Write-Host "🔌 Registering Ruflo MCP with Claude Code...`n" -ForegroundColor Cyan
-    claude mcp add ruflo -- npx ruflo@latest mcp start 2>$null | Out-Null
-    if ($?) {
-        Write-Host "✅ Ruflo MCP registered`n" -ForegroundColor Green
-    } else {
-        Write-Host "⚠️  Could not register Ruflo MCP. Run manually: claude mcp add ruflo -- npx ruflo@latest mcp start`n" -ForegroundColor Yellow
+# 3. .env.local
+if (Test-Path .env.example) {
+    Invoke-Step "Create .env.local from .env.example" {
+        Copy-Item .env.example .env.local
     }
 } else {
-    Write-Host "ℹ️  Claude Code CLI not found — skipping MCP registration.`n" -ForegroundColor Yellow
-    Write-Host "   After installing Claude Code, run: claude mcp add ruflo -- npx ruflo@latest mcp start`n"
+    Mark-Skip "Create .env.local" ".env.example not found in repo"
 }
 
-# 6. Per-project Ruflo init (via npm setup script for cross-platform compat)
-Write-Host "🌀 Running Ruflo project init wizard...`n" -ForegroundColor Cyan
-npx ruflo@latest init wizard 2>$null | Out-Null
-if ($?) {
-    Write-Host "✅ Ruflo project init complete`n" -ForegroundColor Green
+# 4. Ruflo global install
+Invoke-Step "Install Ruflo globally (beta)" { npm install -g ruflo@latest }
+
+# 5. Register Ruflo MCP with Claude Code
+$claudeExists = (Get-Command claude -ErrorAction SilentlyContinue) -ne $null
+if ($claudeExists) {
+    Invoke-Step "Register Ruflo MCP server with Claude Code" {
+        claude mcp add ruflo -- npx ruflo@latest mcp start
+    }
 } else {
-    Write-Host "⚠️  Ruflo init wizard did not finish. You can run it later with: npx ruflo@latest init wizard`n" -ForegroundColor Yellow
+    Mark-Skip "Register Ruflo MCP server" "Claude Code CLI not found on PATH — run later: claude mcp add ruflo -- npx ruflo@latest mcp start"
 }
 
-# 7. Install design-taste skill packs (idempotent)
-Write-Host "🎨 Installing skill packs...`n" -ForegroundColor Cyan
-npm run setup:skills 2>$null | Out-Null
-if ($?) {
-    Write-Host "✅ Skill packs installed`n" -ForegroundColor Green
+# 6. Ruflo project init wizard (interactive)
+Invoke-Step "Ruflo project init wizard" { npx ruflo@latest init wizard }
+
+# 7. Skill packs
+Write-Host "`n── Installing skill packs ──" -ForegroundColor Cyan
+
+Invoke-Step "Skill: Leonxlnx/taste-skill (design taste)"      { npx -y skills add https://github.com/Leonxlnx/taste-skill --all -y }
+Invoke-Step "Skill: emilkowalski/skill (animation craft)"      { npx -y skills add https://github.com/emilkowalski/skill --all -y }
+Invoke-Step "Skill: pbakaus/impeccable (UI anti-patterns)"     { npx -y skills add https://github.com/pbakaus/impeccable --all -y }
+Invoke-Step "Skill: anthropics/claude-api (SDK + caching)"     { npx -y skills add anthropics/skills@claude-api -y }
+Invoke-Step "Skill: shadcn/ui (component guidance)"            { npx -y skills add shadcn/ui@shadcn -y }
+Invoke-Step "Skill: alirezarezvani/a11y-audit (WCAG 2.2)"      { npx -y skills add alirezarezvani/claude-skills@a11y-audit -y }
+Invoke-Step "Skill: coreyhaines31/marketingskills (30+)"       { npx -y skills add coreyhaines31/marketingskills --all -y }
+Invoke-Step "Skill: addyosmani/web-quality-skills (SEO)"       { npx -y skills add addyosmani/web-quality-skills@seo -y }
+
+# ── Summary ───────────────────────────────────────────────────────────────────
+Write-Host ""
+Write-Host "═══════════════════ Installation Summary ═══════════════════" -ForegroundColor White
+foreach ($item in $Global:Summary) {
+    Write-Host "  $item"
+}
+Write-Host "─────────────────────────────────────────────────────────────" -ForegroundColor White
+Write-Host "  Passed:  $Global:PassCount" -ForegroundColor Green
+Write-Host "  Failed:  $Global:FailCount" -ForegroundColor Red
+Write-Host "  Skipped: $Global:SkipCount" -ForegroundColor Yellow
+Write-Host "  Total:   $Global:StepNum"
+Write-Host "═════════════════════════════════════════════════════════════`n" -ForegroundColor White
+
+if ($Global:FailCount -eq 0 -and $Global:SkipCount -eq 0) {
+    Write-Host "🎉 All $Global:StepNum steps completed successfully — no failures, no skips.`n" -ForegroundColor Green
+} elseif ($Global:FailCount -eq 0) {
+    Write-Host "✅ All required steps passed. ($Global:SkipCount optional step(s) skipped — see above.)`n" -ForegroundColor Green
 } else {
-    Write-Host "⚠️  Some skill packs failed. Retry later with: npm run setup:skills`n" -ForegroundColor Yellow
+    Write-Host "⚠️  $Global:FailCount step(s) failed:" -ForegroundColor Red
+    foreach ($s in $Global:FailedSteps) { Write-Host "   • $s" -ForegroundColor Red }
+    Write-Host "`nScroll up to see the actual error output for each failed step.`n" -ForegroundColor Yellow
 }
 
-# 8. Trigger Guide Initialization (Unix guide.sh equivalent — manual steps for Windows)
-Write-Host "`n✨ Project initialization instructions:`n" -ForegroundColor Cyan
-Write-Host "1. Edit .env.local with your Supabase credentials" -ForegroundColor Yellow
-Write-Host "2. Run: npm run dev" -ForegroundColor Yellow
-Write-Host "3. For the interactive setup guide, use WSL/Git Bash: ./guide.sh`n" -ForegroundColor Yellow
-
-Write-Host "────────────────────────────────────────────────────────`n" -ForegroundColor Cyan
-Write-Host "Setup Complete!`n" -ForegroundColor Green -BackgroundColor Black
+# ── Next steps ────────────────────────────────────────────────────────────────
 Write-Host "Your project is ready in: $folder_name`n" -ForegroundColor Cyan
-Write-Host "To start developing:`n" -ForegroundColor White
-Write-Host "  1. cd $folder_name`n" -ForegroundColor Yellow
-Write-Host "  2. npm run dev`n" -ForegroundColor Yellow
-Write-Host "`nHappy Vibe Coding! 🚢`n" -ForegroundColor Green
+Write-Host "Next: Tailor Claude to YOUR project (do this before building)`n"
+Write-Host "  1. cd $folder_name" -ForegroundColor Yellow
+Write-Host "  2. Edit README.md to describe YOUR app — not DannFlow" -ForegroundColor Yellow
+Write-Host "  3. Open Claude Code and run /init-claude" -ForegroundColor Yellow
+Write-Host "  4. Fill in PROJECT_CONTEXT.md" -ForegroundColor Yellow
+Write-Host "  5. Run /ruflo-upgrade then /no-conflict" -ForegroundColor Yellow
+Write-Host "`nThen: npm run dev to start the dev server.`n" -ForegroundColor Cyan
+Write-Host "Happy Vibe Coding! 🚢`n" -ForegroundColor Green
+
+if ($Global:FailCount -gt 0) { exit 1 }
+exit 0

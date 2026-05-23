@@ -1,134 +1,214 @@
 #!/bin/bash
 
-# Color definitions
+# install.sh — DannFlow 'Elite' Installer
+# Usage:  bash install.sh
+#    or:  curl -sSL https://raw.githubusercontent.com/Danncode10/DannFlow/main/install.sh | bash
+#
+# Every step prints a clear PASS/FAIL status. A summary at the end lists
+# exactly which steps succeeded, which failed, and which (if any) were skipped.
+
+# ── Self-pipe fix ─────────────────────────────────────────────────────────────
+# When run as `curl | bash`, stdin is the pipe stream. Interactive subprocesses
+# (the Ruflo wizard, the skills CLI TUI) consume that stream and never finish.
+# Fix: save ourselves to a temp file and re-execute with a real stdin.
+if [ -z "$INSTALL_RUNNING" ]; then
+    export INSTALL_RUNNING=1
+    SELF_TMP=$(mktemp /tmp/dannflow-install-XXXX.sh)
+    cat > "$SELF_TMP"
+    bash "$SELF_TMP"
+    EXIT_CODE=$?
+    rm -f "$SELF_TMP"
+    exit $EXIT_CODE
+fi
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Colors
 CYAN='\033[0;36m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
+RED='\033[0;31m'
 BOLD='\033[1m'
+DIM='\033[2m'
 NC='\033[0m'
 
+# Step tracking
+STEP_NUM=0
+PASS_COUNT=0
+FAIL_COUNT=0
+SKIP_COUNT=0
+declare -a SUMMARY
+declare -a FAILED_STEPS
+
+# ── Helpers ───────────────────────────────────────────────────────────────────
+# run_step "Step name" command arg1 arg2 ...
+# Streams the command's output live, then prints PASS/FAIL and records it.
+run_step() {
+    local name="$1"
+    shift
+    STEP_NUM=$((STEP_NUM + 1))
+    echo ""
+    echo -e "${CYAN}${BOLD}[$STEP_NUM] ${name}${NC}"
+    echo -e "${DIM}    \$ $*${NC}"
+
+    if "$@"; then
+        echo -e "  ${GREEN}✅ PASS — ${name}${NC}"
+        PASS_COUNT=$((PASS_COUNT + 1))
+        SUMMARY+=("${GREEN}✅${NC} [$STEP_NUM] $name")
+        return 0
+    fi
+    local code=$?
+    echo -e "  ${RED}❌ FAIL — ${name} (exit $code)${NC}"
+    echo -e "  ${YELLOW}↳ See output above for the actual error.${NC}"
+    FAIL_COUNT=$((FAIL_COUNT + 1))
+    FAILED_STEPS+=("[$STEP_NUM] $name (exit $code)")
+    SUMMARY+=("${RED}❌${NC} [$STEP_NUM] $name (exit $code)")
+    return $code
+}
+
+# mark_skip "Step name" "reason"
+mark_skip() {
+    STEP_NUM=$((STEP_NUM + 1))
+    echo ""
+    echo -e "${YELLOW}${BOLD}[$STEP_NUM] ${1} — SKIPPED${NC}"
+    echo -e "  ${YELLOW}↳ Reason: $2${NC}"
+    SKIP_COUNT=$((SKIP_COUNT + 1))
+    SUMMARY+=("${YELLOW}⏭${NC}  [$STEP_NUM] $1 (skipped: $2)")
+}
+
+# ── Banner ────────────────────────────────────────────────────────────────────
 clear
 echo -e "${CYAN}${BOLD}"
 cat << "EOF"
-  _____                   ______ _               
- |  __ \                 |  ____| |              
+  _____                   ______ _
+ |  __ \                 |  ____| |
  | |  | | __ _ _ __  _ __| |__  | | _____      __
  | |  | |/ _` | '_ \| '_ \  __| | |/ _ \ \ /\ / /
- | |__| | (_| | | | | | | | |   | | (_) \ V  V / 
- |_____/ \__,_|_| |_|_| |_|_|   |_|\___/ \_/\_/  
+ | |__| | (_| | | | | | | | |   | | (_) \ V  V /
+ |_____/ \__,_|_| |_|_| |_|_|   |_|\___/ \_/\_/
 EOF
 echo -e "${NC}"
 
 echo -e "${BOLD}Welcome to the DannFlow 'Elite' Installer!${NC}"
 echo -e "The high-performance AI-Native Next.js SaaS Starter.\n"
 
-# 1. Prompt for App Name
+# ── 0. Prompt for App Name ────────────────────────────────────────────────────
 read -p "Enter your App Name [My DannFlow App]: " app_name < /dev/tty
 app_name=${app_name:-"My DannFlow App"}
-
-# Derive slug for the folder name
 folder_name=$(echo "$app_name" | tr '[:upper:]' '[:lower:]' | sed 's/ /-/g' | sed 's/[^a-z0-9-]//g')
 
-echo -e "\n🚀 ${CYAN}Creating $app_name in $folder_name...${NC}\n"
+echo -e "\n🚀 ${CYAN}Creating ${BOLD}$app_name${NC}${CYAN} in ${BOLD}$folder_name${NC}${CYAN}...${NC}"
 
-# 2. Clone the Repository
-if git clone https://github.com/Danncode10/DannFlow "$folder_name"; then
-    cd "$folder_name" || exit
-    # Remove the installer script from the new project to avoid clutter
-    rm install.sh
-else
-    echo -e "❌ ${RED}Failed to clone the repository.${NC}"
+# ── 1. Clone repo ─────────────────────────────────────────────────────────────
+run_step "Clone DannFlow repository" \
+    git clone https://github.com/Danncode10/DannFlow "$folder_name"
+
+if [ $? -ne 0 ]; then
+    echo -e "\n${RED}${BOLD}Fatal: clone failed. Cannot continue.${NC}"
     exit 1
 fi
 
-# 3. Environment Setup
-echo -e "📦 ${CYAN}Installing dependencies...${NC}"
-npm install
+cd "$folder_name" || { echo -e "${RED}Cannot cd into $folder_name${NC}"; exit 1; }
+rm -f install.sh install.ps1
 
-echo -e "🔑 ${CYAN}Setting up environment variables...${NC}"
-cp .env.example .env.local
+# ── 2. npm install ────────────────────────────────────────────────────────────
+run_step "Install npm dependencies" npm install
 
-# 4. Install Ruflo (global, once per machine) + register MCP server
-# Ruflo is currently in BETA — the global install pins @latest so you always
-# pull the freshest build. Run this BEFORE the per-project `init wizard`.
-echo -e "🧠 ${CYAN}Installing Ruflo globally (beta)...${NC}"
-if ! npm install -g ruflo@latest; then
-    echo -e "${YELLOW}⚠️  Global ruflo install failed. You can retry later with:${NC}"
-    echo -e "   ${YELLOW}npm install -g ruflo@latest${NC}"
-fi
-
-if command -v claude >/dev/null 2>&1; then
-    echo -e "🔌 ${CYAN}Registering Ruflo MCP server with Claude Code...${NC}"
-    claude mcp add ruflo -- npx ruflo@latest mcp start || \
-        echo -e "${YELLOW}⚠️  Could not register ruflo MCP. Run manually:${NC} claude mcp add ruflo -- npx ruflo@latest mcp start"
+# ── 3. .env.local ─────────────────────────────────────────────────────────────
+if [ -f .env.example ]; then
+    run_step "Create .env.local from .env.example" cp .env.example .env.local
 else
-    echo -e "${YELLOW}ℹ️  Claude Code CLI not found — skipping MCP registration.${NC}"
-    echo -e "   After installing Claude Code, run: ${YELLOW}claude mcp add ruflo -- npx ruflo@latest mcp start${NC}"
+    mark_skip "Create .env.local" ".env.example not found in repo"
 fi
 
-# 5. Per-project Ruflo init (swarms, hooks, agents)
-echo -e "🌀 ${CYAN}Running Ruflo project init wizard...${NC}"
-npx ruflo@latest init wizard || \
-    echo -e "${YELLOW}⚠️  Ruflo init wizard did not finish. You can run it later with: npx ruflo@latest init wizard${NC}"
+# ── 4. Ruflo global install ───────────────────────────────────────────────────
+run_step "Install Ruflo globally (beta)" npm install -g ruflo@latest
 
-# 6. Install design-taste skill packs (all idempotent — re-runs pull latest from upstream)
-# Sources land in .agents/skills/<name>/ and are symlinked into .claude/skills/<name>/.
-#
-# Pack 1: Leonxlnx/taste-skill  — 12 broad design-taste skills (Low Risk)
-# Pack 2: emilkowalski/skill    — Emil Kowalski's animation/UI craft (Low Risk)
-# Pack 3: pbakaus/impeccable    — anti-pattern detector + 23-command vocabulary (Med Risk; review SKILL.md before relying on it)
-echo -e "🎨 ${CYAN}Installing design-taste skill packs (Leonxlnx + Emil Kowalski + Impeccable)...${NC}"
+# ── 5. Register Ruflo MCP with Claude Code ────────────────────────────────────
+if command -v claude >/dev/null 2>&1; then
+    run_step "Register Ruflo MCP server with Claude Code" \
+        claude mcp add ruflo -- npx ruflo@latest mcp start
+else
+    mark_skip "Register Ruflo MCP server" \
+        "Claude Code CLI not found on PATH — run later: claude mcp add ruflo -- npx ruflo@latest mcp start"
+fi
 
-npx -y skills add https://github.com/Leonxlnx/taste-skill --all || \
-    echo -e "${YELLOW}⚠️  Leonxlnx/taste-skill install failed. Retry later with:${NC} ./guide.sh skills-update"
+# ── 6. Ruflo project init wizard (interactive — needs real TTY) ───────────────
+echo ""
+echo -e "${CYAN}${BOLD}[$((STEP_NUM + 1))] Ruflo project init wizard${NC}"
+echo -e "${YELLOW}  ↳ This is interactive. Use arrow keys + Enter to select a preset.${NC}"
+STEP_NUM=$((STEP_NUM + 1))
+if npx ruflo@latest init wizard < /dev/tty; then
+    echo -e "  ${GREEN}✅ PASS — Ruflo project init wizard${NC}"
+    PASS_COUNT=$((PASS_COUNT + 1))
+    SUMMARY+=("${GREEN}✅${NC} [$STEP_NUM] Ruflo project init wizard")
+else
+    code=$?
+    echo -e "  ${RED}❌ FAIL — Ruflo init wizard (exit $code)${NC}"
+    echo -e "  ${YELLOW}↳ Re-run later with: npx ruflo@latest init wizard${NC}"
+    FAIL_COUNT=$((FAIL_COUNT + 1))
+    FAILED_STEPS+=("[$STEP_NUM] Ruflo init wizard (exit $code)")
+    SUMMARY+=("${RED}❌${NC} [$STEP_NUM] Ruflo init wizard (exit $code)")
+fi
 
-npx -y skills add https://github.com/emilkowalski/skill --all || \
-    echo -e "${YELLOW}⚠️  emilkowalski/skill install failed. Retry later with:${NC} ./guide.sh skills-update"
+# ── 7–14. Skill packs ─────────────────────────────────────────────────────────
+echo -e "\n${CYAN}${BOLD}── Installing skill packs ──${NC}"
 
-npx -y skills add https://github.com/pbakaus/impeccable --all || \
-    echo -e "${YELLOW}⚠️  pbakaus/impeccable install failed. Retry later with:${NC} ./guide.sh skills-update"
+run_step "Skill: Leonxlnx/taste-skill (design taste)" \
+    npx -y skills add https://github.com/Leonxlnx/taste-skill --all -y
 
-# 7. Install quality skills (idempotent — re-runs pull latest)
-# These are non-visual: API correctness, accessibility, component-library guidance.
-#
-#   anthropics/skills@claude-api  — Anthropic SDK / prompt caching / model migration
-#   shadcn/ui@shadcn              — official shadcn component docs + composition
-#   alirezarezvani@a11y-audit     — WCAG 2.2 A/AA scanning + fixes for React/Next/etc.
-echo -e "🧰 ${CYAN}Installing quality skills (claude-api + shadcn + a11y-audit)...${NC}"
+run_step "Skill: emilkowalski/skill (animation craft)" \
+    npx -y skills add https://github.com/emilkowalski/skill --all -y
 
-npx -y skills add anthropics/skills@claude-api -y || \
-    echo -e "${YELLOW}⚠️  anthropics/skills@claude-api install failed. Retry later with:${NC} ./guide.sh skills-update"
+run_step "Skill: pbakaus/impeccable (UI anti-patterns)" \
+    npx -y skills add https://github.com/pbakaus/impeccable --all -y
 
-npx -y skills add shadcn/ui@shadcn -y || \
-    echo -e "${YELLOW}⚠️  shadcn/ui@shadcn install failed. Retry later with:${NC} ./guide.sh skills-update"
+run_step "Skill: anthropics/claude-api (SDK + caching)" \
+    npx -y skills add anthropics/skills@claude-api -y
 
-npx -y skills add alirezarezvani/claude-skills@a11y-audit -y || \
-    echo -e "${YELLOW}⚠️  alirezarezvani/claude-skills@a11y-audit install failed. Retry later with:${NC} ./guide.sh skills-update"
+run_step "Skill: shadcn/ui (component guidance)" \
+    npx -y skills add shadcn/ui@shadcn -y
 
-# 8. Install SEO + marketing skill packs (idempotent — re-runs pull latest)
-# These cover everything from technical SEO to copy, CRO, launch, and pricing.
-#
-#   coreyhaines31/marketingskills  — 30+ growth/marketing skills (seo-audit, copywriting,
-#                                    cro, pricing, launch, ads, emails, signup, etc.)
-#                                    Top install: seo-audit (116K+)
-#   addyosmani/web-quality-skills  — Addy Osmani's technical SEO + Core Web Vitals
-echo -e "📈 ${CYAN}Installing SEO + marketing skill packs (coreyhaines31 + addyosmani)...${NC}"
+run_step "Skill: alirezarezvani/a11y-audit (WCAG 2.2)" \
+    npx -y skills add alirezarezvani/claude-skills@a11y-audit -y
 
-npx -y skills add coreyhaines31/marketingskills --all || \
-    echo -e "${YELLOW}⚠️  coreyhaines31/marketingskills install failed. Retry later with:${NC} ./guide.sh skills-update"
+run_step "Skill: coreyhaines31/marketingskills (30+ skills)" \
+    npx -y skills add coreyhaines31/marketingskills --all -y
 
-npx -y skills add addyosmani/web-quality-skills@seo -y || \
-    echo -e "${YELLOW}⚠️  addyosmani/web-quality-skills@seo install failed. Retry later with:${NC} ./guide.sh skills-update"
+run_step "Skill: addyosmani/web-quality-skills (SEO)" \
+    npx -y skills add addyosmani/web-quality-skills@seo -y
 
-# 9. Trigger Guide Initialization
-# This handles the branding and resetting of GIT history for the user.
-echo -e "✨ ${CYAN}Running project initialization...${NC}"
-chmod +x guide.sh
-./guide.sh init "$app_name"
+# ── 15. guide.sh init (branding + git reset) ──────────────────────────────────
+chmod +x guide.sh 2>/dev/null
+run_step "Initialize project (guide.sh init)" ./guide.sh init "$app_name"
 
-echo -e "\n${GREEN}${BOLD}Setup Complete!${NC}"
-echo -e "Your project is ready in: ${CYAN}$folder_name${NC}\n"
+# ── Summary ───────────────────────────────────────────────────────────────────
+echo ""
+echo -e "${BOLD}═══════════════════ Installation Summary ═══════════════════${NC}"
+for item in "${SUMMARY[@]}"; do
+    echo -e "  $item"
+done
+echo -e "${BOLD}─────────────────────────────────────────────────────────────${NC}"
+echo -e "  ${GREEN}Passed:${NC}  $PASS_COUNT"
+echo -e "  ${RED}Failed:${NC}  $FAIL_COUNT"
+echo -e "  ${YELLOW}Skipped:${NC} $SKIP_COUNT"
+echo -e "  ${BOLD}Total:${NC}   $STEP_NUM"
+echo -e "${BOLD}═════════════════════════════════════════════════════════════${NC}\n"
 
+if [ "$FAIL_COUNT" -eq 0 ] && [ "$SKIP_COUNT" -eq 0 ]; then
+    echo -e "${GREEN}${BOLD}🎉 All $STEP_NUM steps completed successfully — no failures, no skips.${NC}\n"
+elif [ "$FAIL_COUNT" -eq 0 ]; then
+    echo -e "${GREEN}${BOLD}✅ All required steps passed.${NC} ${YELLOW}($SKIP_COUNT optional step(s) skipped — see above.)${NC}\n"
+else
+    echo -e "${RED}${BOLD}⚠️  $FAIL_COUNT step(s) failed:${NC}"
+    for s in "${FAILED_STEPS[@]}"; do
+        echo -e "   ${RED}•${NC} $s"
+    done
+    echo -e "\n${YELLOW}Scroll up to see the actual error output for each failed step.${NC}"
+    echo -e "${YELLOW}You may still continue, but expect issues until the failures are resolved.${NC}\n"
+fi
+
+# ── Next steps ────────────────────────────────────────────────────────────────
+echo -e "Your project is ready in: ${CYAN}${BOLD}$folder_name${NC}\n"
 echo -e "${BOLD}Next: Tailor Claude to YOUR project (do this before building)${NC}\n"
 echo -e "  ${CYAN}1.${NC} ${YELLOW}cd $folder_name${NC}"
 echo -e "  ${CYAN}2.${NC} Open ${YELLOW}README.md${NC} and rewrite it to describe YOUR app — not DannFlow"
@@ -137,8 +217,13 @@ echo -e "     → Rewrites CLAUDE.md + SKILLS.md + commands to match your projec
 echo -e "  ${CYAN}4.${NC} Fill in ${YELLOW}PROJECT_CONTEXT.md${NC} (audience, stack decisions, design rules)"
 echo -e "  ${CYAN}5.${NC} Run ${YELLOW}/ruflo-upgrade${NC} → adds memory + parallel-agent patterns to commands"
 echo -e "  ${CYAN}6.${NC} Run ${YELLOW}/no-conflict${NC} → verifies docs and code are in sync\n"
-
 echo -e "Then: ${CYAN}npm run dev${NC} to start the dev server.\n"
 echo -e "Run ${CYAN}./guide.sh claude${NC} at any time for the full setup wizard."
 echo -e "Full setup guide: ${CYAN}docs/dannflow_docs/setup-flow.md${NC}\n"
 echo -e "Happy Vibe Coding! 🚢\n"
+
+# Exit with non-zero if anything failed (so CI / scripts can detect it)
+if [ "$FAIL_COUNT" -gt 0 ]; then
+    exit 1
+fi
+exit 0
