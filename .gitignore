@@ -61,3 +61,6 @@ next-env.d.ts
 
 # MCP config (contains real tokens — never commit)
 mcp.json
+
+# Screenshot for Claude basis
+/ss/*
