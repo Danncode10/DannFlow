@@ -2,11 +2,12 @@
 
 > Skills are reusable capabilities Claude Code can invoke (e.g. `/security-review`, `/review`). They're managed globally (`~/.claude/skills/`) or via plugins — this file just documents **which skills matter for this project** and when to use them.
 
+DannFlow is a **multi-tenant website builder and SaaS starter** — priorities are SEO + marketing (landing pages matter), lead capture, CMS, and RLS security (data isolation). This guide prioritizes skills accordingly.
+
 ## Recommended skills
 
 | Skill | When to use it |
 |---|---|
-| **`/masterplan-task`** | Run to execute one task from `MASTERPLAN.md`. Generates code + auto-creates `TEST.md` verification guide. Use during development sprints to scaffold features systematically without hallucination (reads exact task spec from MASTERPLAN.md). |
 | **`init`** | Re-bootstrap `CLAUDE.md` from scratch. Use when the project pivots significantly or after a major refactor. Prefer `/init-claude` (project-specific custom command) for routine refreshes. |
 | **`review`** | Run before opening a PR. Critiques the current branch's diff against project conventions in `CLAUDE.md`. |
 | **`security-review`** | **Always run** before merging changes that touch: auth (`src/services/auth.ts`), RLS policies, Supabase queries, environment variables, or anything in `src/utils/supabase/`. Catches RLS bypasses and key leaks that `/security-audit` may miss. |
@@ -40,18 +41,19 @@ DannFlow is a SaaS starter, so it ships with two upstream packs covering everyth
 | **coreyhaines31/marketingskills** | [skills.sh](https://skills.sh/coreyhaines31/marketingskills) | `seo-audit` (116K+ installs), `programmatic-seo`, `ai-seo`, `schema`, `copywriting`, `copy-editing`, `cro`, `pricing`, `paywalls`, `signup`, `onboarding`, `churn-prevention`, `launch`, `ads`, `ad-creative`, `emails`, `cold-email`, `social`, `sms`, `referrals`, `directory-submissions`, `marketing-psychology`, `marketing-ideas`, `content-strategy`, `customer-research`, `competitor-profiling`, `competitors`, `site-architecture`, `popups`, `lead-magnets`, `sales-enablement`, `analytics`, `ab-testing`, `image`, `video`, `aso`, `revops`, `co-marketing`, `community-marketing`, `free-tools`, `product-marketing` |
 | **addyosmani/web-quality-skills** | [skills.sh](https://skills.sh/addyosmani/web-quality-skills) | `seo` — Google Chrome team's technical SEO + Core Web Vitals patterns |
 
-**Most relevant for a SaaS landing page:**
+**Most relevant for website builders and B2B SaaS (prioritized):**
 
-| Skill | Trigger |
-|---|---|
-| `seo-audit` (coreyhaines31) | "audit SEO", "why am I not ranking", "meta tags review" |
-| `seo` (addyosmani) | technical SEO, Core Web Vitals, page-speed, indexing |
-| `copywriting` (coreyhaines31) | "write copy for", "improve this headline", landing-page copy |
-| `cro` (coreyhaines31) | conversion rate optimization, A/B test ideas, page-level lift |
-| `pricing` (coreyhaines31) | pricing-page strategy, tier design, anchor pricing |
-| `launch` (coreyhaines31) | Product Hunt, waitlist, GTM plan |
-| `marketing-psychology` (coreyhaines31) | persuasion principles, cognitive biases applied to copy |
-| `programmatic-seo` (coreyhaines31) | SEO pages at scale, comparison/alternative pages |
+| Skill | When to use | Why |
+|---|---|---|
+| `seo-audit` (coreyhaines31) | "audit SEO", "meta tags", local SEO | **Core** — local search ranking (especially service/retail businesses) |
+| `seo` (addyosmani) | Core Web Vitals, page-speed, indexing | **Core** — Google ranking factors |
+| `copywriting` (coreyhaines31) | "write hero copy", "improve headline", services page copy | **Core** — first landing-page impression |
+| `schema` (coreyhaines31) | "add JSON-LD", LocalBusiness markup | **Core** — local SEO relies on structured data |
+| `marketing-psychology` (coreyhaines31) | "improve call-to-action", trust-building copy | **High** — leads depend on persuasion |
+| `programmatic-seo` (coreyhaines31) | "generate blog posts at scale", location pages | **High** — blog scales SEO reach |
+| `cro` (coreyhaines31) | "why aren't leads converting", form optimization | **Med** — lead-quality matters |
+| `pricing` (coreyhaines31) | service/product pricing strategy | **Med** — if client sells services |
+| `launch` (coreyhaines31) | go-live strategy, domain switchover | **Low** — one-time per site deployment |
 
 **Tip — start here:** run `product-marketing` (coreyhaines31) on a fresh project to create `.agents/product-marketing.md` (ICP + positioning + value props). All the other Corey skills reference it, so you avoid repeating positioning context in every prompt.
 
