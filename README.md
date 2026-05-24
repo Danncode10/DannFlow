@@ -202,7 +202,7 @@ src/types/supabase.ts is up to date with the live schema.
 | GitHub Repos Tab | `dashboard-shell.tsx` — paginated, 5/page |
 | TanStack Query caching | `src/hooks/` |
 | Toast notifications | Sonner — global |
-| Rate limiting | Upstash Redis + Ratelimit |
+| Rate limiting | Optional (Upstash Redis — deferred to Phase 8+) |
 | RLS-first service layer | `src/services/` |
 
 ---
