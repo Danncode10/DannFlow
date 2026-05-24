@@ -823,7 +823,7 @@ show_commands() {
             new-feature|new-page) echo "3|🧱 Scaffolding" ;;
             seo-check|seo-fix|marketing-check) echo "4|📈 SEO & marketing" ;;
             security-audit|rls-check|rls|ui|review) echo "5|🛡️  Security & quality" ;;
-            commit|cleanup|sync-commands|auto-docs|no-conflict|init-update|ruflo-upgrade) echo "6|🧹 Housekeeping" ;;
+            commit|cleanup|sync-commands|auto-docs|no-conflict|init-update|ruflo-upgrade|masterplan-task) echo "6|🧹 Housekeeping" ;;
             *) echo "9|📦 Other" ;;
         esac
     }
