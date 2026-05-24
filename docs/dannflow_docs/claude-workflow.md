@@ -97,6 +97,7 @@ Run `/ask-command <what you want>` if you don't remember which command to use.
 |---|---|
 | `/new-feature <name>` | Scaffolds service + types + App Router page + Shadcn form for a new feature. |
 | `/new-page <route>` | Scaffolds an App Router page (Server Component) with `loading.tsx` + `error.tsx`. |
+| `/masterplan-task <task>` | Execute a single task from `MASTERPLAN.md` with full context. Auto-generates `TEST.md` verification guide. Use during development sprints for systematic, hallucination-free feature scaffolding. |
 
 ### SEO & marketing
 | Command | What it does |
@@ -116,7 +117,6 @@ Run `/ask-command <what you want>` if you don't remember which command to use.
 | `/sync-upstream [path|--commits [N]]` | Pull selective file or commit updates from DannFlow upstream. File-level diff is default — safe for forked repos with no common git ancestry. |
 | `/no-conflict` | Audits repo for conflicts between documentation (README, CLAUDE.md) and actual code — versions, features, commands, RLS, semantic tokens, folder structure. Reports only. |
 | `/ruflo-upgrade` | Re-applies Ruflo memory + parallel-agent patterns to the 5 core commands (`/new-feature`, `/new-page`, `/security-audit`, `/seo-fix`, `/migrate`). Safe to re-run after `/init-update`. |
-| `/masterplan-task <task>` | Execute a single task from `MASTERPLAN.md` with full context. Auto-generates `TEST.md` verification guide. Use during development sprints for systematic, hallucination-free feature scaffolding. |
 
 ---
 
