@@ -13,7 +13,11 @@ Scaffold a new feature: **$ARGUMENTS**
 
 2. **Confirm requirements** with the user before writing files. Ask (briefly):
    - What's the primary user action? (create / view / edit / delete data?)
-   - Does it need a new Supabase table? If yes, suggest running `/checkpoint` first and creating the table via Supabase MCP.
+   - Does it need a new Supabase table? If yes:
+     - Suggest running `/checkpoint` first
+     - Creating the table via Supabase MCP
+     - **CRITICAL for multi-tenancy:** table MUST have `organization_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE` as the first column
+     - Define RLS policies enforcing `organization_id` filter from `auth.jwt() ->> 'organization_id'`
    - Should it be a protected route (under `src/app/dashboard/`) or public?
 
 3. **Scaffold these files** (use feature name in kebab-case for paths, PascalCase for components). These four artifacts are independent — **spawn parallel agents** for service, page, component, and types simultaneously when the feature scope is clear:
@@ -27,7 +31,9 @@ Scaffold a new feature: **$ARGUMENTS**
    - **`src/services/<feature-name>.ts`** — service layer
      - Import typed Supabase client from `src/utils/supabase/server.ts`
      - Define functions using types from `src/types/supabase.ts` (no `any`)
-     - Every query MUST include user/ownership filter (RLS-compliant)
+     - **CRITICAL for multi-tenancy:** Every query MUST include `.eq('organization_id', tenantId)` (tenant isolation)
+     - ALSO include user/ownership filter when applicable (RLS-compliant)
+     - Example: `.from('pages').select('*').eq('organization_id', tenantId).eq('created_by', userId)`
      - Async/await, return typed results
 
    - **`src/app/<route>/page.tsx`** — Server Component by default

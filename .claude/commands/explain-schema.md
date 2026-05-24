@@ -13,6 +13,7 @@ Produce a plain-English summary of the live Supabase schema.
    - Foreign key relationships from `information_schema.table_constraints` + `key_column_usage`
 
 3. Synthesize, don't dump. The user doesn't want raw SQL — they want to understand the model.
+4. **Multi-tenancy emphasis** — highlight the `organization_id` foreign key and its RLS role in every table. This is the security boundary.
 
 **Output format:**
 

@@ -63,3 +63,6 @@ ruvector.db
 
 # MCP config (contains real tokens — never commit)
 mcp.json
+
+# Screenshot for Claude basis
+/ss/*

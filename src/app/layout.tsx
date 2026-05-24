@@ -45,12 +45,12 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable}`}
     >
-      <body className="min-h-screen flex flex-col antialiased">
+      <body className="min-h-screen flex flex-col antialiased relative">
         <QueryProvider>
           {children}
           <Toaster
             position="bottom-right"
-            theme="system"
+            theme="dark"
             richColors
             toastOptions={{
               className: "font-mono font-bold tracking-tight rounded-xl border border-border shadow-2xl",
