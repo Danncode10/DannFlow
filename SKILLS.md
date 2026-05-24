@@ -6,6 +6,7 @@
 
 | Skill | When to use it |
 |---|---|
+| **`/masterplan-task`** | Run to execute one task from `MASTERPLAN.md`. Generates code + auto-creates `TEST.md` verification guide. Use during development sprints to scaffold features systematically without hallucination (reads exact task spec from MASTERPLAN.md). |
 | **`init`** | Re-bootstrap `CLAUDE.md` from scratch. Use when the project pivots significantly or after a major refactor. Prefer `/init-claude` (project-specific custom command) for routine refreshes. |
 | **`review`** | Run before opening a PR. Critiques the current branch's diff against project conventions in `CLAUDE.md`. |
 | **`security-review`** | **Always run** before merging changes that touch: auth (`src/services/auth.ts`), RLS policies, Supabase queries, environment variables, or anything in `src/utils/supabase/`. Catches RLS bypasses and key leaks that `/security-audit` may miss. |
