@@ -54,15 +54,16 @@ next-env.d.ts
 .claude-flow/sessions/
 .claude-flow/metrics/
 .claude-flow/learning/
-.claude-flow/embeddings.json
 
 # Ruflo memory (local, session-specific, may contain sensitive context)
 .swarm/
 @ruvector.db
-ruvector.db
 
 # MCP config (contains real tokens — never commit)
 mcp.json
 
 # Screenshot for Claude basis
 /ss/*
+
+# Supabase CLI generated files (machine-specific, ephemeral)
+supabase/.temp/
