@@ -21,7 +21,7 @@ For the full marketing/setup story, see [README.md](README.md). For deeper docs,
 - **DB / Auth**: Supabase (`@supabase/ssr`, `@supabase/supabase-js`)
 - **Styling**: Tailwind CSS v4 + Shadcn/UI primitives
 - **State / Data**: TanStack Query, React Server Components by default
-- **Rate limiting**: Upstash Redis + Ratelimit
+- **Rate limiting**: Optional (Upstash Redis, deferred to Phase 8+ — see [#23](https://github.com/Danncode10/DannFlow/issues/23))
 - **Animation**: Framer Motion
 - **Toasts**: Sonner
 - **Icons**: lucide-react
