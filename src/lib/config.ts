@@ -1,8 +1,8 @@
 export const siteConfig = {
-  name: process.env.NEXT_PUBLIC_SITE_NAME || "my-app",
+  name: process.env.NEXT_PUBLIC_SITE_NAME || "Fix Pinas",
   githubUrl: process.env.NEXT_PUBLIC_GITHUB_URL || "https://github.com/Danncode10",
-  description: "The backbone template for your next million-dollar idea.",
-  url: process.env.NEXT_PUBLIC_SITE_URL || "https://dannflow.vercel.app",
+  description: "Snap. Report. Fix. — The national platform for reporting infrastructure and safety issues in the Philippines.",
+  url: process.env.NEXT_PUBLIC_SITE_URL || "https://fixpinas.vercel.app",
 } as const;
 
 /**

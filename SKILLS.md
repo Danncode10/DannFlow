@@ -1,8 +1,8 @@
-# SKILLS.md — Claude Code Skills for DannFlow
+# SKILLS.md — Claude Code Skills for Fix Pinas
 
 > Skills are reusable capabilities Claude Code can invoke (e.g. `/security-review`, `/review`). They're managed globally (`~/.claude/skills/`) or via plugins — this file just documents **which skills matter for this project** and when to use them.
 
-DannFlow is a **multi-tenant website builder and SaaS starter** — priorities are SEO + marketing (landing pages matter), lead capture, CMS, and RLS security (data isolation). This guide prioritizes skills accordingly.
+Fix Pinas is a **national civic incident reporting platform** — priorities are RLS security (multi-role data isolation), mobile-first UI (camera/GPS primary flow), and reliability (reports must reach the right agency without failure). SEO and marketing skills are lower priority than in a typical SaaS starter. This guide reflects that.
 
 ## Recommended skills
 
