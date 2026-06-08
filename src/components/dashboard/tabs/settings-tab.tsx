@@ -84,8 +84,8 @@ function OrganizationPanel() {
         <Field label="Supabase project" value={sb.projectName ?? sb.projectRef ?? "—"} />
         <Field label="Website" value={siteConfig.url} />
         <Field label="Industry" value={businessConfig.business.industry} />
-        <Field label="Contact email" value={siteConfig.contact.email} />
-        <Field label="Address" value={siteConfig.contact.address} />
+        <Field label="Contact email" value={businessConfig.contact.email} />
+        <Field label="Address" value={businessConfig.contact.address} />
       </dl>
 
       <div className="border-t border-border pt-4 text-[12px] text-muted-foreground">
