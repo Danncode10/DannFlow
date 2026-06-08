@@ -6,7 +6,7 @@ import {
   Tag,
   Inbox,
   Calendar,
-  Image as ImageIcon,
+  BookOpen,
   BarChart3,
   Settings,
   LogOut,
@@ -28,7 +28,7 @@ import { OverviewTab } from "@/components/dashboard/tabs/overview-tab";
 import { ServicesTab } from "@/components/dashboard/tabs/services-tab";
 import { LeadsTab } from "@/components/dashboard/tabs/leads-tab";
 import { BookingsTab } from "@/components/dashboard/tabs/bookings-tab";
-import { GalleryTab } from "@/components/dashboard/tabs/gallery-tab";
+import { BlogTab } from "@/components/dashboard/tabs/blog-tab";
 import { AnalyticsTab } from "@/components/dashboard/tabs/analytics-tab";
 import { SettingsTab } from "@/components/dashboard/tabs/settings-tab";
 import { NotificationsBell } from "@/components/dashboard/notifications-bell";
@@ -38,7 +38,7 @@ const ICONS: Record<DashboardTabId, LucideIcon> = {
   services: Tag,
   leads: Inbox,
   bookings: Calendar,
-  gallery: ImageIcon,
+  blog: BookOpen,
   analytics: BarChart3,
   settings: Settings,
 };
@@ -233,7 +233,7 @@ export function DashboardShell({ user, profile }: DashboardShellProps) {
           {activeTab === "services"  && <ServicesTab />}
           {activeTab === "leads"     && <LeadsTab />}
           {activeTab === "bookings"  && <BookingsTab />}
-          {activeTab === "gallery"   && <GalleryTab />}
+          {activeTab === "blog"      && <BlogTab />}
           {activeTab === "analytics" && <AnalyticsTab />}
           {activeTab === "settings"  && <SettingsTab />}
         </main>

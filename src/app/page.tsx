@@ -7,6 +7,7 @@ import { HowItWorks } from "@/components/landing/how-it-works";
 import { Pricing } from "@/components/landing/pricing";
 import { CtaBanner } from "@/components/landing/cta-banner";
 import { Typewriter } from "@/components/landing/typewriter";
+import { BlogPreview } from "@/components/landing/blog-preview";
 import { creatorRepos } from "@/lib/config";
 
 
@@ -61,6 +62,8 @@ export default async function Home() {
       <HowItWorks />
 
       <Pricing isAuthed={!!user} />
+
+      <BlogPreview />
 
       <CtaBanner isAuthed={!!user} />
 
