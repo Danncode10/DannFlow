@@ -60,7 +60,7 @@ export default function AuthPage() {
           }, 800);
         }
       } else {
-        await signUpWithEmailRateLimited(email, password);
+        await signUpWithEmailRateLimited(email, password, window.location.origin);
         setSuccess(true);
         setTimeout(() => {
           toast.success('Account created!', { description: 'Check your email for confirmation.' });

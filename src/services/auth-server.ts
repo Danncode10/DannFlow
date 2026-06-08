@@ -25,7 +25,11 @@ export async function signInWithEmailRateLimited(email: string, password: string
   return { success: true, requiresMFA: false };
 }
 
-export async function signUpWithEmailRateLimited(email: string, password: string) {
+export async function signUpWithEmailRateLimited(
+  email: string,
+  password: string,
+  origin: string,
+) {
   const { success } = await verifyRateLimit(email);
   if (!success) throw new Error('Too many signup attempts. Try again in a few moments.');
 
@@ -33,6 +37,12 @@ export async function signUpWithEmailRateLimited(email: string, password: string
   const { error } = await supabase.auth.signUp({
     email,
     password,
+    options: {
+      // After user clicks the email link, Supabase will redirect here
+      // with ?code=... → our /auth/callback route exchanges it for a session
+      // → then redirects to /login (default next)
+      emailRedirectTo: `${origin}/auth/callback?next=/login`,
+    },
   });
   if (error) throw error;
   return { success: true };
