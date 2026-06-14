@@ -1,105 +1,96 @@
-# Project Context — Fix Pinas
+# Project Context
 
-> Read by Claude, skills, and commands before they act on this project.
-> Update whenever the product direction changes.
+> This file is read by Claude, skills, and commands before they act on your project.
+> Fill it in once after running `/init-claude`. Update it when your product direction changes.
+> Do NOT edit `.claude/skills/` files directly — put project-specific context here instead.
 
 ---
 
 ## What this app is
 
-**App name:** Fix Pinas
+**App name:** <!-- e.g. "Trello for freelancers" -->
 
-**One-liner:** A national Philippines incident reporting platform where citizens snap a photo, pin the location, and the system routes the report to the correct government agency automatically.
+**One-liner:** <!-- What it does, for whom, and the outcome. Max 1 sentence. -->
+<!-- Example: "Helps freelance designers track client revisions without email chaos." -->
 
 **The problem it solves:**
-When Filipinos encounter infrastructure problems — broken roads, exposed electrical wires, flooding, fire hazards — there is no central, accessible way to report them to the right agency. People don't know who to call, reports get lost, and agencies never hear about issues in their jurisdiction. Fix Pinas closes that gap with one app that figures out who to notify and does it for you.
+<!-- 2-3 sentences. What's broken without this app? -->
 
 ---
 
 ## Target audience
 
-**Primary user:** Filipino citizens on mobile (18–45), especially in provincial areas where infrastructure problems are common and underreported.
+**Primary user:**
+<!-- Job title / persona. e.g. "Indie SaaS founders who code solo" -->
 
 **What they care most about:**
-- Submitting a report in under 60 seconds (photo + location + tap submit)
-- Knowing their report actually went somewhere and wasn't ignored
-- Seeing the status change (received → in progress → resolved)
+<!-- Top 1-2 outcomes. e.g. "Shipping fast without breaking auth or losing data." -->
 
 **What they don't care about:**
-- Complex account management or profile pages
-- Dashboards with charts and analytics (that's for admins)
-- Social features, likes, comments
-
-**Secondary users:**
-- `provincial_admin`: LGU or agency staff managing reports in their province — need a clean queue with filter/status controls
-- `admin`: Super admin (initially just the developer) — manages provinces, agencies, categories
+<!-- Helps Claude avoid over-engineering. e.g. "Enterprise SSO, complex RBAC, audit logs." -->
 
 ---
 
-## Stack decisions
+## Stack decisions (supplement CLAUDE.md)
 
-> Supplements CLAUDE.md. Only deviations from DannFlow defaults listed here.
+> Only add decisions that differ from DannFlow defaults or that you want emphasized.
 
-- **Maps**: Google Maps JS API + Geocoding API — server-proxied via Next.js API route. Never expose API key client-side.
-- **Email**: Resend (not SendGrid)
-- **SMS**: Semaphore PH — Philippines-local, cheaper than Twilio. Phase 3+ only.
-- **Photo storage**: Supabase Storage (not S3)
-- **State**: TanStack Query only — no Zustand, no Redux
-- **Auth**: Supabase email/password + phone OTP for verification. No social providers in MVP.
-- **Rate limiting**: Upstash Redis (Phase 6+). Not in MVP — DB-level trust tier handles spam for now.
-- **AI classification**: Claude Vision Haiku (Phase 4+). Photo category is user-selected manually in MVP.
+<!-- Examples:
+- Email: Resend (not SendGrid)
+- Payments: Lemon Squeezy (not Stripe)
+- State: TanStack Query only — no Zustand, no Redux
+- Auth: Supabase email/password only — no social providers yet
+- File uploads: Supabase Storage (not S3)
+-->
 
 ---
 
 ## Design decisions
 
-- **Mobile-first, camera-optimized**: Primary flow is on a phone. Forms are large, buttons are tall (h-14 minimum), map picker is full-screen.
-- **Border radius**: `rounded-xl` for cards, `rounded-lg` for inputs — slightly softer than default
-- **Spacing**: `p-6` / `gap-6` as base in main content. `p-4` only in compact list items.
-- **Color mode**: Light mode primary. Dark mode is a nice-to-have, not MVP.
-- **Tone**: Civic, clear, trustworthy. Not playful. Not corporate. Think gov.ph meets a well-designed app.
-- **Report status colors**: `pending_review` → muted, `received` → blue, `in_progress` → amber, `resolved` → green, `rejected` → destructive
+> These override or supplement the UI standards in CLAUDE.md.
+> Commands like /ui and /new-feature read this before applying styles.
+
+<!-- Examples:
+- Border radius: rounded-2xl for cards, rounded-xl for inputs (not rounded-lg)
+- Spacing: p-6/gap-6 as base — never p-4/gap-4 in main content areas
+- Typography: text-lg for body copy, not text-base
+- Buttons: h-14 (not h-12) — we target iPad touch users
+- Color mode: dark mode first, light mode secondary
+-->
 
 ---
 
 ## Tone & voice
 
-**Brand tone:** Clear, civic, and direct. Speaks to ordinary Filipinos, not tech people. Short sentences. Action-oriented. Filipino-English mix acceptable in UI copy (e.g., "I-report na" for CTA).
+> For /marketing-check, copywriting, and seo-fix.
 
-**What to avoid:** No government jargon. No legalese. No exclamation mark spam. No "revolutionary" or "game-changing" language.
+**Brand tone:**
+<!-- e.g. "Confident and direct. No fluff. Talk like a senior engineer, not a marketing team." -->
 
----
-
-## Anti-decisions
-
-- **NOT building a mobile app** — PWA-capable web only for now. Reduces complexity.
-- **NOT pre-seeding all 1,647 municipalities manually** — provinces seeded upfront (82 rows), municipalities populated via reverse geocoding at report submission time.
-- **NOT using AI classification in MVP** — user picks category from dropdown. Claude Vision Haiku added in Phase 4 as a *suggestion*, never a blocker.
-- **NOT building an agency login dashboard in MVP** — agencies are notified by email. Dashboard comes after agencies confirm they want it.
-- **NOT using Twilio** — Semaphore PH is the SMS provider when we get there.
-- **NOT adding analytics until Phase 5+** — focus is on the report loop, not metrics.
-- **NOT supporting multi-province admins** — one `provincial_admin` account = one province. Keep RLS simple.
+**What to avoid:**
+<!-- e.g. "No buzzwords like 'revolutionary' or 'game-changing'. No exclamation marks." -->
 
 ---
 
-## Geographic scope
+## Anti-decisions (things we're NOT doing)
 
-- **Schema**: Province-agnostic from day one. All 82 provinces seeded as reference data.
-- **Pilot**: Nueva Vizcaya — agencies configured, `provincial_admin` account active.
-- **National rollout**: Phase 5+, driven by agency partnerships and real usage data from the pilot.
+> Saves Claude from suggesting them. Equally important as the decisions above.
 
----
-
-## Current focus
-
-**Status: Planning / Schema design phase.**
-
-Next steps (in order):
-1. Write `docs/fixpinas/` technical specs (schema, roles, routing, anti-spam)
-2. Fill `MASTERPLAN.md` with phased plan
-3. Create Supabase project + apply Phase 0 migrations
-4. Build Phase 0: 2 tables, auth, report submission, email routing
+<!-- Examples:
+- NOT adding a mobile app — web only for now
+- NOT supporting multi-tenancy — single user per account
+- NOT using Prisma — Supabase types only
+- NOT adding analytics until we have 100 users
+-->
 
 ---
 
-*Last updated: 2026-06-05*
+## Current focus / what's being built right now
+
+> Update this as the project evolves. Helps Claude prioritize suggestions.
+
+<!-- e.g. "Phase 1: auth + onboarding. Phase 2: core CRUD. Not thinking about billing yet." -->
+
+---
+
+*Last updated: <!-- YYYY-MM-DD -->*
