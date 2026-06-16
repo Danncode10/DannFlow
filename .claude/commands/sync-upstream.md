@@ -1,10 +1,12 @@
 ---
-description: Pull selective updates from DannFlow upstream. File-level diff is the default — commit-level cherry-pick is opt-in.
+description: Pull selective updates from DannFlow upstream. Reads dannflow.json to know your base commit. File-level diff is the default — commit-level cherry-pick is opt-in.
 ---
 
 # /sync-upstream
 
 Pull selective updates from the DannFlow upstream repo without merging or rebasing. The user's project has rewritten git history (via `guide.sh init`), so **there is no common ancestor with `upstream/main`** — a normal `git merge upstream/main` would be a disaster. This command works around that.
+
+> **Version-aware:** This command reads `dannflow.json` at the project root to know which DannFlow commit you last synced from, so it can show you only what's new since then.
 
 **Two modes** — file-level is the default and recommended:
 
@@ -24,26 +26,46 @@ The user invokes this command with optional args:
 
 ## Preflight (always run first)
 
-1. Verify `upstream` remote exists:
+1. **Read `dannflow.json`** to get the base commit:
+   ```bash
+   cat dannflow.json
+   ```
+   - If the file is missing, warn:
+     ```
+     ⚠️ No dannflow.json found. This project has no version anchor.
+     Run /update-dannflow to create one before syncing.
+     ```
+     and stop.
+   - Extract `dannflow_commit` (the SHA you last synced from) and `repo` (the upstream URL).
+   - Show the user: `Last synced from DannFlow commit: <sha> on <synced_at>`
+
+2. Verify `upstream` remote exists and matches `dannflow.json`'s `repo`:
    ```bash
    git remote get-url upstream
    ```
    - If missing, instruct the user:
      ```
-     git remote add upstream https://github.com/Danncode10/DannFlow.git
+     git remote add upstream <repo from dannflow.json>
      ```
      and stop.
+   - If it exists but doesn't match the `repo` field in `dannflow.json`, warn: "upstream remote points to a different repo than dannflow.json expects. Confirm before continuing."
 
-2. Fetch latest upstream (quiet — output is noisy):
+3. Fetch latest upstream (quiet — output is noisy):
    ```bash
    git fetch upstream --quiet
    ```
 
-3. Confirm `upstream/main` exists:
+4. Confirm `upstream/main` exists:
    ```bash
    git rev-parse --verify upstream/main
    ```
    If it doesn't, fall back to whatever default branch upstream has (`git remote show upstream | grep 'HEAD branch'`).
+
+5. **Show commit changelog** — what's new in upstream since your `dannflow_commit`:
+   ```bash
+   git log <dannflow_commit>..upstream/main --oneline --no-merges
+   ```
+   If there are no new commits, tell the user: "You're already up to date with DannFlow (at commit <sha>)." and exit.
 
 ---
 
@@ -111,7 +133,24 @@ src/prompts/features/
      - If "merge manually": copy upstream version to `<path>.upstream` next to the local file so user can diff them in their editor
    - 🗑️ DELETED: just inform the user — do NOT delete their local file unless they explicitly say to
 
-6. **After applying**, run `git status` and show what changed. Do NOT auto-commit. End with a suggested conventional commit message, e.g.:
+6. **After applying**, run `git status` and show what changed. Do NOT auto-commit.
+
+7. **Update `dannflow.json`** with the new upstream HEAD SHA:
+   ```bash
+   UPSTREAM_SHA=$(git rev-parse upstream/main)
+   SYNCED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+   ```
+   Write the updated `dannflow.json`:
+   ```json
+   {
+     "dannflow_commit": "<new upstream/main SHA>",
+     "synced_at": "<ISO timestamp>",
+     "repo": "<repo from existing dannflow.json>"
+   }
+   ```
+   Tell the user: "Updated dannflow.json: now tracking DannFlow at `<new sha>`"
+
+8. End with a suggested conventional commit message, e.g.:
    ```
    chore(sync): pull upstream updates to .claude/commands/ and SKILLS.md
    ```
