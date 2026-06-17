@@ -28,7 +28,14 @@ function readingTime(content: string) {
 }
 
 export default async function BlogPage() {
-  const { data: posts } = await listBlogPosts({ publishedOnly: true, pageSize: 50 });
+  // Resilient to an unreachable DB at build time — render the empty state
+  // instead of failing the build (CI, or a project pre-Supabase-setup).
+  let posts: Awaited<ReturnType<typeof listBlogPosts>>["data"] = [];
+  try {
+    posts = (await listBlogPosts({ publishedOnly: true, pageSize: 50 })).data;
+  } catch {
+    posts = [];
+  }
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12">
