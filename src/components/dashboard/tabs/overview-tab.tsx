@@ -61,7 +61,6 @@ export function OverviewTab({ displayName, setTab }: OverviewTabProps) {
     { label: "Edit services & pricing",   desc: "Update prices live",       tab: "services" as const, flag: "pricing" as const },
     { label: "View leads",                desc: "See who reached out",      tab: "leads" as const,    flag: "contactForm" as const },
     { label: "Manage bookings",           desc: "Confirm appointments",     tab: "bookings" as const, flag: "contactForm" as const },
-    { label: "Update gallery",            desc: "Publish before/after",     tab: "gallery" as const,  flag: "gallery" as const },
     { label: "View analytics",            desc: "Page views & traffic",     tab: "analytics" as const, flag: "analytics" as const },
     { label: "Account settings",          desc: "Profile & security",       tab: "settings" as const, flag: "always" as const },
   ].filter(a => isFeatureEnabled(a.flag));

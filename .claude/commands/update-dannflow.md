@@ -126,7 +126,7 @@ Affected areas: .claude/commands/, SKILLS.md
 Generate the affected areas summary:
 ```bash
 git diff --name-only <dannflow_commit> upstream/main -- \
-  .claude/commands/ .claude/agents/ SKILLS.md CLAUDE.md AGENTS.md \
+  .claude/commands/ .claude/agents/ .github/ SKILLS.md CLAUDE.md AGENTS.md \
   guide.sh docs/dannflow_docs/ scripts/ src/prompts/features/
 ```
 

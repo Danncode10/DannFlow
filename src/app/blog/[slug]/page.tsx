@@ -12,8 +12,16 @@ interface Props {
 }
 
 export async function generateStaticParams() {
-  const slugs = await getAllPublishedSlugs();
-  return slugs.map(slug => ({ slug }));
+  // Resilient to a missing/unreachable database at build time (e.g. CI, or a
+  // freshly scaffolded project before Supabase is connected). Returning [] lets
+  // the build succeed; pages then render on-demand at runtime (dynamicParams +
+  // revalidate above) once the DB is available.
+  try {
+    const slugs = await getAllPublishedSlugs();
+    return slugs.map(slug => ({ slug }));
+  } catch {
+    return [];
+  }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
