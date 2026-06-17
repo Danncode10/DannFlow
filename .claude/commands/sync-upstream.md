@@ -80,6 +80,7 @@ If the user didn't pass a path, scan these (in this order):
 ```
 .claude/commands/
 .claude/agents/
+.github/
 SKILLS.md
 CLAUDE.md
 AGENTS.md
