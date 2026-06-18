@@ -267,6 +267,7 @@ Run `./guide.sh commands` to see all 16 commands. Key ones:
 | [docs/dannflow_docs/methodology.md](docs/dannflow_docs/methodology.md) | Vibe Coding + Zero-Hallucination philosophy |
 | [docs/dannflow_docs/the-holy-trinity.md](docs/dannflow_docs/the-holy-trinity.md) | Types + Schema + Services model |
 | [docs/dannflow_docs/mcp-setup.md](docs/dannflow_docs/mcp-setup.md) | Supabase + GitHub MCP setup |
+| [docs/dannflow_docs/branching-and-sync.md](docs/dannflow_docs/branching-and-sync.md) | **Branch flow** (feat→dev→main), CI gate, adopt/sync/contribute model |
 | [docs/dannflow_docs/backups-and-sync.md](docs/dannflow_docs/backups-and-sync.md) | Checkpoint + sync-types loop |
 | [docs/dannflow_docs/ui-system.md](docs/dannflow_docs/ui-system.md) | Semantic tokens + UI standards |
 
