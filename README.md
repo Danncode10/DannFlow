@@ -287,6 +287,7 @@ Run `./guide.sh commands` to see all 34 commands. Key ones:
 | [docs/dannflow_docs/the-holy-trinity.md](docs/dannflow_docs/the-holy-trinity.md) | Types + Schema + Services model |
 | [docs/dannflow_docs/mcp-setup.md](docs/dannflow_docs/mcp-setup.md) | Supabase + GitHub MCP setup |
 | [docs/dannflow_docs/branching-and-sync.md](docs/dannflow_docs/branching-and-sync.md) | **Branch flow** (feat→dev→main), CI gate, adopt/sync/contribute model |
+| [docs/dannflow_docs/updating-old-projects.md](docs/dannflow_docs/updating-old-projects.md) | Bring an **old DannFlow project** current — bootstrap new commands, then upgrade |
 | [docs/dannflow_docs/backups-and-sync.md](docs/dannflow_docs/backups-and-sync.md) | Checkpoint + sync-types loop |
 | [docs/dannflow_docs/ui-system.md](docs/dannflow_docs/ui-system.md) | Semantic tokens + UI standards |
 
