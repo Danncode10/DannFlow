@@ -1,6 +1,6 @@
 # 🚀 DannFlow (2026 Edition)
 
-**The Claude Code-Optimized SaaS Starter.** Built for AI-assisted development with Claude Code, Cursor, or Antigravity — Next.js 15+, Supabase, Tailwind v4, Shadcn UI, with auth, dashboard, RLS-first design, and 16 built-in slash commands.
+**The Claude Code-Optimized SaaS Starter.** Built for AI-assisted development with Claude Code, Cursor, or Antigravity — Next.js 15+, Supabase, Tailwind v4, Shadcn UI, with auth, dashboard, RLS-first design, and 34 built-in slash commands.
 
 > **Built for Speed. Structured for Agents. Optimized for the Vibe.**
 
@@ -78,12 +78,30 @@ git remote add origin https://github.com/YOUR_USERNAME/my-template.git
 git push -u origin main
 ```
 
+**Already have a repo that *didn't* start from DannFlow?** Adopt it in one command:
+```bash
+/adopt-dannflow   # installs CI, creates the dannflow.json anchor + dev branch, then syncs
+```
+
 **Sync updates from the parent later:**
 ```bash
 /sync-upstream   # pulls selective updates from upstream into your project
 ```
 
 `/sync-upstream` only touches safe files (commands, docs, scripts) — never your app code.
+
+### Clean by default: the `feat → dev → main` flow
+
+Adopted projects get a branch flow that keeps `main` always shippable:
+
+```
+feat/*  →  dev  →  main
+  prep      test    release
+```
+
+Every promotion runs the CI check (`.github/workflows/ci.yml`), so nothing reaches `main` un-tested. `/sync-upstream` respects this — synced changes land on a `feat/sync-*` branch and open a PR into `dev`, never straight onto `main`. DannFlow itself stays on `main`-only (no `dev`) so the template is always green.
+
+→ Full details in [docs/dannflow_docs/branching-and-sync.md](docs/dannflow_docs/branching-and-sync.md).
 
 ---
 
@@ -222,7 +240,7 @@ supabase/
 └── backups/          # Schema snapshots from npm run checkpoint
 
 .claude/
-├── commands/         # 16 DannFlow slash commands
+├── commands/         # 34 DannFlow slash commands
 ├── agents/           # Ruflo agent definitions
 ├── skills/           # Installed skill packs
 └── settings.json     # Ruflo hook wiring
@@ -232,14 +250,15 @@ supabase/
 
 ## ⚡ Slash Commands
 
-Run `./guide.sh commands` to see all 16 commands. Key ones:
+Run `./guide.sh commands` to see all 34 commands. Key ones:
 
 | Command | When to use |
 |---|---|
 | `/ask-command <intent>` | Don't know which command? This routes you. |
 | `/init-claude` | Tailor CLAUDE.md + SKILLS.md to your project |
 | `/make-command <name>` | Create a new slash command |
-| `/sync-upstream` | Pull selective updates from the parent template |
+| `/adopt-dannflow` | Bootstrap a non-DannFlow repo: CI + dannflow.json + dev branch, then sync |
+| `/sync-upstream` | Pull selective updates from the parent template (PRs into `dev`) |
 | `/checkpoint` | Snapshot DB before risky schema changes |
 | `/sync-types` | Regenerate types after schema changes |
 | `/new-feature <name>` | Scaffold service + page + form |
@@ -263,7 +282,7 @@ Run `./guide.sh commands` to see all 16 commands. Key ones:
 
 | Doc | What it covers |
 |---|---|
-| [docs/dannflow_docs/claude-workflow.md](docs/dannflow_docs/claude-workflow.md) | **START HERE** — daily loop, all 16 commands |
+| [docs/dannflow_docs/claude-workflow.md](docs/dannflow_docs/claude-workflow.md) | **START HERE** — daily loop, all 34 commands |
 | [docs/dannflow_docs/methodology.md](docs/dannflow_docs/methodology.md) | Vibe Coding + Zero-Hallucination philosophy |
 | [docs/dannflow_docs/the-holy-trinity.md](docs/dannflow_docs/the-holy-trinity.md) | Types + Schema + Services model |
 | [docs/dannflow_docs/mcp-setup.md](docs/dannflow_docs/mcp-setup.md) | Supabase + GitHub MCP setup |
