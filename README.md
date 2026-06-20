@@ -50,6 +50,8 @@ Then start building:
 npm run dev
 ```
 
+**Want Claude to design the whole site for you?** After the 5 steps, run **`/design-project`** (⭐ on Opus) — it reads your `README` + `business.json` + `PROJECT_CONTEXT`, runs a quick design-taste interview, then designs and builds every section with real copy and a fitting theme, replacing all template placeholders. Spinning up a fresh client/business project from scratch instead? **`/new-project`** does the full Phase-1 scaffold (config + GitHub repo + `origin` repoint + Supabase tenant) before you hand off to `/design-project`.
+
 ---
 
 ## 🔗 Template Chain (Build Your Own Templates)
