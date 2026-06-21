@@ -1,6 +1,6 @@
 # 🚀 DannFlow (2026 Edition)
 
-**The Claude Code-Optimized SaaS Starter.** Built for AI-assisted development with Claude Code, Cursor, or Antigravity — Next.js 15+, Supabase, Tailwind v4, Shadcn UI, with auth, dashboard, RLS-first design, and 34 built-in slash commands.
+**The AI-agent-optimized SaaS Starter.** Built for AI-assisted development with Claude Code, Codex, Cursor, or Antigravity — Next.js 15+, Supabase, Tailwind v4, Shadcn UI, with auth, dashboard, RLS-first design, and a reusable command system.
 
 > **Built for Speed. Structured for Agents. Optimized for the Vibe.**
 
@@ -51,6 +51,37 @@ npm run dev
 ```
 
 **Want Claude to design the whole site for you?** After the 5 steps, run **`/design-project`** (⭐ on Opus) — it reads your `README` + `business.json` + `PROJECT_CONTEXT`, runs a quick design-taste interview, then designs and builds every section with real copy and a fitting theme, replacing all template placeholders. Spinning up a fresh client/business project from scratch instead? **`/new-project`** does the full Phase-1 scaffold (config + GitHub repo + `origin` repoint + Supabase tenant) before you hand off to `/design-project`.
+
+---
+
+## Codex Workflow
+
+DannFlow keeps the existing `.claude/commands/` library as the command source of
+truth and adds a thin `.codex/` compatibility layer for Codex.
+
+Use Codex commands like this:
+
+```text
+/claude-command <claude-command> [arguments]
+```
+
+Examples:
+
+```text
+/claude-command ui src/components/BillingForm.tsx
+/claude-command new-feature billing
+/claude-command sync-upstream --commits 3
+```
+
+If you do not know which command fits, ask Codex to route it:
+
+```text
+/ask-claude-command make the pricing page responsive and review it
+```
+
+Codex will read `AGENTS.md`, load the exact matching `.claude/commands/*.md`
+prompt, replace `$ARGUMENTS`, and translate Claude-only concepts such as Ruflo
+memory, Claude hooks, and swarms using `.codex/context/claude-compatibility.md`.
 
 ---
 
@@ -246,13 +277,20 @@ supabase/
 ├── agents/           # Ruflo agent definitions
 ├── skills/           # Installed skill packs
 └── settings.json     # Ruflo hook wiring
+
+.codex/
+├── commands/         # Codex commands that load .claude command prompts
+├── context/          # DannFlow + Claude compatibility notes for Codex
+└── adapters/         # Command-loading contract
 ```
 
 ---
 
 ## ⚡ Slash Commands
 
-Run `./guide.sh commands` to see all 34 commands. Key ones:
+Run `./guide.sh commands` or read `.claude/commands/README.md` to see the core
+DannFlow commands. The repository also includes additional command packs under
+`.claude/commands/`. Key ones:
 
 | Command | When to use |
 |---|---|
@@ -267,6 +305,18 @@ Run `./guide.sh commands` to see all 34 commands. Key ones:
 | `/review` | Pre-commit lint + typecheck + guardrail check |
 | `/commit` | Stage + draft conventional commit message |
 | `/rls-check` | Audit RLS policies for missing tenant filters |
+
+### Running Claude commands from Codex
+
+Use the Codex bridge instead of duplicating command files:
+
+```text
+/claude-command <command> [arguments]
+```
+
+For example, `/claude-command sync-upstream` loads
+`.claude/commands/sync-upstream.md` and runs it under Codex with DannFlow's
+agent guardrails.
 
 ---
 
