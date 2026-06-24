@@ -20,11 +20,15 @@ tenant, or ownership filters unless the endpoint is intentionally public.
 Before schema-sensitive work:
 
 ```bash
-npm run checkpoint
-npm run update-types
+pnpm checkpoint
+pnpm db:generate
+pnpm db:migrate
 ```
 
-Use Supabase MCP for live schema reads and migrations when available.
+Author schema changes in `db/schema/*.ts`, generate SQL into `db/migrations/`,
+review that SQL, then apply it with `pnpm db:migrate`. Use Supabase MCP for live
+schema reads, advisors, verification, project provisioning, and checkpoints. Do
+not use MCP `apply_migration` for normal tracked schema changes.
 
 ## UI Discipline
 
@@ -42,4 +46,3 @@ Avoid raw `button` elements for app UI. Use Shadcn `Button`.
 The `.claude/commands/` files remain the command source of truth. Codex should
 load those prompts through `.codex/commands/claude-command.md` instead of copying
 or rewriting them.
-
