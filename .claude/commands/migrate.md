@@ -1,127 +1,120 @@
 ---
-description: Wraps the full migration flow — checkpoint → apply_migration → sync-types — into one step. Plain-English description in, type-safe code out.
+description: Safely changes database schema through Drizzle schema files, generated SQL migrations, Supabase verification, and synced types.
 argument-hint: <plain-english description of the schema change>
 ---
 
-Execute a complete, safe Supabase migration described by `$ARGUMENTS`. Chains `/checkpoint` → migration SQL → `apply_migration` (via Supabase MCP) → `/sync-types`, with confirmation gates between destructive steps.
+Execute a complete DannFlow database migration described by `$ARGUMENTS`.
+
+The source of truth is `db/schema/*.ts`. Do **not** use Supabase MCP `apply_migration` for normal schema changes.
 
 ## Procedure
 
 ### Step 0 — Check ruflo memory
 
-Before drafting SQL, search ruflo memory for prior decisions related to this table or domain (e.g. if adding a column to `profiles`, search "profiles", the column topic, or the feature name). Retrieve any relevant schema decisions, naming conventions, or "why not" context.
+Before changing schema, search ruflo memory for prior decisions related to this table or domain. Surface relevant naming conventions, RLS decisions, or "why not" context before editing.
 
 ### Step 1 — Understand the request
 
-Parse `$ARGUMENTS` into a concrete schema change. Examples:
-- "add a `bio` text column to profiles" → `ALTER TABLE public.profiles ADD COLUMN bio text;`
-- "create a `posts` table with a user_id FK" → `CREATE TABLE` + RLS policies + trigger
-- "drop the `legacy_field` from users" → destructive — ⚠️ extra confirmation
+Parse `$ARGUMENTS` into a concrete schema change.
 
-If the request is ambiguous (e.g. "add a posts table" without saying which columns), ask ONE clarifying question, then proceed.
+Examples:
+- "add a `bio` text column to profiles" → edit `db/schema/core.ts`
+- "create a `posts` table with a user_id FK" → add a table file or extend an existing schema module, then include RLS SQL in the generated migration
+- "drop the `legacy_field` from users" → destructive — require explicit confirmation
 
-### Step 2 — Checkpoint first (mandatory)
+If the request is ambiguous, ask one clarifying question.
 
-Run the `/checkpoint` flow: verify Supabase MCP, snapshot the live schema to a timestamped file in `supabase/backups/`. **Never skip this**, even for additive changes.
+### Step 2 — Checkpoint before risky changes
 
-If `/checkpoint` fails (MCP down, write error), stop. Report the error. Do not proceed.
+For destructive or live-project changes, run `/checkpoint` first to snapshot the live schema into `supabase/backups/`.
 
-### Step 3 — Draft the migration SQL
+For purely local additive changes, a checkpoint is recommended but not required.
 
-Based on the parsed change, draft:
+### Step 3 — Edit Drizzle schema
 
-1. **The migration SQL itself** — `ALTER`, `CREATE`, `DROP`, etc.
-2. **RLS policies** — if creating a new table, every table MUST have RLS enabled and at minimum an ownership policy (`auth.uid() = user_id` or equivalent). This is non-negotiable per CLAUDE.md.
-3. **Indexes** — for any new FK or commonly filtered column.
-4. **Triggers** — if the table needs `updated_at` auto-update, include the trigger.
+Edit the appropriate file under `db/schema/`.
 
-Show the full SQL to the user with a header:
+Rules:
+- Tables, columns, indexes, enums, and relations belong in `db/schema/*.ts`.
+- Split large domains into focused files and re-export from `db/schema/index.ts`.
+- Never edit `src/types/supabase.ts` manually.
+- New tables must include tenant/ownership columns consistent with the existing app model.
 
-```
-📋 Proposed migration: <short name derived from request>
+### Step 4 — Generate and review SQL
 
-Description: <one-line>
-Safety: ✅ Additive  /  ⚠️ Destructive  /  🛑 Irreversible
+Run:
 
-SQL:
-─────────────────────────────────────────
-<the full SQL>
-─────────────────────────────────────────
-
-This will:
-  - <plain-english effect 1>
-  - <plain-english effect 2>
-
-RLS coverage: <"included" / "n/a — not a new table">
-Rollback: <"snapshot in supabase/backups/<file>.sql" — always cite the checkpoint file>
-
-Proceed? (y/n)
+```bash
+pnpm db:generate
 ```
 
-For destructive changes (`DROP`, `TRUNCATE`, type narrowing, `NOT NULL` on existing columns without defaults), require the user to type `yes` explicitly — not just `y`.
+Review the generated SQL in `db/migrations/`.
 
-### Step 4 — Apply via Supabase MCP
+Add Supabase-specific SQL directly to the generated migration when needed:
+- `ALTER TABLE ... ENABLE ROW LEVEL SECURITY`
+- RLS policies
+- auth triggers and functions
+- storage buckets and storage policies
+- extensions, grants, and comments
 
-After confirmation, call `apply_migration` via the Supabase MCP with the SQL and a meaningful name (`<verb>_<target>`, e.g. `add_bio_to_profiles`).
+Every new exposed table must have RLS before the migration is applied.
 
-If `apply_migration` fails:
-- Report the exact error
-- Point to the rollback file
-- Do NOT proceed to type sync
+### Step 5 — Apply migration
 
-### Step 5 — Sync types
+After showing the migration summary and getting confirmation for destructive changes, run:
 
-Run `/sync-types`: execute `npm run update-types`, diff `src/types/supabase.ts` before/after, summarize the schema drift Claude now sees.
+```bash
+pnpm db:migrate
+```
+
+This applies `db/migrations/` using `DATABASE_URL` and refreshes `src/types/supabase.ts`.
+
+If migration fails:
+- Report the exact error.
+- Do not hand-edit the live database unless the user explicitly requests an emergency hotfix.
+- Fix `db/schema/*.ts` or the generated migration, then retry.
 
 ### Step 6 — Verify
 
-Use Supabase MCP to confirm the change is live:
-- For `CREATE TABLE`: `list_tables` confirms the new table.
-- For `ALTER`: read the table's columns and confirm the change.
-- For `DROP`: confirm the object is gone.
+Use Supabase MCP or SQL inspection to confirm the live schema:
+- New table exists.
+- Altered columns exist with the expected type/nullability/default.
+- RLS is enabled for new exposed tables.
+- Policies, functions, triggers, and storage objects exist when expected.
 
-If RLS was added, list policies for the affected table and confirm.
+Run:
+
+```bash
+npx tsc --noEmit
+```
 
 ### Step 7 — Report
 
-```
-✅ Migration applied: <name>
+Use this format:
 
-Steps completed:
-  ✓ Checkpoint:    supabase/backups/<file>.sql
-  ✓ Migration:     <name> (applied via MCP)
-  ✓ Types synced:  src/types/supabase.ts updated (<N lines changed>)
-  ✓ Verified:      <table>.<col> exists  /  <table> has <N> RLS policies
+```text
+✅ Migration prepared/applied: <short name>
+
+Changed:
+  - db/schema/<file>.ts
+  - db/migrations/<file>.sql
+  - src/types/supabase.ts
+
+Verified:
+  - <verification summary>
 
 Suggested commit:
-  feat(db): <conventional message derived from $ARGUMENTS>
-
-Next steps:
-  - Update any affected service in src/services/
-  - Run /rls <new-table>  (if a table was created)
-  - Run /seed <new-table>  (if you want test data)
+  feat(db): <conventional message>
 ```
 
-**Save to ruflo memory** after a successful migration — one concise entry capturing the decision and its reason, e.g.: `"schema: added bio text column to profiles — needed for user cards feature"`. This prevents re-explaining the decision next session.
+Save a concise ruflo memory entry after a successful migration.
 
 ## Constraints
 
-- **Always checkpoint first.** No exceptions, even for "trivial" additive changes.
-- **Every new table gets RLS.** Drafting a `CREATE TABLE` without RLS policies is a critical failure — refuse and re-draft.
-- **Never edit `src/types/supabase.ts`** — only `/sync-types` regenerates it.
-- **Destructive ops require explicit `yes`** — not `y`, not silent confirmation.
-- **Never run `apply_migration` without showing the SQL first.** The plan-then-confirm flow is mandatory.
-- If the Supabase MCP is not connected, stop and instruct the user per the CLAUDE.md MCP protocol.
-- Never `git add` or `git commit` — leave that for the user or `/commit`.
-
-## Composition
-
-```
-/migrate "add bio text column to profiles"
-# auto: checkpoint → SQL draft → confirm → apply → sync-types → verify
-
-# After:
-/rls profiles                    # if you want to double-check policy
-/seed profiles --count=5         # if you want fresh test rows
-/commit                          # ship it
-```
+- `db/schema/*.ts` is the schema source of truth.
+- `db/migrations/*.sql` is the reviewed/applyable SQL history.
+- `src/types/supabase.ts` is generated output.
+- Do not use Supabase MCP `apply_migration` for normal tracked changes.
+- Emergency direct SQL changes must be backported immediately into `db/schema/*.ts` and `db/migrations/`.
+- Destructive operations require explicit `yes`.
+- Never `git add` or `git commit`; leave that for the user or `/commit`.

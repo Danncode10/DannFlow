@@ -1,14 +1,15 @@
-# The "Time Machine" Workflow — Database Backups & Type Sync
+# The "Time Machine" Workflow — Schema, Migrations, Backups & Type Sync
 
-When you are "Vibe Coding," you will change your database frequently. This loop keeps your AI's view of the schema honest and gives you a restore point if something breaks.
+When you are "Vibe Coding," you will change your database frequently. This loop keeps schema changes tracked in code, keeps the AI's type view honest, and gives you a restore point if something breaks.
 
 > **Two kinds of "sync" in DannFlow.** This doc covers **database** sync — keeping `src/types/supabase.ts` and your backups aligned with the live schema. For **template** sync — pulling command/doc updates from DannFlow upstream — see [branching-and-sync.md](branching-and-sync.md).
 
 ## The loop
 
-1. **Change**: Tell Claude Code to modify the DB (via the Supabase MCP, or `/migrate <description>`).
-2. **Sync types**: Run `npm run update-types` (or `/sync-types`) to refresh `src/types/supabase.ts` — the AI's "Eyes." Never let it guess the schema.
-3. **Checkpoint**: Every time you finish a feature, run `npm run checkpoint` (or `/checkpoint`).
+1. **Author schema**: Edit `db/schema/*.ts` directly or run `/migrate <description>`.
+2. **Generate SQL**: Run `pnpm db:generate` and review `db/migrations/*.sql`.
+3. **Apply + sync types**: Run `pnpm db:migrate` to apply migrations and refresh `src/types/supabase.ts`.
+4. **Checkpoint**: Every time you finish a feature, run `pnpm checkpoint` (or `/checkpoint`).
    - The script verifies your Supabase MCP connection and generates a prompt.
    - Claude Code reads your live Supabase schema (tables, enums, RLS policies, triggers, functions) via MCP.
    - It writes a new timestamped DDL snapshot under `supabase/backups/`.
@@ -20,7 +21,38 @@ If you ever break your DB, "restore" by copying the SQL from your most recent ch
 
 ## The golden rule
 
-**Change → Sync types → Checkpoint.** Do the type-sync *immediately* after any schema change so the AI never works against a stale `src/types/supabase.ts`. Checkpoint before anything destructive so you always have a way back.
+**Schema → Generate SQL → Migrate → Checkpoint.** Do not alter live Supabase schema directly for normal work. If an emergency direct SQL change is explicitly requested, backport it immediately into `db/schema/*.ts` and `db/migrations/`.
+
+## Local contributor setup
+
+New contributors should not need access to the hosted Supabase project just to boot the app. Use the local database flow:
+
+```bash
+pnpm db:setup
+```
+
+This runs local Supabase, applies `db/migrations/`, and generates `src/types/supabase.ts` from the local database.
+
+When `db/schema/*.ts` changes are ready to save:
+
+```bash
+pnpm db:generate add_feature_tables
+```
+
+This creates a SQL migration under `db/migrations/`. Review that SQL before applying it to the hosted project:
+
+```bash
+pnpm db:migrate
+```
+
+For hosted projects, use:
+
+```bash
+pnpm db:types:remote
+pnpm checkpoint
+```
+
+Remote type generation requires `SUPABASE_PROJECT_ID` in `.env.local`.
 
 ## See also
 

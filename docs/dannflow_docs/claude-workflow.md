@@ -52,9 +52,9 @@ Before writing anything, `/init-claude` shows you a plan grouped by file and wai
 You're done with setup. From here on, the daily loop is:
 
 ```
-1. /checkpoint           → snapshot your DB schema (before risky changes)
-2. Ask Claude to build something
-3. /sync-types           → after any schema change
+1. Ask Claude to build something
+2. /migrate              → for schema changes (db/schema → db/migrations → Supabase)
+3. /checkpoint           → snapshot live DB before risky/destructive changes
 4. /review               → before opening a PR
 5. /commit               → stage + draft commit message
 ```
@@ -87,9 +87,9 @@ Run `/ask-command <what you want>` if you don't remember which command to use.
 | Command | What it does |
 |---|---|
 | `/checkpoint` | Snapshots live schema (tables, RLS, triggers, functions) to `supabase/backups/schema-MM-DD-YYYY-HH-MM.sql`. |
-| `/sync-types` | Runs `npm run update-types`, diffs `src/types/supabase.ts` before/after, summarizes schema drift. |
+| `/sync-types` | Regenerates `src/types/supabase.ts` from Supabase and summarizes drift. Usually handled by `pnpm db:migrate`. |
 | `/explain-schema` | Plain-English summary of your live Supabase schema. |
-| `/migrate <description>` | Wraps the full migration flow — checkpoint → apply_migration → sync-types — into one step. Plain-English description in, type-safe code out. |
+| `/migrate <description>` | Edits `db/schema/*.ts`, generates `db/migrations/*.sql`, applies with `pnpm db:migrate`, then verifies Supabase. |
 | `/seed <table\|all>` | Generates type-safe seed data from `src/types/supabase.ts`. Respects FK dependency order and RLS ownership. Writes to `supabase/seeds/`. Never auto-applies. |
 
 ### Scaffolding
@@ -243,9 +243,9 @@ These pair with three DannFlow slash commands that enforce per-route checks:
 /migrate "add bio text column to profiles"
 
 # Manual path (if you prefer per-step control):
-/checkpoint             # snapshot first
-# (apply your migration via Supabase MCP)
-/sync-types             # regenerate types
+pnpm db:generate        # generate SQL from db/schema/*.ts
+# review db/migrations/*.sql
+pnpm db:migrate         # apply migration and regenerate types
 /rls <new-table>        # verify RLS on any new tables
 /seed <new-table>       # optional: generate type-safe test data
 ```
@@ -267,7 +267,7 @@ These pair with three DannFlow slash commands that enforce per-route checks:
 
 | Layer | Where it lives | When to use |
 |---|---|---|
-| **Custom command** (`.claude/commands/*.md`) | This repo | DannFlow-specific workflows (RLS check against `src/services/`, schema sync via `npm run update-types`) |
+| **Custom command** (`.claude/commands/*.md`) | This repo | DannFlow-specific workflows (RLS check against `src/services/`, schema flow via `db/schema` and `pnpm db:migrate`) |
 | **Skill** (`~/.claude/skills/` or plugin) | Your machine | Generally useful workflows reusable across all your projects (security review, code review, simplification) |
 
 See [SKILLS.md](../../SKILLS.md) for which Claude Code skills are recommended for this project.

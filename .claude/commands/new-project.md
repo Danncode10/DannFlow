@@ -19,7 +19,7 @@ Turn a fresh DannFlow clone into a wired, repo-backed, database-connected projec
 4. **Rebrand code** — `package.json`, `src/lib/config.ts`, `.env.local`. (No folder rename — that would break this session. Skipped if already rebranded.)
 5. **Git + repo** — commit on top of history, create a GitHub repo, repoint `origin`, keep `upstream` → DannFlow, push.
 6. **Wire Claude** — `/business-init` → `/init-claude` → `/ruflo-upgrade`.
-7. **Database** — pause for Supabase keys, then `/create-organization` (org row + feature tables).
+7. **Database** — pause for Supabase keys, run `pnpm db:migrate` for tracked schema, then `/create-organization` for the org row.
 8. **Hand off** — print the repo link and tell the user to run **`/design-project`** next.
 
 ---
@@ -137,7 +137,8 @@ Run in order; pass "go" where they ask, since the user already approved the flow
    SUPABASE_SERVICE_ROLE_KEY=...
    ```
 2. Wait for confirmation they've pasted the keys.
-3. Run **`/create-organization`** — inserts the `organizations` row for this `APP_ID` and creates the feature tables.
+3. Run **`pnpm db:migrate`** — applies tracked Drizzle migrations to Supabase.
+4. Run **`/create-organization`** — inserts or updates the `organizations` row for this `APP_ID`. It does not create tables.
 
 If they don't have keys yet, skip — note it as a remaining task and continue.
 

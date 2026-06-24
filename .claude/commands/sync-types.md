@@ -1,5 +1,5 @@
 ---
-description: Runs npm run update-types, diffs src/types/supabase.ts before and after, and summarizes schema drift.
+description: Regenerates src/types/supabase.ts, diffs before and after, and summarizes schema drift.
 ---
 
 Sync TypeScript types with the live Supabase schema.
@@ -7,7 +7,7 @@ Sync TypeScript types with the live Supabase schema.
 **Procedure:**
 
 1. **Snapshot current types** — read `src/types/supabase.ts` and remember its contents.
-2. **Run** `npm run update-types` via Bash.
+2. **Run** `pnpm db:types:remote` for hosted projects or `pnpm db:types` for local Supabase via Bash.
 3. **Read the new** `src/types/supabase.ts`.
 4. **Diff** the two versions semantically:
    - New tables added
@@ -40,6 +40,6 @@ Impact:
   - <suggested follow-up: run typecheck, update affected services>
 ```
 
-If there's no drift, say so in one line and exit. If `npm run update-types` fails, report stderr and stop — don't pretend success.
+If there's no drift, say so in one line and exit. If type generation fails, report stderr and stop — don't pretend success.
 
 After reporting, suggest running `npx tsc --noEmit` if any removals/renames were detected, so the user can spot broken consumers.

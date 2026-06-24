@@ -69,7 +69,8 @@ Each generated file follows this structure:
 Claude runs these after implementation and marks each pass/fail:
 
 - [ ] `npm run build` exits 0
-- [ ] `npm run update-types` exits 0 (if schema changed)
+- [ ] `pnpm db:generate` and `pnpm db:migrate` completed if schema changed
+- [ ] `src/types/supabase.ts` refreshed after migration
 - [ ] <task-specific checks>
 
 ## Manual verification
