@@ -8,9 +8,9 @@ You are an expert developer working on **Dann's Vibe-Coding Starter**. This proj
 ## Diagnostic Protocol
 **Unified Dependency Check**: Before starting any specialized tasks, verify that the required MCP (Model Context Protocol) tools are enabled and connected.
 
-- **Supabase MCP**: Essential for database schema reading, SQL execution, and types validation.
+- **Supabase MCP**: Essential for live schema reading, RLS/policy verification, advisors, checkpoints, and project provisioning.
 - **GitHub MCP**: Essential for version control tasks, including comparing branches, resolving merge conflicts, and checking commit history before suggesting broad refactors.
-- **Terminal MCP**: Essential for running local backup commands and interacting with the local system environment.
+- **Terminal MCP**: Essential for running local database, migration, backup, and verification commands.
 
 **Missing Tool Alert Protocol:** 
 If any required MCP tool is missing for the current task, stop immediately and provide the exact instruction block below:
@@ -39,18 +39,20 @@ To fix:
 -   **GitHub MCP Mastery**: Use the GitHub MCP whenever the user reports a regression or a merge conflict. Compare current files with historical commits before asking for manual diffs.
 -   **Codex Compatibility**: If the user invokes `/claude-command <command> [args]`, read `.codex/commands/claude-command.md`, resolve the matching `.claude/commands/*.md` file, replace `$ARGUMENTS` with the provided args, and execute the loaded prompt under these AGENTS.md rules.
 -   **Command Source of Truth**: Keep `.claude/commands/` as the canonical command library. Do not duplicate every Claude command into `.codex/`; `.codex/` is the adapter/context layer for Codex.
--   **Backup & Snapshot**: If the user runs `npm run checkpoint` and provides the generated prompt, you must:
+-   **Backup & Snapshot**: If the user runs `pnpm checkpoint` and provides the generated prompt, you must:
     1. Verify Supabase MCP connection.
     2. Read the live schema (Tables, Enums, RLS, Triggers) for the specified project ID.
     3. Generate the full DDL and save it to the specified timestamped SQL file in `supabase/backups/`.
+-   **Schema Source of Truth**: Database schema is authored in `db/schema/*.ts` with Drizzle. For normal schema changes, edit `db/schema/`, run `pnpm db:generate`, review `db/migrations/*.sql`, then run `pnpm db:migrate`. Do **not** use Supabase MCP `apply_migration` or direct SQL for normal schema changes unless the user explicitly requests an emergency live hotfix.
+-   **Emergency Schema Hotfixes**: If a schema change is made directly through Supabase MCP or SQL, immediately backport the change into `db/schema/*.ts`, generate a matching migration with `pnpm db:generate`, and refresh `src/types/supabase.ts`. Never leave live schema drift untracked.
 -   **Project Provisioning**: If requested to create a new project and apply a schema:
     1. List organizations to help the user choose one.
     2. Ask for the Project Name and Organization ID.
     3. Check costs using `get_cost` and `confirm_cost` before `create_project`.
-    4. After initialization, read the latest backup from `supabase/backups/` and apply it using `apply_migration`.
+    4. After initialization, apply `db/migrations/` using `pnpm db:migrate` with the new project's `DATABASE_URL`.
 -   **Project Initialization & Migration**: If a user provides a Project ID for a new project:
-    1. Locate the latest `.sql` backup in `supabase/backups/`.
-    2. Read and apply the schema using the Supabase MCP.
+    1. Confirm `.env.local` has `SUPABASE_PROJECT_ID` and `DATABASE_URL` for the target project.
+    2. Apply tracked schema with `pnpm db:migrate`; do not apply `supabase/backups/` unless performing an explicit restore.
     3. **MANDATORY Verification**: After execution, list tables and functions in the `public` schema.
     4. Confirm existence of core architecture (`profiles` table, `handle_new_user` function).
     5. Do not report success until verification is complete.
@@ -87,10 +89,11 @@ Always check `src/types/supabase.ts` and **assume RLS is active on every table**
 
 
 ## 🗄️ Supabase Workflow for AI Agents
-1. **Live Schema Awareness**: Use the **Supabase MCP Server** to query the live database state (tables, types, RLS policies). Do not assume schema structure without checking.
-2. **Schema Changes via MCP**: Execute SQL directly using the MCP when prompted to alter tables or policies. Do not ask the user for manual SQL entry.
-3. **Sync Types**: After any schema change, instruct the user to run `npm run update-types` to refresh `src/types/supabase.ts` via the Supabase CLI. Rely ONLY on these generated definitions.
-4. **RLS Constraint**: Always assume Row Level Security (RLS) is active. By default, write queries that respect RLS constraints.
+1. **Schema Source of Truth**: Author tables, columns, indexes, and relations in `db/schema/*.ts` with Drizzle.
+2. **Migration Flow**: Run `pnpm db:generate` to create SQL in `db/migrations/`, review the SQL, then run `pnpm db:migrate` to apply it to Supabase and refresh generated types.
+3. **MCP Read/Verify Role**: Use the Supabase MCP for live schema reads, verification, advisors, project provisioning, and checkpoint snapshots. Do not use MCP `apply_migration` for normal tracked schema changes.
+4. **Sync Types**: After any schema change, refresh `src/types/supabase.ts` using `pnpm db:migrate`, `pnpm db:types`, or `pnpm db:types:remote`. Rely ONLY on these generated definitions in app code.
+5. **RLS Constraint**: Always assume Row Level Security (RLS) is active. New tables require explicit RLS policies in the generated SQL migration before it is applied.
 
 ## Project Overview
 A high-performance Next.js starter optimized for AI-native development (Vibe Coding), featuring automated type-safety and live database orchestration.

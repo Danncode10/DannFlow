@@ -50,6 +50,40 @@ Then start building:
 npm run dev
 ```
 
+### Database setup for contributors
+
+DannFlow keeps Supabase as the database/auth layer. Database schema is authored in TypeScript with Drizzle:
+
+```text
+db/schema/*.ts
+```
+
+Generated SQL migrations live in:
+
+```text
+db/migrations/*.sql
+```
+
+For a fresh local clone:
+
+```bash
+pnpm install
+cp .env.example .env.local
+pnpm db:setup
+pnpm dev
+```
+
+`pnpm db:setup` starts local Supabase, applies `db/migrations/`, and regenerates `src/types/supabase.ts` from the local database. Hosted projects can use `pnpm db:types:remote` after setting `SUPABASE_PROJECT_ID` in `.env.local`.
+
+When you change `db/schema/*.ts`:
+
+```bash
+pnpm db:generate add_profiles_table
+pnpm db:migrate
+```
+
+`pnpm db:generate` writes SQL into `db/migrations/`. `pnpm db:migrate` applies those migrations to Supabase with `DATABASE_URL` and refreshes remote types.
+
 **Want Claude to design the whole site for you?** After the 5 steps, run **`/design-project`** (⭐ on Opus) — it reads your `README` + `business.json` + `PROJECT_CONTEXT`, runs a quick design-taste interview, then designs and builds every section with real copy and a fitting theme, replacing all template placeholders. Spinning up a fresh client/business project from scratch instead? **`/new-project`** does the full Phase-1 scaffold (config + GitHub repo + `origin` repoint + Supabase tenant) before you hand off to `/design-project`.
 
 ---
@@ -221,14 +255,20 @@ UPSTASH_REDIS_REST_TOKEN=AAAx...
 
 ## 🗃️ Database Workflow (Zero-Hallucination Loop)
 
-Never let your AI guess about your database schema. Run this loop:
+Never let your AI guess about your database schema. Schema changes start in `db/schema/*.ts` and flow through reviewed SQL:
 
 ```bash
-# Before risky schema changes
-npm run checkpoint      # snapshots live schema → supabase/backups/
+# Edit schema
+$EDITOR db/schema/*.ts
 
-# After any schema change
-npm run update-types    # regenerates src/types/supabase.ts from live DB
+# Generate and review SQL
+pnpm db:generate        # writes db/migrations/*.sql
+
+# Apply to Supabase and refresh generated app types
+pnpm db:migrate         # applies db/migrations/ + refreshes src/types/supabase.ts
+
+# Before risky/destructive work
+pnpm checkpoint         # snapshots live schema → supabase/backups/
 
 # Verify before committing
 /review                 # lint + typecheck + guardrail check
@@ -236,9 +276,10 @@ npm run update-types    # regenerates src/types/supabase.ts from live DB
 
 **Session starter prompt** (paste this to Claude at the start of every session):
 ```
-Read CLAUDE.md before doing anything. Confirm my Supabase MCP is
-connected by listing all tables in the public schema, and check that
-src/types/supabase.ts is up to date with the live schema.
+Read CLAUDE.md before doing anything. For schema changes, edit
+db/schema/*.ts first, generate SQL with pnpm db:generate, then apply
+with pnpm db:migrate. Use Supabase MCP only to read, verify, checkpoint,
+or inspect the live project.
 ```
 
 ---
@@ -269,8 +310,13 @@ src/
 ├── types/supabase.ts # Auto-generated — never edit manually
 └── utils/supabase/   # Supabase client helpers
 
+db/
+├── schema/           # Drizzle schema source of truth
+├── migrations/       # Generated/reviewed SQL migrations
+└── migrate.ts        # Applies migrations with DATABASE_URL
+
 supabase/
-└── backups/          # Schema snapshots from npm run checkpoint
+└── backups/          # Live schema snapshots from pnpm checkpoint
 
 .claude/
 ├── commands/         # 34 DannFlow slash commands
@@ -300,7 +346,8 @@ DannFlow commands. The repository also includes additional command packs under
 | `/adopt-dannflow` | Bootstrap a non-DannFlow repo: CI + dannflow.json + dev branch, then sync |
 | `/sync-upstream` | Pull selective updates from the parent template (PRs into `dev`) |
 | `/checkpoint` | Snapshot DB before risky schema changes |
-| `/sync-types` | Regenerate types after schema changes |
+| `/sync-types` | Regenerate Supabase types when needed |
+| `/migrate` | Edit `db/schema/*.ts`, generate SQL, apply with `pnpm db:migrate` |
 | `/new-feature <name>` | Scaffold service + page + form |
 | `/review` | Pre-commit lint + typecheck + guardrail check |
 | `/commit` | Stage + draft conventional commit message |
