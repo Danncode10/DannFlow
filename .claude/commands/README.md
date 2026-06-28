@@ -32,6 +32,7 @@ Drop `.md` files in this folder to add custom slash commands. Each file becomes 
 | `/no-conflict` | Audits repo for conflicts between documentation (README, CLAUDE.md) and actual code — technology versions, features, commands, RLS enforcement, semantic tokens, folder structure. Reports only. |
 | `/seed <table\|all>` | Generates realistic, type-safe seed data from `src/types/supabase.ts`. Respects FK order and RLS ownership. Writes to `supabase/seeds/`. |
 | `/migrate <description>` | Edits `db/schema/*.ts`, generates SQL in `db/migrations/`, applies with `pnpm db:migrate`, verifies Supabase, and syncs types. |
+| `/schema-change <description>` | Explicit live Supabase MCP schema workflow: checkpoint → approved SQL → tracked `db/migrations/*.sql` file → apply_migration → sync types → verify. |
 | `/seo-check [route]` | Per-route SEO audit: metadata, OG, canonical, sitemap.ts, robots.ts, JSON-LD, alt text, heading hierarchy. Reports only. |
 | `/seo-fix <route\|all>` | Active rewrite — adds missing SEO essentials. Scaffolds `sitemap.ts`, `robots.ts`, metadata blocks, JSON-LD. Plan-then-confirm. |
 | `/marketing-check [route]` | Conversion-fundamentals audit for landing/marketing pages — headline, CTA, social proof, friction, pricing legibility. Opinionated, judgement-heavy. Reports only. |
