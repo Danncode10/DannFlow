@@ -44,7 +44,8 @@ To fix:
     2. Read the live schema (Tables, Enums, RLS, Triggers) for the specified project ID.
     3. Generate the full DDL and save it to the specified timestamped SQL file in `supabase/backups/`.
 -   **Schema Source of Truth**: Database schema is authored in `db/schema/*.ts` with Drizzle. For normal schema changes, edit `db/schema/`, run `pnpm db:generate`, review `db/migrations/*.sql`, then run `pnpm db:migrate`. Do **not** use Supabase MCP `apply_migration` or direct SQL for normal schema changes unless the user explicitly requests an emergency live hotfix.
--   **Emergency Schema Hotfixes**: If a schema change is made directly through Supabase MCP or SQL, immediately backport the change into `db/schema/*.ts`, generate a matching migration with `pnpm db:generate`, and refresh `src/types/supabase.ts`. Never leave live schema drift untracked.
+-   **Explicit Supabase MCP Schema Changes**: If the user explicitly asks to manipulate the live Supabase schema through MCP, use `.claude/commands/schema-change.md`. The tracked flow must checkpoint first, save the approved SQL to `db/migrations/YYYYMMDDHHMMSS_<name>.sql`, apply the exact SQL with Supabase MCP `apply_migration`, regenerate `src/types/supabase.ts`, verify the live schema/RLS state, and backport app-owned table changes into `db/schema/*.ts`.
+-   **Emergency Schema Hotfixes**: If a schema change is made directly through Supabase MCP or SQL, immediately backport the change into `db/schema/*.ts`, generate or reconcile a matching migration in `db/migrations/`, and refresh `src/types/supabase.ts`. Never leave live schema drift untracked.
 -   **Project Provisioning**: If requested to create a new project and apply a schema:
     1. List organizations to help the user choose one.
     2. Ask for the Project Name and Organization ID.
@@ -92,8 +93,9 @@ Always check `src/types/supabase.ts` and **assume RLS is active on every table**
 1. **Schema Source of Truth**: Author tables, columns, indexes, and relations in `db/schema/*.ts` with Drizzle.
 2. **Migration Flow**: Run `pnpm db:generate` to create SQL in `db/migrations/`, review the SQL, then run `pnpm db:migrate` to apply it to Supabase and refresh generated types.
 3. **MCP Read/Verify Role**: Use the Supabase MCP for live schema reads, verification, advisors, project provisioning, and checkpoint snapshots. Do not use MCP `apply_migration` for normal tracked schema changes.
-4. **Sync Types**: After any schema change, refresh `src/types/supabase.ts` using `pnpm db:migrate`, `pnpm db:types`, or `pnpm db:types:remote`. Rely ONLY on these generated definitions in app code.
-5. **RLS Constraint**: Always assume Row Level Security (RLS) is active. New tables require explicit RLS policies in the generated SQL migration before it is applied.
+4. **Explicit MCP Mutation Flow**: When the user explicitly requests live Supabase schema manipulation through MCP, use `.claude/commands/schema-change.md` so the approved SQL is tracked in `db/migrations/`, types are regenerated, and app-owned schema changes are backported into `db/schema/*.ts`.
+5. **Sync Types**: After any schema change, refresh `src/types/supabase.ts` using `pnpm db:migrate`, `pnpm db:types`, or `pnpm db:types:remote`. Rely ONLY on these generated definitions in app code.
+6. **RLS Constraint**: Always assume Row Level Security (RLS) is active. New tables require explicit RLS policies in the generated SQL migration before it is applied.
 
 ## Project Overview
 A high-performance Next.js starter optimized for AI-native development (Vibe Coding), featuring automated type-safety and live database orchestration.

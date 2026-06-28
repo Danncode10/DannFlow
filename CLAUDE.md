@@ -94,6 +94,8 @@ Theme variables live in `src/app/globals.css` under `@theme`.
 
 Do **not** use Supabase MCP `apply_migration` for normal schema changes. Supabase MCP is for reading, verifying, advisors, provisioning, and checkpointing. If an emergency live SQL change is explicitly requested, backport it immediately into `db/schema/*.ts` and `db/migrations/`.
 
+Use `.claude/commands/schema-change.md` only when the user explicitly wants to manipulate the live Supabase schema through MCP or needs an emergency live SQL change captured in git. That command checkpoints the live schema, writes the approved SQL to `db/migrations/YYYYMMDDHHMMSS_<name>.sql`, applies it through Supabase MCP `apply_migration`, regenerates `src/types/supabase.ts`, verifies the live database, and backports app-owned table changes into `db/schema/*.ts`.
+
 ### Checkpoint protocol
 When the user runs `pnpm checkpoint` and provides the generated prompt:
 1. Verify Supabase MCP connection.
