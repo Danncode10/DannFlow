@@ -1,53 +1,64 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getPublishedBlogPost, getAllPublishedSlugs } from "@/services/blog";
+import { ArrowLeft, CalendarDays, Clock } from "lucide-react";
+import { getPublishedBlogPost } from "@/services/blog";
 import { siteConfig } from "@/lib/config";
-import { CalendarDays, Clock, ArrowLeft } from "lucide-react";
 
 export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
-interface Props {
+type Props = {
   params: Promise<{ slug: string }>;
-}
+};
 
-export async function generateStaticParams() {
-  // Resilient to a missing/unreachable database at build time (e.g. CI, or a
-  // freshly scaffolded project before Supabase is connected). Returning [] lets
-  // the build succeed; pages then render on-demand at runtime (dynamicParams +
-  // revalidate above) once the DB is available.
+async function getPost(slug: string) {
   try {
-    const slugs = await getAllPublishedSlugs();
-    return slugs.map(slug => ({ slug }));
+    return await getPublishedBlogPost(slug);
   } catch {
-    return [];
+    return null;
   }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const post = await getPublishedBlogPost(slug);
+  const post = await getPost(slug);
   if (!post) return { title: "Post Not Found" };
 
   const title = post.seo_title || post.title;
   const description = post.seo_description || post.excerpt || `Read "${post.title}" on the ${siteConfig.name} blog.`;
+  const imageAlt = post.image_alt_text || post.title;
 
   return {
     title: `${title} | ${siteConfig.name}`,
     description,
+    alternates: {
+      canonical: `/blog/${post.slug}`,
+    },
     openGraph: {
       title,
       description,
       type: "article",
+      url: `/blog/${post.slug}`,
+      siteName: siteConfig.name,
       publishedTime: post.published_at ?? undefined,
-      images: post.cover_image_url ? [{ url: post.cover_image_url }] : [],
+      images: post.cover_image_url ? [{ url: post.cover_image_url, alt: imageAlt }] : [],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: post.cover_image_url ? [post.cover_image_url] : [],
     },
   };
 }
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-US", {
-    day: "numeric", month: "long", year: "numeric",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
   });
 }
 
@@ -58,7 +69,7 @@ function readingTime(content: string) {
 
 export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params;
-  const post = await getPublishedBlogPost(slug);
+  const post = await getPost(slug);
   if (!post) notFound();
 
   const jsonLd = {
@@ -67,6 +78,7 @@ export default async function BlogPostPage({ params }: Props) {
     headline: post.title,
     description: post.seo_description || post.excerpt || "",
     image: post.cover_image_url || undefined,
+    keywords: post.primary_keyword || undefined,
     datePublished: post.published_at || post.created_at,
     dateModified: post.updated_at,
     author: { "@type": "Organization", name: siteConfig.name, url: siteConfig.url },
@@ -82,8 +94,6 @@ export default async function BlogPostPage({ params }: Props) {
       />
 
       <article className="max-w-3xl mx-auto px-4 sm:px-6 py-12">
-
-        {/* Back link */}
         <Link
           href="/blog"
           className="inline-flex items-center gap-1.5 text-[13px] text-muted-foreground hover:text-foreground transition-colors mb-8"
@@ -92,18 +102,37 @@ export default async function BlogPostPage({ params }: Props) {
           Back to Blog
         </Link>
 
-        {/* Cover image */}
         {post.cover_image_url && (
-          <div className="rounded-2xl overflow-hidden mb-8 aspect-video">
-            <img
-              src={post.cover_image_url}
-              alt={post.title}
-              className="w-full h-full object-cover"
-            />
-          </div>
+          <figure className="mb-8">
+            <div className="rounded-2xl overflow-hidden aspect-video">
+              <Image
+                src={post.cover_image_url}
+                alt={post.image_alt_text || post.title}
+                width={1200}
+                height={630}
+                unoptimized
+                className="w-full h-full object-cover"
+              />
+            </div>
+            {(post.image_caption || post.pexels_credit_url) && (
+              <figcaption className="mt-2 text-[12px] leading-relaxed text-muted-foreground">
+                {post.image_caption}
+                {post.image_caption && post.pexels_credit_url ? " " : null}
+                {post.pexels_credit_url && (
+                  <a
+                    href={post.pexels_credit_url}
+                    rel="nofollow noopener noreferrer"
+                    target="_blank"
+                    className="text-primary hover:underline"
+                  >
+                    Image source
+                  </a>
+                )}
+              </figcaption>
+            )}
+          </figure>
         )}
 
-        {/* Meta */}
         <div className="flex items-center gap-3 text-[12px] text-muted-foreground mb-4">
           <span className="flex items-center gap-1">
             <CalendarDays className="w-3.5 h-3.5" />
@@ -116,21 +145,17 @@ export default async function BlogPostPage({ params }: Props) {
           </span>
         </div>
 
-        {/* Title */}
         <h1 className="text-3xl sm:text-4xl font-bold text-foreground tracking-tight leading-tight mb-6">
           {post.title}
         </h1>
 
-        {/* Divider */}
         <div className="w-12 h-1 bg-primary rounded-full mb-8" />
 
-        {/* Content */}
         <div
           className="prose"
           dangerouslySetInnerHTML={{ __html: post.content }}
         />
 
-        {/* Footer */}
         <div className="mt-16 pt-8 border-t border-border">
           <p className="text-[13px] text-muted-foreground mb-4">
             Ready to get started? Get in touch today.

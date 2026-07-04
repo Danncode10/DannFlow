@@ -74,8 +74,18 @@ export type BlogPostInput = {
   excerpt?: string;
   content: string;
   cover_image_url?: string;
+  image_alt_text?: string;
+  image_caption?: string;
+  pexels_credit_url?: string;
   seo_title?: string;
   seo_description?: string;
+  primary_keyword?: string;
+  search_intent?: string;
+  internal_links?: string;
+  facebook_caption?: string;
+  reddit_discussion_prompt?: string;
+  seo_quality_score?: number;
+  pre_publish_warnings?: string;
 };
 
 export interface BlogListResult {
@@ -115,6 +125,19 @@ export async function getBlogPost(slug: string): Promise<BlogPost | null> {
     .select("*")
     .eq("app_id", APP_ID)
     .eq("slug", slug)
+    .single();
+
+  if (error && error.code !== "PGRST116") throw error;
+  return data ?? null;
+}
+
+export async function getBlogPostById(id: string): Promise<BlogPost | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("blog_posts")
+    .select("*")
+    .eq("app_id", APP_ID)
+    .eq("id", id)
     .single();
 
   if (error && error.code !== "PGRST116") throw error;
@@ -194,6 +217,7 @@ export async function updateBlogPost(
     .from("blog_posts")
     .update(input)
     .eq("id", id)
+    .eq("app_id", APP_ID)
     .select()
     .single();
 
@@ -209,6 +233,7 @@ export async function publishBlogPost(id: string): Promise<BlogPost> {
     .from("blog_posts")
     .update({ is_published: true, published_at: new Date().toISOString() })
     .eq("id", id)
+    .eq("app_id", APP_ID)
     .select()
     .single();
 
@@ -225,6 +250,7 @@ export async function unpublishBlogPost(id: string): Promise<BlogPost> {
     .from("blog_posts")
     .update({ is_published: false })
     .eq("id", id)
+    .eq("app_id", APP_ID)
     .select()
     .single();
 
@@ -241,12 +267,14 @@ export async function deleteBlogPost(id: string): Promise<void> {
     .from("blog_posts")
     .select("slug, cover_image_url, content")
     .eq("id", id)
+    .eq("app_id", APP_ID)
     .single();
 
   const { error } = await supabase
     .from("blog_posts")
     .delete()
-    .eq("id", id);
+    .eq("id", id)
+    .eq("app_id", APP_ID);
 
   if (error) throw error;
 

@@ -17,13 +17,6 @@ const PUBLIC_ORIGIN = process.env.BLOG_PUBLIC_ORIGIN || process.env.NEXT_PUBLIC_
 const ADMIN_EDIT_PATH_TEMPLATE = process.env.BLOG_ADMIN_EDIT_PATH_TEMPLATE || "/dashboard/blog/{id}";
 const PUBLIC_BASE_PATH = process.env.BLOG_PUBLIC_BASE_PATH || "/blog";
 const ORGANIZATION_ID = process.env.BLOG_POST_ORGANIZATION_ID || "";
-const EXTRA_COLUMNS = new Set(
-  (process.env.BLOG_POST_EXTRA_COLUMNS || "")
-    .split(",")
-    .map((column) => column.trim())
-    .filter(Boolean),
-);
-
 const OPTIONAL_EXTRA_FIELDS = [
   "image_alt_text",
   "image_caption",
@@ -36,6 +29,13 @@ const OPTIONAL_EXTRA_FIELDS = [
   "seo_quality_score",
   "pre_publish_warnings",
 ];
+const DEFAULT_EXTRA_COLUMNS = OPTIONAL_EXTRA_FIELDS.join(",");
+const EXTRA_COLUMNS = new Set(
+  (process.env.BLOG_POST_EXTRA_COLUMNS || DEFAULT_EXTRA_COLUMNS)
+    .split(",")
+    .map((column) => column.trim())
+    .filter(Boolean),
+);
 
 function requiredEnv(name) {
   const value = process.env[name];
