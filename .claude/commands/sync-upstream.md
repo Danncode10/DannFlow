@@ -82,6 +82,8 @@ If the user didn't pass a path, scan these (in this order):
 ```
 .claude/commands/
 .claude/agents/
+.codex/commands/
+.codex/context/
 .github/
 SKILLS.md
 CLAUDE.md

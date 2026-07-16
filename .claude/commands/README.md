@@ -10,6 +10,8 @@ Drop `.md` files in this folder to add custom slash commands. Each file becomes 
 | `/design-project ["section"]` | **Then design it (Phase 2). ⭐ Use Opus.** Claude reads README + `business.json` + `PROJECT_CONTEXT`, runs a design-taste interview, then strictly replaces the template's placeholder copy, theme, and sections with a bespoke design for this project. |
 | `/init-claude` | Reads `README.md` + scans `src/` + `package.json`, then auto-rewrites `CLAUDE.md`, `SKILLS.md`, and refreshes this README to match the actual project state. |
 | `/ask-command` | Meta-router. Describe what you want in plain English; it searches all commands here and returns the best one + a ready-to-paste prompt. |
+| `/make-masterplan [--project-owner <owner>] [--project-number <number>]` | Creates `MASTERPLAN.md` from project context and populates a linked GitHub Project with ordered `[P2.1]` task cards. |
+| `/update-masterplan [--project-owner <owner>] [--project-number <number>]` | Syncs edits in `MASTERPLAN.md` to the linked GitHub Project, preserving ordered task IDs and live statuses. |
 | `/security-audit` | Full security scan: secrets in client bundles, service-role key leaks, `dangerouslySetInnerHTML`, missing `'use server'`, XSS vectors. |
 | `/rls-check` | Walks `src/services/` and confirms every query filters by user/ownership. Cross-references `src/types/supabase.ts`. |
 | `/rls <table>` | Inspects RLS policies for a single table via Supabase MCP. Returns who can SELECT/INSERT/UPDATE/DELETE and any gaps. |
@@ -38,7 +40,7 @@ Drop `.md` files in this folder to add custom slash commands. Each file becomes 
 | `/marketing-check [route]` | Conversion-fundamentals audit for landing/marketing pages — headline, CTA, social proof, friction, pricing legibility. Opinionated, judgement-heavy. Reports only. |
 | `/ruflo-upgrade` | Re-applies Ruflo memory + parallel-agent patterns to the 8 core commands. Safe to re-run after `/init-update`. |
 | `/make-command` | Creates a new custom slash command from a plain-English description. Auto-updates documentation and proposes conflict-avoidance edits to existing commands or SKILLS.md. |
-| `/masterplan-task` | Execute a task from MASTERPLAN.md and auto-generate TEST.md verification guide. Use during development sprints for systematic, hallucination-free feature scaffolding. |
+| `/masterplan-task` | Execute an ordered task from MASTERPLAN.md, move its GitHub Project item through In progress → Done, and auto-generate TEST.md verification guide. |
 
 ## File format
 

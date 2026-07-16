@@ -24,7 +24,8 @@ User input: **$ARGUMENTS**
 6. Preserve the command's frontmatter as routing context, then execute the body.
 7. Replace every `$ARGUMENTS` occurrence in the Claude command body with `command_arguments`.
 8. Apply `.codex/context/claude-compatibility.md` whenever the command mentions Claude-only primitives such as Ruflo memory, Claude hooks, Claude Flow, swarms, or subagents.
-9. Follow the command's requested output format unless it conflicts with `AGENTS.md` or active user instructions.
+9. Apply the Masterplan + GitHub Project protocol from `AGENTS.md` / `CLAUDE.md` when the loaded command starts tracked feature work, executes `/masterplan-task`, or edits `MASTERPLAN.md`.
+10. Follow the command's requested output format unless it conflicts with `AGENTS.md` or active user instructions.
 
 ## Safety Rules
 
@@ -32,6 +33,7 @@ User input: **$ARGUMENTS**
 - Never edit `.claude/commands/` while running a command unless the loaded command explicitly asks for command maintenance.
 - If multiple command files match, show the candidate paths and ask the user to choose.
 - If the command requires a missing MCP, report the missing tool using the project's Missing Tool Alert Protocol unless the user explicitly asked to proceed without that MCP.
+- If the loaded command edits `MASTERPLAN.md`, run `/update-masterplan` when GitHub tooling is available or warn the user that the linked GitHub Project needs syncing.
 - For code changes, keep edits scoped to the loaded command's task.
 
 ## Examples
@@ -55,4 +57,3 @@ Loads `.claude/commands/sync-upstream.md` and runs it with:
 ```text
 $ARGUMENTS = --commits 3
 ```
-
