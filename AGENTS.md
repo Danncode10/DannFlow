@@ -36,6 +36,11 @@ To fix:
 ## Vibe Workflow
 -   If you encounter a bug, fix it in the **Service** layer first.
 -   If you need a new data structure, define or request generation of its types in `src/types/` first.
+-   **Masterplan + GitHub Project Tracking**: Before starting feature or task work, find the matching ordered task in `MASTERPLAN.md` and the linked GitHub Project when one exists. Use stable IDs like `[P2.1]`, `[P2.2]`, `[P3A.1]`; never create bare `[P2]` cards.
+    - If the task exists, confirm the card when ambiguous, then move it to `In progress` when work starts.
+    - If the task is not in `MASTERPLAN.md`, warn the user and ask whether to add it to `MASTERPLAN.md` and the GitHub Project before proceeding.
+    - When finishing, check the task in `MASTERPLAN.md`, move the GitHub Project item to `Done`, and mention the task ID in the final response.
+    - If `MASTERPLAN.md` is edited, warn that `/update-masterplan` must be run to sync GitHub Project cards; run it immediately when GitHub tooling is available and the edit belongs to the current task.
 -   **GitHub MCP Mastery**: Use the GitHub MCP whenever the user reports a regression or a merge conflict. Compare current files with historical commits before asking for manual diffs.
 -   **Codex Compatibility**: If the user invokes `/claude-command <command> [args]`, read `.codex/commands/claude-command.md`, resolve the matching `.claude/commands/*.md` file, replace `$ARGUMENTS` with the provided args, and execute the loaded prompt under these AGENTS.md rules.
 -   **Command Source of Truth**: Keep `.claude/commands/` as the canonical command library. Do not duplicate every Claude command into `.codex/`; `.codex/` is the adapter/context layer for Codex.

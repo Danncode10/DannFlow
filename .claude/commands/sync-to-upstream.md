@@ -8,7 +8,7 @@ argument-hint: (optional --dry-run to preview without touching git)
 Push improvements from your project back to the DannFlow upstream repo. This is the **reverse** of `/sync-upstream`.
 
 Use this when:
-- You improved a `.claude/command/` that would benefit every DannFlow project
+- You improved a `.claude/commands/` or `.codex/commands/` file that would benefit every DannFlow project
 - You wrote a new doc, script, or skill that belongs in the template
 - You found and fixed a bug that exists in the upstream source
 
@@ -66,6 +66,8 @@ Scan these paths for files that differ between your `HEAD` and `upstream/main`:
 .claude/commands/        (top-level .md files only — exclude Ruflo subdirectories)
 .claude/agents/
 .claude/skills/
+.codex/commands/
+.codex/context/
 CLAUDE.md
 SKILLS.md
 AGENTS.md
@@ -150,8 +152,8 @@ HEAD vs upstream/main
 
 #   Status   Class              Path
 ─────────────────────────────────────────────────────────────────
-1   Added    🟢 UPSTREAM        .claude/commands/sync-to-upstream.md
-2   Added    🟢 UPSTREAM        .claude/commands/masterplan-task.md
+1   Added    🟢 UPSTREAM        .claude/commands/update-masterplan.md
+2   Added    🟢 UPSTREAM        .codex/commands/claude-command.md
 3   Modified 🟡 REVIEW NEEDED   .claude/commands/commit.md
 4   Modified 🔒 KEEP LOCAL      .claude/commands/new-page.md
 5   Added    🔒 KEEP LOCAL      docs/dannflow_docs/your-client-guide.md

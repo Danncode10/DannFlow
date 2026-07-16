@@ -73,6 +73,8 @@ Run `/ask-command <what you want>` if you don't remember which command to use.
 | `/ask-command <intent>` | Tells you which command to use for your task. Returns a copy-paste-ready prompt. |
 | `/init-claude` | Rewrites the entire Claude environment (`CLAUDE.md`, `SKILLS.md`, commands README, individual commands, and this file's command tables) to match the current README + src + package.json. Plan-then-confirm flow. |
 | `/make-command <description>` | Creates a new custom slash command from a plain-English description. Auto-updates this file's tables and proposes conflict-avoidance edits to existing commands. |
+| `/make-masterplan [--project-owner <owner>] [--project-number <number>]` | Creates `MASTERPLAN.md` from project context and populates a linked GitHub Project with ordered `[P2.1]` task cards. |
+| `/update-masterplan [--project-owner <owner>] [--project-number <number>]` | Syncs `MASTERPLAN.md` edits to the linked GitHub Project while preserving task order and live statuses. |
 
 ### Security & quality
 | Command | What it does |
@@ -97,7 +99,7 @@ Run `/ask-command <what you want>` if you don't remember which command to use.
 |---|---|
 | `/new-feature <name>` | Scaffolds service + types + App Router page + Shadcn form for a new feature. |
 | `/new-page <route>` | Scaffolds an App Router page (Server Component) with `loading.tsx` + `error.tsx`. |
-| `/masterplan-task <task>` | Execute a single task from `MASTERPLAN.md` with full context. Auto-generates `TEST.md` verification guide. Use during development sprints for systematic, hallucination-free feature scaffolding. |
+| `/masterplan-task <task>` | Execute a single ordered task from `MASTERPLAN.md` with full context. Moves the linked GitHub Project item through `In progress` → `Done` and auto-generates `TEST.md` verification guide. |
 
 ### SEO & marketing
 | Command | What it does |
@@ -227,6 +229,8 @@ These pair with three DannFlow slash commands that enforce per-route checks:
 
 **Building a new feature?**
 ```
+/make-masterplan                 # once per new project, creates MASTERPLAN.md + GitHub Project cards
+/update-masterplan               # after editing MASTERPLAN.md, sync ordered cards back to GitHub
 /new-feature <name>             # scaffold
 /ui                             # responsive + a11y hard rules
 # Claude may then invoke:

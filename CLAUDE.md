@@ -136,6 +136,7 @@ If a required MCP is missing, stop and tell the user:
 |---|---|
 | `CLAUDE.md` (this file) | Authoritative Claude Code config |
 | [SKILLS.md](SKILLS.md) | Which Claude Code skills are relevant + when to invoke them |
+| [MASTERPLAN.md](MASTERPLAN.md) | Ordered build plan — check before starting any feature or task |
 | `.claude/commands/` | Custom slash commands (see its README for the list) |
 | `AGENTS.md` | Cross-tool agent standard (Cursor/Antigravity/etc.) — kept for compatibility |
 | `.codex/` | Codex compatibility layer that loads `.claude/commands/` through `/claude-command` |
@@ -145,9 +146,21 @@ If you don't know which custom command fits a task, run `/ask-command <your inte
 ## Memory & docs
 
 - **`PROJECT_CONTEXT.md`** (root) — project-specific decisions that override or extend this file: audience, stack choices, design rules, tone, anti-decisions. Read this before any feature work, UI rewrite, or marketing command. Fill it in once after running `/init-claude`.
+- **`MASTERPLAN.md`** (root) — current phase status and what's being built. Use ordered IDs like `[P2.1]`, `[P2.2]`, `[P3A.1]`. Run `/make-masterplan` to create it from project context and `/update-masterplan` after edits.
 - Project methodology in `docs/dannflow_docs/` (methodology, trinity model, MCP setup, backups, UI system)
 - Central config: `src/lib/config.ts`
 - Auto-generated types: `src/types/supabase.ts` (read-only)
+
+## Masterplan + GitHub Project protocol
+
+`MASTERPLAN.md` is the local source of truth and the linked GitHub Project is the execution board. Every task should be anchored to both when the project uses GitHub Projects.
+
+1. **Before starting work**, find the matching task in `MASTERPLAN.md` and the GitHub Project. Ask the user which card to use if the request could map to multiple cards.
+2. **If no matching task exists**, warn the user: "This task is not in `MASTERPLAN.md`. Add it to `MASTERPLAN.md` and the GitHub Project first?" Do not begin feature work until the user confirms or explicitly says to proceed without tracking.
+3. **When starting a tracked task**, ask or confirm: "This maps to `[P2.1] ...`; move it to `In progress` in GitHub Project?" Move it once confirmed.
+4. **When finishing a tracked task**, check the task in `MASTERPLAN.md`, move the GitHub Project item to `Done`, and mention the task ID in the final response.
+5. **If `MASTERPLAN.md` is edited**, warn: "`MASTERPLAN.md` changed. Run `/update-masterplan` to sync GitHub Project cards." If the edit was part of the current task and GitHub tooling is available, run the sync immediately.
+6. **Task IDs are ordered and stable**: use `[P2.1]`, `[P2.2]`, `[P3A.1]`, etc. Never create bare `[P2]` cards.
 
 ---
 
