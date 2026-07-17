@@ -1,12 +1,12 @@
 ---
 name: masterplan-task
-description: Execute an ordered task from MASTERPLAN.md, sync its GitHub Project status, and auto-generate a test file in docs/tests/
+description: Execute an ordered task from MASTERPLAN.md, keep it In progress, and tell the user to run /verify-task when implementation appears ready.
 trigger: /masterplan-task
 ---
 
 # /masterplan-task — Run & Test Phase Tasks
 
-Execute one ordered task from MASTERPLAN.md, generate code, sync GitHub Project status, and create a dedicated test file under `docs/tests/`.
+Execute one ordered task from MASTERPLAN.md, generate code, sync GitHub Project status to `In progress`, and create a dedicated test file under `docs/tests/`.
 
 ## Usage
 
@@ -31,9 +31,13 @@ Execute one ordered task from MASTERPLAN.md, generate code, sync GitHub Project 
    - Step-by-step manual verification (human follows in browser/terminal)
    - RLS smoke test (if the task touches DB or auth)
    - Common issues + troubleshooting
-9. **Mark task** `[x]` in MASTERPLAN.md only after implementation and verification
-10. **Move the GitHub Project item to `Done` when complete**
-11. **Output a conventional commit message** for copy-paste
+9. **Leave task tracking open** after implementation:
+   - do not mark the task `[x]` in MASTERPLAN.md
+   - do not move the GitHub Project item to `Done`
+   - keep the Project item `In progress`
+10. **Tell the user to run `/verify-task <task-id>`** when implementation appears ready for human verification
+11. **After the user verifies everything, they should run `/close-task <task-id>`** to commit, check MASTERPLAN.md, and move the Project item to `Done`
+12. **Output an auto-selected conventional commit message preview** for context only; `/close-task` creates the actual commit
 
 ## GitHub Project status sync
 
@@ -41,6 +45,7 @@ Execute one ordered task from MASTERPLAN.md, generate code, sync GitHub Project 
 - If Projects APIs are not exposed through MCP, use authenticated `gh` CLI with the `project` scope.
 - If neither path is available, stop with the project's Missing Tool Alert Protocol for GitHub MCP.
 - Match Project items by the stable task ID prefix. Do not rely on the rest of the title.
+- Leave the Project item `In progress` after implementation until `/verify-task` passes and `/close-task` runs.
 - If the work pauses or verification fails, leave the Project item `In progress` and explain what remains.
 - If `MASTERPLAN.md` changes during the task, run `/update-masterplan` or warn the user that the Project board needs syncing.
 
@@ -115,9 +120,9 @@ Step-by-step for the human to follow:
 ```
 Phase 2, Task P2.6 — Feature form — complete
 📁 docs/tests/phase-2/feature-form.md created
-✔️  Task marked [x] in MASTERPLAN.md
-✔️  GitHub Project item moved to Done
-📦 Commit message: feat: add feature form
+Next: run /verify-task [P2.6]
+Then, after human verification passes: run /close-task [P2.6]
+📦 Commit message preview: feat: add feature form
 ```
 
 ## Flags
@@ -132,3 +137,4 @@ Phase 2, Task P2.6 — Feature form — complete
 - **One file per task** — never append to an existing test file; create a new one
 - **RLS is always checked** for any task that touches Supabase tables or auth
 - **Never skip the docs/tests/ write** — even if implementation is trivial
+- **Never close from this command** — when implementation appears ready, tell the user to run `/verify-task <task-id>` first.

@@ -1,9 +1,9 @@
 ---
-description: Close the current tracked task by committing completed work, then updating MASTERPLAN.md and the linked GitHub Project to Done.
+description: Close a human-verified tracked task by committing completed work, then updating MASTERPLAN.md and the linked GitHub Project to Done.
 argument-hint: "[task-id] [--project-owner <owner>] [--project-number <number>] [--dry-run]"
 ---
 
-Close a completed tracked task.
+Close a completed tracked task after human verification. If the user has not confirmed `/verify-task` passed, send them back to `/verify-task` first.
 
 User input: **$ARGUMENTS**
 
@@ -21,23 +21,27 @@ User input: **$ARGUMENTS**
    - If Projects APIs are not exposed through MCP, use authenticated `gh` CLI with the `project` scope.
    - If neither is available, stop with the project's Missing Tool Alert Protocol for GitHub MCP.
 4. Confirm the task exists in `MASTERPLAN.md` and the linked GitHub Project by stable task ID prefix.
-5. Check whether the task appears complete:
+5. Confirm human verification:
+   - If the current conversation includes a clear user confirmation that `/verify-task <task-id>` passed, continue.
+   - If not, stop and say: "Before closing, run `/verify-task <task-id>` and confirm the checklist passes."
+   - Do not infer human verification from automated checks alone.
+6. Check whether the task appears complete:
    - inspect `git status`
    - inspect unstaged and staged diffs
    - run task-appropriate verification commands when available
    - summarize what changed and what passed
-6. If completion is ambiguous, ask before closing.
-7. Commit completed work before updating task tracking:
+7. If completion is ambiguous, ask before closing.
+8. Commit completed work before updating task tracking:
    - follow the same safety rules as `/commit`
    - do not stage `.env*`, credentials, or unrelated files
    - stage only files that belong to the completed task
    - create a focused conventional commit
-8. After the implementation commit succeeds, update task tracking:
+9. After the implementation commit succeeds, update task tracking:
    - mark the matching checkbox `[x]` in `MASTERPLAN.md`
    - move the GitHub Project item to `Done`
    - do not use `In review` unless the repository explicitly requires it
-9. If `MASTERPLAN.md` changed, create a second small tracking commit unless the user explicitly asks to leave it uncommitted.
-10. Report the closed task, commit hash or hashes, verification, and any remaining follow-up.
+10. If `MASTERPLAN.md` changed, create a second small tracking commit unless the user explicitly asks to leave it uncommitted.
+11. Report the closed task, commit hash or hashes, verification, and any remaining follow-up.
 
 ## Commit rules
 
@@ -69,6 +73,7 @@ Commits:
   <hash> <tracking commit message>
 
 Verification:
+  - Human verification: confirmed after /verify-task
   - <command>: pass
 
 Updated:
@@ -82,6 +87,7 @@ Next:
 ## Constraints
 
 - Close only one task per run unless the user explicitly provides multiple task IDs.
+- Require human confirmation from `/verify-task` before closing.
 - `MASTERPLAN.md` is updated only after the implementation commit succeeds.
 - Do not move unfinished or ambiguous work to `Done`.
 - Do not modify application code after the implementation commit except to fix failed verification or hooks.
