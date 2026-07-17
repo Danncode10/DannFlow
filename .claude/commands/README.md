@@ -12,6 +12,8 @@ Drop `.md` files in this folder to add custom slash commands. Each file becomes 
 | `/ask-command` | Meta-router. Describe what you want in plain English; it searches all commands here and returns the best one + a ready-to-paste prompt. |
 | `/make-masterplan [--project-owner <owner>] [--project-number <number>]` | Creates `MASTERPLAN.md` from project context and populates a linked GitHub Project with ordered `[P2.1]` task cards. |
 | `/update-masterplan [--project-owner <owner>] [--project-number <number>]` | Syncs edits in `MASTERPLAN.md` to the linked GitHub Project, preserving ordered task IDs and live statuses. |
+| `/what-task [--project-owner <owner>] [--project-number <number>]` | Shows current task status, prepares Ready tasks when empty, and asks before moving one task to `In progress`; never implements the task. |
+| `/close-task [task-id] [--project-owner <owner>] [--project-number <number>]` | Commits completed work, then marks the task complete in `MASTERPLAN.md` and moves its Project item to `Done`. |
 | `/security-audit` | Full security scan: secrets in client bundles, service-role key leaks, `dangerouslySetInnerHTML`, missing `'use server'`, XSS vectors. |
 | `/rls-check` | Walks `src/services/` and confirms every query filters by user/ownership. Cross-references `src/types/supabase.ts`. |
 | `/rls <table>` | Inspects RLS policies for a single table via Supabase MCP. Returns who can SELECT/INSERT/UPDATE/DELETE and any gaps. |
