@@ -162,6 +162,13 @@ If you don't know which custom command fits a task, run `/ask-command <your inte
 5. **If `MASTERPLAN.md` is edited**, warn: "`MASTERPLAN.md` changed. Run `/update-masterplan` to sync GitHub Project cards." If the edit was part of the current task and GitHub tooling is available, run the sync immediately.
 6. **Task IDs are ordered and stable**: use `[P2.1]`, `[P2.2]`, `[P3A.1]`, etc. Never create bare `[P2]` cards.
 
+### Task lifecycle commands
+
+- Use `/what-task` when organizing the task board or choosing what to work on next. It reports current `In progress`, `Ready`, and pending `Backlog` tasks; moves one or more tasks to `Ready` when that lane is empty; recommends one task; and asks before moving exactly one task to `In progress`. It must stop after task selection and must not implement or edit application code.
+- Use `/close-task` when a tracked task is complete. It commits completed work first, then marks the task checked in `MASTERPLAN.md` and moves the linked Project item to `Done`.
+- Do not leave completed work sitting in `In progress`. If the current task appears finished, proactively tell the user to run `/close-task` even when they did not explicitly ask.
+- Do not use `In review` unless the active repository explicitly requires a review step for that task.
+
 ---
 
 ## Ruflo memory protocol
