@@ -70,6 +70,7 @@ Run `/ask-command <what you want>` if you don't remember which command to use.
 ### Discovery & setup
 | Command | What it does |
 |---|---|
+| `/help-dannflow` | Report-only command catalog. Shows Claude and Codex usage, grouped command categories, and a Mermaid graph. |
 | `/ask-command <intent>` | Tells you which command to use for your task. Returns a copy-paste-ready prompt. |
 | `/init-claude` | Rewrites the entire Claude environment (`CLAUDE.md`, `SKILLS.md`, commands README, individual commands, and this file's command tables) to match the current README + src + package.json. Plan-then-confirm flow. |
 | `/make-command <description>` | Creates a new custom slash command from a plain-English description. Auto-updates this file's tables and proposes conflict-avoidance edits to existing commands. |
@@ -262,6 +263,7 @@ pnpm db:migrate         # apply migration and regenerate types
 
 **Don't know what to do?**
 ```
+/help-dannflow
 /ask-command I want to <plain English>
 ```
 

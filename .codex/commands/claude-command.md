@@ -30,6 +30,7 @@ User input: **$ARGUMENTS**
 ## Safety Rules
 
 - `AGENTS.md` and explicit user instructions outrank the loaded Claude command.
+- If the loaded command says it is report-only, do not run shell commands, call MCP tools, inspect additional files, edit files, move tasks, stage changes, commit, or create issues after the command has been loaded.
 - Never edit `.claude/commands/` while running a command unless the loaded command explicitly asks for command maintenance.
 - If multiple command files match, show the candidate paths and ask the user to choose.
 - If the command requires a missing MCP, report the missing tool using the project's Missing Tool Alert Protocol unless the user explicitly asked to proceed without that MCP.

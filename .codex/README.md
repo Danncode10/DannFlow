@@ -24,6 +24,7 @@ Use the Codex commands in `.codex/commands/`:
 Examples:
 
 ```text
+/claude-command help-dannflow
 /claude-command ui src/components/BillingForm.tsx
 /claude-command new-feature billing
 /claude-command sync-upstream --commits 3
@@ -35,4 +36,3 @@ Examples:
 Do not duplicate the Claude command library into `.codex`. The canonical command
 prompts remain in `.claude/commands/`; Codex loads them on demand and applies the
 compatibility rules in this folder.
-
