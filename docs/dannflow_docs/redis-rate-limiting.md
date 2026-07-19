@@ -47,6 +47,17 @@ Recommended behavior:
 - In local development, allow a clearly logged bypass when Redis env vars are missing.
 - In production, fail closed if Redis is missing or unreachable on expensive/sensitive paths.
 
+DannFlow's template helper exports:
+
+- `verifyRateLimit(identifier, namespace)` for server actions and route handlers.
+- `isDurableRateLimitConfigured()` for setup checks and diagnostics.
+
+Use the `namespace` argument to isolate different workflows:
+
+```ts
+const { success, retryAfter } = await verifyRateLimit(user.id, "profile-update");
+```
+
 Example limits:
 
 - AI messages: 10 requests per user per minute.

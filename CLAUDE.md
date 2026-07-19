@@ -23,7 +23,7 @@ For the full marketing/setup story, see [README.md](README.md). For deeper docs,
 - **Schema / Migrations**: Drizzle (`db/schema/*.ts` → `db/migrations/*.sql`)
 - **Styling**: Tailwind CSS v4 + Shadcn/UI primitives
 - **State / Data**: TanStack Query, React Server Components by default
-- **Rate limiting**: Optional (Upstash Redis, deferred to Phase 8+ — see [#23](https://github.com/Danncode10/DannFlow/issues/23))
+- **Rate limiting**: Upstash Redis helper for production-sensitive paths
 - **Animation**: Framer Motion
 - **Toasts**: Sonner
 - **Icons**: lucide-react
