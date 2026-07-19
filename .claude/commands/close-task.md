@@ -1,5 +1,5 @@
 ---
-description: Close a human-verified tracked task by committing completed work, then updating MASTERPLAN.md and the linked GitHub Project to Done.
+description: Close a human-verified tracked task by committing completed work, recording a short verification note, then updating MASTERPLAN.md and the linked GitHub Project to Done.
 argument-hint: "[task-id] [--project-owner <owner>] [--project-number <number>] [--dry-run]"
 ---
 
@@ -36,12 +36,20 @@ User input: **$ARGUMENTS**
    - do not stage `.env*`, credentials, or unrelated files
    - stage only files that belong to the completed task
    - create a focused conventional commit
-9. After the implementation commit succeeds, update task tracking:
+   - if the implementation was already committed and the worktree is clean, reuse that existing commit instead of creating an empty commit
+9. Create or update one short verification note before marking the task done:
+   - path: `docs/tests/<task-id-lowercase>-<short-task-slug>.md`
+   - keep it text-only by default; do not copy screenshots, images, or large artifacts into the repo
+   - summarize screenshot evidence in one sentence when screenshots were discussed in chat
+   - write for beginners: explain what was tested, why the task mattered, what passed, and what would count as a failure
+   - keep the note concise; prefer 1-2 short paragraphs and a compact checklist
+   - if `docs/tests/` does not exist, create it
+10. After the implementation commit succeeds and the verification note is ready, update task tracking:
    - mark the matching checkbox `[x]` in `MASTERPLAN.md`
    - move the GitHub Project item to `Done`
    - do not use `In review` unless the repository explicitly requires it
-10. If `MASTERPLAN.md` changed, create a second small tracking commit unless the user explicitly asks to leave it uncommitted.
-11. Report the closed task, commit hash or hashes, verification, and any remaining follow-up.
+11. Create a second small tracking commit for `MASTERPLAN.md` and the verification note unless the user explicitly asks to leave tracking uncommitted.
+12. Report the closed task, commit hash or hashes, verification note path, verification, and any remaining follow-up.
 
 ## Commit rules
 
@@ -51,6 +59,31 @@ User input: **$ARGUMENTS**
 - Never push.
 - If there are multiple unrelated changes, ask before grouping them into one implementation commit.
 - If a verification or pre-commit hook fails, fix the issue before committing or stop with a clear explanation.
+- Tracking commit message format:
+  - subject: `chore(tasks): close <task-id> <short-task-slug>`
+  - body includes `Task: [P1.2] <title>` and `Verification: docs/tests/<file>.md`
+  - do not rely on GitHub issue closing keywords unless the task is linked to a real issue number
+
+## Verification note format
+
+Use this compact shape for `docs/tests/<task-id-lowercase>-<short-task-slug>.md`:
+
+```md
+# [P2.2] <task title>
+
+## Why This Task Mattered
+<1-2 beginner-friendly sentences explaining the user/product risk this task reduces.>
+
+## What Was Verified
+- <automated check or code check>: <pass/fail and short note>
+- <human app check>: <pass/fail and short note>
+
+## Human Evidence
+<short text summary of what the user did in the app. If screenshots were provided, summarize what they showed instead of storing the images.>
+
+## Result
+Pass. <one sentence on why it is safe to close.>
+```
 
 ## GitHub Project commands
 
@@ -72,12 +105,16 @@ Commits:
   <hash> <implementation commit message>
   <hash> <tracking commit message>
 
+Verification note:
+  docs/tests/p2.2-<task-slug>.md
+
 Verification:
   - Human verification: confirmed after /verify-task
   - <command>: pass
 
 Updated:
   - MASTERPLAN.md checkbox marked [x]
+  - Verification note written under docs/tests/
   - GitHub Project item moved to Done
 
 Next:
@@ -89,5 +126,7 @@ Next:
 - Close only one task per run unless the user explicitly provides multiple task IDs.
 - Require human confirmation from `/verify-task` before closing.
 - `MASTERPLAN.md` is updated only after the implementation commit succeeds.
+- A concise `docs/tests/*.md` verification note is written before the task is moved to `Done`.
+- Do not create GitHub issues or upload screenshots unless the user explicitly asks.
 - Do not move unfinished or ambiguous work to `Done`.
 - Do not modify application code after the implementation commit except to fix failed verification or hooks.
