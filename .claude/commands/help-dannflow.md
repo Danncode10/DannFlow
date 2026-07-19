@@ -72,7 +72,7 @@ Codex uses `.codex/commands/claude-command.md` as a bridge. The source-of-truth 
 | `/what-task [--project-owner <owner>] [--project-number <number>]` | Shows current task status, explains why the chosen task matters, and keeps the next backlog task Ready. |
 | `/masterplan-task <task>` | Executes one ordered `MASTERPLAN.md` task. |
 | `/verify-task [task-id]` | Produces the human verification checklist for an active task. |
-| `/close-task [task-id]` | Closes a verified task and moves project tracking to done. |
+| `/close-task [task-id]` | Closes a verified task, records a short test note, and moves project tracking to done. |
 
 ### Build & UI
 
