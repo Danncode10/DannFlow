@@ -69,7 +69,7 @@ Codex uses `.codex/commands/claude-command.md` as a bridge. The source-of-truth 
 |---|---|
 | `/make-masterplan [--project-owner <owner>] [--project-number <number>]` | Creates `MASTERPLAN.md` and linked ordered task cards. |
 | `/update-masterplan [--project-owner <owner>] [--project-number <number>]` | Syncs `MASTERPLAN.md` changes to GitHub Project cards. |
-| `/what-task [--project-owner <owner>] [--project-number <number>]` | Shows current task status and helps choose the next task. |
+| `/what-task [--project-owner <owner>] [--project-number <number>]` | Shows current task status, explains why the chosen task matters, and keeps the next backlog task Ready. |
 | `/masterplan-task <task>` | Executes one ordered `MASTERPLAN.md` task. |
 | `/verify-task [task-id]` | Produces the human verification checklist for an active task. |
 | `/close-task [task-id]` | Closes a verified task and moves project tracking to done. |

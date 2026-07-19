@@ -34,13 +34,20 @@ User input: **$ARGUMENTS**
 8. If no task is `In progress`, recommend one best task from `Ready`.
 9. Ask the user whether to move the recommended task to `In progress`.
 10. Move exactly one task to `In progress` only after the user confirms the status change.
-11. After moving a task to `In progress`, stop. Do not begin implementation. The user must explicitly ask to work on the task in a follow-up prompt or run the project command intended for executing tasks.
+11. When reporting that the task moved to `In progress`, include a beginner-friendly `Why this matters` statement that explains the task's value in plain language, avoiding jargon where possible.
+12. After moving a task to `In progress`, move the next eligible unchecked `Backlog` task in `MASTERPLAN.md` order to `Ready` unless:
+   - that task is already `Ready`, `In progress`, `In review`, or `Done`
+   - no eligible unchecked backlog task exists
+   - `--dry-run` is present
+13. Report the task promoted to `Ready`, or say that no next backlog task was available.
+14. Stop after the status updates and task selection. Do not begin implementation. The user must explicitly ask to work on the task in a follow-up prompt or run the project command intended for executing tasks.
 
 ## Recommendation rules
 
 - If any task is already `In progress`, prefer showing that active work over recommending new work.
 - Prefer the earliest unchecked task in `MASTERPLAN.md` order unless dependencies or active work clearly point elsewhere.
 - Do not start more than one task per `/what-task` run.
+- Keep one upcoming task prepared in `Ready` after a confirmed `In progress` move so the board always shows the next likely task.
 - Do not use the `In review` status unless the repository explicitly uses a review workflow for this task.
 - Keep paused or abandoned work in `In progress` until the user asks to close, pause, or replace it.
 - Never mark a task `Done`; use `/close-task` for finishing.
@@ -83,12 +90,29 @@ Confirm:
   Should I move [P2.2] to In progress?
 ```
 
+After the user confirms moving the recommended task, use this final output shape:
+
+```text
+Moved to In progress:
+  [P2.2] <title>
+
+Why this matters:
+  <plain-language explanation of why this task helps the project or protects users>
+
+Moved upcoming task to Ready:
+  [P2.3] <title>
+
+Next:
+  Ask me to work on [P2.2] when you are ready to begin implementation.
+```
+
 ## Constraints
 
 - `MASTERPLAN.md` remains the source of truth; GitHub Project status mirrors execution state.
 - Match tasks by stable ID prefix, not by full title.
 - Ask before moving a task to `In progress`.
 - Move no more than one task to `In progress` per run.
+- After a confirmed move to `In progress`, move no more than one upcoming backlog task to `Ready`.
 - Do not modify application code.
 - Do not commit.
 - Stop after board organization and task selection.
