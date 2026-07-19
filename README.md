@@ -294,7 +294,7 @@ or inspect the live project.
 | GitHub Repos Tab | `dashboard-shell.tsx` — paginated, 5/page |
 | TanStack Query caching | `src/hooks/` |
 | Toast notifications | Sonner — global |
-| Rate limiting | Optional (Upstash Redis — deferred to Phase 8+) |
+| Rate limiting | Upstash Redis helper for production-sensitive paths |
 | RLS-first service layer | `src/services/` |
 
 ---

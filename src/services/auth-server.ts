@@ -4,7 +4,7 @@ import { createClient } from '@/utils/supabase/server';
 import { verifyRateLimit } from '@/lib/ratelimit';
 
 export async function signInWithEmailRateLimited(email: string, password: string) {
-  const { success } = await verifyRateLimit(email);
+  const { success } = await verifyRateLimit(email, "sign-in");
   if (!success) throw new Error('Too many login attempts. Try again in a few moments.');
 
   const supabase = await createClient();
@@ -30,7 +30,7 @@ export async function signUpWithEmailRateLimited(
   password: string,
   origin: string,
 ) {
-  const { success } = await verifyRateLimit(email);
+  const { success } = await verifyRateLimit(email, "sign-up");
   if (!success) throw new Error('Too many signup attempts. Try again in a few moments.');
 
   const supabase = await createClient();
@@ -49,7 +49,7 @@ export async function signUpWithEmailRateLimited(
 }
 
 export async function forgotPasswordRateLimited(email: string, redirectUrl: string) {
-  const { success } = await verifyRateLimit(email);
+  const { success } = await verifyRateLimit(email, "password-reset");
   if (!success) throw new Error('Too many password reset attempts. Try again in a few moments.');
 
   const supabase = await createClient();
