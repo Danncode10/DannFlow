@@ -21,6 +21,8 @@ Drop `.md` files in this folder to add custom slash commands. Each file becomes 
 | `/rls <table>` | Inspects RLS policies for a single table via Supabase MCP. Returns who can SELECT/INSERT/UPDATE/DELETE and any gaps. |
 | `/ui` | Active rewrite — makes the diff (or a target file) fully responsive: mobile-first, 48px touch targets, labels above inputs, focus rings, semantic tokens only. |
 | `/checkpoint` | Runs `pnpm checkpoint`: verifies Supabase MCP, pulls live schema, writes timestamped DDL to `supabase/backups/`. |
+| `/start-supabase [project ref\|name] [--pause <project ref>]` | Restores/starts the Supabase project from `.env.local` or an explicit ref. Separates MCP-visible active projects from Supabase-counted free-plan projects, explains visibility gaps, and uses strict pause/start commands. |
+| `/pause-supabase [project id\|name]` | Lists Supabase projects, confirms the target, pauses it through MCP, and verifies status. |
 | `/sync-types` | Regenerates `src/types/supabase.ts`, diffs before/after, summarizes schema drift. |
 | `/new-feature <name>` | Reads `src/prompts/features/` blueprint, scaffolds service + types + App Router page + Shadcn form. |
 | `/new-page <route>` | Scaffolds an App Router page (Server Component) with `loading.tsx` + `error.tsx`, Card-wrapped layout. |

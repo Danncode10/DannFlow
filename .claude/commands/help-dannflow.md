@@ -90,6 +90,8 @@ Codex uses `.codex/commands/claude-command.md` as a bridge. The source-of-truth 
 | `/migrate <description>` | Runs the tracked Drizzle migration workflow. |
 | `/schema-change <description>` | Runs the explicit live Supabase MCP schema-change workflow. |
 | `/checkpoint` | Snapshots the live Supabase schema. |
+| `/start-supabase [project ref\|name] [--pause <project ref>]` | Starts or restores a paused Supabase project and handles free-plan active-project limits. |
+| `/pause-supabase [project id\|name]` | Pauses a Supabase project after listing, confirming, and verifying the target. |
 | `/sync-types` | Regenerates `src/types/supabase.ts`. |
 | `/explain-schema` | Explains the live Supabase schema. |
 | `/rls <table>` | Explains RLS policies for one table. |
@@ -183,6 +185,8 @@ graph TD
   DB["Database & Supabase"] --> MIG["/migrate"]
   DB --> SC["/schema-change"]
   DB --> CP["/checkpoint"]
+  DB --> SS["/start-supabase"]
+  DB --> PS["/pause-supabase"]
   DB --> ST["/sync-types"]
   DB --> ES["/explain-schema"]
   DB --> RLS["/rls"]
