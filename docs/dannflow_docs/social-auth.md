@@ -29,6 +29,13 @@ Also open **Authentication > URL Configuration** and confirm these values:
 - Site URL for production: your deployed app origin
 - Redirect URL for production: `https://your-domain.com/auth/callback`
 
+## Email Confirmation Templates
+
+Copy the ready-made templates from [`docs/supabase/email-templates`](../supabase/email-templates/README.md) into **Authentication > Emails > Templates** in Supabase.
+Keep `{{ .ConfirmationURL }}` intact in both templates so Supabase can issue the signed, single-use confirmation and reset links.
+
+For the complete local redirect URL and email template setup, use the [Supabase email auth setup guide](../supabase/auth-redirect-and-email-setup.md).
+
 ## Google Cloud OAuth
 
 Create a Google OAuth client:

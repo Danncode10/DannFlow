@@ -157,6 +157,13 @@ export default function AuthPage() {
     }
   };
 
+  const clearAuthError = () => {
+    setError('');
+    if (typeof window !== 'undefined' && window.location.search.includes('error=')) {
+      window.history.replaceState(null, '', window.location.pathname);
+    }
+  };
+
   const isDesktop = windowWidth >= 900;
   const passwordScore = (() => {
     let score = 0;
@@ -513,9 +520,13 @@ export default function AuthPage() {
                     <div style={{ position: 'relative' }}>
                       <User size={15} style={{ position: 'absolute', left: 13, top: '50%', transform: 'translateY(-50%)', color: '#9490B5', pointerEvents: 'none' }} />
                       <input
+                        id="name"
+                        name="name"
+                        autoComplete="name"
                         type="text"
                         value={name}
                         onChange={e => setName(e.target.value)}
+                        onFocus={clearAuthError}
                         placeholder="Dann Lopez"
                         style={{
                           width: '100%',
@@ -544,13 +555,17 @@ export default function AuthPage() {
                   <div style={{ position: 'relative' }}>
                     <Mail size={15} style={{ position: 'absolute', left: 13, top: '50%', transform: 'translateY(-50%)', color: '#9490B5', pointerEvents: 'none' }} />
                     <input
+                      id="email"
+                      name="email"
+                      autoComplete="email"
                       type="email"
                       value={email}
                       onChange={e => {
                         setEmail(e.target.value);
-                        setError('');
+                        clearAuthError();
                         setResetSentTo('');
                       }}
+                      onFocus={clearAuthError}
                       placeholder="dann@example.com"
                       required
                       style={{
@@ -580,12 +595,16 @@ export default function AuthPage() {
                   <div style={{ position: 'relative' }}>
                     <Lock size={15} style={{ position: 'absolute', left: 13, top: '50%', transform: 'translateY(-50%)', color: '#9490B5', pointerEvents: 'none' }} />
                     <input
+                      id="password"
+                      name="password"
+                      autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
                       type={showPassword ? 'text' : 'password'}
                       value={password}
                       onChange={e => {
                         setPassword(e.target.value);
-                        setError('');
+                        clearAuthError();
                       }}
+                      onFocus={clearAuthError}
                       placeholder={mode === 'login' ? '••••••••' : 'Min. 8 characters'}
                       required
                       style={{
