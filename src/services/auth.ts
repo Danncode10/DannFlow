@@ -1,5 +1,6 @@
 'use client';
 
+import type { Provider } from '@supabase/supabase-js';
 import { createClient } from '@/utils/supabase/client';
 
 /**
@@ -43,6 +44,21 @@ export async function signUpWithEmail(email: string, password: string) {
 export async function signOut() {
   const client = createClient();
   const { error } = await client.auth.signOut();
+  if (error) throw error;
+  return { success: true };
+}
+
+export async function signInWithOAuthProvider(provider: Provider, next = '/dashboard') {
+  const client = createClient();
+  const safeNext = next.startsWith('/') ? next : '/dashboard';
+
+  const { error } = await client.auth.signInWithOAuth({
+    provider,
+    options: {
+      redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(safeNext)}`,
+    },
+  });
+
   if (error) throw error;
   return { success: true };
 }

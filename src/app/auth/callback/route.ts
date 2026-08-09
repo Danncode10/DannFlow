@@ -6,7 +6,8 @@ export async function GET(request: Request) {
   const code = searchParams.get('code')
   // `next` lets us send users to a specific page after confirming
   // e.g. /auth/callback?next=/dashboard — defaults to /login
-  const next = searchParams.get('next') ?? '/login'
+  const nextParam = searchParams.get('next') ?? '/login'
+  const next = nextParam.startsWith('/') ? nextParam : '/login'
 
   if (code) {
     const supabase = await createClient()

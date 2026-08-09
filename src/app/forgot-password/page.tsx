@@ -1,82 +1,140 @@
-"use client";
+"use client"
 
-import { useState } from 'react';
-import { Mail, Loader2, ArrowLeft } from 'lucide-react';
-import { forgotPasswordRateLimited } from '@/services/auth-server';
-import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
-import Link from 'next/link';
+import { useState, type FormEvent } from "react"
+import Link from "next/link"
+import { ArrowLeft, Loader2, Mail } from "lucide-react"
+import { toast } from "sonner"
+
+import { AuthShell } from "@/components/auth/AuthShell"
+import { Button } from "@/components/ui/button"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { forgotPasswordRateLimited } from "@/services/auth-server"
+
+function getErrorMessage(error: unknown) {
+  if (!(error instanceof Error)) {
+    return "Something went wrong. Please try again."
+  }
+
+  const message = error.message.toLowerCase()
+
+  if (message.includes("fetch failed") || message.includes("failed to fetch")) {
+    return "Could not reach Supabase. Check that the project is active and try again."
+  }
+
+  return error.message
+}
 
 export default function ForgotPasswordPage() {
-  const [email, setEmail] = useState('');
-  const [loading, setLoading] = useState(false);
-  const router = useRouter();
+  const [email, setEmail] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
+  const [sent, setSent] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setError("")
+
+    if (!email.trim()) {
+      setError("Enter the email address for your account.")
+      return
+    }
+
+    setLoading(true)
 
     try {
-      await forgotPasswordRateLimited(email, `${window.location.origin}/reset-password`);
-      toast.success('Reset email sent!', {
-        description: 'Check your inbox for the password reset link.',
-      });
-      router.push('/login');
-    } catch (err: any) {
-      toast.error('Error sending reset email', {
-        description: err.message || 'Something went wrong. Please try again.',
-      });
+      await forgotPasswordRateLimited(
+        email,
+        `${window.location.origin}/reset-password`
+      )
+      setSent(true)
+      toast.success("Reset email sent", {
+        description: "Check your inbox for the password reset link.",
+      })
+    } catch (err) {
+      setError(getErrorMessage(err))
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background text-foreground px-4">
-      <div className="w-full max-w-md bg-card border border-border p-8 rounded-2xl shadow-2xl flex flex-col gap-6 relative overflow-hidden">
-        
-        <div className="absolute -top-10 -right-10 w-40 h-40 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
+    <AuthShell showBrandPanel={false}>
+      <Card className="w-full max-w-md rounded-lg border-border bg-card shadow-sm">
+        <CardHeader className="space-y-2 text-center">
+          <CardTitle className="text-3xl font-bold tracking-tight">
+            Forgot password
+          </CardTitle>
+          <CardDescription className="leading-6">
+            Enter your email and we will send a secure recovery link.
+          </CardDescription>
+        </CardHeader>
 
-        <div className="flex flex-col gap-2 text-center z-10">
-          <h1 className="text-2xl font-black tracking-tighter uppercase italic">Forgot Password</h1>
-          <p className="text-muted-foreground text-sm font-semibold italic">
-            Enter your email to receive a recovery link.
-          </p>
-        </div>
-        
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4 z-10">
-          <div className="relative group">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Mail className="h-4 w-4 text-neutral-500 group-focus-within:text-primary transition-colors" />
+        <CardContent>
+          {sent ? (
+            <div className="rounded-lg border border-border bg-muted p-4 text-center">
+              <p className="font-semibold text-foreground">Check your inbox</p>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                If the account exists, a password reset link is on its way.
+              </p>
             </div>
-            <input 
-              type="email" 
-              placeholder="Email address" 
-              className="w-full pl-10 pr-4 py-3 bg-neutral-900/50 border border-neutral-800 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all font-mono text-sm placeholder:text-neutral-600"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          
-          <button 
-            type="submit" 
-            disabled={loading} 
-            className="w-full py-3 bg-foreground text-background font-mono font-bold text-sm rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
-          >
-            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-            {loading ? 'Sending...' : 'Send Reset Link'}
-          </button>
-        </form>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+              <div className="space-y-2">
+                <label
+                  htmlFor="email"
+                  className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground"
+                >
+                  Email address
+                </label>
+                <div className="relative">
+                  <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                    required
+                    aria-invalid={Boolean(error)}
+                    aria-describedby={error ? "forgot-password-error" : undefined}
+                    className="min-h-12 w-full rounded-lg border border-input bg-background py-3 pl-10 pr-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/30"
+                    placeholder="dann@example.com"
+                  />
+                </div>
+              </div>
 
-        <Link 
-          href="/login" 
-          className="flex items-center justify-center gap-2 text-sm text-neutral-400 hover:text-neutral-200 transition-colors font-mono z-10"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back to Login
-        </Link>
-      </div>
-    </div>
-  );
+              {error ? (
+                <div
+                  id="forgot-password-error"
+                  className="rounded-lg border border-destructive/40 bg-card p-3 text-sm text-destructive"
+                >
+                  {error}
+                </div>
+              ) : null}
+
+              <Button type="submit" size="lg" className="w-full" disabled={loading}>
+                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                {loading ? "Sending" : "Send Reset Link"}
+              </Button>
+            </form>
+          )}
+        </CardContent>
+
+        <CardFooter className="justify-center">
+          <Button asChild variant="ghost" className="px-3">
+            <Link href="/login">
+              <ArrowLeft className="h-4 w-4" />
+              Back to Login
+            </Link>
+          </Button>
+        </CardFooter>
+      </Card>
+    </AuthShell>
+  )
 }
