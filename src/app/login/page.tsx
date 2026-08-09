@@ -369,12 +369,39 @@ export default function AuthPage() {
           flex: 1,
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center',
-          padding: isDesktop ? '40px 44px' : '28px 20px',
+          justifyContent: isDesktop ? 'center' : 'flex-start',
+          padding: isDesktop ? '40px 44px' : '24px 20px 28px',
           position: 'relative',
           zIndex: 10,
         }}>
           <div style={{ width: '100%', maxWidth: 400, animation: 'fadeUp 0.45s ease both' }}>
+            {!isDesktop && (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 22 }}>
+                <div style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: 8,
+                  background: 'linear-gradient(135deg, var(--color-primary), var(--color-primary))',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: 'bold',
+                  fontSize: 13,
+                  color: 'white',
+                  boxShadow: '0 0 18px rgba(108, 71, 255,0.333)',
+                }}>D</div>
+                <span style={{ fontSize: 17, fontWeight: 'bold', letterSpacing: -0.025, color: '#F0EEFF' }}>DannFlow</span>
+                <span style={{
+                  padding: '2px 7px',
+                  borderRadius: 5,
+                  background: 'rgba(108, 71, 255,0.125)',
+                  border: '1px solid rgba(108, 71, 255,0.25)',
+                  fontSize: 10,
+                  color: 'var(--color-primary)',
+                  letterSpacing: 0.06,
+                }}>v2.0</span>
+              </div>
+            )}
             {/* Tabs */}
             {mode !== 'recovery' && (
             <div style={{
