@@ -19,12 +19,13 @@ import { AuthShell } from "@/components/auth/AuthShell"
 import { Button } from "@/components/ui/button"
 import {
   signInWithEmailRateLimited,
+  forgotPasswordRateLimited,
   signUpWithEmailRateLimited,
 } from "@/services/auth-server"
 import { signInWithOAuthProvider } from "@/services/auth"
 import { cn } from "@/lib/utils"
 
-type AuthMode = "login" | "signup"
+type AuthMode = "login" | "signup" | "recovery"
 
 type FieldErrors = {
   name?: string
@@ -33,6 +34,56 @@ type FieldErrors = {
 }
 
 const passwordLabels = ["Weak", "Fair", "Good", "Strong"]
+const passwordTones = [
+  {
+    bar: "bg-password-weak",
+    text: "text-password-weak",
+    border: "border-password-weak text-password-weak",
+  },
+  {
+    bar: "bg-password-fair",
+    text: "text-password-fair",
+    border: "border-password-fair text-password-fair",
+  },
+  {
+    bar: "bg-password-good",
+    text: "text-password-good",
+    border: "border-password-good text-password-good",
+  },
+  {
+    bar: "bg-password-strong",
+    text: "text-password-strong",
+    border: "border-password-strong text-password-strong",
+  },
+]
+
+function GoogleIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="h-5 w-5"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+        fill="#4285F4"
+      />
+      <path
+        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+        fill="#34A853"
+      />
+      <path
+        d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.84z"
+        fill="#FBBC05"
+      />
+      <path
+        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06L5.84 9.9C6.71 7.3 9.14 5.38 12 5.38z"
+        fill="#EA4335"
+      />
+    </svg>
+  )
+}
 
 function getPasswordScore(password: string) {
   let score = 0
@@ -78,6 +129,7 @@ export default function AuthPage() {
   const [loading, setLoading] = useState(false)
   const [oauthLoading, setOauthLoading] = useState(false)
   const [success, setSuccess] = useState(false)
+  const [resetSentTo, setResetSentTo] = useState("")
   const [error, setError] = useState("")
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
   const router = useRouter()
@@ -93,6 +145,14 @@ export default function AuthPage() {
     [password]
   )
   const isStrongEnough = passwordScore >= 3
+  const passwordTone =
+    passwordScore > 0
+      ? passwordTones[passwordScore - 1]
+      : {
+          bar: "bg-muted",
+          text: "text-muted-foreground",
+          border: "border-border text-muted-foreground",
+        }
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
@@ -102,6 +162,12 @@ export default function AuthPage() {
       }
 
       const searchParams = new URLSearchParams(window.location.search)
+      if (searchParams.get("mode") === "recovery") {
+        setMode("recovery")
+        setSuccess(false)
+        setResetSentTo("")
+      }
+
       if (searchParams.get("error") === "confirmation_failed") {
         setError("We could not complete that auth link. Please try again.")
       }
@@ -112,11 +178,16 @@ export default function AuthPage() {
 
   const switchMode = (nextMode: AuthMode) => {
     setMode(nextMode)
-    localStorage.setItem("df_auth_mode", nextMode)
+    if (nextMode === "login" || nextMode === "signup") {
+      localStorage.setItem("df_auth_mode", nextMode)
+    }
     setError("")
     setFieldErrors({})
     setSuccess(false)
-    setEmail("")
+    setResetSentTo("")
+    if (nextMode !== "recovery") {
+      setEmail("")
+    }
     setPassword("")
     setName("")
   }
@@ -128,7 +199,7 @@ export default function AuthPage() {
       nextErrors.email = "Enter an email address."
     }
 
-    if (!password) {
+    if (mode !== "recovery" && !password) {
       nextErrors.password = "Enter your password."
     }
 
@@ -158,6 +229,18 @@ export default function AuthPage() {
     setLoading(true)
 
     try {
+      if (mode === "recovery") {
+        await forgotPasswordRateLimited(
+          email,
+          `${window.location.origin}/reset-password`
+        )
+        setResetSentTo(email)
+        toast.success("Reset email sent", {
+          description: `Check ${email} for the setup link.`,
+        })
+        return
+      }
+
       if (mode === "login") {
         const result = await signInWithEmailRateLimited(email, password)
 
@@ -202,35 +285,78 @@ export default function AuthPage() {
     }
   }
 
+  const handlePasswordChange = (value: string) => {
+    setPassword(value)
+    setError("")
+    setFieldErrors((current) => ({ ...current, password: undefined }))
+  }
+
+  const handleEmailChange = (value: string) => {
+    setEmail(value)
+    setError("")
+    setResetSentTo("")
+    setFieldErrors((current) => ({ ...current, email: undefined }))
+  }
+
   return (
     <AuthShell>
       <div className="w-full max-w-[26rem]">
-        <div className="mb-8 grid grid-cols-2 gap-1 rounded-lg border border-border bg-card p-1">
-          {(["login", "signup"] as const).map((item) => (
-            <Button
-              key={item}
-              type="button"
-              variant={mode === item ? "default" : "ghost"}
-              className="h-12"
-              onClick={() => switchMode(item)}
-            >
-              {item === "login" ? "Sign In" : "Create Account"}
-            </Button>
-          ))}
-        </div>
+        {mode !== "recovery" ? (
+          <div className="mb-8 grid grid-cols-2 gap-1 rounded-lg border border-border bg-card p-1">
+            {(["login", "signup"] as const).map((item) => (
+              <Button
+                key={item}
+                type="button"
+                variant={mode === item ? "default" : "ghost"}
+                className="h-12"
+                onClick={() => switchMode(item)}
+              >
+                {item === "login" ? "Sign In" : "Create Account"}
+              </Button>
+            ))}
+          </div>
+        ) : null}
 
         <div className="mb-6 space-y-2">
           <h2 className="text-3xl font-bold tracking-tight">
-            {mode === "login" ? "Welcome back" : "Start building"}
+            {mode === "login"
+              ? "Welcome back"
+              : mode === "signup"
+                ? "Start building"
+                : "Reset password"}
           </h2>
           <p className="text-sm leading-6 text-muted-foreground">
             {mode === "login"
               ? "Access Mission Control with email or Google."
-              : "Create your account with stronger defaults from the start."}
+              : mode === "signup"
+                ? "Create your account with stronger defaults from the start."
+                : email
+                  ? `Send a secure setup link to ${email}.`
+                  : "Enter your account email and we will send a secure setup link."}
           </p>
         </div>
 
-        {success ? (
+        {resetSentTo ? (
+          <div className="rounded-lg border border-border bg-card p-7 text-center">
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg border border-password-strong bg-muted text-password-strong">
+              <Check className="h-5 w-5" />
+            </div>
+            <p className="font-semibold">Reset email sent</p>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              We sent a setup link to <span className="text-foreground">{resetSentTo}</span>.
+              Make sure this is your email, then open the link to create a new
+              password.
+            </p>
+            <Button
+              type="button"
+              variant="ghost"
+              className="mt-5"
+              onClick={() => switchMode("login")}
+            >
+              Back to Sign In
+            </Button>
+          </div>
+        ) : success ? (
           <div className="rounded-lg border border-border bg-card p-7 text-center">
             <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg border border-border bg-muted text-primary">
               <Check className="h-5 w-5" />
@@ -260,7 +386,13 @@ export default function AuthPage() {
                     id="name"
                     type="text"
                     value={name}
-                    onChange={(event) => setName(event.target.value)}
+                    onChange={(event) => {
+                      setName(event.target.value)
+                      setFieldErrors((current) => ({
+                        ...current,
+                        name: undefined,
+                      }))
+                    }}
                     aria-invalid={Boolean(fieldErrors.name)}
                     aria-describedby={fieldErrors.name ? "name-error" : undefined}
                     className="min-h-12 w-full rounded-lg border border-input bg-card py-3 pl-10 pr-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/30"
@@ -288,7 +420,7 @@ export default function AuthPage() {
                   id="email"
                   type="email"
                   value={email}
-                  onChange={(event) => setEmail(event.target.value)}
+                  onChange={(event) => handleEmailChange(event.target.value)}
                   required
                   aria-invalid={Boolean(fieldErrors.email)}
                   aria-describedby={fieldErrors.email ? "email-error" : undefined}
@@ -303,93 +435,96 @@ export default function AuthPage() {
               ) : null}
             </div>
 
-            <div className="space-y-2">
-              <label
-                htmlFor="password"
-                className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground"
-              >
-                Password
-              </label>
-              <div className="relative">
-                <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(event) => setPassword(event.target.value)}
-                  required
-                  aria-invalid={Boolean(fieldErrors.password)}
-                  aria-describedby={
-                    fieldErrors.password ? "password-error" : "password-help"
-                  }
-                  className="min-h-12 w-full rounded-lg border border-input bg-card py-3 pl-10 pr-12 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/30"
-                  placeholder={mode === "login" ? "Your password" : "Min. 8 characters"}
-                />
-                <Button
-                  type="button"
-                  size="icon"
-                  variant="ghost"
-                  className="absolute right-1 top-1/2 h-10 w-10 -translate-y-1/2 text-muted-foreground"
-                  onClick={() => setShowPassword((current) => !current)}
-                  aria-label={showPassword ? "Hide password" : "Show password"}
+            {mode !== "recovery" ? (
+              <div className="space-y-2">
+                <label
+                  htmlFor="password"
+                  className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground"
                 >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
-                </Button>
-              </div>
-
-              {mode === "signup" ? (
-                <div id="password-help" className="space-y-2">
-                  <div className="grid grid-cols-4 gap-1">
-                    {[0, 1, 2, 3].map((index) => (
-                      <span
-                        key={index}
-                        className={cn(
-                          "h-1 rounded-full bg-muted",
-                          index < passwordScore && "bg-primary"
-                        )}
-                      />
-                    ))}
-                  </div>
-                  <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-                    <span className="font-semibold text-foreground">
-                      {password
-                        ? passwordLabels[passwordScore - 1] ?? "Weak"
-                        : "Password strength"}
-                    </span>
-                    {passwordChecks.map((check) => (
-                      <span
-                        key={check.label}
-                        className={cn(
-                          "rounded-md border border-border bg-card px-2 py-1",
-                          check.passed && "border-primary text-primary"
-                        )}
-                      >
-                        {check.label}
-                      </span>
-                    ))}
-                  </div>
+                  Password
+                </label>
+                <div className="relative">
+                  <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(event) => handlePasswordChange(event.target.value)}
+                    required
+                    aria-invalid={Boolean(fieldErrors.password)}
+                    aria-describedby={
+                      fieldErrors.password ? "password-error" : "password-help"
+                    }
+                    className="min-h-12 w-full rounded-lg border border-input bg-card py-3 pl-10 pr-12 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/30"
+                    placeholder={mode === "login" ? "Your password" : "Min. 8 characters"}
+                  />
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="ghost"
+                    className="absolute right-1 top-1/2 h-10 w-10 -translate-y-1/2 text-muted-foreground"
+                    onClick={() => setShowPassword((current) => !current)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </Button>
                 </div>
-              ) : null}
 
-              {fieldErrors.password ? (
-                <p id="password-error" className="text-sm text-destructive">
-                  {fieldErrors.password}
-                </p>
-              ) : null}
-            </div>
+                {mode === "signup" ? (
+                  <div id="password-help" className="space-y-2">
+                    <div className="grid grid-cols-4 gap-1">
+                      {[0, 1, 2, 3].map((index) => (
+                        <span
+                          key={index}
+                          className={cn(
+                            "h-1 rounded-full bg-muted",
+                            index < passwordScore && passwordTone.bar
+                          )}
+                        />
+                      ))}
+                    </div>
+                    <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+                      <span className={cn("font-semibold", passwordTone.text)}>
+                        {password
+                          ? passwordLabels[passwordScore - 1] ?? "Weak"
+                          : "Password strength"}
+                      </span>
+                      {passwordChecks.map((check) => (
+                        <span
+                          key={check.label}
+                          className={cn(
+                            "rounded-md border border-border bg-card px-2 py-1",
+                            check.passed && passwordTone.border
+                          )}
+                        >
+                          {check.label}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+
+                {fieldErrors.password ? (
+                  <p id="password-error" className="text-sm text-destructive">
+                    {fieldErrors.password}
+                  </p>
+                ) : null}
+              </div>
+            ) : null}
 
             {mode === "login" ? (
               <div className="flex justify-end">
-                <Link
-                  href="/forgot-password"
+                <button
+                  type="button"
                   className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                  onClick={() => switchMode("recovery")}
                 >
                   Forgot password?
-                </Link>
+                </button>
               </div>
             ) : null}
 
@@ -410,7 +545,9 @@ export default function AuthPage() {
                 ? "Processing"
                 : mode === "login"
                   ? "Sign In"
-                  : "Create Account"}
+                  : mode === "signup"
+                    ? "Create Account"
+                    : "Send Reset Link"}
               {!loading ? <ArrowRight className="h-4 w-4" /> : null}
             </Button>
 
@@ -430,31 +567,42 @@ export default function AuthPage() {
           </form>
         )}
 
-        <div className="my-6 flex items-center gap-3">
-          <div className="h-px flex-1 bg-border" />
-          <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            Or
-          </span>
-          <div className="h-px flex-1 bg-border" />
-        </div>
+        {mode === "recovery" ? (
+          <Button
+            type="button"
+            variant="ghost"
+            className="mt-4 w-full"
+            onClick={() => switchMode("login")}
+          >
+            Back to Sign In
+          </Button>
+        ) : (
+          <>
+            <div className="my-6 flex items-center gap-3">
+              <div className="h-px flex-1 bg-border" />
+              <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Or
+              </span>
+              <div className="h-px flex-1 bg-border" />
+            </div>
 
-        <Button
-          type="button"
-          variant="outline"
-          size="lg"
-          className="w-full"
-          onClick={handleGoogleSignIn}
-          disabled={loading || oauthLoading}
-        >
-          {oauthLoading ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <span className="flex h-5 w-5 items-center justify-center rounded-full border border-border text-xs font-bold text-primary">
-              G
-            </span>
-          )}
-          Continue with Google
-        </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="lg"
+              className="w-full"
+              onClick={handleGoogleSignIn}
+              disabled={loading || oauthLoading}
+            >
+              {oauthLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <GoogleIcon />
+              )}
+              Continue with Google
+            </Button>
+          </>
+        )}
       </div>
     </AuthShell>
   )

@@ -8,7 +8,7 @@ DannFlow defaults to email/password plus Google OAuth because most client-facing
 ## Current App Flow
 
 - Login and signup live in `src/app/login/page.tsx`.
-- Forgot password lives in `src/app/forgot-password/page.tsx`.
+- Password recovery is handled inline on `/login` with `mode=recovery`; `src/app/forgot-password/page.tsx` redirects there for backwards compatibility.
 - OAuth starts through `signInWithOAuthProvider` in `src/services/auth.ts`.
 - Supabase returns to `src/app/auth/callback/route.ts`, where the auth code is exchanged for a cookie-based session.
 - Successful Google login redirects to `/dashboard` through `/auth/callback?next=/dashboard`.
@@ -73,6 +73,7 @@ The login UI maps common failures to user-facing messages:
 - Supabase unavailable or paused: tells the user to check project status and environment URL.
 - Invalid email/password: explains that credentials do not match.
 - Google provider not configured: points to Supabase provider and redirect URL setup.
+- Forgot password: reuses the email already entered on the login form and sends a setup link without asking for the old password.
 
 Password signup currently requires at least 3 of these 4 checks:
 
