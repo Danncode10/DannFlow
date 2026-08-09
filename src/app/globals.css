@@ -29,12 +29,6 @@
   --color-destructive: #ef4444;
   --color-destructive-foreground: #ffffff;
 
-  /* Password strength */
-  --color-password-weak: #ef4444;
-  --color-password-fair: #f97316;
-  --color-password-good: #eab308;
-  --color-password-strong: #22c55e;
-
   /* Popover / dropdown */
   --color-popover: #0C0C14;
   --color-popover-foreground: #EEEAFF;
