@@ -1,53 +1,125 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { signUpWithEmail } from '@/services/auth';
-import { signInWithEmailRateLimited, signUpWithEmailRateLimited } from '@/services/auth-server';
+import { signInWithOAuthProvider } from '@/services/auth';
+import { forgotPasswordRateLimited, signInWithEmailRateLimited, signUpWithEmailRateLimited } from '@/services/auth-server';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import Link from 'next/link';
 import { Mail, Lock, User, Eye, EyeOff, ArrowRight, Loader2, Check } from 'lucide-react';
 
+type AuthMode = 'login' | 'signup' | 'recovery';
+
+function GoogleIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+      <path d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.84z" fill="#FBBC05" />
+      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06L5.84 9.9C6.71 7.3 9.14 5.38 12 5.38z" fill="#EA4335" />
+    </svg>
+  );
+}
+
+function getAuthErrorMessage(err: unknown) {
+  if (!(err instanceof Error)) return 'Something went wrong. Please try again.';
+
+  const message = err.message.toLowerCase();
+  if (message.includes('fetch failed') || message.includes('failed to fetch')) {
+    return 'Could not reach Supabase. Check that the project is active and your environment URL is correct.';
+  }
+  if (message.includes('invalid login')) {
+    return 'The email or password does not match an account.';
+  }
+  if (message.includes('password')) {
+    return 'Use a stronger password before creating your account.';
+  }
+  if (message.includes('provider') || message.includes('oauth')) {
+    return 'Google login is not configured yet. Check the Supabase provider and redirect URLs.';
+  }
+
+  return err.message;
+}
+
 export default function AuthPage() {
-  const [mode, setMode] = useState<'login' | 'signup'>('login');
+  const [mode, setMode] = useState<AuthMode>('login');
   const [formKey, setFormKey] = useState(0);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [oauthLoading, setOauthLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [resetSentTo, setResetSentTo] = useState('');
   const [error, setError] = useState('');
   const [windowWidth, setWindowWidth] = useState(1024);
   const router = useRouter();
 
   useEffect(() => {
-    setWindowWidth(window.innerWidth);
+    const timeout = window.setTimeout(() => {
+      setWindowWidth(window.innerWidth);
+      const saved = localStorage.getItem('df_auth_mode');
+      if (saved === 'login' || saved === 'signup') setMode(saved);
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('mode') === 'recovery') setMode('recovery');
+      if (params.get('error') === 'confirmation_failed') {
+        setError('We could not complete that auth link. Please try again.');
+      }
+    }, 0);
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener('resize', handleResize);
-    const saved = localStorage.getItem('df_auth_mode');
-    if (saved) setMode(saved as 'login' | 'signup');
-    return () => window.removeEventListener('resize', handleResize);
+    return () => {
+      window.clearTimeout(timeout);
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
 
-  const switchMode = (m: 'login' | 'signup') => {
+  const switchMode = (m: AuthMode) => {
     setMode(m);
-    localStorage.setItem('df_auth_mode', m);
+    if (m === 'login' || m === 'signup') localStorage.setItem('df_auth_mode', m);
     setFormKey(k => k + 1);
     setError('');
     setSuccess(false);
-    setEmail('');
+    setResetSentTo('');
+    if (m !== 'recovery') setEmail('');
     setPassword('');
     setName('');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError('');
 
+    if (!email.trim()) {
+      setError('Enter an email address.');
+      return;
+    }
+
+    if (mode !== 'recovery' && !password) {
+      setError('Enter your password.');
+      return;
+    }
+
+    if (mode === 'signup' && passwordScore < 3) {
+      setError('Use at least 3 password requirements before creating an account.');
+      return;
+    }
+
+    setLoading(true);
+
     try {
-      if (mode === 'login') {
+      if (mode === 'recovery') {
+        await forgotPasswordRateLimited(email, `${window.location.origin}/reset-password`);
+        setResetSentTo(email);
+        toast.success('Reset email sent', { description: `Check ${email} for the setup link.` });
+      } else if (mode === 'login') {
         const result = await signInWithEmailRateLimited(email, password);
         if (result.requiresMFA) {
           router.push('/auth/mfa');
@@ -60,16 +132,35 @@ export default function AuthPage() {
           }, 800);
         }
       } else {
-        await signUpWithEmailRateLimited(email, password, window.location.origin);
+        await signUpWithEmailRateLimited(email, password, window.location.origin, name.trim());
         setSuccess(true);
         setTimeout(() => {
           toast.success('Account created!', { description: 'Check your email for confirmation.' });
         }, 800);
       }
-    } catch (err: any) {
-      setError(err.message || 'An error occurred');
+    } catch (err: unknown) {
+      setError(getAuthErrorMessage(err));
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setError('');
+    setOauthLoading(true);
+
+    try {
+      await signInWithOAuthProvider('google');
+    } catch (err: unknown) {
+      setError(getAuthErrorMessage(err));
+      setOauthLoading(false);
+    }
+  };
+
+  const clearAuthError = () => {
+    setError('');
+    if (typeof window !== 'undefined' && window.location.search.includes('error=')) {
+      window.history.replaceState(null, '', window.location.pathname);
     }
   };
 
@@ -285,13 +376,41 @@ export default function AuthPage() {
           flex: 1,
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center',
-          padding: isDesktop ? '40px 44px' : '28px 20px',
+          justifyContent: isDesktop ? 'center' : 'flex-start',
+          padding: isDesktop ? '40px 44px' : '24px 20px 28px',
           position: 'relative',
           zIndex: 10,
         }}>
           <div style={{ width: '100%', maxWidth: 400, animation: 'fadeUp 0.45s ease both' }}>
+            {!isDesktop && (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 22 }}>
+                <div style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: 8,
+                  background: 'linear-gradient(135deg, var(--color-primary), var(--color-primary))',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: 'bold',
+                  fontSize: 13,
+                  color: 'white',
+                  boxShadow: '0 0 18px rgba(108, 71, 255,0.333)',
+                }}>D</div>
+                <span style={{ fontSize: 17, fontWeight: 'bold', letterSpacing: -0.025, color: '#F0EEFF' }}>DannFlow</span>
+                <span style={{
+                  padding: '2px 7px',
+                  borderRadius: 5,
+                  background: 'rgba(108, 71, 255,0.125)',
+                  border: '1px solid rgba(108, 71, 255,0.25)',
+                  fontSize: 10,
+                  color: 'var(--color-primary)',
+                  letterSpacing: 0.06,
+                }}>v2.0</span>
+              </div>
+            )}
             {/* Tabs */}
+            {mode !== 'recovery' && (
             <div style={{
               display: 'flex',
               background: '#13131F',
@@ -323,19 +442,58 @@ export default function AuthPage() {
                 </button>
               ))}
             </div>
+            )}
 
             {/* Heading */}
             <div style={{ marginBottom: 24 }}>
               <h2 style={{ fontSize: 26, fontWeight: 'bold', letterSpacing: -0.025, marginBottom: 5, color: '#F0EEFF' }}>
-                {mode === 'login' ? 'Welcome back' : 'Start building'}
+                {mode === 'login' ? 'Welcome back' : mode === 'signup' ? 'Start building' : 'Reset password'}
               </h2>
               <p style={{ fontSize: 13, color: '#9490B5', lineHeight: 1.55 }}>
-                {mode === 'login' ? 'Access Mission Control — your launchpad awaits.' : 'Create your account and ship your first idea today.'}
+                {mode === 'login'
+                  ? 'Access Mission Control — your launchpad awaits.'
+                  : mode === 'signup'
+                    ? 'Create your account and ship your first idea today.'
+                    : email
+                      ? `Send a secure setup link to ${email}.`
+                      : 'Enter your account email and we will send a secure setup link.'}
               </p>
             </div>
 
             {/* Success State */}
-            {success ? (
+            {resetSentTo ? (
+              <div style={{
+                padding: 28,
+                borderRadius: 12,
+                textAlign: 'center',
+                background: 'rgba(34,197,94,0.07)',
+                border: '1px solid rgba(34,197,94,0.22)',
+                animation: 'fadeUp 0.35s ease both',
+              }}>
+                <div style={{ fontSize: 28, marginBottom: 10 }}>✓</div>
+                <p style={{ fontWeight: 600, marginBottom: 5, color: '#F0EEFF' }}>
+                  Reset email sent
+                </p>
+                <p style={{ fontSize: 12, color: '#9490B5', lineHeight: 1.55 }}>
+                  We sent a setup link to {resetSentTo}. Make sure this is your email, then open the link to create a new password.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => switchMode('login')}
+                  style={{
+                    marginTop: 18,
+                    background: 'transparent',
+                    border: 'none',
+                    color: 'var(--color-primary)',
+                    cursor: 'pointer',
+                    fontSize: 12,
+                    fontWeight: 600,
+                  }}
+                >
+                  Back to Sign In
+                </button>
+              </div>
+            ) : success ? (
               <div style={{
                 padding: 28,
                 borderRadius: 12,
@@ -362,9 +520,13 @@ export default function AuthPage() {
                     <div style={{ position: 'relative' }}>
                       <User size={15} style={{ position: 'absolute', left: 13, top: '50%', transform: 'translateY(-50%)', color: '#9490B5', pointerEvents: 'none' }} />
                       <input
+                        id="name"
+                        name="name"
+                        autoComplete="name"
                         type="text"
                         value={name}
                         onChange={e => setName(e.target.value)}
+                        onFocus={clearAuthError}
                         placeholder="Dann Lopez"
                         style={{
                           width: '100%',
@@ -393,9 +555,17 @@ export default function AuthPage() {
                   <div style={{ position: 'relative' }}>
                     <Mail size={15} style={{ position: 'absolute', left: 13, top: '50%', transform: 'translateY(-50%)', color: '#9490B5', pointerEvents: 'none' }} />
                     <input
+                      id="email"
+                      name="email"
+                      autoComplete="email"
                       type="email"
                       value={email}
-                      onChange={e => setEmail(e.target.value)}
+                      onChange={e => {
+                        setEmail(e.target.value);
+                        clearAuthError();
+                        setResetSentTo('');
+                      }}
+                      onFocus={clearAuthError}
                       placeholder="dann@example.com"
                       required
                       style={{
@@ -417,6 +587,7 @@ export default function AuthPage() {
                   </div>
                 </div>
 
+                {mode !== 'recovery' && (
                 <div>
                   <label style={{ display: 'block', fontSize: 11, fontWeight: 600, letterSpacing: 0.08, textTransform: 'uppercase', color: '#9490B5', marginBottom: 6 }}>
                     Password
@@ -424,9 +595,16 @@ export default function AuthPage() {
                   <div style={{ position: 'relative' }}>
                     <Lock size={15} style={{ position: 'absolute', left: 13, top: '50%', transform: 'translateY(-50%)', color: '#9490B5', pointerEvents: 'none' }} />
                     <input
+                      id="password"
+                      name="password"
+                      autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
                       type={showPassword ? 'text' : 'password'}
                       value={password}
-                      onChange={e => setPassword(e.target.value)}
+                      onChange={e => {
+                        setPassword(e.target.value);
+                        clearAuthError();
+                      }}
+                      onFocus={clearAuthError}
                       placeholder={mode === 'login' ? '••••••••' : 'Min. 8 characters'}
                       required
                       style={{
@@ -466,34 +644,33 @@ export default function AuthPage() {
                     </button>
                   </div>
 
-                  {mode === 'signup' && password && (
+                  {mode === 'signup' && (
                     <div style={{ marginTop: 7 }}>
-                      <div style={{ display: 'flex', gap: 4, marginBottom: 4 }}>
+                      <div style={{ display: 'flex', gap: 4 }}>
                         {[0, 1, 2, 3].map(i => {
                           const colors = ['#ef4444', '#f97316', '#eab308', '#22c55e'];
+                          const visualScore = password ? Math.max(1, passwordScore) : 0;
                           return (
                             <div key={i} style={{
                               flex: 1,
                               height: 3,
                               borderRadius: 2,
-                              background: i < passwordScore ? colors[passwordScore - 1] : 'var(--color-border)',
+                              background: i < visualScore ? colors[visualScore - 1] : 'var(--color-border)',
                               transition: 'background 0.25s',
                             }} />
                           );
                         })}
                       </div>
-                      <p style={{ fontSize: 10, color: passwordScore > 0 ? ['#ef4444', '#f97316', '#eab308', '#22c55e'][passwordScore - 1] : '#9490B5' }}>
-                        {passwordScore > 0 ? ['Weak', 'Fair', 'Good', 'Strong'][passwordScore - 1] : ''}
-                      </p>
                     </div>
                   )}
                 </div>
+                )}
 
                 {mode === 'login' && (
                   <div style={{ textAlign: 'right', marginTop: -4 }}>
-                    <Link href="/forgot-password" style={{ fontSize: 11, color: '#9490B5', textDecoration: 'none', letterSpacing: 0.05, transition: 'color 0.2s', cursor: 'pointer' }} onMouseEnter={e => (e.currentTarget as any).style.color = 'var(--color-primary)'} onMouseLeave={e => (e.currentTarget as any).style.color = '#9490B5'}>
+                    <button type="button" onClick={() => switchMode('recovery')} style={{ fontSize: 11, color: '#9490B5', textDecoration: 'none', letterSpacing: 0.05, transition: 'color 0.2s', cursor: 'pointer', background: 'transparent', border: 'none', padding: 0 }} onMouseEnter={e => (e.currentTarget as HTMLButtonElement).style.color = 'var(--color-primary)'} onMouseLeave={e => (e.currentTarget as HTMLButtonElement).style.color = '#9490B5'}>
                       FORGOT PASSWORD?
-                    </Link>
+                    </button>
                   </div>
                 )}
 
@@ -531,8 +708,8 @@ export default function AuthPage() {
                     boxShadow: loading ? 'none' : `0 4px 18px rgba(108, 71, 255,0.267), 0 0 0 1px rgba(255,255,255,0.06)`,
                     transition: 'all 0.18s',
                   }}
-                  onMouseEnter={e => { if (!loading) { (e.currentTarget as any).style.transform = 'translateY(-1px)'; (e.currentTarget as any).style.boxShadow = `0 6px 24px rgba(108, 71, 255,0.333), 0 0 0 1px rgba(255,255,255,0.1)`; } }}
-                  onMouseLeave={e => { (e.currentTarget as any).style.transform = 'translateY(0)'; (e.currentTarget as any).style.boxShadow = `0 4px 18px rgba(108, 71, 255,0.267), 0 0 0 1px rgba(255,255,255,0.06)`; }}
+                  onMouseEnter={e => { if (!loading) { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = `0 6px 24px rgba(108, 71, 255,0.333), 0 0 0 1px rgba(255,255,255,0.1)`; } }}
+                  onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = `0 4px 18px rgba(108, 71, 255,0.267), 0 0 0 1px rgba(255,255,255,0.06)`; }}
                 >
                   {loading ? (
                     <>
@@ -541,7 +718,7 @@ export default function AuthPage() {
                     </>
                   ) : (
                     <>
-                      {mode === 'login' ? 'Sign In' : 'Create Account'}
+                      {mode === 'login' ? 'Sign In' : mode === 'signup' ? 'Create Account' : 'Send Reset Link'}
                       <ArrowRight size={16} />
                     </>
                   )}
@@ -557,13 +734,34 @@ export default function AuthPage() {
               </form>
             )}
 
+            {mode === 'recovery' ? (
+              <button
+                type="button"
+                onClick={() => switchMode('login')}
+                style={{
+                  width: '100%',
+                  marginTop: 18,
+                  padding: '12px 0',
+                  background: 'transparent',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: 10,
+                  color: '#9490B5',
+                  cursor: 'pointer',
+                  fontWeight: 600,
+                  fontSize: 13,
+                }}
+              >
+                Back to Sign In
+              </button>
+            ) : (
+            <>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '22px 0' }}>
               <div style={{ flex: 1, height: 1, background: 'var(--color-border)' }} />
               <span style={{ fontSize: 10, color: '#5A5680' }}>OR</span>
               <div style={{ flex: 1, height: 1, background: 'var(--color-border)' }} />
             </div>
 
-            <button type="button" style={{
+            <button type="button" disabled={oauthLoading || loading} onClick={handleGoogleSignIn} style={{
               width: '100%',
               padding: '12px 0',
               background: '#13131F',
@@ -578,10 +776,12 @@ export default function AuthPage() {
               justifyContent: 'center',
               gap: 9,
               transition: 'all 0.18s',
-            }} onMouseEnter={e => { (e.currentTarget as any).style.borderColor = '#4A4670'; (e.currentTarget as any).style.background = '#1A1A2E'; }} onMouseLeave={e => { (e.currentTarget as any).style.borderColor = 'var(--color-border)'; (e.currentTarget as any).style.background = '#13131F'; }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" /></svg>
-              Continue with GitHub
+            }} onMouseEnter={e => { e.currentTarget.style.borderColor = '#4A4670'; e.currentTarget.style.background = '#1A1A2E'; }} onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--color-border)'; e.currentTarget.style.background = '#13131F'; }}>
+              {oauthLoading ? <Loader2 size={16} style={{ animation: 'spin 0.75s linear infinite' }} /> : <GoogleIcon />}
+              Continue with Google
             </button>
+            </>
+            )}
           </div>
         </div>
       </div>
@@ -603,7 +803,7 @@ export default function AuthPage() {
         <span style={{ fontSize: 11, color: '#5A5680' }}>© 2026 DannFlow</span>
         <div style={{ display: 'flex', gap: 18 }}>
           {['Privacy', 'Terms', 'Docs'].map(l => (
-            <Link key={l} href="#" style={{ fontSize: 11, color: '#5A5680', textDecoration: 'none', transition: 'color 0.2s', cursor: 'pointer' }} onMouseEnter={e => (e.currentTarget as any).style.color = 'var(--color-primary)'} onMouseLeave={e => (e.currentTarget as any).style.color = '#5A5680'}>{l}</Link>
+            <Link key={l} href="#" style={{ fontSize: 11, color: '#5A5680', textDecoration: 'none', transition: 'color 0.2s', cursor: 'pointer' }} onMouseEnter={e => e.currentTarget.style.color = 'var(--color-primary)'} onMouseLeave={e => e.currentTarget.style.color = '#5A5680'}>{l}</Link>
           ))}
         </div>
       </div>
