@@ -8,7 +8,6 @@ interface TypewriterProps {
   speed?: number; // ms per character
   delay?: number; // ms before typing starts (after coming into view)
   className?: string;
-  onStart?: () => void;
   onComplete?: () => void;
   skipAnimation?: boolean; // if true, show all text immediately (for anchor navigation)
   /** After typing completes, smoothly tint chars [start, end) to primary color */
@@ -37,17 +36,14 @@ export function Typewriter({
   speed = 35,
   delay = 0,
   className,
-  onStart,
   onComplete,
   highlight,
   skipAnimation,
 }: TypewriterProps) {
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, margin: "-40px" });
-  // The full sentence is server-rendered so slow connections never show a
-  // blank headline while the client bundle is still downloading.
-  const [shown, setShown] = useState(text.length);
-  const [highlightActive, setHighlightActive] = useState(Boolean(highlight));
+  const [shown, setShown] = useState(0);
+  const [highlightActive, setHighlightActive] = useState(false);
   const startedRef = useRef(false);
   const completedRef = useRef(false);
   const highlightTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -55,10 +51,8 @@ export function Typewriter({
   // Stash onComplete in a ref so it doesn't invalidate the typing effect
   // when the parent re-renders (which would restart typing — bug).
   const onCompleteRef = useRef(onComplete);
-  const onStartRef = useRef(onStart);
   useEffect(() => {
     onCompleteRef.current = onComplete;
-    onStartRef.current = onStart;
   });
 
   useEffect(() => {
@@ -67,51 +61,41 @@ export function Typewriter({
     startedRef.current = true;
 
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    // A typewriter effect is enhancement, never a reason to hide primary
-    // content. If hydration took more than three seconds, leave the complete
-    // server-rendered headline visible.
-    const hydrationWasSlow = performance.now() > 3000;
-    if (reduce || skipAnimation || hydrationWasSlow) {
+    if (reduce || skipAnimation) {
+      setShown(text.length);
       if (!completedRef.current) {
         completedRef.current = true;
         onCompleteRef.current?.();
+        if (highlight) setHighlightActive(true);
       }
       return;
     }
 
+    const startAt = performance.now() + delay;
     let raf = 0;
 
-    // Reset only after fast hydration, immediately before typing begins.
-    raf = requestAnimationFrame(() => {
-      setShown(0);
-      setHighlightActive(false);
-      onStartRef.current?.();
-      const startAt = performance.now() + delay;
-
-      const type = (now: number) => {
-        const elapsed = now - startAt;
-        if (elapsed < 0) {
-          raf = requestAnimationFrame(type);
-          return;
+    const tick = (now: number) => {
+      const elapsed = now - startAt;
+      if (elapsed < 0) {
+        raf = requestAnimationFrame(tick);
+        return;
+      }
+      const next = Math.min(text.length, Math.floor(elapsed / speed));
+      setShown(next);
+      if (next < text.length) {
+        raf = requestAnimationFrame(tick);
+      } else if (!completedRef.current) {
+        completedRef.current = true;
+        onCompleteRef.current?.();
+        if (highlight) {
+          highlightTimerRef.current = setTimeout(
+            () => setHighlightActive(true),
+            highlight.delay ?? 300
+          );
         }
-        const next = Math.min(text.length, Math.floor(elapsed / speed));
-        setShown(next);
-        if (next < text.length) {
-          raf = requestAnimationFrame(type);
-        } else if (!completedRef.current) {
-          completedRef.current = true;
-          onCompleteRef.current?.();
-          if (highlight) {
-            highlightTimerRef.current = setTimeout(
-              () => setHighlightActive(true),
-              highlight.delay ?? 300
-            );
-          }
-        }
-      };
-
-      raf = requestAnimationFrame(type);
-    });
+      }
+    };
+    raf = requestAnimationFrame(tick);
 
     return () => {
       cancelAnimationFrame(raf);

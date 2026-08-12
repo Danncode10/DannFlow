@@ -23,44 +23,54 @@ const HERO_HEADLINE = "The AI-native starter for shipping faster.";
 const HERO_TYPING_SPEED = 70; // ~3s total for 42-char headline
 
 export function Hero({ isAuthed }: HeroProps) {
-  const [introActive, setIntroActive] = useState(false);
   const [typingDone, setTypingDone] = useState(false);
   const [videoEnabled, setVideoEnabled] = useState(false);
 
   const handleTypingComplete = () => {
-    setIntroActive(false);
     setTypingDone(true);
     if (canUseHeroVideo()) setVideoEnabled(true);
   };
 
-  // Keep the original focused intro treatment, but turn it on only when the
-  // enhanced typewriter actually starts. A slow client never receives this
-  // late-loading blur because it keeps the static headline instead.
+  // Blur the fixed navbar directly — CSS `body.intro-active header` can be
+  // unreliable for fixed+z-indexed elements; inline styles guarantee it.
+  const blurHeader = () => {
+    const el = document.querySelector<HTMLElement>("header");
+    if (!el) return;
+    el.style.transition =
+      "filter 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1)";
+    el.style.filter = "blur(8px)";
+    el.style.opacity = "0.25";
+    el.style.pointerEvents = "none";
+  };
+  const clearHeader = () => {
+    const el = document.querySelector<HTMLElement>("header");
+    if (!el) return;
+    el.style.filter = "";
+    el.style.opacity = "";
+    el.style.pointerEvents = "";
+  };
+
   useEffect(() => {
-    const header = document.querySelector<HTMLElement>("header");
-
-    document.body.classList.toggle("intro-active", introActive);
-    if (header) {
-      header.style.filter = introActive ? "blur(8px)" : "";
-      header.style.opacity = introActive ? "0.25" : "";
-      header.style.pointerEvents = introActive ? "none" : "";
-    }
-
+    document.body.classList.add("intro-active");
+    blurHeader();
     return () => {
       document.body.classList.remove("intro-active");
-      if (header) {
-        header.style.filter = "";
-        header.style.opacity = "";
-        header.style.pointerEvents = "";
-      }
+      clearHeader();
     };
-  }, [introActive]);
+  }, []);
+
+  useEffect(() => {
+    if (typingDone) {
+      document.body.classList.remove("intro-active");
+      clearHeader();
+    }
+  }, [typingDone]);
 
   return (
     <>
     <section
       id="home"
-      className="relative isolate min-h-[100dvh] overflow-hidden bg-background pt-16 pb-12 sm:pb-16 md:pt-24 md:pb-44"
+      className="relative isolate min-h-[100dvh] overflow-hidden bg-background pt-16 pb-32 md:pt-24 md:pb-44"
     >
       {/* The poster is immediate and remains the visual fallback. The video
           starts only after the headline has completed typing. */}
@@ -129,7 +139,6 @@ export function Hero({ isAuthed }: HeroProps) {
             text={HERO_HEADLINE}
             speed={HERO_TYPING_SPEED}
             delay={200}
-            onStart={() => setIntroActive(true)}
             onComplete={handleTypingComplete}
             highlight={{ start: 4, end: 21, delay: 350 }}
           />
@@ -245,8 +254,6 @@ interface HeroVideoBackgroundProps {
 function HeroVideoBackground({ enabled }: HeroVideoBackgroundProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isReady, setIsReady] = useState(false);
-  const [format, setFormat] = useState<"webm" | "mp4">("webm");
-  const [mp4Ready, setMp4Ready] = useState(false);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -262,7 +269,7 @@ function HeroVideoBackground({ enabled }: HeroVideoBackgroundProps) {
 
     document.addEventListener("visibilitychange", syncPlayback);
     return () => document.removeEventListener("visibilitychange", syncPlayback);
-  }, [enabled, format]);
+  }, [enabled]);
 
   if (!enabled) return null;
 
@@ -273,50 +280,25 @@ function HeroVideoBackground({ enabled }: HeroVideoBackgroundProps) {
     void video.play().then(() => setIsReady(true)).catch(() => setIsReady(false));
   };
 
-  const handleWebmEnd = () => {
-    if (format === "webm" && mp4Ready) {
-      setIsReady(false);
-      setFormat("mp4");
-      return;
-    }
-    void videoRef.current?.play();
-  };
-
   return (
-    <>
-      {/* Download the brighter MP4 in parallel without displaying it yet. */}
-      <video
-        aria-hidden
-        muted
-        preload="auto"
-        onCanPlayThrough={() => setMp4Ready(true)}
-        className="hidden"
-      >
-        <source src="/hero-background.mp4" type="video/mp4" />
-      </video>
-      <video
-        key={format}
-        ref={videoRef}
-        aria-hidden
-        tabIndex={-1}
-        muted
-        loop={format === "mp4"}
-        playsInline
-        preload="metadata"
-        poster="/hero-poster.avif"
-        onCanPlay={handleCanPlay}
-        onEnded={handleWebmEnd}
-        onError={() => setIsReady(false)}
-        className={`pointer-events-none absolute inset-0 -z-10 h-full w-full object-cover object-[85%_center] sm:object-[62%_center] transition-opacity duration-1000 ease-out ${
-          isReady ? "opacity-100" : "opacity-0"
-        }`}
-      >
-        <source
-          src={format === "webm" ? "/hero-background.webm" : "/hero-background.mp4"}
-          type={format === "webm" ? "video/webm" : "video/mp4"}
-        />
-      </video>
-    </>
+    <video
+      ref={videoRef}
+      aria-hidden
+      tabIndex={-1}
+      muted
+      loop
+      playsInline
+      preload="metadata"
+      poster="/hero-poster.avif"
+      onCanPlay={handleCanPlay}
+      onError={() => setIsReady(false)}
+      className={`pointer-events-none absolute inset-0 -z-10 h-full w-full object-cover object-[85%_center] sm:object-[62%_center] transition-opacity duration-1000 ease-out ${
+        isReady ? "opacity-100" : "opacity-0"
+      }`}
+    >
+      <source src="/hero-background.webm" type="video/webm" />
+      <source src="/hero-background.mp4" type="video/mp4" />
+    </video>
   );
 }
 
@@ -342,7 +324,7 @@ function canUseHeroVideo() {
 
 function ProductPreview({ typingDone }: { typingDone: boolean }) {
   return (
-    <section className="relative bg-background px-4 py-12 sm:px-6 sm:py-16 md:py-28 lg:px-8" aria-label="Product preview">
+    <section className="relative bg-background px-4 py-20 sm:px-6 md:py-28 lg:px-8" aria-label="Product preview">
       <motion.div
         initial={{ opacity: 0.2, filter: "blur(14px)" }}
         animate={typingDone ? { opacity: 1, filter: "blur(0px)" } : { opacity: 0.2, filter: "blur(14px)" }}
