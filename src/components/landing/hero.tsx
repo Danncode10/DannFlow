@@ -70,7 +70,7 @@ export function Hero({ isAuthed }: HeroProps) {
     <>
     <section
       id="home"
-      className="relative isolate min-h-[100dvh] overflow-hidden bg-background pt-16 pb-32 md:pt-24 md:pb-44"
+      className="relative isolate min-h-[100dvh] overflow-hidden bg-background pt-16 pb-12 sm:pb-16 md:pt-24 md:pb-44"
     >
       {/* The poster is immediate and remains the visual fallback. The video
           starts only after the headline has completed typing. */}
@@ -254,6 +254,8 @@ interface HeroVideoBackgroundProps {
 function HeroVideoBackground({ enabled }: HeroVideoBackgroundProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isReady, setIsReady] = useState(false);
+  const [format, setFormat] = useState<"webm" | "mp4">("webm");
+  const [mp4Ready, setMp4Ready] = useState(false);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -269,7 +271,7 @@ function HeroVideoBackground({ enabled }: HeroVideoBackgroundProps) {
 
     document.addEventListener("visibilitychange", syncPlayback);
     return () => document.removeEventListener("visibilitychange", syncPlayback);
-  }, [enabled]);
+  }, [enabled, format]);
 
   if (!enabled) return null;
 
@@ -280,25 +282,50 @@ function HeroVideoBackground({ enabled }: HeroVideoBackgroundProps) {
     void video.play().then(() => setIsReady(true)).catch(() => setIsReady(false));
   };
 
+  const handleWebmEnd = () => {
+    if (format === "webm" && mp4Ready) {
+      setIsReady(false);
+      setFormat("mp4");
+      return;
+    }
+    void videoRef.current?.play();
+  };
+
   return (
-    <video
-      ref={videoRef}
-      aria-hidden
-      tabIndex={-1}
-      muted
-      loop
-      playsInline
-      preload="metadata"
-      poster="/hero-poster.avif"
-      onCanPlay={handleCanPlay}
-      onError={() => setIsReady(false)}
-      className={`pointer-events-none absolute inset-0 -z-10 h-full w-full object-cover object-[85%_center] sm:object-[62%_center] transition-opacity duration-1000 ease-out ${
-        isReady ? "opacity-100" : "opacity-0"
-      }`}
-    >
-      <source src="/hero-background.webm" type="video/webm" />
-      <source src="/hero-background.mp4" type="video/mp4" />
-    </video>
+    <>
+      {/* Download the brighter MP4 in parallel without displaying it yet. */}
+      <video
+        aria-hidden
+        muted
+        preload="auto"
+        onCanPlayThrough={() => setMp4Ready(true)}
+        className="hidden"
+      >
+        <source src="/hero-background.mp4" type="video/mp4" />
+      </video>
+      <video
+        key={format}
+        ref={videoRef}
+        aria-hidden
+        tabIndex={-1}
+        muted
+        loop={format === "mp4"}
+        playsInline
+        preload="metadata"
+        poster="/hero-poster.avif"
+        onCanPlay={handleCanPlay}
+        onEnded={handleWebmEnd}
+        onError={() => setIsReady(false)}
+        className={`pointer-events-none absolute inset-0 -z-10 h-full w-full object-cover object-[85%_center] sm:object-[62%_center] transition-opacity duration-1000 ease-out ${
+          isReady ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        <source
+          src={format === "webm" ? "/hero-background.webm" : "/hero-background.mp4"}
+          type={format === "webm" ? "video/webm" : "video/mp4"}
+        />
+      </video>
+    </>
   );
 }
 
@@ -324,7 +351,7 @@ function canUseHeroVideo() {
 
 function ProductPreview({ typingDone }: { typingDone: boolean }) {
   return (
-    <section className="relative bg-background px-4 py-20 sm:px-6 md:py-28 lg:px-8" aria-label="Product preview">
+    <section className="relative bg-background px-4 py-12 sm:px-6 sm:py-16 md:py-28 lg:px-8" aria-label="Product preview">
       <motion.div
         initial={{ opacity: 0.2, filter: "blur(14px)" }}
         animate={typingDone ? { opacity: 1, filter: "blur(0px)" } : { opacity: 0.2, filter: "blur(14px)" }}
