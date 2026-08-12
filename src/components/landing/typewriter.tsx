@@ -61,7 +61,11 @@ export function Typewriter({
     startedRef.current = true;
 
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce || skipAnimation) {
+    // An anchor URL is already a navigation destination, never an intro.
+    // Complete every typewriter there immediately so no section appears to
+    // be loading while the browser restores the hash scroll position.
+    const isAnchorNavigation = window.location.hash.length > 0;
+    if (reduce || skipAnimation || isAnchorNavigation) {
       setShown(text.length);
       if (!completedRef.current) {
         completedRef.current = true;

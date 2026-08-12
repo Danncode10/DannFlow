@@ -51,17 +51,22 @@ export function Hero({ isAuthed }: HeroProps) {
   };
 
   useEffect(() => {
-    document.body.classList.add("intro-active");
+    // This animation is deliberately scoped to the hero. An anchored page
+    // must never inherit a blur or pointer-event lock from the landing intro.
+    if (window.location.hash) {
+      const frame = window.requestAnimationFrame(() => setTypingDone(true));
+      return () => window.cancelAnimationFrame(frame);
+    }
+
     blurHeader();
+
     return () => {
-      document.body.classList.remove("intro-active");
       clearHeader();
     };
   }, []);
 
   useEffect(() => {
     if (typingDone) {
-      document.body.classList.remove("intro-active");
       clearHeader();
     }
   }, [typingDone]);
@@ -140,6 +145,7 @@ export function Hero({ isAuthed }: HeroProps) {
             speed={HERO_TYPING_SPEED}
             delay={200}
             onComplete={handleTypingComplete}
+            skipAnimation={typingDone}
             highlight={{ start: 4, end: 21, delay: 350 }}
           />
         </h1>
