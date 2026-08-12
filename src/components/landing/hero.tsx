@@ -81,7 +81,7 @@ export function Hero({ isAuthed }: HeroProps) {
           fill
           priority
           sizes="100vw"
-          className="object-cover object-[28%_center] sm:object-[62%_center]"
+          className="object-cover object-[85%_center] sm:object-[62%_center]"
         />
       </div>
       <HeroVideoBackground enabled={videoEnabled} />
@@ -89,11 +89,11 @@ export function Hero({ isAuthed }: HeroProps) {
       {/* Keep contrast stable no matter which frame of the video is shown. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-r from-background via-background/85 to-background/35"
+        className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-r from-background/90 via-background/65 to-background/15 sm:from-background sm:via-background/85 sm:to-background/35"
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-background/45 via-transparent to-background"
+        className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-background/40 via-transparent to-background/70 sm:from-background/45 sm:to-background"
       />
 
       {/* Static dot grid */}
@@ -103,7 +103,7 @@ export function Hero({ isAuthed }: HeroProps) {
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 grid-fade-overlay"
+        className="pointer-events-none absolute inset-0 grid-fade-overlay opacity-40 sm:opacity-100"
       />
 
       {/* Ambient particles set the intro apart, then recede for the video. */}
@@ -292,7 +292,7 @@ function HeroVideoBackground({ enabled }: HeroVideoBackgroundProps) {
       poster="/hero-poster.avif"
       onCanPlay={handleCanPlay}
       onError={() => setIsReady(false)}
-      className={`pointer-events-none absolute inset-0 -z-10 h-full w-full object-cover object-[28%_center] sm:object-[62%_center] transition-opacity duration-1000 ease-out ${
+      className={`pointer-events-none absolute inset-0 -z-10 h-full w-full object-cover object-[85%_center] sm:object-[62%_center] transition-opacity duration-1000 ease-out ${
         isReady ? "opacity-100" : "opacity-0"
       }`}
     >
