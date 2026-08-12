@@ -260,7 +260,16 @@ interface HeroVideoBackgroundProps {
 function HeroVideoBackground({ enabled }: HeroVideoBackgroundProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isReady, setIsReady] = useState(false);
-  const [videoSource] = useState(getHeroVideoSource);
+  // Keep the server and initial client markup identical. Safari's source is
+  // selected only after hydration, once `navigator.userAgent` is available.
+  const [videoSource, setVideoSource] = useState("/hero-background.webm");
+
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => {
+      setVideoSource(getHeroVideoSource());
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
 
   useEffect(() => {
     const video = videoRef.current;
