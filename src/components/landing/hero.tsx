@@ -23,48 +23,38 @@ const HERO_HEADLINE = "The AI-native starter for shipping faster.";
 const HERO_TYPING_SPEED = 70; // ~3s total for 42-char headline
 
 export function Hero({ isAuthed }: HeroProps) {
+  const [introActive, setIntroActive] = useState(false);
   const [typingDone, setTypingDone] = useState(false);
   const [videoEnabled, setVideoEnabled] = useState(false);
 
   const handleTypingComplete = () => {
+    setIntroActive(false);
     setTypingDone(true);
     if (canUseHeroVideo()) setVideoEnabled(true);
   };
 
-  // Blur the fixed navbar directly — CSS `body.intro-active header` can be
-  // unreliable for fixed+z-indexed elements; inline styles guarantee it.
-  const blurHeader = () => {
-    const el = document.querySelector<HTMLElement>("header");
-    if (!el) return;
-    el.style.transition =
-      "filter 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1)";
-    el.style.filter = "blur(8px)";
-    el.style.opacity = "0.25";
-    el.style.pointerEvents = "none";
-  };
-  const clearHeader = () => {
-    const el = document.querySelector<HTMLElement>("header");
-    if (!el) return;
-    el.style.filter = "";
-    el.style.opacity = "";
-    el.style.pointerEvents = "";
-  };
-
+  // Keep the original focused intro treatment, but turn it on only when the
+  // enhanced typewriter actually starts. A slow client never receives this
+  // late-loading blur because it keeps the static headline instead.
   useEffect(() => {
-    document.body.classList.add("intro-active");
-    blurHeader();
+    const header = document.querySelector<HTMLElement>("header");
+
+    document.body.classList.toggle("intro-active", introActive);
+    if (header) {
+      header.style.filter = introActive ? "blur(8px)" : "";
+      header.style.opacity = introActive ? "0.25" : "";
+      header.style.pointerEvents = introActive ? "none" : "";
+    }
+
     return () => {
       document.body.classList.remove("intro-active");
-      clearHeader();
+      if (header) {
+        header.style.filter = "";
+        header.style.opacity = "";
+        header.style.pointerEvents = "";
+      }
     };
-  }, []);
-
-  useEffect(() => {
-    if (typingDone) {
-      document.body.classList.remove("intro-active");
-      clearHeader();
-    }
-  }, [typingDone]);
+  }, [introActive]);
 
   return (
     <>
@@ -139,6 +129,7 @@ export function Hero({ isAuthed }: HeroProps) {
             text={HERO_HEADLINE}
             speed={HERO_TYPING_SPEED}
             delay={200}
+            onStart={() => setIntroActive(true)}
             onComplete={handleTypingComplete}
             highlight={{ start: 4, end: 21, delay: 350 }}
           />
