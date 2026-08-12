@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect, MouseEvent } from "react";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import {
   ArrowUpRight,
@@ -23,6 +24,12 @@ const HERO_TYPING_SPEED = 70; // ~3s total for 42-char headline
 
 export function Hero({ isAuthed }: HeroProps) {
   const [typingDone, setTypingDone] = useState(false);
+  const [videoEnabled, setVideoEnabled] = useState(false);
+
+  const handleTypingComplete = () => {
+    setTypingDone(true);
+    if (canUseHeroVideo()) setVideoEnabled(true);
+  };
 
   // Blur the fixed navbar directly — CSS `body.intro-active header` can be
   // unreliable for fixed+z-indexed elements; inline styles guarantee it.
@@ -50,7 +57,6 @@ export function Hero({ isAuthed }: HeroProps) {
       document.body.classList.remove("intro-active");
       clearHeader();
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -58,31 +64,50 @@ export function Hero({ isAuthed }: HeroProps) {
       document.body.classList.remove("intro-active");
       clearHeader();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [typingDone]);
 
   return (
+    <>
     <section
       id="home"
-      className="relative overflow-hidden pt-16 pb-32 md:pt-24 md:pb-44"
-      style={{
-        background:
-          "radial-gradient(ellipse 800px 600px at 80% 0%, rgba(124,92,255,0.16), transparent 60%), var(--color-background)",
-      }}
+      className="relative isolate min-h-[100dvh] overflow-hidden bg-background pt-16 pb-32 md:pt-24 md:pb-44"
     >
+      {/* The poster is immediate and remains the visual fallback. The video
+          starts only after the headline has completed typing. */}
+      <div aria-hidden className="absolute inset-0 -z-20">
+        <Image
+          src="/hero-poster.avif"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-[28%_center] sm:object-[62%_center]"
+        />
+      </div>
+      <HeroVideoBackground enabled={videoEnabled} />
+
+      {/* Keep contrast stable no matter which frame of the video is shown. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-r from-background via-background/85 to-background/35"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-background/45 via-transparent to-background"
+      />
+
       {/* Static dot grid */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-grid opacity-40"
+        className="pointer-events-none absolute inset-0 bg-grid opacity-25"
       />
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 grid-fade-overlay"
       />
 
-      {/* Water-particle field — visible and moving immediately so it's
-          present during the typewriter reveal, not only after it */}
-      <WaterParticles active={true} count={140} />
+      {/* Ambient particles set the intro apart, then recede for the video. */}
+      <WaterParticles active={!typingDone} count={140} />
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Microcopy link — blurred while typing, clears after */}
@@ -114,7 +139,7 @@ export function Hero({ isAuthed }: HeroProps) {
             text={HERO_HEADLINE}
             speed={HERO_TYPING_SPEED}
             delay={200}
-            onComplete={() => setTypingDone(true)}
+            onComplete={handleTypingComplete}
             highlight={{ start: 4, end: 21, delay: 350 }}
           />
         </h1>
@@ -210,56 +235,125 @@ export function Hero({ isAuthed }: HeroProps) {
           </div>
         </motion.div>
 
-        {/* Product preview — blurred during typing, fully revealed after */}
-        <motion.div
-          initial={{ opacity: 0.2, filter: "blur(14px)" }}
-          animate={
-            typingDone
-              ? { opacity: 1, filter: "blur(0px)" }
-              : { opacity: 0.2, filter: "blur(14px)" }
-          }
-          transition={{
-            duration: 1.0,
-            delay: typingDone ? 0.5 : 0,
-            ease: [0.34, 1.3, 0.64, 1],
-          }}
-          className="relative mt-24"
-          style={{ perspective: "1500px" }}
-        >
-          <TiltCard>
-            <div className="relative rounded-[calc(2rem-0.375rem)] bg-card overflow-hidden border border-white/[0.04] inner-highlight">
-              {/* Top bar */}
-              <div className="flex items-center justify-between px-5 py-3 border-b border-white/[0.04] bg-background/40">
-                <div className="flex items-center gap-1.5">
-                  <div className="h-2.5 w-2.5 rounded-full bg-white/10" />
-                  <div className="h-2.5 w-2.5 rounded-full bg-white/10" />
-                  <div className="h-2.5 w-2.5 rounded-full bg-white/10" />
-                </div>
-                <div className="flex items-center gap-2 px-3 py-1 rounded-md bg-white/[0.03] border border-white/[0.04]">
-                  <div className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                  <span className="text-[10px] font-mono text-muted-foreground">
-                    {siteConfig.name}.app/dashboard
-                  </span>
-                </div>
-                <div className="w-12" />
-              </div>
+      </div>
+    </section>
+    <ProductPreview typingDone={typingDone} />
+    </>
+  );
+}
 
-              {/* Dashboard grid */}
-              <div className="grid grid-cols-12 gap-3 p-5">
+interface HeroVideoBackgroundProps {
+  enabled: boolean;
+}
+
+/**
+ * A progressive enhancement for the hero poster. It avoids spending network,
+ * battery, or motion on a video until the headline is complete, and falls
+ * back silently to the poster for reduced-motion and data-saving visitors.
+ */
+function HeroVideoBackground({ enabled }: HeroVideoBackgroundProps) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !enabled) return;
+
+    const syncPlayback = () => {
+      if (document.hidden) {
+        video.pause();
+        return;
+      }
+      void video.play().catch(() => setIsReady(false));
+    };
+
+    document.addEventListener("visibilitychange", syncPlayback);
+    return () => document.removeEventListener("visibilitychange", syncPlayback);
+  }, [enabled]);
+
+  if (!enabled) return null;
+
+  const handleCanPlay = () => {
+    const video = videoRef.current;
+    if (!video || document.hidden) return;
+
+    void video.play().then(() => setIsReady(true)).catch(() => setIsReady(false));
+  };
+
+  return (
+    <video
+      ref={videoRef}
+      aria-hidden
+      tabIndex={-1}
+      muted
+      loop
+      playsInline
+      preload="metadata"
+      poster="/hero-poster.avif"
+      onCanPlay={handleCanPlay}
+      onError={() => setIsReady(false)}
+      className={`pointer-events-none absolute inset-0 -z-10 h-full w-full object-cover object-[28%_center] sm:object-[62%_center] transition-opacity duration-1000 ease-out ${
+        isReady ? "opacity-100" : "opacity-0"
+      }`}
+    >
+      <source src="/hero-background.webm" type="video/webm" />
+      <source src="/hero-background.mp4" type="video/mp4" />
+    </video>
+  );
+}
+
+function canUseHeroVideo() {
+  if (typeof window === "undefined") return false;
+
+  const reduceMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)"
+  ).matches;
+  const connection = (
+    navigator as Navigator & {
+      connection?: { saveData?: boolean; effectiveType?: string };
+    }
+  ).connection;
+
+  return !(
+    reduceMotion ||
+    connection?.saveData ||
+    connection?.effectiveType === "slow-2g" ||
+    connection?.effectiveType === "2g"
+  );
+}
+
+function ProductPreview({ typingDone }: { typingDone: boolean }) {
+  return (
+    <section className="relative bg-background px-4 py-20 sm:px-6 md:py-28 lg:px-8" aria-label="Product preview">
+      <motion.div
+        initial={{ opacity: 0.2, filter: "blur(14px)" }}
+        animate={typingDone ? { opacity: 1, filter: "blur(0px)" } : { opacity: 0.2, filter: "blur(14px)" }}
+        transition={{ duration: 1, delay: typingDone ? 0.5 : 0, ease: [0.34, 1.3, 0.64, 1] }}
+        className="mx-auto max-w-7xl"
+        style={{ perspective: "1500px" }}
+      >
+        <TiltCard>
+          <div className="relative overflow-hidden rounded-[calc(2rem-0.375rem)] border border-white/[0.04] bg-card inner-highlight">
+            <div className="flex items-center justify-between border-b border-white/[0.04] bg-background/40 px-4 py-3 sm:px-5">
+              <div className="flex items-center gap-1.5">
+                <div className="h-2.5 w-2.5 rounded-full bg-white/10" />
+                <div className="h-2.5 w-2.5 rounded-full bg-white/10" />
+                <div className="h-2.5 w-2.5 rounded-full bg-white/10" />
+              </div>
+              <div className="flex items-center gap-2 rounded-md border border-white/[0.04] bg-white/[0.03] px-2 py-1 sm:px-3">
+                <div className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                <span className="text-[9px] font-mono text-muted-foreground sm:text-[10px]">{siteConfig.name}.app/dashboard</span>
+              </div>
+              <div className="w-6 sm:w-12" />
+            </div>
+
+            <div className="overflow-hidden">
+              <div className="grid min-w-[42rem] grid-cols-12 gap-3 p-4 sm:p-5">
                 <div className="col-span-3 space-y-2">
-                  {[Terminal, Database, Shield, Zap].map((Icon, i) => (
-                    <div
-                      key={i}
-                      className={`flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] transition-colors duration-200 ${
-                        i === 0
-                          ? "bg-primary/10 border border-primary/20 text-primary"
-                          : "text-muted-foreground hover:bg-white/[0.02]"
-                      }`}
-                    >
+                  {[Terminal, Database, Shield, Zap].map((Icon, index) => (
+                    <div key={index} className={`flex items-center gap-2 rounded-lg px-3 py-2 text-[11px] ${index === 0 ? "border border-primary/20 bg-primary/10 text-primary" : "text-muted-foreground"}`}>
                       <Icon className="h-3 w-3" strokeWidth={1.5} />
-                      <span className="font-medium">
-                        {["Overview", "Database", "Auth", "API"][i]}
-                      </span>
+                      <span className="font-medium">{["Overview", "Database", "Auth", "API"][index]}</span>
                     </div>
                   ))}
                 </div>
@@ -270,38 +364,21 @@ export function Hero({ isAuthed }: HeroProps) {
                       { label: "MRR", val: "$48.2k", delta: "+12.4%" },
                       { label: "Active orgs", val: "1,247", delta: "+8.2%" },
                       { label: "Uptime", val: "99.99%", delta: "30d" },
-                    ].map((s) => (
-                      <div
-                        key={s.label}
-                        className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.04]"
-                      >
-                        <p className="text-[9px] uppercase tracking-[0.15em] text-muted-foreground">
-                          {s.label}
-                        </p>
-                        <p className="mt-1.5 text-base font-semibold text-foreground tabular-nums">
-                          {s.val}
-                        </p>
-                        <p className="mt-0.5 text-[9px] text-emerald-400 font-mono">
-                          {s.delta}
-                        </p>
+                    ].map((stat) => (
+                      <div key={stat.label} className="rounded-xl border border-white/[0.04] bg-white/[0.02] p-3">
+                        <p className="text-[9px] uppercase tracking-[0.15em] text-muted-foreground">{stat.label}</p>
+                        <p className="mt-1.5 text-base font-semibold tabular-nums text-foreground">{stat.val}</p>
+                        <p className="mt-0.5 font-mono text-[9px] text-emerald-400">{stat.delta}</p>
                       </div>
                     ))}
                   </div>
 
-                  <div className="relative h-32 rounded-xl bg-white/[0.02] border border-white/[0.04] overflow-hidden p-3">
-                    <p className="text-[9px] uppercase tracking-[0.15em] text-muted-foreground mb-2">
-                      Revenue by tenant · last 12 weeks
-                    </p>
-                    <div className="flex items-end justify-between h-16 gap-1">
-                      {[40, 60, 35, 75, 55, 85, 70, 90, 65, 80, 50, 95].map(
-                        (h, i) => (
-                          <div
-                            key={i}
-                            style={{ height: `${h}%` }}
-                            className="flex-1 rounded-sm bg-gradient-to-t from-primary/40 to-primary/80"
-                          />
-                        )
-                      )}
+                  <div className="relative h-32 overflow-hidden rounded-xl border border-white/[0.04] bg-white/[0.02] p-3">
+                    <p className="mb-2 text-[9px] uppercase tracking-[0.15em] text-muted-foreground">Revenue by tenant · last 12 weeks</p>
+                    <div className="flex h-16 items-end justify-between gap-1">
+                      {[40, 60, 35, 75, 55, 85, 70, 90, 65, 80, 50, 95].map((height, index) => (
+                        <div key={index} style={{ height: `${height}%` }} className="flex-1 rounded-sm bg-gradient-to-t from-primary/40 to-primary/80" />
+                      ))}
                     </div>
                   </div>
 
@@ -310,36 +387,25 @@ export function Hero({ isAuthed }: HeroProps) {
                       { user: "stripe-checkout", action: "POST /api/webhooks · 200 OK" },
                       { user: "auth.signIn", action: "INSERT auth.sessions · RLS pass" },
                       { user: "pages.update", action: "UPDATE pages · org_id matched" },
-                    ].map((row, i) => (
-                      <div
-                        key={i}
-                        className="flex items-center justify-between p-2.5 rounded-lg bg-white/[0.015] border border-white/[0.03]"
-                      >
+                    ].map((row, index) => (
+                      <div key={index} className="flex items-center justify-between rounded-lg border border-white/[0.03] bg-white/[0.015] p-2.5">
                         <div className="flex items-center gap-2.5">
-                          <span className="px-1.5 py-0.5 rounded text-[8px] font-mono uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                            ok
-                          </span>
+                          <span className="rounded border border-emerald-500/20 bg-emerald-500/10 px-1.5 py-0.5 font-mono text-[8px] uppercase tracking-wider text-emerald-400">ok</span>
                           <div>
-                            <p className="text-[10px] font-mono text-foreground">
-                              {row.user}
-                            </p>
-                            <p className="text-[9px] text-muted-foreground">
-                              {row.action}
-                            </p>
+                            <p className="font-mono text-[10px] text-foreground">{row.user}</p>
+                            <p className="text-[9px] text-muted-foreground">{row.action}</p>
                           </div>
                         </div>
-                        <span className="text-[9px] font-mono text-muted-foreground">
-                          {12 + i}ms
-                        </span>
+                        <span className="font-mono text-[9px] text-muted-foreground">{12 + index}ms</span>
                       </div>
                     ))}
                   </div>
                 </div>
               </div>
             </div>
-          </TiltCard>
-        </motion.div>
-      </div>
+          </div>
+        </TiltCard>
+      </motion.div>
     </section>
   );
 }
