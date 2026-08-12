@@ -254,30 +254,52 @@ interface HeroVideoBackgroundProps {
 function HeroVideoBackground({ enabled }: HeroVideoBackgroundProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isReady, setIsReady] = useState(false);
+  const [videoSource] = useState(getHeroVideoSource);
 
   useEffect(() => {
     const video = videoRef.current;
-    if (!video || !enabled) return;
+    if (!video) return;
 
-    const syncPlayback = () => {
+    const playVideo = () => {
       if (document.hidden) {
         video.pause();
         return;
       }
-      void video.play().catch(() => setIsReady(false));
+      video.muted = true;
+      video.setAttribute("muted", "");
+      void video.play().catch(() => undefined);
     };
 
-    document.addEventListener("visibilitychange", syncPlayback);
-    return () => document.removeEventListener("visibilitychange", syncPlayback);
-  }, [enabled]);
+    // Keep Safari's MP4 attached from the first render, then retry as it
+    // becomes ready. It is revealed only after the typewriter completes.
+    playVideo();
+    const retryTimers = [100, 400, 1_000].map((delay) =>
+      window.setTimeout(playVideo, delay)
+    );
+    document.addEventListener("visibilitychange", playVideo);
+    return () => {
+      retryTimers.forEach(window.clearTimeout);
+      document.removeEventListener("visibilitychange", playVideo);
+    };
+  }, []);
 
-  if (!enabled) return null;
+  const handleVideoReady = () => {
+    const video = videoRef.current;
+    if (!video) return;
 
-  const handleCanPlay = () => {
+    if (!document.hidden) {
+      video.muted = true;
+      video.setAttribute("muted", "");
+      void video.play().then(() => setIsReady(true)).catch(() => undefined);
+    }
+  };
+
+  const handleEnded = () => {
     const video = videoRef.current;
     if (!video || document.hidden) return;
 
-    void video.play().then(() => setIsReady(true)).catch(() => setIsReady(false));
+    video.currentTime = 0;
+    void video.play().catch(() => undefined);
   };
 
   return (
@@ -286,20 +308,31 @@ function HeroVideoBackground({ enabled }: HeroVideoBackgroundProps) {
       aria-hidden
       tabIndex={-1}
       muted
+      autoPlay
       loop
       playsInline
-      preload="metadata"
+      preload="auto"
       poster="/hero-poster.avif"
-      onCanPlay={handleCanPlay}
+      onCanPlay={handleVideoReady}
+      onLoadedData={handleVideoReady}
+      onEnded={handleEnded}
       onError={() => setIsReady(false)}
       className={`pointer-events-none absolute inset-0 -z-10 h-full w-full object-cover object-[85%_center] sm:object-[62%_center] transition-opacity duration-1000 ease-out ${
-        isReady ? "opacity-100" : "opacity-0"
+        enabled && isReady ? "opacity-100" : "opacity-0"
       }`}
-    >
-      <source src="/hero-background.webm" type="video/webm" />
-      <source src="/hero-background.mp4" type="video/mp4" />
-    </video>
+      src={videoSource}
+    />
   );
+}
+
+function getHeroVideoSource() {
+  if (typeof navigator === "undefined") return "/hero-background.webm";
+
+  const isSafari =
+    /safari/i.test(navigator.userAgent) &&
+    !/chrome|chromium|android|crios|fxios/i.test(navigator.userAgent);
+
+  return isSafari ? "/hero-background.mp4" : "/hero-background.webm";
 }
 
 function canUseHeroVideo() {
