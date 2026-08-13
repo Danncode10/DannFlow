@@ -11,14 +11,14 @@ User input: **$ARGUMENTS**
 
 ## Procedure
 
-1. Read `CLAUDE.md`, `AGENTS.md`, `PROJECT_CONTEXT.md`, `README.md`, `dannflow.json`, the full existing `MASTERPLAN.md`, `docs/`, `src/prompts/features/`, and any existing planning docs.
+1. Read `CLAUDE.md`, `AGENTS.md`, `PROJECT_CONTEXT.md`, `README.md`, `.env.local`, the full existing `MASTERPLAN.md`, `docs/`, `src/prompts/features/`, and any existing planning docs.
 2. If Phase 0 has not been initialized, stop and tell the user to run `/masterplan-init` first.
 3. Verify GitHub tooling before touching the Project:
    - Prefer GitHub MCP if it exposes GitHub Projects v2 item APIs.
    - If Projects APIs are not exposed through MCP, use authenticated `gh` CLI with the `project` scope.
    - If neither path is available, stop with the project's Missing Tool Alert Protocol for GitHub MCP.
 4. Resolve the GitHub Project:
-   - Prefer the binding in `dannflow.json`.
+   - Prefer `GITHUB_PROJECT_OWNER`, `GITHUB_PROJECT_NUMBER`, and `GITHUB_PROJECT_ID` in `.env.local`.
    - Use `--project-owner` and `--project-number` when provided.
    - Otherwise list projects for the current repo owner or authenticated user and ask only if the intended project is ambiguous.
 5. Require a target phase from `$ARGUMENTS` such as `Phase 1`, `P1`, or `Phase 2`. If it is ambiguous, ask which future phase to expand.

@@ -153,7 +153,7 @@ If you don't know which custom command fits a task, run `/ask-command <your inte
 
 ## Masterplan + GitHub Project protocol
 
-`MASTERPLAN.md` is the local source of truth and the linked GitHub Project is the execution board. `/masterplan-init` links an existing Kanban-style Project and records it in non-secret `dannflow.json`; it never creates a Project or draft board.
+`MASTERPLAN.md` is the local source of truth and the linked GitHub Project is the execution board. `/masterplan-init` links an existing Kanban-style Project and stores its non-secret identifiers in `.env.local`; it never creates a Project or draft board.
 
 1. **Before starting work**, find the matching task in `MASTERPLAN.md` and the GitHub Project. Ask the user which card to use if the request could map to multiple cards.
 2. **If no matching task exists**, warn the user: "This task is not in `MASTERPLAN.md`. Add it to `MASTERPLAN.md` and the GitHub Project first?" Do not begin feature work until the user confirms or explicitly says to proceed without tracking.

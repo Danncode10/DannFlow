@@ -15,7 +15,7 @@ User input: **$ARGUMENTS**
    - If Projects APIs are not exposed through MCP, use authenticated `gh` CLI with the `project` scope.
    - If neither is available, stop with the project's Missing Tool Alert Protocol for GitHub MCP.
 3. Resolve the GitHub Project:
-   - Prefer the `github_project` binding in `dannflow.json`.
+   - Prefer `GITHUB_PROJECT_OWNER`, `GITHUB_PROJECT_NUMBER`, and `GITHUB_PROJECT_ID` in `.env.local`.
    - Use `--project-owner` and `--project-number` when provided.
    - Otherwise list projects and ask only if the intended Project is ambiguous.
 4. Fetch Project items and match them to `MASTERPLAN.md` tasks by stable task ID prefix:

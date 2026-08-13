@@ -11,20 +11,20 @@ User input: **$ARGUMENTS**
 
 ## Required state
 
-Read `dannflow.json`, `README.md`, `PROJECT_CONTEXT.md`, `src/lib/config.ts`, `.env.example`, and `MASTERPLAN.md` before changing anything.
+Read `.env.local`, `.env.example`, `README.md`, `PROJECT_CONTEXT.md`, `src/lib/config.ts`, and `MASTERPLAN.md` before changing anything.
 
 Treat the project as initialized only when all of the following are true:
 
-- `dannflow.json` contains `project.initialized_at` and a non-empty `project.name`.
 - `README.md`, `PROJECT_CONTEXT.md`, and `src/lib/config.ts` no longer contain DannFlow starter placeholders for the product identity.
-- `project.repository` and `project.supabase_project_id` are recorded in `dannflow.json`.
+- `.env.local` contains a non-placeholder `SUPABASE_PROJECT_ID`.
+- Git remote metadata identifies a repository that is not the DannFlow template repository.
 
 If the project is still the DannFlow template, or the record is incomplete, stop without editing files or GitHub. Say which signals were missing and tell the user to run `/new-project` first. Do not add prerequisite/admin tasks to `MASTERPLAN.md`.
 
 ## GitHub Project prerequisite
 
 1. Verify GitHub Projects access. Prefer GitHub MCP; use authenticated `gh` CLI with the `project` scope only when MCP Projects APIs are unavailable.
-2. Resolve the Project from command arguments, then from `dannflow.json`'s `github_project` binding, then by listing Projects for the repository owner.
+2. Resolve the Project from command arguments, then `GITHUB_PROJECT_OWNER`, `GITHUB_PROJECT_NUMBER`, and `GITHUB_PROJECT_ID` in `.env.local`, then by listing Projects for the repository owner.
 3. If no matching Project exists, stop without editing `MASTERPLAN.md` or creating cards. Tell the user:
 
 ```text
@@ -37,18 +37,12 @@ No GitHub Project is linked to this SaaS yet. Create a GitHub Project in Kanban/
 ## Procedure
 
 1. Preserve completed tasks and existing IDs if `MASTERPLAN.md` was previously initialized. Do not duplicate tasks or cards when rerun.
-2. Update `dannflow.json` with a non-secret binding:
+2. After selecting the Project, write its non-secret binding to `.env.local` and keep the placeholder names documented in `.env.example`:
 
-```json
-{
-  "github_project": {
-    "owner": "<owner>",
-    "number": 0,
-    "id": "<project-id>",
-    "view": "Kanban",
-    "linked_at": "<ISO-8601 timestamp>"
-  }
-}
+```env
+GITHUB_PROJECT_OWNER=<owner>
+GITHUB_PROJECT_NUMBER=<number>
+GITHUB_PROJECT_ID=<project-id>
 ```
 
 3. Create or refresh `MASTERPLAN.md` with:
@@ -88,5 +82,5 @@ Next:
 - `MASTERPLAN.md` is the local source of truth; GitHub Project mirrors detailed tasks only.
 - Never create a GitHub Project automatically.
 - Never create a draft Project or draft card; use real GitHub Issues as cards.
-- Never store credentials, database URLs, or tokens in `dannflow.json`.
+- Never store credentials, database URLs, or tokens in `.env.example` or tracked files.
 - Do not modify application code while initializing the plan.

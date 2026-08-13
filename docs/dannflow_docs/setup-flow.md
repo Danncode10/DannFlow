@@ -23,7 +23,7 @@ Step 1 — Configure GitHub MCP and Supabase MCP
 
 Step 2 — Run /new-project
   Describe the SaaS, rebrand the repository, connect Supabase, migrate tracked schema,
-  verify generated types, and record non-secret initialization metadata.
+  and verify generated types. The non-secret Supabase project reference stays in .env.local.
 
 Step 3 — Create a GitHub Project yourself
   Choose Kanban/Board layout (not Draft) and add Status values:

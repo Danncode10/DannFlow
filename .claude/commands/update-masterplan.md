@@ -16,7 +16,7 @@ User input: **$ARGUMENTS**
    - Prefer GitHub MCP if it exposes GitHub Projects v2 item APIs.
    - If Projects APIs are not exposed through MCP, use authenticated `gh` CLI with the `project` scope.
    - If neither path is available, stop with the project's Missing Tool Alert Protocol for GitHub MCP.
-3. Resolve the GitHub Project from explicit args, then `dannflow.json`'s `github_project` binding, then by listing projects. If no linked Project exists, tell the user to create a Kanban-style Project and run `/masterplan-init`; do not create a Project automatically.
+3. Resolve the GitHub Project from explicit args, then `GITHUB_PROJECT_OWNER`, `GITHUB_PROJECT_NUMBER`, and `GITHUB_PROJECT_ID` in `.env.local`, then by listing projects. If no linked Project exists, tell the user to create a Kanban-style Project and run `/masterplan-init`; do not create a Project automatically.
 4. Parse all task checkboxes in `MASTERPLAN.md`.
 5. Validate every task title starts with a stable ID:
    - valid: `[P2.1] Build feature service`

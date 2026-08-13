@@ -66,7 +66,7 @@ Run `/ask-command <what you want>` if you don't remember which command to use.
 | `/ask-command <intent>` | Tells you which command to use for your task. Returns a copy-paste-ready prompt. |
 | `/init-claude` | Rewrites the entire Claude environment (`CLAUDE.md`, `SKILLS.md`, commands README, individual commands, and this file's command tables) to match the current README + src + package.json. Plan-then-confirm flow. |
 | `/make-command <description>` | Creates a new custom slash command from a plain-English description. Auto-updates this file's tables and proposes conflict-avoidance edits to existing commands. |
-| `/new-project [name]` | Initializes the SaaS identity, repository, Supabase connection, tracked schema, and non-secret state record. |
+| `/new-project [name]` | Initializes the SaaS identity, repository, Supabase connection, and tracked schema. |
 | `/masterplan-init` | Requires an existing Kanban-style GitHub Project, then links it and creates detailed Phase 0 cards. |
 | `/make-masterplan <phase>` | Expands a later phase without overwriting Phase 0. |
 | `/update-masterplan [--project-owner <owner>] [--project-number <number>]` | Syncs `MASTERPLAN.md` edits to the linked GitHub Project while preserving task order and live statuses. |
