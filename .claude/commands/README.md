@@ -6,8 +6,8 @@ Drop `.md` files in this folder to add custom slash commands. Each file becomes 
 
 | Command | Purpose |
 |---|---|
-| `/new-project ["name"]` | **Start a new project (Phase 1).** Interviews you for the project facts, writes `business.json` + `README` + `PROJECT_CONTEXT`, rebrands the code, creates a GitHub repo and repoints `origin` (keeps DannFlow as `upstream`), wires the Claude env (`/business-init` → `/init-claude` → `/ruflo-upgrade`), and stands up the Supabase tenant. |
-| `/design-project ["section"]` | **Then design it (Phase 2). ⭐ Use Opus.** Claude reads README + `business.json` + `PROJECT_CONTEXT`, runs a design-taste interview, then strictly replaces the template's placeholder copy, theme, and sections with a bespoke design for this project. |
+| `/new-project ["name"]` | **Start a new project.** Rebrands the code, creates a GitHub repo, and connects one dedicated Supabase project. |
+| `/design-project ["section"]` | **Then design it.** Claude reads README + `PROJECT_CONTEXT` + code configuration and replaces template copy and design with a bespoke project. |
 | `/init-claude` | Reads `README.md` + scans `src/` + `package.json`, then auto-rewrites `CLAUDE.md`, `SKILLS.md`, and refreshes this README to match the actual project state. |
 | `/help-dannflow` | Report-only command catalog. Shows how to run DannFlow commands in Claude and through the Codex bridge, grouped by category with a Mermaid graph. |
 | `/ask-command` | Meta-router. Describe what you want in plain English; it searches all commands here and returns the best one + a ready-to-paste prompt. |

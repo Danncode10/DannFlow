@@ -1,8 +1,8 @@
 ---
-description: Walks every file in src/services/ and confirms each Supabase query filters by organization_id (tenant isolation). Cross-references src/types/supabase.ts.
+description: Walks every file in src/services/ and confirms each Supabase query matches the project's RLS ownership or admin policy. Cross-references src/types/supabase.ts.
 ---
 
-Audit `src/services/` for RLS compliance — **multi-tenant edition**.
+Audit `src/services/` for RLS compliance — **single-project edition**.
 
 **Procedure:**
 
@@ -12,16 +12,16 @@ Audit `src/services/` for RLS compliance — **multi-tenant edition**.
    - `.from('<table>').update(...)`
    - `.from('<table>').delete(...)`
    - `.from('<table>').insert(...)`
-3. For each query, check whether it includes a **tenant filter** — typically `.eq('organization_id', tenantId)`.
-4. ALSO check for user-level ownership — `.eq('user_id', userId)` — when applicable (within a tenant).
-5. Cross-reference the table name against `src/types/supabase.ts` to confirm it actually exists and identify its tenant + owner columns.
+3. For each query, identify the table's RLS policy and confirm the operation is authorized by user ownership, an admin policy, or an explicit public policy.
+4. Check for an explicit `.eq('user_id', userId)` filter when a table has user-owned rows.
+5. Cross-reference the table name against `src/types/supabase.ts` to confirm it exists and identify ownership columns.
 
 **Exceptions** — these don't need a tenant filter:
 - Explicitly public reads (e.g. public landing-page content)
 - Inserts creating a row FOR the current user (the user_id field IS populated from auth context)
 - Service-role admin operations (but flag those for `/security-audit` review)
 
-**⚠️ CRITICAL:** Every query missing `.eq('organization_id', ...)` is a data-leakage risk. Flag as FAIL, not warning.
+**⚠️ CRITICAL:** Every query without a matching RLS authorization path is a data-leakage risk. Flag as FAIL, not warning.
 
 **Output:**
 

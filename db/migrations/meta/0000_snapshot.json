@@ -1,96 +1,9 @@
 {
-  "id": "3481b0d1-fb63-4444-a86e-72562e8f38e1",
+  "id": "75bad7c8-265e-4e6e-b065-17dcc84acfe1",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.organizations": {
-      "name": "organizations",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "app_id": {
-          "name": "app_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'business-template'"
-        },
-        "name": {
-          "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "slug": {
-          "name": "slug",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "website": {
-          "name": "website",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "logo_url": {
-          "name": "logo_url",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        }
-      },
-      "indexes": {
-        "organizations_app_id_slug_idx": {
-          "name": "organizations_app_id_slug_idx",
-          "columns": [
-            {
-              "expression": "app_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "slug",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": true,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
     "public.profiles": {
       "name": "profiles",
       "schema": "",
@@ -100,19 +13,6 @@
           "type": "uuid",
           "primaryKey": true,
           "notNull": true
-        },
-        "app_id": {
-          "name": "app_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'business-template'"
-        },
-        "organization_id": {
-          "name": "organization_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
         },
         "email": {
           "name": "email",
@@ -161,21 +61,7 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {
-        "profiles_organization_id_organizations_id_fk": {
-          "name": "profiles_organization_id_organizations_id_fk",
-          "tableFrom": "profiles",
-          "tableTo": "organizations",
-          "columnsFrom": [
-            "organization_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "set null",
-          "onUpdate": "no action"
-        }
-      },
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -192,19 +78,6 @@
           "primaryKey": true,
           "notNull": true,
           "default": "gen_random_uuid()"
-        },
-        "app_id": {
-          "name": "app_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'business-template'"
-        },
-        "organization_id": {
-          "name": "organization_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
         },
         "event_type": {
           "name": "event_type",
@@ -258,36 +131,6 @@
         }
       },
       "indexes": {
-        "idx_analytics_app_id": {
-          "name": "idx_analytics_app_id",
-          "columns": [
-            {
-              "expression": "app_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_analytics_organization_id": {
-          "name": "idx_analytics_organization_id",
-          "columns": [
-            {
-              "expression": "organization_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
         "idx_analytics_event_type": {
           "name": "idx_analytics_event_type",
           "columns": [
@@ -319,21 +162,7 @@
           "with": {}
         }
       },
-      "foreignKeys": {
-        "analytics_events_organization_id_organizations_id_fk": {
-          "name": "analytics_events_organization_id_organizations_id_fk",
-          "tableFrom": "analytics_events",
-          "tableTo": "organizations",
-          "columnsFrom": [
-            "organization_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -350,19 +179,6 @@
           "primaryKey": true,
           "notNull": true,
           "default": "gen_random_uuid()"
-        },
-        "app_id": {
-          "name": "app_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'business-template'"
-        },
-        "organization_id": {
-          "name": "organization_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
         },
         "actor_id": {
           "name": "actor_id",
@@ -433,36 +249,6 @@
         }
       },
       "indexes": {
-        "idx_audit_logs_app_id": {
-          "name": "idx_audit_logs_app_id",
-          "columns": [
-            {
-              "expression": "app_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_audit_logs_organization_id": {
-          "name": "idx_audit_logs_organization_id",
-          "columns": [
-            {
-              "expression": "organization_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
         "idx_audit_logs_action": {
           "name": "idx_audit_logs_action",
           "columns": [
@@ -494,21 +280,7 @@
           "with": {}
         }
       },
-      "foreignKeys": {
-        "audit_logs_organization_id_organizations_id_fk": {
-          "name": "audit_logs_organization_id_organizations_id_fk",
-          "tableFrom": "audit_logs",
-          "tableTo": "organizations",
-          "columnsFrom": [
-            "organization_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -525,19 +297,6 @@
           "primaryKey": true,
           "notNull": true,
           "default": "gen_random_uuid()"
-        },
-        "app_id": {
-          "name": "app_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'business-template'"
-        },
-        "organization_id": {
-          "name": "organization_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
         },
         "customer_name": {
           "name": "customer_name",
@@ -684,36 +443,6 @@
         }
       },
       "indexes": {
-        "idx_bookings_app_id": {
-          "name": "idx_bookings_app_id",
-          "columns": [
-            {
-              "expression": "app_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_bookings_organization_id": {
-          "name": "idx_bookings_organization_id",
-          "columns": [
-            {
-              "expression": "organization_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
         "idx_bookings_status": {
           "name": "idx_bookings_status",
           "columns": [
@@ -731,19 +460,6 @@
         }
       },
       "foreignKeys": {
-        "bookings_organization_id_organizations_id_fk": {
-          "name": "bookings_organization_id_organizations_id_fk",
-          "tableFrom": "bookings",
-          "tableTo": "organizations",
-          "columnsFrom": [
-            "organization_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
         "bookings_service_id_services_id_fk": {
           "name": "bookings_service_id_services_id_fk",
           "tableFrom": "bookings",
@@ -787,19 +503,6 @@
           "primaryKey": true,
           "notNull": true,
           "default": "gen_random_uuid()"
-        },
-        "app_id": {
-          "name": "app_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'business-template'"
-        },
-        "organization_id": {
-          "name": "organization_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
         },
         "title": {
           "name": "title",
@@ -860,53 +563,8 @@
           "default": "now()"
         }
       },
-      "indexes": {
-        "idx_gallery_app_id": {
-          "name": "idx_gallery_app_id",
-          "columns": [
-            {
-              "expression": "app_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_gallery_organization_id": {
-          "name": "idx_gallery_organization_id",
-          "columns": [
-            {
-              "expression": "organization_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "gallery_items_organization_id_organizations_id_fk": {
-          "name": "gallery_items_organization_id_organizations_id_fk",
-          "tableFrom": "gallery_items",
-          "tableTo": "organizations",
-          "columnsFrom": [
-            "organization_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
+      "indexes": {},
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -923,19 +581,6 @@
           "primaryKey": true,
           "notNull": true,
           "default": "gen_random_uuid()"
-        },
-        "app_id": {
-          "name": "app_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'business-template'"
-        },
-        "organization_id": {
-          "name": "organization_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
         },
         "name": {
           "name": "name",
@@ -1003,36 +648,6 @@
         }
       },
       "indexes": {
-        "idx_leads_app_id": {
-          "name": "idx_leads_app_id",
-          "columns": [
-            {
-              "expression": "app_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_leads_organization_id": {
-          "name": "idx_leads_organization_id",
-          "columns": [
-            {
-              "expression": "organization_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
         "idx_leads_status": {
           "name": "idx_leads_status",
           "columns": [
@@ -1064,21 +679,7 @@
           "with": {}
         }
       },
-      "foreignKeys": {
-        "leads_organization_id_organizations_id_fk": {
-          "name": "leads_organization_id_organizations_id_fk",
-          "tableFrom": "leads",
-          "tableTo": "organizations",
-          "columnsFrom": [
-            "organization_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -1095,19 +696,6 @@
           "primaryKey": true,
           "notNull": true,
           "default": "gen_random_uuid()"
-        },
-        "app_id": {
-          "name": "app_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'business-template'"
-        },
-        "organization_id": {
-          "name": "organization_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
         },
         "type": {
           "name": "type",
@@ -1156,36 +744,6 @@
         }
       },
       "indexes": {
-        "idx_notifications_app_id": {
-          "name": "idx_notifications_app_id",
-          "columns": [
-            {
-              "expression": "app_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_notifications_organization_id": {
-          "name": "idx_notifications_organization_id",
-          "columns": [
-            {
-              "expression": "organization_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
         "idx_notifications_is_read": {
           "name": "idx_notifications_is_read",
           "columns": [
@@ -1202,21 +760,7 @@
           "with": {}
         }
       },
-      "foreignKeys": {
-        "notifications_organization_id_organizations_id_fk": {
-          "name": "notifications_organization_id_organizations_id_fk",
-          "tableFrom": "notifications",
-          "tableTo": "organizations",
-          "columnsFrom": [
-            "organization_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -1233,19 +777,6 @@
           "primaryKey": true,
           "notNull": true,
           "default": "gen_random_uuid()"
-        },
-        "app_id": {
-          "name": "app_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'business-template'"
-        },
-        "organization_id": {
-          "name": "organization_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
         },
         "name": {
           "name": "name",
@@ -1350,15 +881,9 @@
         }
       },
       "indexes": {
-        "services_app_id_slug_idx": {
-          "name": "services_app_id_slug_idx",
+        "services_slug_idx": {
+          "name": "services_slug_idx",
           "columns": [
-            {
-              "expression": "app_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
             {
               "expression": "slug",
               "isExpression": false,
@@ -1367,36 +892,6 @@
             }
           ],
           "isUnique": true,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_services_app_id": {
-          "name": "idx_services_app_id",
-          "columns": [
-            {
-              "expression": "app_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_services_organization_id": {
-          "name": "idx_services_organization_id",
-          "columns": [
-            {
-              "expression": "organization_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
           "concurrently": false,
           "method": "btree",
           "with": {}
@@ -1417,21 +912,7 @@
           "with": {}
         }
       },
-      "foreignKeys": {
-        "services_organization_id_organizations_id_fk": {
-          "name": "services_organization_id_organizations_id_fk",
-          "tableFrom": "services",
-          "tableTo": "organizations",
-          "columnsFrom": [
-            "organization_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -1448,19 +929,6 @@
           "primaryKey": true,
           "notNull": true,
           "default": "gen_random_uuid()"
-        },
-        "app_id": {
-          "name": "app_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "current_setting('app.id', true)"
-        },
-        "organization_id": {
-          "name": "organization_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
         },
         "title": {
           "name": "title",
@@ -1534,15 +1002,9 @@
         }
       },
       "indexes": {
-        "blog_posts_app_id_slug_idx": {
-          "name": "blog_posts_app_id_slug_idx",
+        "blog_posts_slug_idx": {
+          "name": "blog_posts_slug_idx",
           "columns": [
-            {
-              "expression": "app_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
             {
               "expression": "slug",
               "isExpression": false,
@@ -1556,21 +1018,7 @@
           "with": {}
         }
       },
-      "foreignKeys": {
-        "blog_posts_organization_id_organizations_id_fk": {
-          "name": "blog_posts_organization_id_organizations_id_fk",
-          "tableFrom": "blog_posts",
-          "tableTo": "organizations",
-          "columnsFrom": [
-            "organization_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},

@@ -688,10 +688,9 @@ interface FormState {
 
 interface BlogEditorPageProps {
   post?: BlogPost | null;
-  orgId: string;
 }
 
-export function BlogEditorPage({ post, orgId }: BlogEditorPageProps) {
+export function BlogEditorPage({ post }: BlogEditorPageProps) {
   const router = useRouter();
   const isEdit = !!post;
   const [postId, setPostId] = useState<string | null>(post?.id ?? null);
@@ -826,7 +825,7 @@ export function BlogEditorPage({ post, orgId }: BlogEditorPageProps) {
       if (postId) {
         result = await updateBlogPost(postId, payload);
       } else {
-        const created = await createBlogPost(payload, orgId);
+        const created = await createBlogPost(payload);
         setPostId(created.id);
         window.history.replaceState({}, "", `/dashboard/blog/${created.id}`);
         result = created;
@@ -870,7 +869,7 @@ export function BlogEditorPage({ post, orgId }: BlogEditorPageProps) {
       const payload = buildPayload({ content, cover_image_url: cover || undefined });
       let id = postId;
       if (!id) {
-        const created = await createBlogPost(payload, orgId);
+        const created = await createBlogPost(payload);
         id = created.id;
         setPostId(created.id);
         window.history.replaceState({}, "", `/dashboard/blog/${created.id}`);

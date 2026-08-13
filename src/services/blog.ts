@@ -4,7 +4,6 @@ import { createClient, createAdminClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 import type { Tables } from "@/types/supabase";
 
-const APP_ID = process.env.NEXT_PUBLIC_APP_ID ?? "business-template";
 const BLOG_IMAGES_BUCKET = "blog-images";
 const PUBLIC_URL_MARKER = `/storage/v1/object/public/${BLOG_IMAGES_BUCKET}/`;
 
@@ -28,8 +27,7 @@ function extractBlogImageStoragePaths(coverImageUrl: string | null, content: str
 export type BlogPost = Tables<"blog_posts">;
 
 /**
- * Garbage-collects orphaned blog images: anything sitting in this app's
- * storage folder that no post (draft or published) references anymore.
+ * Garbage-collects orphaned blog images from this project's storage bucket.
  *
  * This exists because uploads happen the moment you pick a file (for instant
  * preview), but a post is only persisted on Save/Publish — and a refresh,
@@ -42,7 +40,6 @@ export async function cleanupOrphanedBlogImages(): Promise<{ deleted: number }> 
   const { data: posts, error } = await supabase
     .from("blog_posts")
     .select("cover_image_url, content")
-    .eq("app_id", APP_ID);
   if (error) throw error;
 
   const referenced = new Set<string>();
@@ -55,11 +52,11 @@ export async function cleanupOrphanedBlogImages(): Promise<{ deleted: number }> 
   const admin = createAdminClient();
   const { data: files, error: listError } = await admin.storage
     .from(BLOG_IMAGES_BUCKET)
-    .list(APP_ID, { limit: 1000 });
+    .list("", { limit: 1000 });
   if (listError) throw listError;
 
   const orphanPaths = (files ?? [])
-    .map(f => `${APP_ID}/${f.name}`)
+    .map(f => f.name)
     .filter(path => !referenced.has(path));
 
   if (orphanPaths.length) {
@@ -97,7 +94,6 @@ export async function listBlogPosts(opts: {
   let query = supabase
     .from("blog_posts")
     .select("*", { count: "exact" })
-    .eq("app_id", APP_ID)
     .order("created_at", { ascending: false })
     .range(offset, offset + pageSize - 1);
 
@@ -113,7 +109,6 @@ export async function getBlogPost(slug: string): Promise<BlogPost | null> {
   const { data, error } = await supabase
     .from("blog_posts")
     .select("*")
-    .eq("app_id", APP_ID)
     .eq("slug", slug)
     .single();
 
@@ -122,14 +117,13 @@ export async function getBlogPost(slug: string): Promise<BlogPost | null> {
 }
 
 // Public reads use the admin client (no cookies, bypasses RLS).
-// Safe because we always filter by app_id + is_published.
+// Safe because we return published posts only.
 
 export async function getPublishedBlogPost(slug: string): Promise<BlogPost | null> {
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("blog_posts")
     .select("*")
-    .eq("app_id", APP_ID)
     .eq("slug", slug)
     .eq("is_published", true)
     .single();
@@ -143,7 +137,6 @@ export async function getLatestPublishedPosts(limit = 3): Promise<BlogPost[]> {
   const { data, error } = await supabase
     .from("blog_posts")
     .select("*")
-    .eq("app_id", APP_ID)
     .eq("is_published", true)
     .order("published_at", { ascending: false })
     .limit(limit);
@@ -158,24 +151,18 @@ export async function getAllPublishedSlugs(): Promise<string[]> {
   const { data, error } = await supabase
     .from("blog_posts")
     .select("slug")
-    .eq("app_id", APP_ID)
     .eq("is_published", true);
 
   if (error) throw error;
   return (data ?? []).map(r => r.slug);
 }
 
-export async function createBlogPost(
-  input: BlogPostInput,
-  organizationId: string
-): Promise<BlogPost> {
+export async function createBlogPost(input: BlogPostInput): Promise<BlogPost> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("blog_posts")
     .insert({
       ...input,
-      app_id: APP_ID,
-      organization_id: organizationId,
     })
     .select()
     .single();

@@ -19,8 +19,7 @@ Scaffold a new feature: **$ARGUMENTS**
      - Run `pnpm db:generate` and review the generated SQL in `db/migrations/`
      - Add RLS policies, triggers, functions, or storage SQL directly to the generated migration when needed
      - Apply with `pnpm db:migrate`; do not use Supabase MCP `apply_migration` for normal tracked schema changes
-     - **CRITICAL for multi-tenancy:** table MUST have `organization_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE` as the first column
-     - Define RLS policies enforcing tenant/ownership access before applying the migration
+     - Define RLS policies enforcing the actual ownership or admin access model before applying the migration
    - Should it be a protected route (under `src/app/dashboard/`) or public?
 
 3. **Scaffold these files** (use feature name in kebab-case for paths, PascalCase for components). These four artifacts are independent — **spawn parallel agents** for service, page, component, and types simultaneously when the feature scope is clear:
@@ -34,9 +33,8 @@ Scaffold a new feature: **$ARGUMENTS**
    - **`src/services/<feature-name>.ts`** — service layer
      - Import typed Supabase client from `src/utils/supabase/server.ts`
      - Define functions using types from `src/types/supabase.ts` (no `any`)
-     - **CRITICAL for multi-tenancy:** Every query MUST include `.eq('organization_id', tenantId)` (tenant isolation)
-     - ALSO include user/ownership filter when applicable (RLS-compliant)
-     - Example: `.from('pages').select('*').eq('organization_id', tenantId).eq('created_by', userId)`
+     - Include a user/ownership filter when the table has an owner column (RLS-compliant)
+     - Example: `.from('pages').select('*').eq('created_by', userId)`
      - Async/await, return typed results
 
    - **`src/app/<route>/page.tsx`** — Server Component by default

@@ -52,8 +52,8 @@ To fix:
 -   **Explicit Supabase MCP Schema Changes**: If the user explicitly asks to manipulate the live Supabase schema through MCP, use `.claude/commands/schema-change.md`. The tracked flow must checkpoint first, save the approved SQL to `db/migrations/YYYYMMDDHHMMSS_<name>.sql`, apply the exact SQL with Supabase MCP `apply_migration`, regenerate `src/types/supabase.ts`, verify the live schema/RLS state, and backport app-owned table changes into `db/schema/*.ts`.
 -   **Emergency Schema Hotfixes**: If a schema change is made directly through Supabase MCP or SQL, immediately backport the change into `db/schema/*.ts`, generate or reconcile a matching migration in `db/migrations/`, and refresh `src/types/supabase.ts`. Never leave live schema drift untracked.
 -   **Project Provisioning**: If requested to create a new project and apply a schema:
-    1. List organizations to help the user choose one.
-    2. Ask for the Project Name and Organization ID.
+    1. List Supabase account organizations to help the user choose one.
+    2. Ask for the Project Name and Supabase account Organization ID.
     3. Check costs using `get_cost` and `confirm_cost` before `create_project`.
     4. After initialization, apply `db/migrations/` using `pnpm db:migrate` with the new project's `DATABASE_URL`.
 -   **Project Initialization & Migration**: If a user provides a Project ID for a new project:
@@ -65,7 +65,7 @@ To fix:
 -   **Be concise and proactive**. If you see an obvious optimization that fits the application's clean aesthetic, suggest it.
 
 ## 🔒 RLS Security Constraint (Non-Negotiable)
-Always check `src/types/supabase.ts` and **assume RLS is active on every table**. Every `select` or `update` in a service must include an `.eq('id', userId)` filter to pass security policies unless explicitly building a public endpoint. Skipping this is a security vulnerability.
+Always check `src/types/supabase.ts` and **assume RLS is active on every table**. Services must rely on the table's documented ownership or admin RLS policy; add an explicit user ownership filter when the table has a user-owner column. Public endpoints must use a deliberate public policy.
 
 ## Code Architecture Rules
 1.  **Maintain Structure**: DO NOT arbitrarily change existing UI structure, folder hierarchy, or core logic unless explicitly asked.

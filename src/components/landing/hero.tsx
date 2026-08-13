@@ -135,7 +135,7 @@ export function Hero({ isAuthed }: HeroProps) {
           <span className="flex items-center gap-1.5 rounded-full bg-primary/10 border border-primary/20 px-2 py-0.5 text-[10px] font-semibold text-primary uppercase tracking-[0.15em]">
             New
           </span>
-          <span>Multi-tenant RLS templates for client websites</span>
+          <span>Secure Supabase templates for focused projects</span>
           <ArrowRight className="h-3 w-3 transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:translate-x-1" />
         </motion.a>
 
@@ -166,7 +166,7 @@ export function Hero({ isAuthed }: HeroProps) {
           }}
           className="mt-8 max-w-xl text-[17px] text-muted-foreground leading-relaxed"
         >
-          A production-grade Next.js + Supabase template with multi-tenant
+          A production-grade Next.js + Supabase template with project-scoped
           RLS, type-safe services, and an AI-driven workflow that turns
           natural language into shipped features.
         </motion.p>
@@ -423,7 +423,7 @@ function ProductPreview({ typingDone }: { typingDone: boolean }) {
                   </div>
 
                   <div className="relative h-32 overflow-hidden rounded-xl border border-white/[0.04] bg-white/[0.02] p-3">
-                    <p className="mb-2 text-[9px] uppercase tracking-[0.15em] text-muted-foreground">Revenue by tenant · last 12 weeks</p>
+                    <p className="mb-2 text-[9px] uppercase tracking-[0.15em] text-muted-foreground">Revenue · last 12 weeks</p>
                     <div className="flex h-16 items-end justify-between gap-1">
                       {[40, 60, 35, 75, 55, 85, 70, 90, 65, 80, 50, 95].map((height, index) => (
                         <div key={index} style={{ height: `${height}%` }} className="flex-1 rounded-sm bg-gradient-to-t from-primary/40 to-primary/80" />

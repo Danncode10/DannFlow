@@ -15,7 +15,7 @@ optimized for AI-assisted development.
 ## Database Discipline
 
 Assume RLS is active on every table. Service queries must include explicit user,
-tenant, or ownership filters unless the endpoint is intentionally public.
+ownership filters when the table has an ownership column unless the endpoint is intentionally public.
 
 Before schema-sensitive work:
 

@@ -84,7 +84,7 @@ pnpm db:migrate
 
 `pnpm db:generate` writes SQL into `db/migrations/`. `pnpm db:migrate` applies those migrations to Supabase with `DATABASE_URL` and refreshes remote types.
 
-**Want Claude to design the whole site for you?** After the 5 steps, run **`/design-project`** (⭐ on Opus) — it reads your `README` + `business.json` + `PROJECT_CONTEXT`, runs a quick design-taste interview, then designs and builds every section with real copy and a fitting theme, replacing all template placeholders. Spinning up a fresh client/business project from scratch instead? **`/new-project`** does the full Phase-1 scaffold (config + GitHub repo + `origin` repoint + Supabase tenant) before you hand off to `/design-project`.
+**Want Claude to design the whole site for you?** After the 5 steps, run **`/design-project`** — it reads your `README`, `PROJECT_CONTEXT`, and code configuration, then designs and builds a bespoke project. Starting from a fresh clone? **`/new-project`** sets up the repo and one dedicated Supabase project first.
 
 ---
 
@@ -351,7 +351,7 @@ DannFlow commands. The repository also includes additional command packs under
 | `/new-feature <name>` | Scaffold service + page + form |
 | `/review` | Pre-commit lint + typecheck + guardrail check |
 | `/commit` | Stage + draft conventional commit message |
-| `/rls-check` | Audit RLS policies for missing tenant filters |
+| `/rls-check` | Audit RLS policies for missing ownership or admin authorization |
 
 ### Running Claude commands from Codex
 

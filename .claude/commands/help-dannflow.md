@@ -61,7 +61,6 @@ Codex uses `.codex/commands/claude-command.md` as a bridge. The source-of-truth 
 | `/init-claude` | Refreshes Claude project context, skills, and command docs. |
 | `/init-update` | Updates the local DannFlow command/runtime setup. |
 | `/adopt-dannflow [--no-protect\|--force]` | Adopts an existing repo into DannFlow conventions. |
-| `/create-organization` | Helps create or prepare an organization context. |
 
 ### Planning & Task Tracking
 

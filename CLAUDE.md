@@ -61,7 +61,7 @@ supabase/
 
 ## RLS security constraint
 
-Assume **Row Level Security is active on every table.** Every `select`/`update`/`delete` in `src/services/` MUST include `.eq('id', userId)` (or equivalent ownership filter) unless it's an explicitly public endpoint. Skipping this is a security vulnerability, not a style issue.
+Assume **Row Level Security is active on every table.** Services must match the table's ownership or admin policy; add an explicit user ownership filter when the table has a user-owner column. Public endpoints require an intentional public policy.
 
 ## UI quality standards
 
