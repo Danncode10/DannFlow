@@ -6,6 +6,23 @@
 
 A Next.js 15 + Supabase starter optimized for **Vibe Coding** — an AI-native dev workflow where schema is authored in TypeScript, applied through reviewed SQL migrations, and mirrored back into generated app types:
 
+## Repository mode guard (mandatory)
+
+Before editing, identify the repository root, folder name, and remotes:
+
+```bash
+REPO_ROOT=$(git rev-parse --show-toplevel)
+printf '%s\n' "$(basename "$REPO_ROOT")"
+git remote -v
+```
+
+Select one mode and follow its rules:
+
+- **Template Mode:** the root folder is `Dannflow`/`DannFlow` and this is the actual DannFlow template repository. Keep all changes generic and reusable. Do not create or commit client-specific context, screenshots, discovery reports, product requirements, Supabase project data, or application work here. Do not run `/new-project`, `/masterplan-init`, or project-specific setup in this checkout. Never push a project change to the template.
+- **Project Mode:** the root folder is not `Dannflow`/`DannFlow`. This is a project using DannFlow. Require `origin` to point to the project repository and `upstream` to point to `Danncode10/DannFlow`. Project-specific work belongs here; use `/sync-upstream` to pull generic template improvements and `/sync-to-upstream` to contribute selected generic improvements back.
+
+If folder name and remotes disagree, stop before editing and explain the mismatch. A non-`Dannflow` checkout with only `upstream → DannFlow` is not ready for project work; configure `origin` and make `upstream` fetch-only first. Never infer mode from the files being viewed—use the repository root folder and remote configuration.
+
 ```
 edit db/schema/*.ts → pnpm db:generate → review db/migrations/*.sql
 pnpm db:migrate    → apply to Supabase + refresh src/types/supabase.ts

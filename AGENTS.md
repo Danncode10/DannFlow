@@ -5,6 +5,23 @@
 
 You are an expert developer working on **Dann's Vibe-Coding Starter**. This project uses **Next.js 16 (App Router)** and follows a strict **"Vibe Coding"** architecture built for clarity, speed, and maintainability.
 
+## Repository identity guard (read before editing)
+
+Determine the repository root and folder name before taking any action:
+
+```bash
+REPO_ROOT=$(git rev-parse --show-toplevel)
+printf '%s\n' "$(basename "$REPO_ROOT")"
+git remote -v
+```
+
+Use the folder name and remotes to select exactly one mode:
+
+- **Template Mode** — the repository folder is `Dannflow`/`DannFlow` and the DannFlow repository is the canonical `origin`. This is the actual DannFlow template. Keep it generic: do not add client names, discovery reports, screenshots, product requirements, Supabase project details, or application-specific code. Changes here must improve the reusable template, installer, commands, docs, or generic starter architecture. Never run project initialization against this checkout and never push project work here.
+- **Project Mode** — the repository folder is not `Dannflow`/`DannFlow`. This is a project built from DannFlow. Its `origin` must identify the project repository, while `upstream` must identify `Danncode10/DannFlow`. Project-specific app code and context belong here. Use `/sync-upstream` for template-to-project updates and `/sync-to-upstream` only for deliberately selected generic improvements.
+
+If the folder name and remotes disagree, stop and report the mismatch before editing. In particular, a non-`Dannflow` folder with only `upstream → DannFlow` is unsafe: configure the project's `origin` first and make the DannFlow remote fetch-only. Do not assume that a file's subject matter changes repository mode; repository identity comes from the root folder and remote configuration.
+
 ## Diagnostic Protocol
 **Unified Dependency Check**: Before starting any specialized tasks, verify that the required MCP (Model Context Protocol) tools are enabled and connected.
 

@@ -30,9 +30,11 @@ echo ""
 # ── 1. Get app name ──────────────────────────────────────────
 if [ -t 0 ]; then
   read -p "$(echo -e "${BOLD}Enter your app name${NC} [my-app]: ")" INPUT_NAME < /dev/tty
+  read -p "$(echo -e "${BOLD}GitHub URL for your project repo${NC} (optional): ")" PROJECT_REPO_URL < /dev/tty
 else
-  # When piped (curl | bash), /dev/tty may not be available — use a default
+  # Non-interactive installs configure the project origin later via /new-project.
   INPUT_NAME=""
+  PROJECT_REPO_URL=""
 fi
 
 APP_NAME=${INPUT_NAME:-"my-app"}
@@ -57,12 +59,21 @@ if [ -d "$TARGET_DIR" ]; then
 fi
 
 echo -e "${CYAN}📦 Cloning DannFlow into ./${PKG_NAME}...${NC}"
-git clone --depth=1 https://github.com/Danncode10/DannFlow.git "$TARGET_DIR"
+git clone https://github.com/Danncode10/DannFlow.git "$TARGET_DIR"
 cd "$TARGET_DIR"
 
-# Rename origin to upstream so the user can add their own origin
+# DannFlow is the template. Keep it as fetch-only upstream so project work
+# cannot accidentally be pushed back into the template repository.
 git remote rename origin upstream
-echo -e "✅ Cloned. Remote 'upstream' → DannFlow (for future sync-upstream)"
+git remote set-url --push upstream DISABLED
+
+if [ -n "$PROJECT_REPO_URL" ]; then
+  git remote add origin "$PROJECT_REPO_URL"
+  echo -e "✅ Remotes configured: origin → project, upstream → DannFlow (fetch-only)"
+else
+  echo -e "✅ Remote configured: upstream → DannFlow (fetch-only)"
+  echo -e "   ${YELLOW}Your project still needs an origin remote. /new-project must create/repoint it before pushing.${NC}"
+fi
 
 # ── 4. Install npm dependencies ──────────────────────────────
 echo -e "\n${CYAN}📦 Installing npm dependencies...${NC}"
@@ -104,8 +115,8 @@ echo -e "${BOLD}Your project:${NC} ./${PKG_NAME}"
 echo ""
 echo -e "${BOLD}Next steps:${NC}"
 echo -e "  1. ${CYAN}cd ${PKG_NAME}${NC}"
-echo -e "  2. Configure ${CYAN}GitHub MCP${NC} and ${CYAN}Supabase MCP${NC} (see docs/dannflow_docs/mcp-setup.md)"
-echo -e "  3. Open in Claude Code and run ${CYAN}/new-project${NC}"
+echo -e "  2. Open in Claude Code and run ${CYAN}/new-project${NC} to configure origin and project context"
+echo -e "  3. Configure ${CYAN}GitHub MCP${NC} and ${CYAN}Supabase MCP${NC} (see docs/dannflow_docs/mcp-setup.md)"
 echo -e "  4. Create a Kanban GitHub Project with Backlog, Ready, In progress, Done"
 echo -e "  5. Run ${CYAN}/masterplan-init${NC}, then ${CYAN}/what-task${NC}"
 echo ""
