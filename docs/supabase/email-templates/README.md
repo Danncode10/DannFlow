@@ -6,7 +6,7 @@ single-use link and honors the redirect URL sent by the application.
 
 ## Install
 
-`/setup-auth` uses this guide after it confirms the product's auth choices. It does not copy HTML into Supabase automatically.
+`/setup-auth` uses this guide during Phase 0 to configure the existing template's email flow. It does not copy HTML into Supabase automatically.
 
 1. In Supabase, open **Authentication > Emails > Templates**.
 2. Select **Confirm sign up**.

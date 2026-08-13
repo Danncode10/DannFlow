@@ -29,6 +29,7 @@ Examples:
 /claude-command new-feature billing
 /claude-command sync-upstream --commits 3
 /claude-command masterplan-init
+/claude-command setup-supabase
 /claude-command setup-auth
 /ask-claude-command make the pricing page responsive and review it
 ```

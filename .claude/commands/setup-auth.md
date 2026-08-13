@@ -1,16 +1,37 @@
 ---
-description: Configure and verify Supabase Auth, selected providers, redirect URLs, branded email templates, and authentication smoke tests for the current SaaS.
+description: Configure and verify the existing DannFlow template's email authentication, Google sign-in, redirect URLs, and branded Supabase email templates without changing database schema.
 ---
 
 # /setup-auth
 
-Configure only the authentication methods chosen in `PROJECT_CONTEXT.md`. Read the auth implementation, `docs/dannflow_docs/social-auth.md`, and `docs/supabase/email-templates/` before acting.
+Configure the auth flow already shipped by the DannFlow template. Read `PROJECT_CONTEXT.md`, `.env.local`, `src/services/auth.ts`, `src/app/auth/callback/route.ts`, `docs/dannflow_docs/social-auth.md`, and `docs/supabase/email-templates/` before acting.
 
-1. Verify Supabase MCP and confirm the hosted project from `.env.local`.
-2. Configure email/password settings, Site URL, and exact local/production callback and recovery redirect URLs required by the app.
-3. If Google OAuth is selected, guide the user through Google Cloud consent-screen setup, a Web OAuth client, allowed JavaScript origins, and Supabase's callback URL. Keep Google client credentials in Supabase, never in browser code or `.env.local`.
-4. Ask the user to paste the project-branded HTML from `docs/supabase/email-templates/` into Supabase Authentication > Emails > Templates. Preserve Supabase variables such as `{{ .ConfirmationURL }}`.
-5. Run or guide a safe signup, confirmation, password-reset, and selected OAuth smoke test. Verify local and production redirects separately when each URL exists.
-6. Report exact dashboard settings confirmed, tests passed, and anything intentionally deferred.
+## Scope
 
-Do not enable an unchosen provider, request unnecessary OAuth scopes, expose credentials, or claim email delivery was verified without a real test email.
+This Phase 0 command configures the template's existing email/password and Google sign-in flows. It does not add providers, alter database schema, create tables, change RLS, or modify application code.
+
+## Procedure
+
+1. Verify Supabase MCP is connected and `.env.local` has non-placeholder `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and `SUPABASE_PROJECT_ID`. Do not print values.
+2. Explain the template's expected auth behavior before changing dashboard settings: email/password sign-in, confirmation and recovery handling, `/auth/callback` for OAuth, and `/reset-password` for recovery.
+3. In Supabase **Authentication > URL Configuration**, guide the user to set the local Site URL to `http://localhost:3000` and allow these local redirect URLs:
+   - `http://localhost:3000/auth/callback`
+   - `http://localhost:3000/reset-password`
+   Add the equivalent production URLs only after the deployed URL is known. Explain that the Site URL must be changed to the production origin at launch.
+4. In Supabase **Authentication > Providers**, keep email/password enabled. Explain the Email Confirm setting and ask the user whether to require confirmation before allowing new accounts; record the chosen behavior in `PROJECT_CONTEXT.md`.
+5. Configure the included Google provider:
+   - In Google Cloud Console, configure the OAuth consent screen with the product's name, support email, and authorized domain when one exists.
+   - Create a **Web application** OAuth client.
+   - Add `http://localhost:3000` as an authorized JavaScript origin and add the production origin later.
+   - Add the exact Supabase callback URL shown in Supabase's Google provider panel, normally `https://<project-ref>.supabase.co/auth/v1/callback`, as an authorized redirect URI.
+   - In Supabase **Authentication > Providers > Google**, enable Google and paste the Client ID and Client Secret. Keep these credentials in Google Cloud and Supabase only—never in `.env.local`, source, or Git.
+   - Use only `openid`, `email`, and `profile` unless a later feature explicitly needs more scopes.
+6. In Supabase **Authentication > Emails > Templates**, ask the user to paste the project-branded HTML from `docs/supabase/email-templates/` into **Confirm sign up** and **Reset password**. Preserve `{{ .ConfirmationURL }}` exactly. Do not paste templates automatically or claim they were saved without user confirmation.
+7. Run or guide smoke tests with an inbox the user controls: sign up with email/password and verify the confirmation link; request and complete a password reset; sign in with Google and confirm the browser returns through `/auth/callback` to `/dashboard`. State which tests cannot be completed until a production domain is available.
+8. Summarize enabled settings, deferred production settings, and test results. Store no secrets in tracked files.
+
+## Constraints
+
+- Do not add a new auth provider or edit database schema in Phase 0.
+- Do not print or commit OAuth client secrets, service-role keys, SMTP credentials, database URLs, or tokens.
+- Do not claim a Google or email test passed unless it was actually performed.

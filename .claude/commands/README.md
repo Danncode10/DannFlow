@@ -8,8 +8,8 @@ Drop `.md` files in this folder to add custom slash commands. Each file becomes 
 |---|---|
 | `/new-project ["name"]` | **Start a new project.** Rebrands the code, creates a GitHub repo, and connects one dedicated Supabase project. |
 | `/masterplan-init [--project-owner <owner>] [--project-number <number>]` | **Initialize execution planning.** Detects a completed `/new-project`, requires an existing Kanban-style GitHub Project, then creates detailed Phase 0 cards. |
-| `/setup-supabase` | Guides and verifies hosted Supabase environment setup, tracked migrations, generated types, and RLS/schema readiness. |
-| `/setup-auth` | Guides and verifies selected Supabase Auth providers, Google OAuth where chosen, redirect URLs, branded emails, and auth smoke tests. |
+| `/setup-supabase` | Guides the existing DannFlow template's Supabase environment values and dashboard settings without designing or changing project database schema. |
+| `/setup-auth` | Configures and verifies the template's email auth, Google sign-in, redirects, and branded Supabase email templates without changing schema. |
 | `/design-project ["section"]` | **Then design it.** Claude reads README + `PROJECT_CONTEXT` + code configuration and replaces template copy and design with a bespoke project. |
 | `/init-claude` | Reads `README.md` + scans `src/` + `package.json`, then auto-rewrites `CLAUDE.md`, `SKILLS.md`, and refreshes this README to match the actual project state. |
 | `/help-dannflow` | Report-only command catalog. Shows how to run DannFlow commands in Claude and through the Codex bridge, grouped by category with a Mermaid graph. |
