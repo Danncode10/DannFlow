@@ -86,19 +86,20 @@ export function Hero({ isAuthed }: HeroProps) {
           fill
           priority
           sizes="100vw"
-          className="object-cover object-[85%_center] sm:object-[62%_center]"
+          className="object-cover object-[85%_center] brightness-110 contrast-[1.03] sm:object-[62%_center]"
         />
       </div>
       <HeroVideoBackground enabled={videoEnabled} />
 
-      {/* Keep contrast stable no matter which frame of the video is shown. */}
+      {/* A light, consistent treatment preserves text legibility without
+          burying the poster or video beneath two heavy overlays. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-r from-background/90 via-background/65 to-background/15 sm:from-background sm:via-background/85 sm:to-background/35"
+        className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-r from-background/80 via-background/45 to-background/10 sm:from-background/85 sm:via-background/55 sm:to-background/15"
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-background/40 via-transparent to-background/70 sm:from-background/45 sm:to-background"
+        className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-background/30 via-transparent to-background/55 sm:from-background/35 sm:to-background/60"
       />
 
       {/* Static dot grid */}
@@ -332,7 +333,7 @@ function HeroVideoBackground({ enabled }: HeroVideoBackgroundProps) {
       onLoadedData={handleVideoReady}
       onEnded={handleEnded}
       onError={() => setIsReady(false)}
-      className={`pointer-events-none absolute inset-0 -z-10 h-full w-full object-cover object-[85%_center] sm:object-[62%_center] transition-opacity duration-1000 ease-out ${
+      className={`pointer-events-none absolute inset-0 -z-10 h-full w-full object-cover object-[85%_center] brightness-110 contrast-[1.03] sm:object-[62%_center] transition-opacity duration-1000 ease-out ${
         enabled && isReady ? "opacity-100" : "opacity-0"
       }`}
       src={videoSource}
