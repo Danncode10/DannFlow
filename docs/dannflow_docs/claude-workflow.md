@@ -108,6 +108,7 @@ Run `/ask-command <what you want>` if you don't remember which command to use.
 | `/seo-check [route]` | Per-route SEO audit — metadata, OG, canonical, sitemap.ts, robots.ts, JSON-LD, alt text, heading hierarchy. Reports gaps only. |
 | `/seo-fix <route\|all>` | Active rewrite — adds missing metadata, OG, canonical, JSON-LD, sitemap/robots files. Plan-then-confirm. |
 | `/marketing-check [route]` | Conversion-fundamentals audit for landing/pricing pages — headline clarity, CTA, social proof, friction, pricing legibility. Opinionated. Reports only. |
+| `/hero-bg [creative direction]` | Inspects the active hero and creates a guided two-image, single 8-second AI-video background workflow with prompts and asset-delivery instructions. Does not modify code or generate media. |
 
 ### Housekeeping
 | Command | What it does |

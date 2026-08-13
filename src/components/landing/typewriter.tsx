@@ -10,11 +10,10 @@ interface TypewriterProps {
   className?: string;
   onComplete?: () => void;
   skipAnimation?: boolean; // if true, show all text immediately (for anchor navigation)
-  /** After typing completes, smoothly tint chars [start, end) to primary color */
+  /** Tint characters in the [start, end) range with the primary color. */
   highlight?: {
     start: number;
     end: number;
-    delay?: number; // ms after completion before color transition (default 300)
   };
 }
 
@@ -43,10 +42,8 @@ export function Typewriter({
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, margin: "-40px" });
   const [shown, setShown] = useState(0);
-  const [highlightActive, setHighlightActive] = useState(false);
   const startedRef = useRef(false);
   const completedRef = useRef(false);
-  const highlightTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Stash onComplete in a ref so it doesn't invalidate the typing effect
   // when the parent re-renders (which would restart typing — bug).
@@ -61,12 +58,15 @@ export function Typewriter({
     startedRef.current = true;
 
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce || skipAnimation) {
+    // An anchor URL is already a navigation destination, never an intro.
+    // Complete every typewriter there immediately so no section appears to
+    // be loading while the browser restores the hash scroll position.
+    const isAnchorNavigation = window.location.hash.length > 0;
+    if (reduce || skipAnimation || isAnchorNavigation) {
       setShown(text.length);
       if (!completedRef.current) {
         completedRef.current = true;
         onCompleteRef.current?.();
-        if (highlight) setHighlightActive(true);
       }
       return;
     }
@@ -87,46 +87,36 @@ export function Typewriter({
       } else if (!completedRef.current) {
         completedRef.current = true;
         onCompleteRef.current?.();
-        if (highlight) {
-          highlightTimerRef.current = setTimeout(
-            () => setHighlightActive(true),
-            highlight.delay ?? 300
-          );
-        }
       }
     };
     raf = requestAnimationFrame(tick);
 
     return () => {
       cancelAnimationFrame(raf);
-      if (highlightTimerRef.current) clearTimeout(highlightTimerRef.current);
     };
   }, [inView, text, speed, delay, skipAnimation]); // intentionally NOT depending on onComplete / highlight
 
   const done = shown >= text.length;
 
-  // Render visible portion — split around the highlight range when done
+  // Split the visible text around the highlight range so the accent is
+  // consistent during the typewriter reveal and once it has completed.
   const renderVisible = () => {
-    if (!highlight || !done) {
+    if (!highlight) {
       return <span aria-hidden>{text.slice(0, shown)}</span>;
     }
+
     const { start, end } = highlight;
+    const highlightEnd = Math.min(end, shown);
+
     return (
       <span aria-hidden>
-        {text.slice(0, start)}
-        <span
-          style={{
-            transition:
-              "color 0.9s cubic-bezier(0.16, 1, 0.3, 1), text-shadow 0.9s cubic-bezier(0.16, 1, 0.3, 1)",
-            color: highlightActive ? "var(--color-primary)" : "inherit",
-            textShadow: highlightActive
-              ? "0 0 32px rgba(124,92,255,0.45)"
-              : "0 0 0px transparent",
-          }}
-        >
-          {text.slice(start, end)}
-        </span>
-        {text.slice(end)}
+        {text.slice(0, Math.min(start, shown))}
+        {shown > start && (
+          <span className="text-primary transition-colors duration-700">
+            {text.slice(start, highlightEnd)}
+          </span>
+        )}
+        {text.slice(Math.max(start, highlightEnd), shown)}
       </span>
     );
   };
