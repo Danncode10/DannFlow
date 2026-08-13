@@ -29,7 +29,7 @@ export async function createClient() {
 
 // Service-role client for public reads that must work without a user session
 // (e.g. generateStaticParams at build time). Bypasses RLS — only use for
-// queries that are already scoped (app_id + is_published) and never expose
+// queries that return published public content only and never expose
 // the service key to the client.
 export function createAdminClient() {
   return createSupabaseClient(

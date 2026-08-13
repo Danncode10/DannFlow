@@ -8,14 +8,11 @@
 
 import { createClient } from "@/utils/supabase/client";
 
-const APP_ID = process.env.NEXT_PUBLIC_APP_ID ?? "business-template";
 const BUCKET  = "blog-images";
 const MAX_PX  = 1200;   // longest edge target
 const QUALITY = 0.82;   // JPEG quality (0–1)
 
-// This bucket is shared across every Dannflow business on a free Supabase
-// storage tier (1 GB total) — keeping each post's images small protects
-// everyone's quota, not just this app's.
+// Keeping each post's images small protects this project's storage quota.
 export const MAX_POST_IMAGES_KB = 2 * 1024; // 2 MB of images per blog post
 
 export interface UploadResult {
@@ -28,7 +25,7 @@ export interface UploadResult {
 
 const PUBLIC_URL_MARKER = `/storage/v1/object/public/${BUCKET}/`;
 
-/** Recovers the storage path (e.g. "business-template/123-abc.jpg") from a public URL. */
+/** Recovers the storage path (e.g. "123-abc.jpg") from a public URL. */
 export function extractBlogImagePath(url: string): string | null {
   const idx = url.indexOf(PUBLIC_URL_MARKER);
   if (idx === -1) return null;
@@ -52,7 +49,7 @@ export async function getBlogImageUsageKb(urls: (string | null | undefined)[]): 
   if (!paths.length) return 0;
 
   const supabase = createClient();
-  const { data } = await supabase.storage.from(BUCKET).list(APP_ID, { limit: 1000 });
+  const { data } = await supabase.storage.from(BUCKET).list("", { limit: 1000 });
   if (!data) return 0;
 
   const sizeByName = new Map(data.map(f => [f.name, f.metadata?.size ?? 0]));
@@ -140,7 +137,7 @@ export function dataUrlSizeKb(dataUrl: string): number {
 export async function uploadDataUrl(dataUrl: string): Promise<UploadResult> {
   const blob = await (await fetch(dataUrl)).blob();
   const rand = Math.random().toString(36).slice(2, 8);
-  const path = `${APP_ID}/${Date.now()}-${rand}.jpg`;
+  const path = `${Date.now()}-${rand}.jpg`;
 
   const supabase = createClient();
   const { error } = await supabase.storage
@@ -176,9 +173,9 @@ export async function uploadBlogImage(
   }
   onProgress?.(40);
 
-  // 2. Unique path: app-id/timestamp-randomhex.jpg
+  // 2. Unique path: timestamp-randomhex.jpg
   const rand = Math.random().toString(36).slice(2, 8);
-  const path = `${APP_ID}/${Date.now()}-${rand}.jpg`;
+  const path = `${Date.now()}-${rand}.jpg`;
 
   // 3. Upload to Supabase Storage
   const supabase = createClient();

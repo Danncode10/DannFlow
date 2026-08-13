@@ -6,6 +6,8 @@ single-use link and honors the redirect URL sent by the application.
 
 ## Install
 
+`/setup-auth` uses this guide after it confirms the product's auth choices. It does not copy HTML into Supabase automatically.
+
 1. In Supabase, open **Authentication > Emails > Templates**.
 2. Select **Confirm sign up**.
 3. Keep the subject as `Confirm your DannFlow email`.
@@ -24,3 +26,4 @@ single-use link and honors the redirect URL sent by the application.
   - `http://localhost:3000/reset-password`
 - Send a new test email after saving. Auth links are single-use and old emails
   cannot verify a newly changed configuration.
+- Test confirmation and password-reset delivery using an inbox you control before marking the auth setup task complete.

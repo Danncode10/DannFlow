@@ -12,7 +12,7 @@ Scan the `.claude/commands/` directory and cross-reference command metadata agai
 1. **Scan .claude/commands/ directory (top level only)** — for each `.md` file directly in `.claude/commands/`, extract the command name (filename without extension) and the `description:` field from YAML frontmatter.
    - **Exclude:** `README.md`, every subdirectory, and the three Ruflo files `claude-flow-help.md`, `claude-flow-memory.md`, `claude-flow-swarm.md`.
 
-2. **Cross-reference against claude-workflow.md** — check if each command appears in one of the category tables (Discovery & setup, Security & quality, Supabase workflow, Scaffolding, Housekeeping). Note which commands are missing.
+2. **Cross-reference against claude-workflow.md** — check if each command appears in one of the category tables (Discovery & setup, Security & quality, Supabase workflow, Scaffolding, Housekeeping). Note which commands are missing. Also verify the onboarding order appears consistently: `/new-project` → user-created Kanban Project → `/masterplan-init` → `/make-masterplan <phase>`.
 
 3. **Cross-reference against ./guide.sh** — run `grep -o "/[a-z-]*" ./guide.sh` to extract all exposed commands. Identify any `.md` commands not listed.
 

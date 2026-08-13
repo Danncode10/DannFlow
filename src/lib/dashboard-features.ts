@@ -1,5 +1,3 @@
-import businessConfig from "../../business.json";
-
 export type DashboardTabId =
   | "overview"
   | "services"
@@ -35,16 +33,8 @@ export const TAB_CONFIG: TabConfig[] = [
   { id: "settings",   label: "Settings",   feature: "always" },
 ];
 
-type FeatureMap = Record<FeatureFlag, boolean>;
-
-const features: FeatureMap = {
-  always: true,
-  ...((businessConfig as { features?: Partial<FeatureMap> }).features ?? {}),
-} as FeatureMap;
-
 export function isFeatureEnabled(flag: FeatureFlag): boolean {
-  if (flag === "always") return true;
-  return Boolean(features[flag]);
+  return flag === "always" || flag === "pricing" || flag === "contactForm" || flag === "blog";
 }
 
 export function getEnabledTabs(): TabConfig[] {

@@ -1,6 +1,6 @@
 # 🚀 DannFlow (2026 Edition)
 
-**The AI-agent-optimized SaaS Starter.** Built for AI-assisted development with Claude Code, Codex, Cursor, or Antigravity — Next.js 15+, Supabase, Tailwind v4, Shadcn UI, with auth, dashboard, RLS-first design, and a reusable command system.
+**The AI-agent-optimized SaaS Starter.** Built for AI-assisted development with Claude Code, Codex, Cursor, or Antigravity — Next.js 16, Supabase, Tailwind v4, Shadcn UI, with auth, dashboard, RLS-first design, and a reusable command system.
 
 > **Built for Speed. Structured for Agents. Optimized for the Vibe.**
 
@@ -21,10 +21,9 @@ That's it. The installer:
 1. Asks for your app name
 2. Clones DannFlow into a new folder
 3. Installs npm dependencies + `.env.local`
-4. Installs Ruflo globally + registers its MCP server
-5. Runs the Ruflo init wizard
-6. Installs 8 skill packs (design, SEO, marketing, accessibility)
-7. Runs `guide.sh init` to rebrand the project to your app name
+4. Installs Ruflo globally (run its init wizard separately when you choose to use Ruflo)
+5. Installs 8 skill packs (design, SEO, marketing, accessibility)
+6. Runs `guide.sh init` to rebrand the project to your app name
 
 **Windows?** Use WSL or Git Bash and run the same command. Or use the PowerShell version:
 ```powershell
@@ -33,19 +32,53 @@ powershell -ExecutionPolicy Bypass -Command "iex (irm https://raw.githubusercont
 
 ---
 
-## 🗺️ After Install — 5 Steps to Make It Yours
+## 🗺️ Build Your SaaS — The Order
 
-Run these **once** in Claude Code after the installer finishes:
+Follow these stages in order. Configure the **GitHub MCP** and **Supabase MCP** before Stage 2; they let the commands verify Supabase and connect your work to GitHub Projects. See [MCP setup](docs/dannflow_docs/mcp-setup.md).
 
-```
-1. Edit README.md          → describe YOUR project (Claude reads this first)
-2. /init-claude            → rewrites CLAUDE.md + SKILLS.md to match your project
-3. Fill PROJECT_CONTEXT.md → audience, stack decisions, design rules, anti-decisions
-4. /ruflo-upgrade          → adds memory + parallel-agent patterns to commands
-5. /no-conflict            → verify docs and code are in sync
-```
+> A command written as `/command` runs directly in Claude Code. In Codex, run the same command as `/claude-command command`.
 
-Then start building:
+1. Install DannFlow
+
+   ```bash
+   curl -sSL https://raw.githubusercontent.com/Danncode10/DannFlow/main/install.sh | bash
+   ```
+
+   This creates your local DannFlow project, installs dependencies, copies `.env.local`, and applies your app name. On Windows, use WSL or Git Bash with the same command, or the PowerShell command in [Quick Start](#-quick-start).
+
+2. Describe and connect your SaaS — `/new-project`
+
+   ```text
+   /new-project
+   ```
+
+   This captures what you are building, updates the project identity and context, connects the GitHub repository and dedicated Supabase project, applies tracked database migrations, and verifies the database/types are ready.
+
+3. Create your GitHub Project — Kanban/Board layout
+
+   Create the Project yourself in GitHub. Use a Kanban/Board layout with these Status values: `Backlog`, `Ready`, `In progress`, and `Done`.
+
+   This is the visual execution board for real task Issues. DannFlow does not create a Project or use draft cards for you.
+
+4. Initialize the masterplan — `/masterplan-init`
+
+   ```text
+   /masterplan-init
+   ```
+
+   This detects that `/new-project` has finished, finds and connects your existing GitHub Project, creates a detailed Phase 0 in `MASTERPLAN.md`, and syncs each Phase 0 task as a real GitHub Issue on the board. It stops and tells you what to create if it cannot find a suitable Kanban Project.
+
+5. Expand future phases — `/make-masterplan`
+
+   ```text
+   /make-masterplan Phase 1
+   ```
+
+   Use this only when you are ready to plan the next phase. It expands Phase 1 (then Phase 2 through Phase X as needed) without overwriting the completed or active work in Phase 0.
+
+After Stage 4, run `/what-task` to select the first Phase 0 task.
+
+Then start development:
 ```bash
 npm run dev
 ```
@@ -84,7 +117,7 @@ pnpm db:migrate
 
 `pnpm db:generate` writes SQL into `db/migrations/`. `pnpm db:migrate` applies those migrations to Supabase with `DATABASE_URL` and refreshes remote types.
 
-**Want Claude to design the whole site for you?** After the 5 steps, run **`/design-project`** (⭐ on Opus) — it reads your `README` + `business.json` + `PROJECT_CONTEXT`, runs a quick design-taste interview, then designs and builds every section with real copy and a fitting theme, replacing all template placeholders. Spinning up a fresh client/business project from scratch instead? **`/new-project`** does the full Phase-1 scaffold (config + GitHub repo + `origin` repoint + Supabase tenant) before you hand off to `/design-project`.
+**Want Claude to design the whole site for you?** Your detailed Phase 0 will direct you to **`/design-project`** at the right point. It reads your `README`, `PROJECT_CONTEXT`, and code configuration, then designs and builds a bespoke project.
 
 ---
 
@@ -351,7 +384,7 @@ DannFlow commands. The repository also includes additional command packs under
 | `/new-feature <name>` | Scaffold service + page + form |
 | `/review` | Pre-commit lint + typecheck + guardrail check |
 | `/commit` | Stage + draft conventional commit message |
-| `/rls-check` | Audit RLS policies for missing tenant filters |
+| `/rls-check` | Audit RLS policies for missing ownership or admin authorization |
 
 ### Running Claude commands from Codex
 

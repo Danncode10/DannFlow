@@ -57,17 +57,19 @@ Codex uses `.codex/commands/claude-command.md` as a bridge. The source-of-truth 
 | Command | Says |
 |---|---|
 | `/new-project ["name"]` | Starts a new DannFlow project from the starter. |
+| `/masterplan-init` | Links an existing Kanban-style GitHub Project and creates detailed Phase 0 cards for an initialized SaaS. |
+| `/setup-supabase` | Guides hosted Supabase environment, migrations, generated types, and RLS/schema verification. |
+| `/setup-auth` | Guides Supabase Auth, selected OAuth providers, redirects, templates, and smoke tests. |
 | `/business-init` | Captures business/project context. |
 | `/init-claude` | Refreshes Claude project context, skills, and command docs. |
 | `/init-update` | Updates the local DannFlow command/runtime setup. |
 | `/adopt-dannflow [--no-protect\|--force]` | Adopts an existing repo into DannFlow conventions. |
-| `/create-organization` | Helps create or prepare an organization context. |
 
 ### Planning & Task Tracking
 
 | Command | Says |
 |---|---|
-| `/make-masterplan [--project-owner <owner>] [--project-number <number>]` | Creates `MASTERPLAN.md` and linked ordered task cards. |
+| `/make-masterplan <phase> [--project-owner <owner>] [--project-number <number>]` | Expands a later phase and syncs its ordered task cards. |
 | `/update-masterplan [--project-owner <owner>] [--project-number <number>]` | Syncs `MASTERPLAN.md` changes to GitHub Project cards. |
 | `/what-task [--project-owner <owner>] [--project-number <number>]` | Shows current task status, explains why the chosen task matters, and keeps the next backlog task Ready. |
 | `/masterplan-task <task>` | Executes one ordered `MASTERPLAN.md` task. |
@@ -165,12 +167,14 @@ graph TD
   ACC --> ClaudeCommands
 
   Setup["Project Setup"] --> NP["/new-project"]
+  NP --> MPI["Create Kanban Project → /masterplan-init"]
   Setup --> BI["/business-init"]
   Setup --> IC["/init-claude"]
   Setup --> IU["/init-update"]
   Setup --> AD["/adopt-dannflow"]
 
-  Planning["Planning & Tasks"] --> MM["/make-masterplan"]
+  Planning["Planning & Tasks"] --> MPI
+  Planning --> MM["/make-masterplan <phase>"]
   Planning --> UM["/update-masterplan"]
   Planning --> WT["/what-task"]
   Planning --> MT["/masterplan-task"]

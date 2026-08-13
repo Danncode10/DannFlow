@@ -14,26 +14,19 @@ async function getEditorData(id: string) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const [profileRes, postRes] = await Promise.all([
-    supabase.from("profiles").select("organization_id").eq("id", user.id).single(),
-    supabase.from("blog_posts").select("*").eq("id", id).single(),
-  ]);
+  const { data: post, error } = await supabase.from("blog_posts").select("*").eq("id", id).single();
 
-  if (postRes.error || !postRes.data) notFound();
-
-  return {
-    orgId: profileRes.data?.organization_id ?? "",
-    post: postRes.data,
-  };
+  if (error || !post) notFound();
+  return post;
 }
 
 export default async function EditBlogPostPage({ params }: Props) {
   const { id } = await params;
-  const { orgId, post } = await getEditorData(id);
+  const post = await getEditorData(id);
 
   return (
     <QueryProvider>
-      <BlogEditorPage post={post} orgId={orgId} />
+      <BlogEditorPage post={post} />
     </QueryProvider>
   );
 }

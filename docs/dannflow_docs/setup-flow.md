@@ -10,41 +10,33 @@ This document covers every path from "fresh start" to "fully Claude-configured p
 
 What `install.sh` does automatically:
 1. Clones DannFlow → installs npm deps → copies `.env.example` → `.env.local`
-2. Installs Ruflo globally + registers its MCP server with Claude Code
-3. Runs `npx ruflo@latest init wizard` (agent hooks, session config)
-4. Downloads all 8 skill packs (design taste, quality, SEO/marketing)
-5. Runs `./guide.sh init` (rebrand + Git history reset)
+2. Installs Ruflo globally; run `npx ruflo@latest init wizard` separately if you choose to use Ruflo
+3. Downloads all 8 skill packs (design taste, quality, SEO/marketing)
+4. Runs `./guide.sh init` (rebrand + Git history reset)
 
 **What you do after install (in Claude Code):**
 
 ```
-Step 1 — Edit README.md
-  Rewrite the intro to describe YOUR project.
-  Update feature table and project structure.
-  Don't polish it — Claude reads it raw.
+Step 1 — Configure GitHub MCP and Supabase MCP
+  Follow mcp-setup.md and verify the GitHub connection can access Projects.
 
-Step 2 — Run /init-claude
-  Reads README + package.json + src/.
-  Rewrites:
-    CLAUDE.md          ← Claude's project config
-    SKILLS.md          ← which skills are relevant
-    .claude/commands/  ← commands tailored to your stack
+Step 2 — Run /new-project
+  Describe the SaaS, rebrand the repository, connect Supabase, migrate tracked schema,
+  and verify generated types. The non-secret Supabase project reference stays in .env.local.
 
-Step 3 — Fill in PROJECT_CONTEXT.md
-  Add: audience, stack decisions, design rules, anti-decisions.
-  Skills and commands read this file.
-  Never edit skill files directly — put project context here.
+Step 3 — Create a GitHub Project yourself
+  Choose Kanban/Board layout (not Draft) and add Status values:
+  Backlog, Ready, In progress, Done.
 
-Step 4 — Run /ruflo-upgrade
-  Adds memory + parallel-agent patterns to 12 core commands.
-  Safe to re-run after any /init-update.
+Step 4 — Run /masterplan-init
+  Detects the initialized SaaS, links the existing Kanban Project, creates detailed
+  Phase 0, and syncs Phase 0 cards. It stops safely if it cannot find a suitable board.
 
-Step 5 — Run /no-conflict
-  Verifies all docs and code are in sync.
-  Fix any drift before you start building.
+Step 5 — Run /what-task
+  Choose the first Phase 0 task. Expand Phase 1 later with /make-masterplan Phase 1.
 ```
 
-**Total time:** ~5 minutes. After that, `/ask-command <what you want>` to start building.
+After initialization, use `/what-task` to start the current Phase 0 work. `/make-masterplan` is for expanding later phases, not creating the initial plan.
 
 ---
 
@@ -181,11 +173,11 @@ Instead: put project-specific context in `PROJECT_CONTEXT.md`. All skills and co
 ```bash
 # New project
 curl -sSL .../install.sh | bash
-# → then /init-claude → PROJECT_CONTEXT.md → /ruflo-upgrade → /no-conflict
+# → configure GitHub + Supabase MCP → /new-project → create Kanban Project → /masterplan-init
 
-# Existing project
+# Existing project after its product context is complete
 curl -sSL .../install-add.sh | bash
-# → then /init-claude → PROJECT_CONTEXT.md → /ruflo-upgrade → /no-conflict
+# → then /init-claude → configure required MCPs → create Kanban Project → /masterplan-init
 
 # After any update
 /init-update → /ruflo-upgrade → /no-conflict

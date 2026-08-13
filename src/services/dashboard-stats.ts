@@ -2,8 +2,6 @@
 
 import { createClient } from "@/utils/supabase/server";
 
-const APP_ID = process.env.NEXT_PUBLIC_APP_ID ?? "business-template";
-
 export async function getDashboardStats() {
   const supabase = await createClient();
   const today = new Date();
@@ -18,12 +16,12 @@ export async function getDashboardStats() {
     newLeadsRes,
     galleryPublishedRes,
   ] = await Promise.all([
-    supabase.from("services").select("*", { count: "exact", head: true }).eq("app_id", APP_ID).eq("is_published", true),
-    supabase.from("leads").select("*", { count: "exact", head: true }).eq("app_id", APP_ID).gte("created_at", todayIso),
-    supabase.from("bookings").select("*", { count: "exact", head: true }).eq("app_id", APP_ID),
-    supabase.from("bookings").select("*", { count: "exact", head: true }).eq("app_id", APP_ID).eq("status", "pending"),
-    supabase.from("leads").select("*", { count: "exact", head: true }).eq("app_id", APP_ID).eq("status", "new"),
-    supabase.from("gallery_items").select("*", { count: "exact", head: true }).eq("app_id", APP_ID).eq("is_published", true),
+    supabase.from("services").select("*", { count: "exact", head: true }).eq("is_published", true),
+    supabase.from("leads").select("*", { count: "exact", head: true }).gte("created_at", todayIso),
+    supabase.from("bookings").select("*", { count: "exact", head: true }),
+    supabase.from("bookings").select("*", { count: "exact", head: true }).eq("status", "pending"),
+    supabase.from("leads").select("*", { count: "exact", head: true }).eq("status", "new"),
+    supabase.from("gallery_items").select("*", { count: "exact", head: true }).eq("is_published", true),
   ]);
 
   return {
@@ -41,7 +39,6 @@ export async function getRecentActivity(limit = 10) {
   const { data, error } = await supabase
     .from("audit_logs")
     .select("id, action, resource_type, resource_id, actor_email, diff, created_at")
-    .eq("app_id", APP_ID)
     .order("created_at", { ascending: false })
     .limit(limit);
   if (error) return [];

@@ -125,7 +125,7 @@ Scan the file content for signals that it's project-specific:
 
 **Business-specific signals (classify as 🔒 KEEP LOCAL):**
 - Hardcoded domain names, brand names, or client names
-- References to `siteConfig`, `organization_id`, tenant names
+- References to `siteConfig`, project-specific names
 - MASTERPLAN.md task references or project-specific phase names
 - Supabase project IDs or keys
 - References to specific client verticals (restaurant, realtor, etc.)

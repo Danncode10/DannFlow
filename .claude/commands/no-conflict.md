@@ -8,7 +8,7 @@ Scan the codebase and documentation to identify conflicts: mismatched technology
 Use `--fix` to automatically remediate conflicts (after confirmation):
 - Replace hardcoded colors with semantic tokens in auth pages
 - Update README with missing env vars documentation
-- Fix version mismatches (e.g., Next.js 15+ → 16+)
+- Fix version mismatches (e.g., Next.js 16 → a different installed version)
 - Add missing folders to project structure docs
 - Clean up outdated references
 
@@ -67,7 +67,7 @@ Without `--fix`, reports findings only (read-only audit).
 🔍 Conflict Audit Report
 
 Technology Versions
-  ✅ Next.js: 15+ (package.json: 15.x, README: "Next.js 15+") — MATCH
+  ✅ Next.js: 16 (package.json: 16.x, README: "Next.js 16") — MATCH
   ❌ Tailwind CSS: v4 claimed (package.json: ^4.0, README: "Tailwind v4") — VERSION MISMATCH
   ⚠️ Node.js: README silent, package.json "engines": "18.x" — UNDOCUMENTED
 

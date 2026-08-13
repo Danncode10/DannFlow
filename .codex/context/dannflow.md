@@ -1,6 +1,6 @@
 # DannFlow Notes for Codex
 
-DannFlow is a Next.js 15+, React 19, Supabase, Tailwind v4, Shadcn/UI starter
+DannFlow is a Next.js 16, React 19, Supabase, Tailwind v4, Shadcn/UI starter
 optimized for AI-assisted development.
 
 ## Operating Order
@@ -15,7 +15,7 @@ optimized for AI-assisted development.
 ## Database Discipline
 
 Assume RLS is active on every table. Service queries must include explicit user,
-tenant, or ownership filters unless the endpoint is intentionally public.
+ownership filters when the table has an ownership column unless the endpoint is intentionally public.
 
 Before schema-sensitive work:
 

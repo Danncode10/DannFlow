@@ -38,7 +38,7 @@ Rules:
 - Tables, columns, indexes, enums, and relations belong in `db/schema/*.ts`.
 - Split large domains into focused files and re-export from `db/schema/index.ts`.
 - Never edit `src/types/supabase.ts` manually.
-- New tables must include tenant/ownership columns consistent with the existing app model.
+- New tables must include only the ownership columns required by their actual access model.
 
 ### Step 4 — Generate and review SQL
 
