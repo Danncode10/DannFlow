@@ -147,7 +147,7 @@ export function Hero({ isAuthed }: HeroProps) {
             delay={200}
             onComplete={handleTypingComplete}
             skipAnimation={typingDone}
-            highlight={{ start: 4, end: 21, delay: 350 }}
+            highlight={{ start: 4, end: 21 }}
           />
         </h1>
 
