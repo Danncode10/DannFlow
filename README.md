@@ -21,10 +21,9 @@ That's it. The installer:
 1. Asks for your app name
 2. Clones DannFlow into a new folder
 3. Installs npm dependencies + `.env.local`
-4. Installs Ruflo globally + registers its MCP server
-5. Installs Ruflo globally (run its init wizard separately when you choose to use Ruflo)
-6. Installs 8 skill packs (design, SEO, marketing, accessibility)
-7. Runs `guide.sh init` to rebrand the project to your app name
+4. Installs Ruflo globally (run its init wizard separately when you choose to use Ruflo)
+5. Installs 8 skill packs (design, SEO, marketing, accessibility)
+6. Runs `guide.sh init` to rebrand the project to your app name
 
 **Windows?** Use WSL or Git Bash and run the same command. Or use the PowerShell version:
 ```powershell
@@ -33,21 +32,51 @@ powershell -ExecutionPolicy Bypass -Command "iex (irm https://raw.githubusercont
 
 ---
 
-## 🗺️ After Install — Initialize Your SaaS
+## 🗺️ Build Your SaaS — The Order
 
-Before starting a new SaaS, configure the **GitHub MCP** and **Supabase MCP**. They let DannFlow verify the hosted database and synchronize work with your GitHub Project. See [MCP setup](docs/dannflow_docs/mcp-setup.md).
+Follow these stages in order. Configure the **GitHub MCP** and **Supabase MCP** before Stage 2; they let the commands verify Supabase and connect your work to GitHub Projects. See [MCP setup](docs/dannflow_docs/mcp-setup.md).
 
-Then use this order in Claude Code (or Codex through `/claude-command`):
+> A command written as `/command` runs directly in Claude Code. In Codex, run the same command as `/claude-command command`.
 
-```
-1. /new-project             → describe the SaaS, rebrand it, connect its repository and Supabase project
-2. Create a GitHub Project  → choose Kanban/Board layout; add Backlog, Ready, In progress, Done statuses
-3. /masterplan-init         → detects the initialized SaaS, links the existing board, writes detailed Phase 0, and syncs cards
-4. /what-task               → select the first Phase 0 task
-5. /make-masterplan Phase 1 → expand later phases only when ready
-```
+1. Install DannFlow
 
-`/masterplan-init` never creates a GitHub Project or draft board. If it cannot find a linked board, it tells you to create the Kanban Project first and then rerun the command.
+   ```bash
+   curl -sSL https://raw.githubusercontent.com/Danncode10/DannFlow/main/install.sh | bash
+   ```
+
+   This creates your local DannFlow project, installs dependencies, copies `.env.local`, and applies your app name. On Windows, use WSL or Git Bash with the same command, or the PowerShell command in [Quick Start](#-quick-start).
+
+2. Describe and connect your SaaS — `/new-project`
+
+   ```text
+   /new-project
+   ```
+
+   This captures what you are building, updates the project identity and context, connects the GitHub repository and dedicated Supabase project, applies tracked database migrations, and verifies the database/types are ready.
+
+3. Create your GitHub Project — Kanban/Board layout
+
+   Create the Project yourself in GitHub. Use a Kanban/Board layout with these Status values: `Backlog`, `Ready`, `In progress`, and `Done`.
+
+   This is the visual execution board for real task Issues. DannFlow does not create a Project or use draft cards for you.
+
+4. Initialize the masterplan — `/masterplan-init`
+
+   ```text
+   /masterplan-init
+   ```
+
+   This detects that `/new-project` has finished, finds and connects your existing GitHub Project, creates a detailed Phase 0 in `MASTERPLAN.md`, and syncs each Phase 0 task as a real GitHub Issue on the board. It stops and tells you what to create if it cannot find a suitable Kanban Project.
+
+5. Expand future phases — `/make-masterplan`
+
+   ```text
+   /make-masterplan Phase 1
+   ```
+
+   Use this only when you are ready to plan the next phase. It expands Phase 1 (then Phase 2 through Phase X as needed) without overwriting the completed or active work in Phase 0.
+
+After Stage 4, run `/what-task` to select the first Phase 0 task.
 
 Then start development:
 ```bash

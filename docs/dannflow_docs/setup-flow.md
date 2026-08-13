@@ -10,10 +10,9 @@ This document covers every path from "fresh start" to "fully Claude-configured p
 
 What `install.sh` does automatically:
 1. Clones DannFlow → installs npm deps → copies `.env.example` → `.env.local`
-2. Installs Ruflo globally + registers its MCP server with Claude Code
-3. Installs Ruflo globally; run `npx ruflo@latest init wizard` separately if you choose to use Ruflo
-4. Downloads all 8 skill packs (design taste, quality, SEO/marketing)
-5. Runs `./guide.sh init` (rebrand + Git history reset)
+2. Installs Ruflo globally; run `npx ruflo@latest init wizard` separately if you choose to use Ruflo
+3. Downloads all 8 skill packs (design taste, quality, SEO/marketing)
+4. Runs `./guide.sh init` (rebrand + Git history reset)
 
 **What you do after install (in Claude Code):**
 
