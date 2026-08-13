@@ -112,11 +112,21 @@ export type Database = {
           cover_image_url: string | null
           created_at: string
           excerpt: string | null
+          facebook_caption: string | null
           id: string
+          image_alt_text: string | null
+          image_caption: string | null
+          internal_links: string | null
           is_published: boolean
           organization_id: string | null
+          pexels_credit_url: string | null
+          pre_publish_warnings: string | null
+          primary_keyword: string | null
           published_at: string | null
+          reddit_discussion_prompt: string | null
+          search_intent: string | null
           seo_description: string | null
+          seo_quality_score: number | null
           seo_title: string | null
           slug: string
           title: string
@@ -128,11 +138,21 @@ export type Database = {
           cover_image_url?: string | null
           created_at?: string
           excerpt?: string | null
+          facebook_caption?: string | null
           id?: string
+          image_alt_text?: string | null
+          image_caption?: string | null
+          internal_links?: string | null
           is_published?: boolean
           organization_id?: string | null
+          pexels_credit_url?: string | null
+          pre_publish_warnings?: string | null
+          primary_keyword?: string | null
           published_at?: string | null
+          reddit_discussion_prompt?: string | null
+          search_intent?: string | null
           seo_description?: string | null
+          seo_quality_score?: number | null
           seo_title?: string | null
           slug: string
           title: string
@@ -144,11 +164,21 @@ export type Database = {
           cover_image_url?: string | null
           created_at?: string
           excerpt?: string | null
+          facebook_caption?: string | null
           id?: string
+          image_alt_text?: string | null
+          image_caption?: string | null
+          internal_links?: string | null
           is_published?: boolean
           organization_id?: string | null
+          pexels_credit_url?: string | null
+          pre_publish_warnings?: string | null
+          primary_keyword?: string | null
           published_at?: string | null
+          reddit_discussion_prompt?: string | null
+          search_intent?: string | null
           seo_description?: string | null
+          seo_quality_score?: number | null
           seo_title?: string | null
           slug?: string
           title?: string

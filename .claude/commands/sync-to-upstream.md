@@ -16,6 +16,19 @@ Because your project has **rewritten git history** (via `guide.sh init`), you ca
 
 Strict output rule: `/sync-to-upstream` must end with either a GitHub PR URL or a clear blocker explaining why a PR could not be created. Do not present email patching or "patch saved for later" as a successful final output.
 
+## Non-negotiable target repo rule
+
+This command is only for contributing reusable template changes to **DannFlow upstream**.
+
+- The PR target must be the repo in `dannflow.json.repo`, normally `https://github.com/Danncode10/DannFlow`.
+- The PR base must be DannFlow's upstream branch, normally `main`.
+- Never open the PR against the current project repo's `origin` (for example, a client or app repo). The project repo is the source of candidate changes only, not the PR target.
+- If the user's wording says "PR this branch" while invoking or referencing `/sync-to-upstream`, interpret that as "extract upstream-safe changes from this branch into a clean DannFlow branch." Do not create a normal PR from the current branch.
+- Before creating any PR, print both repositories:
+  - `Source project: <origin remote>`
+  - `Target upstream: <dannflow.json.repo or upstream remote>`
+  If these are the same repo, stop and explain that `/sync-to-upstream` requires a project repo plus a separate DannFlow upstream.
+
 ---
 
 ## Argument parsing
@@ -301,10 +314,18 @@ Proceed directly with the PR flow unless a required tool or permission is missin
    https://github.com/Danncode10/DannFlow/compare/<branch-name>
    ```
 
+   Before opening the PR, verify the target one final time:
+   ```bash
+   gh repo view --json nameWithOwner
+   git remote get-url origin
+   ```
+   The repository must be the DannFlow clean clone. If the repo is still the source project, stop immediately. Do not create an app-repo PR and do not treat that as a successful `/sync-to-upstream` run.
+
 ---
 
 ## Safety rules
 
+- **Never** create a PR in the source project repo when running `/sync-to-upstream`; only DannFlow upstream is valid.
 - **Never** `git push` without asking first.
 - **Never** push to `main` or `upstream/main`. Always a feature branch.
 - **Never** finish successfully without a PR URL. A compare URL is only a blocker/fallback that still needs user action.

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef, useEffect, useMemo } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEditor, EditorContent } from "@tiptap/react";
 import { DOMParser as PMDOMParser } from "@tiptap/pm/model";
@@ -17,7 +18,7 @@ import {
   Bold, Italic, Code, List, ListOrdered, Quote, AlignLeft,
   Heading1, Heading2, Heading3, ImageIcon, PlayCircle,
   EyeOff, Check, X, Upload, Table2, ChevronDown,
-  Undo2, Redo2, Trash2,
+  Undo2, Redo2, Trash2, Search, AlertCircle, Send, ExternalLink,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -64,6 +65,73 @@ function localImageUsageKb(coverUrl: string, contentHtml: string): number {
     if (isDataUrl(u)) kb += dataUrlSizeKb(u);
   }
   return kb;
+}
+
+function plainTextFromHtml(html: string): string {
+  return html
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function countContentInternalLinks(contentHtml: string): number {
+  const matches = contentHtml.match(/href=["']\/(?!\/)[^"']+/g);
+  return matches?.length ?? 0;
+}
+
+function countPlannedInternalLinks(value: string): number {
+  return value
+    .split(/\n|,/)
+    .map(item => item.trim())
+    .filter(item => item.startsWith("/")).length;
+}
+
+type SeoAnalysis = {
+  score: number;
+  warnings: string[];
+};
+
+type SocialPlatform = "facebook" | "reddit";
+
+type SocialLinks = Partial<Record<SocialPlatform, string>>;
+
+function analyzeSeo(form: FormState, wordCount: number): SeoAnalysis {
+  const warnings: string[] = [];
+  let score = 100;
+  const contentText = plainTextFromHtml(form.content);
+  const seoTitleLength = (form.seo_title || form.title).trim().length;
+  const descriptionLength = (form.seo_description || form.excerpt).trim().length;
+  const h2Count = (form.content.match(/<h2[\s>]/gi) ?? []).length;
+  const internalLinkCount = countContentInternalLinks(form.content) + countPlannedInternalLinks(form.internal_links);
+  const keyword = form.primary_keyword.trim().toLowerCase();
+
+  const addWarning = (message: string, penalty: number) => {
+    warnings.push(message);
+    score -= penalty;
+  };
+
+  if (!form.title.trim()) addWarning("Add a clear article title.", 10);
+  if (seoTitleLength < 35 || seoTitleLength > 60) addWarning("Keep the SEO title between 35 and 60 characters.", 8);
+  if (descriptionLength < 120 || descriptionLength > 160) addWarning("Write a unique meta description between 120 and 160 characters.", 10);
+  if (!form.primary_keyword.trim()) addWarning("Set one primary keyword or long-tail phrase.", 8);
+  if (!form.search_intent.trim()) addWarning("Describe the search intent this post answers.", 8);
+  if (wordCount < 700) addWarning("Expand the article with practical detail; aim for at least 700 words.", 8);
+  if (h2Count < 2) addWarning("Use at least two H2 sections so readers and search engines can scan it.", 7);
+  if (!form.cover_image_url) addWarning("Add a relevant cover image near the article topic.", 8);
+  if (form.cover_image_url && !form.image_alt_text.trim()) addWarning("Add descriptive cover image alt text.", 8);
+  if (form.cover_image_url && !form.image_caption.trim()) addWarning("Add an image caption that explains the image context.", 5);
+  if (form.cover_image_url && !form.pexels_credit_url.trim()) addWarning("Add the Pexels source URL for attribution tracking.", 4);
+  if (internalLinkCount < 1) addWarning("Add at least one internal link to a related site page or blog post.", 8);
+  if (!form.facebook_caption.trim()) addWarning("Draft a Facebook caption for launch promotion.", 3);
+  if (!form.reddit_discussion_prompt.trim()) addWarning("Draft a Reddit discussion prompt for community-safe promotion.", 3);
+  if (keyword && !contentText.toLowerCase().includes(keyword)) addWarning("Use the primary keyword naturally in the article body.", 5);
+
+  return {
+    score: Math.max(0, Math.min(100, score)),
+    warnings,
+  };
 }
 
 // ─── Cover Upload ─────────────────────────────────────────────────────────────
@@ -133,7 +201,7 @@ function CoverUpload({ url, onChange, budget, compact = false }: CoverUploadProp
         <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={onInputChange} />
         {url ? (
           <div className="relative group rounded-lg overflow-hidden aspect-video bg-muted">
-            <img src={url} alt="cover" className="w-full h-full object-cover" />
+            <Image src={url} alt="cover" fill unoptimized className="object-cover" />
             <div className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity bg-background/60 backdrop-blur-sm">
               <button onClick={() => inputRef.current?.click()} className="px-2.5 py-1.5 rounded-lg bg-card border border-border text-foreground text-[11px] hover:bg-muted transition-colors">Replace</button>
               <button onClick={handleRemove} className="p-1.5 rounded-lg bg-card border border-border text-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"><X className="w-3.5 h-3.5" /></button>
@@ -179,7 +247,7 @@ function CoverUpload({ url, onChange, budget, compact = false }: CoverUploadProp
           onDragOver={e => e.preventDefault()}
           onClick={() => inputRef.current?.click()}
         >
-          <img src={url} alt="cover" className="w-full h-full object-cover" />
+          <Image src={url} alt="cover" fill unoptimized className="object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-muted via-transparent to-transparent" />
           {/* Hover overlay */}
           <div className="absolute inset-0 flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity bg-background/50 backdrop-blur-sm">
@@ -461,10 +529,10 @@ function Sep() {
 }
 
 function Toolbar({ editor, budget }: { editor: ReturnType<typeof useEditor>; budget: ImageBudget }) {
-  if (!editor) return null;
-
   const imgInputRef = useRef<HTMLInputElement>(null);
   const [imgUploading, setImgUploading] = useState(false);
+
+  if (!editor) return null;
 
   const handleInlineImageFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -545,13 +613,19 @@ function Toolbar({ editor, budget }: { editor: ReturnType<typeof useEditor>; bud
 // ─── Settings Panel ───────────────────────────────────────────────────────────
 
 function SettingsPanel({
-  form, onChange, isPublished, wordCount, budget,
+  form, onChange, isPublished, wordCount, budget, seoAnalysis, socialLinks,
+  publicBlogUrl, onPostSocial, socialPending,
 }: {
   form: FormState;
   onChange: (f: Partial<FormState>) => void;
   isPublished: boolean;
   wordCount: number;
   budget: ImageBudget;
+  seoAnalysis: SeoAnalysis;
+  socialLinks: SocialLinks;
+  publicBlogUrl: string;
+  onPostSocial: (platform: SocialPlatform) => void;
+  socialPending: boolean;
 }) {
   const inputCls = "w-full bg-muted border border-border rounded-lg px-3 py-2 text-[13px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-ring transition-colors resize-none";
 
@@ -567,12 +641,77 @@ function SettingsPanel({
         <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest mb-3">Status</p>
         <div className={cn(
           "flex items-center gap-2 px-3 py-2 rounded-lg text-[13px] font-medium border border-border",
-          isPublished ? "bg-muted text-emerald-400" : "bg-muted text-muted-foreground"
+          isPublished ? "bg-muted text-primary" : "bg-muted text-muted-foreground"
         )}>
           {isPublished ? <Globe className="w-3.5 h-3.5 shrink-0" /> : <FileText className="w-3.5 h-3.5 shrink-0" />}
           {isPublished ? "Published" : "Draft"}
         </div>
         <p className="text-[11px] text-muted-foreground mt-2">{wordCount} words</p>
+      </div>
+
+      {/* Social publishing */}
+      <div className="p-4 space-y-3">
+        <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">Social Publishing</p>
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            onClick={() => onPostSocial("facebook")}
+            disabled={!isPublished || socialPending}
+            className="min-h-12 inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-muted px-3 py-2 text-[12px] font-medium text-foreground hover:bg-background transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {socialPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
+            Facebook
+          </button>
+          <button
+            type="button"
+            onClick={() => onPostSocial("reddit")}
+            disabled={!isPublished || socialPending}
+            className="min-h-12 inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-muted px-3 py-2 text-[12px] font-medium text-foreground hover:bg-background transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {socialPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
+            Reddit
+          </button>
+        </div>
+        {!isPublished && (
+          <p className="text-[11px] leading-relaxed text-muted-foreground">
+            Publish the blog first, then post it to Facebook or Reddit.
+          </p>
+        )}
+        {isPublished && (
+          <div className="grid grid-cols-1 gap-2">
+            <a
+              href={publicBlogUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="min-h-10 inline-flex items-center justify-center gap-2 rounded-lg border border-border px-3 py-2 text-[12px] text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              View Blog
+            </a>
+            {socialLinks.facebook && (
+              <a
+                href={socialLinks.facebook}
+                target="_blank"
+                rel="noreferrer"
+                className="min-h-10 inline-flex items-center justify-center gap-2 rounded-lg border border-border px-3 py-2 text-[12px] text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+              >
+                <ExternalLink className="w-3.5 h-3.5" />
+                View Facebook Post
+              </a>
+            )}
+            {socialLinks.reddit && (
+              <a
+                href={socialLinks.reddit}
+                target="_blank"
+                rel="noreferrer"
+                className="min-h-10 inline-flex items-center justify-center gap-2 rounded-lg border border-border px-3 py-2 text-[12px] text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+              >
+                <ExternalLink className="w-3.5 h-3.5" />
+                View Reddit Post
+              </a>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Slug */}
@@ -600,17 +739,50 @@ function SettingsPanel({
         />
       </div>
 
+      {/* Image SEO */}
+      <div className="p-4 space-y-3">
+        <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">Image SEO</p>
+        <div>
+          <label className="block text-[11px] text-muted-foreground mb-1.5">Image Alt Text</label>
+          <input
+            value={form.image_alt_text}
+            onChange={e => onChange({ image_alt_text: e.target.value })}
+            placeholder="Describe the cover image and its article context"
+            className={inputCls}
+          />
+        </div>
+        <div>
+          <label className="block text-[11px] text-muted-foreground mb-1.5">Image Caption</label>
+          <textarea
+            value={form.image_caption}
+            onChange={e => onChange({ image_caption: e.target.value })}
+            rows={2}
+            placeholder="Short caption shown below the cover image"
+            className={inputCls}
+          />
+        </div>
+        <div>
+          <label className="block text-[11px] text-muted-foreground mb-1.5">Pexels Credit URL</label>
+          <input
+            value={form.pexels_credit_url}
+            onChange={e => onChange({ pexels_credit_url: e.target.value })}
+            placeholder="https://www.pexels.com/photo/..."
+            className={inputCls}
+          />
+        </div>
+      </div>
+
       {/* Image budget */}
       <div className="p-4">
         <div className="flex items-center justify-between mb-2">
           <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">Image Storage</label>
-          <span className={cn("text-[11px]", nearLimit ? "text-amber-400" : "text-muted-foreground")}>
+          <span className={cn("text-[11px]", nearLimit ? "text-primary" : "text-muted-foreground")}>
             {(usedKb / 1024).toFixed(2)} / {(MAX_POST_IMAGES_KB / 1024).toFixed(0)} MB
           </span>
         </div>
         <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
           <div
-            className={cn("h-full rounded-full transition-all duration-300", nearLimit ? "bg-amber-400" : "bg-primary")}
+            className={cn("h-full rounded-full transition-all duration-300", nearLimit ? "bg-primary" : "bg-primary")}
             style={{ width: `${usedPct}%` }}
           />
         </div>
@@ -644,7 +816,7 @@ function SettingsPanel({
             className={inputCls}
           />
           <div className="flex justify-end mt-1">
-            <span className={cn("text-[10px]", form.seo_title.length > 55 ? "text-amber-400" : "text-muted-foreground")}>
+            <span className={cn("text-[10px]", form.seo_title.length > 55 ? "text-primary" : "text-muted-foreground")}>
               {form.seo_title.length}/60
             </span>
           </div>
@@ -660,11 +832,99 @@ function SettingsPanel({
             className={inputCls}
           />
           <div className="flex justify-end mt-1">
-            <span className={cn("text-[10px]", form.seo_description.length > 150 ? "text-emerald-400" : form.seo_description.length > 0 ? "text-amber-400" : "text-muted-foreground")}>
+            <span className={cn("text-[10px]", form.seo_description.length > 150 ? "text-primary" : form.seo_description.length > 0 ? "text-primary" : "text-muted-foreground")}>
               {form.seo_description.length}/160
             </span>
           </div>
         </div>
+        <div>
+          <label className="block text-[11px] text-muted-foreground mb-1.5">Primary Keyword</label>
+          <input
+            value={form.primary_keyword}
+            onChange={e => onChange({ primary_keyword: e.target.value })}
+            placeholder="e.g. small business booking checklist"
+            className={inputCls}
+          />
+        </div>
+        <div>
+          <label className="block text-[11px] text-muted-foreground mb-1.5">Search Intent</label>
+          <textarea
+            value={form.search_intent}
+            onChange={e => onChange({ search_intent: e.target.value })}
+            rows={2}
+            placeholder="What exact question should this article answer?"
+            className={inputCls}
+          />
+        </div>
+        <div>
+          <label className="block text-[11px] text-muted-foreground mb-1.5">Internal Links</label>
+          <textarea
+            value={form.internal_links}
+            onChange={e => onChange({ internal_links: e.target.value })}
+            rows={3}
+            placeholder="/blog&#10;/#features&#10;/#pricing"
+            className={inputCls}
+          />
+        </div>
+      </div>
+
+      {/* Social drafts */}
+      <div className="p-4 space-y-3">
+        <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">Social Drafts</p>
+        <div>
+          <label className="block text-[11px] text-muted-foreground mb-1.5">Facebook Caption</label>
+          <textarea
+            value={form.facebook_caption}
+            onChange={e => onChange({ facebook_caption: e.target.value })}
+            rows={3}
+            placeholder="Short launch caption for your Facebook Page"
+            className={inputCls}
+          />
+        </div>
+        <div>
+          <label className="block text-[11px] text-muted-foreground mb-1.5">Reddit Discussion Prompt</label>
+          <textarea
+            value={form.reddit_discussion_prompt}
+            onChange={e => onChange({ reddit_discussion_prompt: e.target.value })}
+            rows={3}
+            placeholder="Discussion-first prompt, not a direct ad"
+            className={inputCls}
+          />
+        </div>
+      </div>
+
+      {/* SEO quality */}
+      <div className="p-4 space-y-3">
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">Quality Gate</p>
+          <span className={cn(
+            "inline-flex items-center gap-1 rounded-lg border border-border px-2 py-1 text-[11px] font-medium",
+            seoAnalysis.score >= 85 ? "text-primary" : "text-muted-foreground"
+          )}>
+            <Search className="w-3 h-3" />
+            {seoAnalysis.score}/100
+          </span>
+        </div>
+        {seoAnalysis.warnings.length === 0 ? (
+          <div className="flex items-start gap-2 rounded-lg border border-border bg-muted px-3 py-2 text-[11px] text-primary">
+            <Check className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+            <p>This post passes the blog SEO checklist.</p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {seoAnalysis.warnings.slice(0, 6).map((warning) => (
+              <div key={warning} className="flex items-start gap-2 rounded-lg border border-border bg-muted px-3 py-2 text-[11px] text-muted-foreground">
+                <AlertCircle className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+                <p>{warning}</p>
+              </div>
+            ))}
+            {seoAnalysis.warnings.length > 6 && (
+              <p className="text-[10px] text-muted-foreground">
+                {seoAnalysis.warnings.length - 6} more checks need attention.
+              </p>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -680,8 +940,16 @@ interface FormState {
   cover_image_url: string;
   cover_storage_path: string; // storage path for deletion on replace/remove
   content: string;
+  image_alt_text: string;
+  image_caption: string;
+  pexels_credit_url: string;
   seo_title: string;
   seo_description: string;
+  primary_keyword: string;
+  search_intent: string;
+  internal_links: string;
+  facebook_caption: string;
+  reddit_discussion_prompt: string;
 }
 
 // ─── Main Editor ──────────────────────────────────────────────────────────────
@@ -698,6 +966,7 @@ export function BlogEditorPage({ post, orgId }: BlogEditorPageProps) {
   const [isPublished, setIsPublished] = useState(post?.is_published ?? false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
+  const [socialLinks, setSocialLinks] = useState<SocialLinks>({});
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [form, setForm] = useState<FormState>({
@@ -708,8 +977,16 @@ export function BlogEditorPage({ post, orgId }: BlogEditorPageProps) {
     cover_image_url: post?.cover_image_url ?? "",
     cover_storage_path: "",  // existing posts: path unknown; deletion handled on replace
     content: post?.content ?? "",
+    image_alt_text: post?.image_alt_text ?? "",
+    image_caption: post?.image_caption ?? "",
+    pexels_credit_url: post?.pexels_credit_url ?? "",
     seo_title: post?.seo_title ?? "",
     seo_description: post?.seo_description ?? "",
+    primary_keyword: post?.primary_keyword ?? "",
+    search_intent: post?.search_intent ?? "",
+    internal_links: post?.internal_links ?? "",
+    facebook_caption: post?.facebook_caption ?? "",
+    reddit_discussion_prompt: post?.reddit_discussion_prompt ?? "",
   });
 
   const updateForm = useCallback((f: Partial<FormState>) => {
@@ -785,18 +1062,32 @@ export function BlogEditorPage({ post, orgId }: BlogEditorPageProps) {
     .split(/\s+/)
     .filter(Boolean).length;
 
+  const seoAnalysis = useMemo(() => analyzeSeo(form, wordCount), [form, wordCount]);
+
   // ── Build payload ──────────────────────────────────────────────────────────
 
-  const buildPayload = (overrides: Partial<BlogPostInput> = {}): BlogPostInput => ({
-    title: form.title || "Untitled",
-    slug: form.slug || slugify(form.title || "untitled"),
-    excerpt: form.excerpt || undefined,
-    content: form.content,
-    cover_image_url: form.cover_image_url || undefined,
-    seo_title: form.seo_title || undefined,
-    seo_description: form.seo_description || undefined,
-    ...overrides,
-  });
+  const buildPayload = (overrides: Partial<BlogPostInput> = {}): BlogPostInput => {
+    return {
+      title: form.title || "Untitled",
+      slug: form.slug || slugify(form.title || "untitled"),
+      excerpt: form.excerpt || undefined,
+      content: form.content,
+      cover_image_url: form.cover_image_url || undefined,
+      image_alt_text: form.image_alt_text || undefined,
+      image_caption: form.image_caption || undefined,
+      pexels_credit_url: form.pexels_credit_url || undefined,
+      seo_title: form.seo_title || undefined,
+      seo_description: form.seo_description || undefined,
+      primary_keyword: form.primary_keyword || undefined,
+      search_intent: form.search_intent || undefined,
+      internal_links: form.internal_links || undefined,
+      facebook_caption: form.facebook_caption || undefined,
+      reddit_discussion_prompt: form.reddit_discussion_prompt || undefined,
+      seo_quality_score: seoAnalysis.score,
+      pre_publish_warnings: seoAnalysis.warnings.join("\n") || undefined,
+      ...overrides,
+    };
+  };
 
   // Uploads every in-editor data URL (cover + inline) to Supabase Storage and
   // returns the rewritten cover/content pointing at the public CDN URLs. This
@@ -884,7 +1175,40 @@ export function BlogEditorPage({ post, orgId }: BlogEditorPageProps) {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const isBusy = saveMutation.isPending || publishMutation.isPending;
+  const socialPublishMutation = useMutation({
+    mutationFn: async (platform: SocialPlatform) => {
+      if (!postId) throw new Error("Save and publish the blog post first.");
+      if (!isPublished) throw new Error("Publish the blog post before posting to social media.");
+
+      const response = await fetch("/api/social/publish", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          postId,
+          platform,
+          caption: platform === "facebook" ? form.facebook_caption : form.reddit_discussion_prompt,
+        }),
+      });
+      const result = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 503 && Array.isArray(result.missing)) {
+          throw new Error(`${result.error} Missing: ${result.missing.join(", ")}`);
+        }
+        throw new Error(result.error || "Social publishing failed.");
+      }
+
+      return result as { platform: SocialPlatform; url: string };
+    },
+    onSuccess: (result) => {
+      setSocialLinks(prev => ({ ...prev, [result.platform]: result.url }));
+      toast.success(`Posted to ${result.platform === "facebook" ? "Facebook" : "Reddit"}`);
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const isBusy = saveMutation.isPending || publishMutation.isPending || socialPublishMutation.isPending;
+  const publicBlogUrl = isPublished ? `/blog/${form.slug || slugify(form.title) || "untitled"}` : "";
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -913,7 +1237,7 @@ export function BlogEditorPage({ post, orgId }: BlogEditorPageProps) {
           <span className={cn(
             "text-[11px] transition-all duration-300 hidden sm:flex items-center gap-1",
             saveStatus === "saving" ? "text-muted-foreground" :
-            saveStatus === "saved"  ? "text-emerald-400" : "text-transparent"
+            saveStatus === "saved"  ? "text-primary" : "text-muted-foreground"
           )}>
             {saveStatus === "saving" && <Loader2 className="w-3 h-3 animate-spin" />}
             {saveStatus === "saved"  && <Check className="w-3 h-3" />}
@@ -929,6 +1253,68 @@ export function BlogEditorPage({ post, orgId }: BlogEditorPageProps) {
             {saveMutation.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileText className="w-3.5 h-3.5" />}
             <span className="hidden sm:inline">Save Draft</span>
           </button>
+
+          {isPublished && (
+            <a
+              href={publicBlogUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg text-[13px] text-muted-foreground border border-border hover:bg-muted hover:text-foreground transition-colors"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              <span className="hidden xl:inline">View Blog</span>
+            </a>
+          )}
+
+          <button
+            onClick={() => socialPublishMutation.mutate("facebook")}
+            disabled={isBusy || !isPublished}
+            title={isPublished ? "Post this blog to Facebook Page" : "Publish the blog first"}
+            className="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg text-[13px] text-muted-foreground border border-border hover:bg-muted hover:text-foreground transition-colors disabled:opacity-50"
+          >
+            {socialPublishMutation.isPending
+              ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              : <Send className="w-3.5 h-3.5" />
+            }
+            <span className="hidden xl:inline">Post FB</span>
+          </button>
+
+          <button
+            onClick={() => socialPublishMutation.mutate("reddit")}
+            disabled={isBusy || !isPublished}
+            title={isPublished ? "Post this blog to Reddit" : "Publish the blog first"}
+            className="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg text-[13px] text-muted-foreground border border-border hover:bg-muted hover:text-foreground transition-colors disabled:opacity-50"
+          >
+            {socialPublishMutation.isPending
+              ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              : <Send className="w-3.5 h-3.5" />
+            }
+            <span className="hidden xl:inline">Post Reddit</span>
+          </button>
+
+          {socialLinks.facebook && (
+            <a
+              href={socialLinks.facebook}
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg text-[13px] text-muted-foreground border border-border hover:bg-muted hover:text-foreground transition-colors"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              <span className="hidden xl:inline">View FB</span>
+            </a>
+          )}
+
+          {socialLinks.reddit && (
+            <a
+              href={socialLinks.reddit}
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg text-[13px] text-muted-foreground border border-border hover:bg-muted hover:text-foreground transition-colors"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              <span className="hidden xl:inline">View Reddit</span>
+            </a>
+          )}
 
           {/* Publish / Unpublish */}
           <button
@@ -979,7 +1365,7 @@ export function BlogEditorPage({ post, orgId }: BlogEditorPageProps) {
             <div className="max-w-3xl mx-auto w-full px-4 sm:px-6 py-8 sm:py-10">
 
               {/* Document sheet */}
-              <div className="rounded-2xl border border-border bg-muted shadow-[0_8px_40px_rgba(0,0,0,0.5)] overflow-hidden">
+              <div className="rounded-2xl border border-border bg-muted shadow-lg overflow-hidden">
 
                 {/* Cover zone */}
                 <CoverUpload
@@ -1036,6 +1422,11 @@ export function BlogEditorPage({ post, orgId }: BlogEditorPageProps) {
               isPublished={isPublished}
               wordCount={wordCount}
               budget={imageBudget}
+              seoAnalysis={seoAnalysis}
+              socialLinks={socialLinks}
+              publicBlogUrl={publicBlogUrl}
+              onPostSocial={(platform) => socialPublishMutation.mutate(platform)}
+              socialPending={socialPublishMutation.isPending}
             />
           )}
         </aside>

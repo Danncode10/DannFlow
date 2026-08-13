@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Plus, Pencil, Trash2, Globe, EyeOff, Loader2,
-  BookOpen, ExternalLink,
+  BookOpen, ExternalLink, ChevronLeft, ChevronRight,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -20,6 +21,7 @@ import type { BlogPost } from "@/services/blog";
 // user or hammering the bucket's `list` endpoint on every render.
 const GC_THROTTLE_KEY = "blog-image-gc-last-run";
 const GC_THROTTLE_MS = 60 * 60 * 1000;
+const BLOG_PAGE_SIZE = 15;
 
 function maybeRunImageCleanup() {
   try {
@@ -77,7 +79,16 @@ function PostRow({ post }: { post: BlogPost }) {
       {/* Cover thumbnail */}
       <div className="shrink-0 w-12 h-12 rounded-lg overflow-hidden bg-muted/40 border border-border flex items-center justify-center">
         {post.cover_image_url
-          ? <img src={post.cover_image_url} alt="" className="w-full h-full object-cover" />
+          ? (
+            <Image
+              src={post.cover_image_url}
+              alt=""
+              width={48}
+              height={48}
+              unoptimized
+              className="w-full h-full object-cover"
+            />
+          )
           : <BookOpen className="w-4 h-4 text-muted-foreground/40" />
         }
       </div>
@@ -91,7 +102,7 @@ function PostRow({ post }: { post: BlogPost }) {
           <span className={cn(
             "inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full border",
             post.is_published
-              ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+              ? "bg-primary/10 text-primary border-primary/20"
               : "bg-muted text-muted-foreground border-border"
           )}>
             {post.is_published ? "Published" : "Draft"}
@@ -161,15 +172,18 @@ function PostRow({ post }: { post: BlogPost }) {
 
 export function BlogTab() {
   const router = useRouter();
+  const [page, setPage] = useState(1);
 
   const postsQuery = useQuery({
-    queryKey: ["blog-posts"],
-    queryFn: () => listBlogPosts({ pageSize: 50 }),
+    queryKey: ["blog-posts", page],
+    queryFn: () => listBlogPosts({ page, pageSize: BLOG_PAGE_SIZE }),
   });
 
   useEffect(() => { maybeRunImageCleanup(); }, []);
 
   const posts = postsQuery.data?.data ?? [];
+  const total = postsQuery.data?.total ?? 0;
+  const totalPages = Math.max(1, Math.ceil(total / BLOG_PAGE_SIZE));
   const published = posts.filter(p => p.is_published).length;
   const drafts = posts.filter(p => !p.is_published).length;
 
@@ -181,7 +195,7 @@ export function BlogTab() {
         <div>
           <h2 className="text-2xl font-semibold text-foreground tracking-tight">Blog Posts</h2>
           <p className="mt-1 text-[14px] text-muted-foreground">
-            Write and publish posts to improve your site's SEO.
+            Write and publish posts to improve your site&apos;s SEO.
           </p>
         </div>
         <button
@@ -196,13 +210,17 @@ export function BlogTab() {
       {/* Stats */}
       {posts.length > 0 && (
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-            <Globe className="w-3.5 h-3.5 text-emerald-400" />
-            <span className="text-[12px] font-medium text-emerald-400">{published} published</span>
+          <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-primary/10 border border-primary/20">
+            <Globe className="w-3.5 h-3.5 text-primary" />
+            <span className="text-[12px] font-medium text-primary">{published} published</span>
           </div>
           <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-muted/40 border border-border">
             <EyeOff className="w-3.5 h-3.5 text-muted-foreground" />
             <span className="text-[12px] font-medium text-muted-foreground">{drafts} draft{drafts !== 1 ? "s" : ""}</span>
+          </div>
+          <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-muted/40 border border-border">
+            <BookOpen className="w-3.5 h-3.5 text-muted-foreground" />
+            <span className="text-[12px] font-medium text-muted-foreground">{total} total</span>
           </div>
         </div>
       )}
@@ -237,6 +255,51 @@ export function BlogTab() {
           </div>
         )}
       </div>
+
+      {totalPages > 1 && (
+        <div className="flex flex-col items-center gap-4">
+          <p className="text-center text-[13px] text-muted-foreground">
+            Page {page} of {totalPages} · showing {posts.length} of {total}
+          </p>
+          <div className="flex max-w-full items-center justify-center gap-2 overflow-x-auto px-1 pb-1">
+            <button
+              type="button"
+              onClick={() => setPage(prev => Math.max(1, prev - 1))}
+              disabled={page === 1 || postsQuery.isFetching}
+              className="min-h-12 shrink-0 inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 text-[13px] font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors disabled:bg-muted disabled:text-muted-foreground/40 disabled:cursor-not-allowed"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              <span className="hidden sm:inline">Previous</span>
+            </button>
+            {Array.from({ length: totalPages }, (_, index) => index + 1).map((pageNumber) => (
+              <button
+                key={pageNumber}
+                type="button"
+                onClick={() => setPage(pageNumber)}
+                disabled={postsQuery.isFetching}
+                aria-current={pageNumber === page ? "page" : undefined}
+                className={cn(
+                  "h-12 w-12 shrink-0 inline-flex items-center justify-center rounded-lg border text-[13px] font-semibold transition-colors disabled:opacity-50",
+                  pageNumber === page
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border bg-card text-muted-foreground hover:bg-muted hover:text-foreground"
+                )}
+              >
+                {pageNumber}
+              </button>
+            ))}
+            <button
+              type="button"
+              onClick={() => setPage(prev => Math.min(totalPages, prev + 1))}
+              disabled={page === totalPages || postsQuery.isFetching}
+              className="min-h-12 shrink-0 inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 text-[13px] font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors disabled:bg-muted disabled:text-muted-foreground/40 disabled:cursor-not-allowed"
+            >
+              <span className="hidden sm:inline">Next</span>
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
