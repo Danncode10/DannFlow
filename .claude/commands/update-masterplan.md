@@ -16,7 +16,7 @@ User input: **$ARGUMENTS**
    - Prefer GitHub MCP if it exposes GitHub Projects v2 item APIs.
    - If Projects APIs are not exposed through MCP, use authenticated `gh` CLI with the `project` scope.
    - If neither path is available, stop with the project's Missing Tool Alert Protocol for GitHub MCP.
-3. Resolve the GitHub Project from args or by listing projects.
+3. Resolve the GitHub Project from explicit args, then `dannflow.json`'s `github_project` binding, then by listing projects. If no linked Project exists, tell the user to create a Kanban-style Project and run `/masterplan-init`; do not create a Project automatically.
 4. Parse all task checkboxes in `MASTERPLAN.md`.
 5. Validate every task title starts with a stable ID:
    - valid: `[P2.1] Build feature service`
@@ -24,9 +24,9 @@ User input: **$ARGUMENTS**
    - invalid: `[P2] Build feature service`
 6. If bare phase IDs are found, renumber tasks in file order before syncing.
 7. Fetch current Project items and match by the stable ID prefix, not by full title.
-8. For each masterplan task:
-   - create missing Project items
-   - update changed titles and bodies
+8. For each detailed masterplan task:
+   - create a missing real GitHub Issue, then add it to the Project; never create a Project draft item
+   - update changed Issue titles and bodies
    - map checked tasks to `Done`
    - keep existing `In progress` / `In review` statuses unless the task is checked
    - map unchecked new tasks to `Backlog`
@@ -49,8 +49,9 @@ Use these primitives when `gh` is the available Projects path:
 ```bash
 gh project item-list <project-number> --owner <owner> --format json --limit 200
 gh project field-list <project-number> --owner <owner> --format json
-gh project item-create <project-number> --owner <owner> --title "<title>" --body "<body>"
-gh project item-edit --id <draft-issue-content-id> --title "<title>" --body "<body>"
+gh issue create --repo <owner>/<repo> --title "<title>" --body "<body>"
+gh issue edit <issue-number> --repo <owner>/<repo> --title "<title>" --body "<body>"
+gh project item-add <project-number> --owner <owner> --url <issue-url>
 gh project item-edit --id <project-item-id> --project-id <project-id> --field-id <status-field-id> --single-select-option-id <option-id>
 ```
 
@@ -74,6 +75,7 @@ Suggested commit: chore: sync masterplan task board
 ## Constraints
 
 - Never create bare `[P2]` task cards.
+- Use real GitHub Issues as cards; never create Project draft items.
 - Never reorder completed task IDs casually; preserve history unless the user explicitly asks to renumber.
 - Do not delete Project items without `--prune`.
 - Do not modify application code.

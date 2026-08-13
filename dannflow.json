@@ -1,5 +1,19 @@
 {
+  "schema_version": 1,
   "dannflow_commit": "latest_commit_hash_in_dannflow",
   "synced_at": "YYYY-MM-DDT00:00:00Z",
-  "repo": "https://github.com/Danncode10/DannFlow"
+  "repo": "https://github.com/Danncode10/DannFlow",
+  "project": {
+    "name": "",
+    "repository": "",
+    "supabase_project_id": "",
+    "initialized_at": ""
+  },
+  "github_project": {
+    "owner": "",
+    "number": null,
+    "id": "",
+    "view": "",
+    "linked_at": ""
+  }
 }

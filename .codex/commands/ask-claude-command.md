@@ -11,6 +11,7 @@ The user's goal: **$ARGUMENTS**
 2. Scan `.claude/commands/**/*.md`.
 3. For each command, read only the YAML frontmatter and first heading or opening paragraph.
 4. Choose the command or short command chain that best matches the user's goal.
+   - For a new SaaS plan/task board, choose `/claude-command masterplan-init` only after `/new-project` and an existing Kanban-style GitHub Project; use `/claude-command make-masterplan Phase 1` only for later-phase expansion.
 5. Return a ready-to-run Codex prompt that uses `/claude-command`.
 
 ## Output Format
@@ -34,4 +35,3 @@ If no existing command fits, return:
 ```text
 /claude-command make-command "<one-sentence description of the command needed>"
 ```
-

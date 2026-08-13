@@ -16,6 +16,8 @@ Figure out:
 - Whether multiple commands should be chained (e.g. `/new-feature` → `/ui` → `/review`)
 - What arguments or context the user should provide
 
+For a newly described SaaS that needs its execution plan or task board, recommend `/masterplan-init` only after `/new-project` is complete and the user has created a Kanban-style GitHub Project. Do not recommend `/make-masterplan` for initial planning; it expands later phases.
+
 ## Step 3 — Output a ready-to-paste prompt
 
 Your ONLY output is the prompt block below. Nothing before it, nothing after it — no explanations, no meta-commentary. The user will copy this and paste it directly into Claude.

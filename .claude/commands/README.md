@@ -7,11 +7,14 @@ Drop `.md` files in this folder to add custom slash commands. Each file becomes 
 | Command | Purpose |
 |---|---|
 | `/new-project ["name"]` | **Start a new project.** Rebrands the code, creates a GitHub repo, and connects one dedicated Supabase project. |
+| `/masterplan-init [--project-owner <owner>] [--project-number <number>]` | **Initialize execution planning.** Detects a completed `/new-project`, requires an existing Kanban-style GitHub Project, then creates detailed Phase 0 cards. |
+| `/setup-supabase` | Guides and verifies hosted Supabase environment setup, tracked migrations, generated types, and RLS/schema readiness. |
+| `/setup-auth` | Guides and verifies selected Supabase Auth providers, Google OAuth where chosen, redirect URLs, branded emails, and auth smoke tests. |
 | `/design-project ["section"]` | **Then design it.** Claude reads README + `PROJECT_CONTEXT` + code configuration and replaces template copy and design with a bespoke project. |
 | `/init-claude` | Reads `README.md` + scans `src/` + `package.json`, then auto-rewrites `CLAUDE.md`, `SKILLS.md`, and refreshes this README to match the actual project state. |
 | `/help-dannflow` | Report-only command catalog. Shows how to run DannFlow commands in Claude and through the Codex bridge, grouped by category with a Mermaid graph. |
 | `/ask-command` | Meta-router. Describe what you want in plain English; it searches all commands here and returns the best one + a ready-to-paste prompt. |
-| `/make-masterplan [--project-owner <owner>] [--project-number <number>]` | Creates `MASTERPLAN.md` from project context and populates a linked GitHub Project with ordered `[P2.1]` task cards. |
+| `/make-masterplan <phase> [--project-owner <owner>] [--project-number <number>]` | Expands a future phase without replacing initialized Phase 0, then syncs its ordered task cards. |
 | `/update-masterplan [--project-owner <owner>] [--project-number <number>]` | Syncs edits in `MASTERPLAN.md` to the linked GitHub Project, preserving ordered task IDs and live statuses. |
 | `/what-task [--project-owner <owner>] [--project-number <number>]` | Shows current task status, prepares Ready tasks when empty, and asks before moving one task to `In progress`; never implements the task. |
 | `/verify-task [task-id] [--project-owner <owner>] [--project-number <number>]` | Generates the human verification checklist for an `In progress` task and tells you to run `/close-task` only after it passes. |

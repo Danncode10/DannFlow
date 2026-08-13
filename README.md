@@ -1,6 +1,6 @@
 # 🚀 DannFlow (2026 Edition)
 
-**The AI-agent-optimized SaaS Starter.** Built for AI-assisted development with Claude Code, Codex, Cursor, or Antigravity — Next.js 15+, Supabase, Tailwind v4, Shadcn UI, with auth, dashboard, RLS-first design, and a reusable command system.
+**The AI-agent-optimized SaaS Starter.** Built for AI-assisted development with Claude Code, Codex, Cursor, or Antigravity — Next.js 16, Supabase, Tailwind v4, Shadcn UI, with auth, dashboard, RLS-first design, and a reusable command system.
 
 > **Built for Speed. Structured for Agents. Optimized for the Vibe.**
 
@@ -22,7 +22,7 @@ That's it. The installer:
 2. Clones DannFlow into a new folder
 3. Installs npm dependencies + `.env.local`
 4. Installs Ruflo globally + registers its MCP server
-5. Runs the Ruflo init wizard
+5. Installs Ruflo globally (run its init wizard separately when you choose to use Ruflo)
 6. Installs 8 skill packs (design, SEO, marketing, accessibility)
 7. Runs `guide.sh init` to rebrand the project to your app name
 
@@ -33,19 +33,23 @@ powershell -ExecutionPolicy Bypass -Command "iex (irm https://raw.githubusercont
 
 ---
 
-## 🗺️ After Install — 5 Steps to Make It Yours
+## 🗺️ After Install — Initialize Your SaaS
 
-Run these **once** in Claude Code after the installer finishes:
+Before starting a new SaaS, configure the **GitHub MCP** and **Supabase MCP**. They let DannFlow verify the hosted database and synchronize work with your GitHub Project. See [MCP setup](docs/dannflow_docs/mcp-setup.md).
+
+Then use this order in Claude Code (or Codex through `/claude-command`):
 
 ```
-1. Edit README.md          → describe YOUR project (Claude reads this first)
-2. /init-claude            → rewrites CLAUDE.md + SKILLS.md to match your project
-3. Fill PROJECT_CONTEXT.md → audience, stack decisions, design rules, anti-decisions
-4. /ruflo-upgrade          → adds memory + parallel-agent patterns to commands
-5. /no-conflict            → verify docs and code are in sync
+1. /new-project             → describe the SaaS, rebrand it, connect its repository and Supabase project
+2. Create a GitHub Project  → choose Kanban/Board layout; add Backlog, Ready, In progress, Done statuses
+3. /masterplan-init         → detects the initialized SaaS, links the existing board, writes detailed Phase 0, and syncs cards
+4. /what-task               → select the first Phase 0 task
+5. /make-masterplan Phase 1 → expand later phases only when ready
 ```
 
-Then start building:
+`/masterplan-init` never creates a GitHub Project or draft board. If it cannot find a linked board, it tells you to create the Kanban Project first and then rerun the command.
+
+Then start development:
 ```bash
 npm run dev
 ```
@@ -84,7 +88,7 @@ pnpm db:migrate
 
 `pnpm db:generate` writes SQL into `db/migrations/`. `pnpm db:migrate` applies those migrations to Supabase with `DATABASE_URL` and refreshes remote types.
 
-**Want Claude to design the whole site for you?** After the 5 steps, run **`/design-project`** — it reads your `README`, `PROJECT_CONTEXT`, and code configuration, then designs and builds a bespoke project. Starting from a fresh clone? **`/new-project`** sets up the repo and one dedicated Supabase project first.
+**Want Claude to design the whole site for you?** Your detailed Phase 0 will direct you to **`/design-project`** at the right point. It reads your `README`, `PROJECT_CONTEXT`, and code configuration, then designs and builds a bespoke project.
 
 ---
 

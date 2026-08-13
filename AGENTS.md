@@ -3,7 +3,7 @@
 
 > **Start here**: Always read this file first before taking any action on this project.
 
-You are an expert developer working on **Dann's Vibe-Coding Starter**. This project uses **Next.js 15+ (App Router)** and follows a strict **"Vibe Coding"** architecture built for clarity, speed, and maintainability.
+You are an expert developer working on **Dann's Vibe-Coding Starter**. This project uses **Next.js 16 (App Router)** and follows a strict **"Vibe Coding"** architecture built for clarity, speed, and maintainability.
 
 ## Diagnostic Protocol
 **Unified Dependency Check**: Before starting any specialized tasks, verify that the required MCP (Model Context Protocol) tools are enabled and connected.
@@ -36,7 +36,7 @@ To fix:
 ## Vibe Workflow
 -   If you encounter a bug, fix it in the **Service** layer first.
 -   If you need a new data structure, define or request generation of its types in `src/types/` first.
--   **Masterplan + GitHub Project Tracking**: Before starting feature or task work, find the matching ordered task in `MASTERPLAN.md` and the linked GitHub Project when one exists. Use stable IDs like `[P2.1]`, `[P2.2]`, `[P3A.1]`; never create bare `[P2]` cards.
+-   **Masterplan + GitHub Project Tracking**: For a new SaaS, `/new-project` must finish before `/masterplan-init`; the user must create a Kanban-style GitHub Project before `/masterplan-init` links it. Before later feature or task work, find the matching ordered task in `MASTERPLAN.md` and the linked GitHub Project when one exists. Use stable IDs like `[P2.1]`, `[P2.2]`, `[P3A.1]`; never create bare `[P2]` cards.
     - If the task exists, confirm the card when ambiguous, then move it to `In progress` when work starts.
     - If the task is not in `MASTERPLAN.md`, warn the user and ask whether to add it to `MASTERPLAN.md` and the GitHub Project before proceeding.
     - When finishing, check the task in `MASTERPLAN.md`, move the GitHub Project item to `Done`, and mention the task ID in the final response.

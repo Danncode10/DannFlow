@@ -1,6 +1,6 @@
 # DannFlow Notes for Codex
 
-DannFlow is a Next.js 15+, React 19, Supabase, Tailwind v4, Shadcn/UI starter
+DannFlow is a Next.js 16, React 19, Supabase, Tailwind v4, Shadcn/UI starter
 optimized for AI-assisted development.
 
 ## Operating Order

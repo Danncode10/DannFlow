@@ -32,6 +32,7 @@ Read current `CLAUDE.md`, `SKILLS.md`, `.claude/commands/README.md`, `docs/dannf
 - Missing commands (e.g. project added Stripe → no `/stripe-check`)
 - Outdated command bodies (referencing files/patterns that no longer exist)
 - Removed features still mentioned
+- Regressions in the onboarding chain: `/new-project` → user-created Kanban GitHub Project → `/masterplan-init` → `/make-masterplan <phase>`.
 
 ## Step 3 — Show the user the planned changes
 
@@ -69,6 +70,7 @@ Proceed? (y/n)
 - **`CLAUDE.md`** — keep existing structure (identity, tech stack, project structure, guardrails, RLS, UI standards, semantic tokens, Supabase workflow, MCP requirements, code conventions). Update sections to match reality. Preserve the non-negotiable rules unless the project genuinely no longer needs them (e.g. drop RLS section ONLY if Supabase is fully removed).
 - **`SKILLS.md`** — refresh skill recommendations. Add `claude-api` if AI features were added. Remove irrelevant skills.
 - **`.claude/commands/README.md`** — regenerate the command table from current frontmatter descriptions in `.claude/commands/*.md`.
+- Preserve `/masterplan-init`, `/setup-supabase`, and `/setup-auth` unless the project has explicitly removed the DannFlow onboarding workflow.
 
 ## Step 5 — Update individual command files
 

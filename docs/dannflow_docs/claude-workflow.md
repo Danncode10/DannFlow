@@ -5,9 +5,10 @@
 ## TL;DR
 
 ```
-1. Edit README.md to describe what you're building
-2. Run /init-claude in Claude Code
-3. Start building
+1. Configure GitHub MCP + Supabase MCP
+2. Run /new-project to describe and initialize the SaaS
+3. Create a Kanban-style GitHub Project
+4. Run /masterplan-init, then start Phase 0
 ```
 
 That's the whole workflow. Everything else is detail.
@@ -16,38 +17,29 @@ That's the whole workflow. Everything else is detail.
 
 ## The setup, step by step
 
-### Step 1 — Make the README reflect your project
+### Step 1 — Configure GitHub MCP and Supabase MCP
 
-`README.md` is the **source of truth** for what this codebase is. When you fork DannFlow and start your own product:
+Follow [MCP setup](mcp-setup.md) before beginning. GitHub MCP must be able to access GitHub Projects; Supabase MCP must be able to verify the hosted project.
 
-1. Open `README.md`
-2. Replace the DannFlow intro with **your** project's pitch (2–3 sentences)
-3. Update the feature table to match what you're building
-4. Update the project structure section if you're adding new top-level folders
+### Step 2 — Run `/new-project`
 
-Don't worry about polishing it. Claude reads it to understand the project, not to publish it. You can keep it scrappy.
+`/new-project` collects and writes the product description into `README.md`, `PROJECT_CONTEXT.md`, and code-owned configuration, connects the repository and Supabase project, and verifies tracked migrations. Do not manually mark this template initialized.
 
-### Step 2 — Run `/init-claude`
+### Step 3 — Create the Kanban board
+
+Create a non-draft GitHub Project in Kanban/Board layout with these Status values: `Backlog`, `Ready`, `In progress`, and `Done`.
+
+### Step 4 — Run `/masterplan-init`
 
 In Claude Code, run:
 
 ```
-/init-claude
+/masterplan-init
 ```
 
-This reads your updated `README.md` + `package.json` + `src/` + existing `.claude/commands/`, then **rewrites the entire Claude environment** to match:
+This detects the completed project, links the existing board, creates detailed Phase 0 and its cards, and leaves later phases concise. It never creates a GitHub Project or a draft board.
 
-- `CLAUDE.md` — Claude's project config
-- `SKILLS.md` — which Claude Code skills are relevant
-- `.claude/commands/README.md` — the command index
-- **Individual command files** — adds missing ones (e.g. `/stripe-check` if you added Stripe), removes stale ones (e.g. `/rls-check` if you dropped Supabase), rewrites outdated bodies
-- The command tables in this file (`claude-workflow.md`)
-
-Before writing anything, `/init-claude` shows you a plan grouped by file and waits for confirmation. Skip the confirmation by adding "go" or "just do it" to your invocation.
-
-> **Tip**: `/init-claude` won't silently overwrite hand-tuned commands. Every individual command change is in the plan and only applied after you say yes.
-
-### Step 3 — Start building
+### Step 5 — Start building
 
 You're done with setup. From here on, the daily loop is:
 
@@ -74,7 +66,9 @@ Run `/ask-command <what you want>` if you don't remember which command to use.
 | `/ask-command <intent>` | Tells you which command to use for your task. Returns a copy-paste-ready prompt. |
 | `/init-claude` | Rewrites the entire Claude environment (`CLAUDE.md`, `SKILLS.md`, commands README, individual commands, and this file's command tables) to match the current README + src + package.json. Plan-then-confirm flow. |
 | `/make-command <description>` | Creates a new custom slash command from a plain-English description. Auto-updates this file's tables and proposes conflict-avoidance edits to existing commands. |
-| `/make-masterplan [--project-owner <owner>] [--project-number <number>]` | Creates `MASTERPLAN.md` from project context and populates a linked GitHub Project with ordered `[P2.1]` task cards. |
+| `/new-project [name]` | Initializes the SaaS identity, repository, Supabase connection, tracked schema, and non-secret state record. |
+| `/masterplan-init` | Requires an existing Kanban-style GitHub Project, then links it and creates detailed Phase 0 cards. |
+| `/make-masterplan <phase>` | Expands a later phase without overwriting Phase 0. |
 | `/update-masterplan [--project-owner <owner>] [--project-number <number>]` | Syncs `MASTERPLAN.md` edits to the linked GitHub Project while preserving task order and live statuses. |
 
 ### Security & quality
@@ -94,6 +88,8 @@ Run `/ask-command <what you want>` if you don't remember which command to use.
 | `/explain-schema` | Plain-English summary of your live Supabase schema. |
 | `/migrate <description>` | Edits `db/schema/*.ts`, generates `db/migrations/*.sql`, applies with `pnpm db:migrate`, then verifies Supabase. |
 | `/seed <table\|all>` | Generates type-safe seed data from `src/types/supabase.ts`. Respects FK dependency order and RLS ownership. Writes to `supabase/seeds/`. Never auto-applies. |
+| `/setup-supabase` | Guides environment values, tracked migration, types, and hosted schema/RLS verification. |
+| `/setup-auth` | Guides selected auth providers, redirects, branded emails, and smoke tests. |
 
 ### Scaffolding
 | Command | What it does |
@@ -231,7 +227,7 @@ These pair with three DannFlow slash commands that enforce per-route checks:
 
 **Building a new feature?**
 ```
-/make-masterplan                 # once per new project, creates MASTERPLAN.md + GitHub Project cards
+/make-masterplan Phase 1         # expand the next phase after /masterplan-init
 /update-masterplan               # after editing MASTERPLAN.md, sync ordered cards back to GitHub
 /new-feature <name>             # scaffold
 /ui                             # responsive + a11y hard rules

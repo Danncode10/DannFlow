@@ -6,7 +6,7 @@ trigger: /masterplan-task
 
 # /masterplan-task — Run & Test Phase Tasks
 
-Execute one ordered task from MASTERPLAN.md, generate code, sync GitHub Project status to `In progress`, and create a dedicated test file under `docs/tests/`.
+Execute one ordered task from MASTERPLAN.md, sync GitHub Project status to `In progress`, and create a dedicated test file under `docs/tests/`. If the selected task contains a `Run: /<command>` handoff, execute or direct the user to that command instead of generating unrelated feature scaffolding.
 
 ## Usage
 

@@ -16,7 +16,7 @@ User input: **$ARGUMENTS**
    - If exactly one task is `In progress`, use that task.
    - If multiple tasks are `In progress`, ask the user which task to verify.
    - If no task is `In progress`, ask for a task ID.
-3. Resolve the task details from `MASTERPLAN.md`, phase docs, and the linked GitHub Project item by stable task ID prefix.
+3. Resolve the task details from `MASTERPLAN.md`, phase docs, and the linked GitHub Project item by stable task ID prefix. For a Phase 0 setup task, include only its relevant dashboard, email, OAuth, browser, or terminal checks; do not invent feature-code checks.
 4. Inspect the local implementation:
    - `git status --short --branch`
    - unstaged and staged diffs

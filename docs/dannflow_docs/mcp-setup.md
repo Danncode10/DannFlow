@@ -8,8 +8,10 @@ To make "DannFlow" work, the AI needs three sets of tools:
 - **Setup**: Use your Supabase Access Token from Account Settings.
 
 ### 2. GitHub MCP (The Memory)
-- **Purpose**: Allows the AI to "Time Travel." It can compare why your code worked yesterday but broke today without you copying and pasting long diffs.
-- **Setup**: Use a GitHub Personal Access Token with repo scopes.
+- **Purpose**: Lets the AI inspect repository history and synchronize detailed Masterplan tasks to an existing GitHub Project.
+- **Setup**: Use a GitHub Personal Access Token with repository access and GitHub Projects access. Verify it can list the repository's Projects before running `/masterplan-init`.
+
+> `/masterplan-init` does not create a Project. Create a non-draft GitHub Project in Kanban/Board layout first, with `Backlog`, `Ready`, `In progress`, and `Done` Status values.
 
 ### 3. Terminal MCP (The Hands)
 - **Purpose**: Allows the AI to run commands like `pnpm db:generate`, `pnpm db:migrate`, and `pnpm db:types` for you.

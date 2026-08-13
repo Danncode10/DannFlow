@@ -18,7 +18,7 @@ For the full marketing/setup story, see [README.md](README.md). For deeper docs,
 
 ## Tech stack
 
-- **Framework**: Next.js 15+ (App Router), React 19
+- **Framework**: Next.js 16 (App Router), React 19
 - **DB / Auth**: Supabase (`@supabase/ssr`, `@supabase/supabase-js`)
 - **Schema / Migrations**: Drizzle (`db/schema/*.ts` → `db/migrations/*.sql`)
 - **Styling**: Tailwind CSS v4 + Shadcn/UI primitives
@@ -146,14 +146,14 @@ If you don't know which custom command fits a task, run `/ask-command <your inte
 ## Memory & docs
 
 - **`PROJECT_CONTEXT.md`** (root) — project-specific decisions that override or extend this file: audience, stack choices, design rules, tone, anti-decisions. Read this before any feature work, UI rewrite, or marketing command. Fill it in once after running `/init-claude`.
-- **`MASTERPLAN.md`** (root) — current phase status and what's being built. Use ordered IDs like `[P2.1]`, `[P2.2]`, `[P3A.1]`. Run `/make-masterplan` to create it from project context and `/update-masterplan` after edits.
+- **`MASTERPLAN.md`** (root) — current phase status and what's being built. Run `/new-project`, create a Kanban-style GitHub Project, then run `/masterplan-init` to create detailed Phase 0. Use `/make-masterplan Phase 1` to expand later phases and `/update-masterplan` after edits.
 - Project methodology in `docs/dannflow_docs/` (methodology, trinity model, MCP setup, backups, UI system)
 - Central config: `src/lib/config.ts`
 - Auto-generated types: `src/types/supabase.ts` (read-only)
 
 ## Masterplan + GitHub Project protocol
 
-`MASTERPLAN.md` is the local source of truth and the linked GitHub Project is the execution board. Every task should be anchored to both when the project uses GitHub Projects.
+`MASTERPLAN.md` is the local source of truth and the linked GitHub Project is the execution board. `/masterplan-init` links an existing Kanban-style Project and records it in non-secret `dannflow.json`; it never creates a Project or draft board.
 
 1. **Before starting work**, find the matching task in `MASTERPLAN.md` and the GitHub Project. Ask the user which card to use if the request could map to multiple cards.
 2. **If no matching task exists**, warn the user: "This task is not in `MASTERPLAN.md`. Add it to `MASTERPLAN.md` and the GitHub Project first?" Do not begin feature work until the user confirms or explicitly says to proceed without tracking.

@@ -177,7 +177,7 @@ show_supabase() {
     echo -e "   ${CYAN}\"I've created a new Supabase project. Ask me for the Project"
     echo -e "   Reference ID. Once provided:"
     echo -e "   1. Connect to the project via Supabase MCP."
-    echo -e "   2. Find the latest .sql file in supabase/backups/ and apply it."
+    echo -e "   2. Run pnpm db:migrate to apply the tracked Drizzle migrations."
     echo -e "   3. MANDATORY: list all tables and functions in the public schema."
     echo -e "   4. Confirm the 'profiles' table and 'handle_new_user' function exist."
     echo -e "   Do not report success until you can see them in the live DB.\"${NC}\n"
@@ -186,7 +186,7 @@ show_supabase() {
     echo -e "   After the schema is applied, paste this to your AI:\n"
     echo -e "   ${CYAN}\"Schema applied successfully. Now:"
     echo -e "   1. Run /checkpoint to snapshot the current state."
-    echo -e "   2. Run npm run update-types to regenerate TypeScript types."
+    echo -e "   2. Confirm pnpm db:migrate regenerated TypeScript types."
     echo -e "   3. Confirm src/types/supabase.ts was regenerated."
     echo -e "   Report the list of generated types.\"${NC}\n"
 
@@ -672,37 +672,20 @@ show_claude() {
     show_header
     echo -e "${BOLD}🤖 Set Up Your Claude Code Environment${NC}\n"
     echo -e "DannFlow ships with a full Claude Code setup: ${CYAN}CLAUDE.md${NC}, ${CYAN}SKILLS.md${NC},"
-    echo -e "22 custom slash commands, Ruflo MCP tools, and 8 skill packs.\n"
+    echo -e "DannFlow custom slash commands, Ruflo MCP tools, and 8 skill packs.\n"
 
     # ── New project flow ──────────────────────────────────────────────────────
     echo -e "${BOLD}━━━ New Project Setup (run once) ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n"
 
-    echo -e "${BOLD}1. Edit README.md${NC}"
-    echo -e "   Rewrite the intro to describe ${YELLOW}your${NC} project — not DannFlow."
-    echo -e "   Update the feature table and project structure to match reality."
-    echo -e "   ${YELLOW}Don't polish it.${NC} Claude reads it to understand what you're building.\n"
-
-    echo -e "${BOLD}2. Run /init-claude in Claude Code${NC}"
-    echo -e "   Reads README + package.json + src/ and tailors everything to your project:"
-    echo -e "   - ${CYAN}CLAUDE.md${NC}        (Claude's project config)"
-    echo -e "   - ${CYAN}SKILLS.md${NC}        (which skills are relevant)"
-    echo -e "   - ${CYAN}.claude/commands/${NC} (command files updated to match your stack)\n"
-
-    echo -e "${BOLD}3. Fill in PROJECT_CONTEXT.md${NC}"
-    echo -e "   Created at your project root. Add your:"
-    echo -e "   - Target audience + what they care about"
-    echo -e "   - Stack decisions (e.g. 'Resend for email, not SendGrid')"
-    echo -e "   - Design decisions (e.g. 'rounded-2xl, h-14 buttons')"
-    echo -e "   - Anti-decisions (e.g. 'NOT adding Stripe yet')"
-    echo -e "   Skills and commands read this file — no skill editing needed.\n"
-
-    echo -e "${BOLD}4. Run /ruflo-upgrade in Claude Code${NC}"
-    echo -e "   Adds memory + parallel-agent patterns to your 12 core commands.\n"
-
-    echo -e "${BOLD}5. Run /no-conflict in Claude Code${NC}"
-    echo -e "   Verifies docs and code are in sync. Fix any drift before building.\n"
-
-    echo -e "${GREEN}✅ Setup complete. Start with: ${CYAN}/ask-command <what you want to build>${NC}\n"
+    echo -e "${BOLD}1. Configure GitHub MCP + Supabase MCP${NC}"
+    echo -e "   See ${CYAN}docs/dannflow_docs/mcp-setup.md${NC}; GitHub MCP must access Projects.\n"
+    echo -e "${BOLD}2. Run /new-project in Claude Code${NC}"
+    echo -e "   Captures your SaaS description, connects the repo and Supabase, and verifies schema.\n"
+    echo -e "${BOLD}3. Create a Kanban GitHub Project${NC}"
+    echo -e "   Use Status values: Backlog, Ready, In progress, Done. Do not use a draft board.\n"
+    echo -e "${BOLD}4. Run /masterplan-init${NC}"
+    echo -e "   Links your existing board and creates detailed Phase 0 cards.\n"
+    echo -e "${GREEN}✅ Setup complete. Start with: ${CYAN}/what-task${NC}\n"
 
     # ── After an update ───────────────────────────────────────────────────────
     echo -e "${BOLD}━━━ After Running /init-update ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n"
@@ -818,9 +801,9 @@ show_commands() {
     # Category for a command — returns "sortKey|emoji label"
     get_category() {
         case "$1" in
-            ask-command|init-claude|make-command) echo "1|🚀 Discovery & setup" ;;
+            ask-command|init-claude|make-command|new-project|masterplan-init|make-masterplan|update-masterplan|what-task) echo "1|🚀 Discovery & setup" ;;
             security-audit|rls-check|rls|ui|review) echo "2|🛡️  Security & quality" ;;
-            checkpoint|sync-types|explain-schema|migrate|seed) echo "3|🗄️  Supabase workflow" ;;
+            checkpoint|sync-types|explain-schema|migrate|seed|setup-supabase|setup-auth) echo "3|🗄️  Supabase workflow" ;;
             new-feature|new-page|masterplan-task) echo "4|🧱 Scaffolding" ;;
             seo-check|seo-fix|marketing-check) echo "5|📈 SEO & marketing" ;;
             sync-upstream|sync-to-upstream) echo "7|🔄 Upstream sync" ;;
