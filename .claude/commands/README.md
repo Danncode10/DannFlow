@@ -44,6 +44,7 @@ Drop `.md` files in this folder to add custom slash commands. Each file becomes 
 | `/seo-check [route]` | Per-route SEO audit: metadata, OG, canonical, sitemap.ts, robots.ts, JSON-LD, alt text, heading hierarchy. Reports only. |
 | `/seo-fix <route\|all>` | Active rewrite — adds missing SEO essentials. Scaffolds `sitemap.ts`, `robots.ts`, metadata blocks, JSON-LD. Plan-then-confirm. |
 | `/marketing-check [route]` | Conversion-fundamentals audit for landing/marketing pages — headline, CTA, social proof, friction, pricing legibility. Opinionated, judgement-heavy. Reports only. |
+| `/hero-bg [creative direction]` | Inspects the active hero and produces a guided two-image, one 8-second video AI-background workflow with prompt and delivery instructions. |
 | `/ruflo-upgrade` | Re-applies Ruflo memory + parallel-agent patterns to the 8 core commands. Safe to re-run after `/init-update`. |
 | `/make-command` | Creates a new custom slash command from a plain-English description. Auto-updates documentation and proposes conflict-avoidance edits to existing commands or SKILLS.md. |
 | `/masterplan-task` | Execute an ordered task from MASTERPLAN.md, keep its Project item `In progress`, and tell you to run `/verify-task` when implementation appears ready. |
