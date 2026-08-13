@@ -89,6 +89,7 @@ Run `/ask-command <what you want>` if you don't remember which command to use.
 | `/migrate <description>` | Edits `db/schema/*.ts`, generates `db/migrations/*.sql`, applies with `pnpm db:migrate`, then verifies Supabase. |
 | `/seed <table\|all>` | Generates type-safe seed data from `src/types/supabase.ts`. Respects FK dependency order and RLS ownership. Writes to `supabase/seeds/`. Never auto-applies. |
 | `/setup-supabase` | Guides existing-template environment values and Supabase dashboard settings without changing schema. |
+| `/setup-auth` | Configures existing-template email auth, Google sign-in, redirects, and branded emails without changing schema. |
 
 ### Scaffolding
 | Command | What it does |

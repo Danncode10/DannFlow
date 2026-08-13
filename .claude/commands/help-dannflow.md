@@ -59,6 +59,7 @@ Codex uses `.codex/commands/claude-command.md` as a bridge. The source-of-truth 
 | `/new-project ["name"]` | Starts a new DannFlow project from the starter. |
 | `/masterplan-init` | Links an existing Kanban-style GitHub Project and creates detailed Phase 0 cards for an initialized SaaS. |
 | `/setup-supabase` | Guides the existing template's Supabase environment values and dashboard settings without changing schema. |
+| `/setup-auth` | Configures the existing template's email auth, Google sign-in, redirects, and branded emails without changing schema. |
 | `/business-init` | Captures business/project context. |
 | `/init-claude` | Refreshes Claude project context, skills, and command docs. |
 | `/init-update` | Updates the local DannFlow command/runtime setup. |

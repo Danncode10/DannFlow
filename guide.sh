@@ -803,7 +803,7 @@ show_commands() {
         case "$1" in
             ask-command|init-claude|make-command|new-project|masterplan-init|make-masterplan|update-masterplan|what-task) echo "1|🚀 Discovery & setup" ;;
             security-audit|rls-check|rls|ui|review) echo "2|🛡️  Security & quality" ;;
-            checkpoint|sync-types|explain-schema|migrate|seed|setup-supabase) echo "3|🗄️  Supabase workflow" ;;
+            checkpoint|sync-types|explain-schema|migrate|seed|setup-supabase|setup-auth) echo "3|🗄️  Supabase workflow" ;;
             new-feature|new-page|masterplan-task) echo "4|🧱 Scaffolding" ;;
             seo-check|seo-fix|marketing-check) echo "5|📈 SEO & marketing" ;;
             sync-upstream|sync-to-upstream) echo "7|🔄 Upstream sync" ;;
