@@ -50,16 +50,16 @@ GITHUB_PROJECT_ID=<project-id>
    - a detailed Phase 0 containing only real SaaS readiness work;
    - concise Phase 1+ placeholders, without detailed tasks;
    - stable ordered IDs for every Phase 0 task.
-4. Use Phase 0 tasks appropriate to the actual SaaS. Include only applicable work from this set:
-   - design direction and visual system — `Run: /design-project`;
-   - Supabase environment, tracked migration, generated types, RLS/schema verification — `Run: /setup-supabase`;
-   - email/password and selected social authentication, Google OAuth when selected, redirects, branded email templates, and auth smoke tests — `Run: /setup-auth`;
-   - project-specific landing page — `Run: /design-project`;
+4. Phase 0 is **DannFlow template readiness**, not project feature design. Do not plan a product-specific relational database, schema migration, RLS policy, OAuth implementation, or application feature in this phase. Include only applicable work from this set:
+   - Supabase template connection and dashboard guidance — where to get the existing template's environment values, which template Auth settings to turn on or off, and required local redirect URLs — `Run: /setup-supabase`;
+   - design direction, color system, and UI decisions derived from the project overview — `Run: /design-project`;
+   - project-specific landing page and template-copy replacement — `Run: /design-project`;
    - hero media brief and asset handoff — `Run: /hero-bg`;
-   - launch-quality review — `Run: /seo-check`, `/marketing-check`, and `/review`.
-5. Every Phase 0 task must include a short goal, dependencies, acceptance criteria, and one or more `Run: /...` handoffs. Do not put long dashboard tutorials in `MASTERPLAN.md`; they belong in the referenced command.
-6. Sync every Phase 0 task to one matching real GitHub Issue and add that Issue to the Project by stable ID prefix. New unchecked items start in `Backlog`; checked items map to `Done`; preserve existing `Ready` and `In progress` states. Never create a Project draft item.
-7. Do not create cards for Phase 1+ placeholders until `/make-masterplan` expands that phase.
+   - template-level visual and quality review — `Run: /seo-check`, `/marketing-check`, and `/review`.
+5. Put project-specific database design, relationships, new tables, RLS changes, provider implementation, and product features into later phases created with `/make-masterplan`.
+6. Every Phase 0 task must include a short goal, dependencies, acceptance criteria, and one or more `Run: /...` handoffs. Do not put long dashboard tutorials in `MASTERPLAN.md`; they belong in the referenced command.
+7. Sync every Phase 0 task to one matching real GitHub Issue and add that Issue to the Project by stable ID prefix. New unchecked items start in `Backlog`; checked items map to `Done`; preserve existing `Ready` and `In progress` states. Never create a Project draft item.
+8. Do not create cards for Phase 1+ placeholders until `/make-masterplan` expands that phase.
 
 ## Output format
 

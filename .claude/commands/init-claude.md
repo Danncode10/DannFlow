@@ -70,7 +70,7 @@ Proceed? (y/n)
 - **`CLAUDE.md`** — keep existing structure (identity, tech stack, project structure, guardrails, RLS, UI standards, semantic tokens, Supabase workflow, MCP requirements, code conventions). Update sections to match reality. Preserve the non-negotiable rules unless the project genuinely no longer needs them (e.g. drop RLS section ONLY if Supabase is fully removed).
 - **`SKILLS.md`** — refresh skill recommendations. Add `claude-api` if AI features were added. Remove irrelevant skills.
 - **`.claude/commands/README.md`** — regenerate the command table from current frontmatter descriptions in `.claude/commands/*.md`.
-- Preserve `/masterplan-init`, `/setup-supabase`, and `/setup-auth` unless the project has explicitly removed the DannFlow onboarding workflow.
+- Preserve `/masterplan-init` and `/setup-supabase` unless the project has explicitly removed the DannFlow onboarding workflow.
 
 ## Step 5 — Update individual command files
 

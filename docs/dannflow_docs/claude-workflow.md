@@ -88,8 +88,7 @@ Run `/ask-command <what you want>` if you don't remember which command to use.
 | `/explain-schema` | Plain-English summary of your live Supabase schema. |
 | `/migrate <description>` | Edits `db/schema/*.ts`, generates `db/migrations/*.sql`, applies with `pnpm db:migrate`, then verifies Supabase. |
 | `/seed <table\|all>` | Generates type-safe seed data from `src/types/supabase.ts`. Respects FK dependency order and RLS ownership. Writes to `supabase/seeds/`. Never auto-applies. |
-| `/setup-supabase` | Guides environment values, tracked migration, types, and hosted schema/RLS verification. |
-| `/setup-auth` | Guides selected auth providers, redirects, branded emails, and smoke tests. |
+| `/setup-supabase` | Guides existing-template environment values and Supabase dashboard settings without changing schema. |
 
 ### Scaffolding
 | Command | What it does |
