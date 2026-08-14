@@ -1,5 +1,5 @@
 ---
-description: "Design and build a bespoke project from README, PROJECT_CONTEXT, and code-owned site configuration."
+description: "Apply approved product copy and semantic theme tokens to the existing template without changing its layout, interactions, or hero media."
 ---
 
 # /design-project
@@ -9,6 +9,29 @@ Read `README.md`, `PROJECT_CONTEXT.md`, `src/lib/config.ts`, and the existing de
 ## Existing-template adaptation — mandatory
 
 This command starts from the existing template. It adapts the template to the product; it does **not** assume permission to replace it.
+
+### Non-negotiable preservation contract
+
+Unless the user explicitly requests a named redesign, a `/design-project` run is a **theme and copy pass only**. The following are protected implementation assets and must remain in place and functional:
+
+- the existing page and component hierarchy, section order, route structure, and navigation;
+- the existing hero composition, media, video, typewriter, animations, and interaction patterns;
+- the existing feature, pricing, blog, CTA, navbar, and footer components, including their current layout behavior; and
+- existing client/server boundaries, data wiring, loading states, and responsive behavior.
+
+Do not delete a component, replace an entire component implementation, substitute a different preview or visual concept, remove an animation or media asset, or convert one section into a different kind of section. Do not add, remove, merge, or reorder sections. A color/theme update must be expressed through existing semantic tokens; copy updates must stay within the existing component's current content slots.
+
+### Hero-media freeze — absolute
+
+`/design-project` has **zero authority** over hero media. It must not edit, delete, replace, move, optimize, rename, regenerate, re-encode, add, or change the use of any of these existing assets:
+
+- `public/hero-poster.avif`
+- `public/hero-background.mp4`
+- `public/hero-background.webm`
+
+It must also preserve the existing hero media loading, fallback, source-selection, poster, playback, and typewriter behavior in `src/components/landing/hero.tsx`. Do not touch the hero's media-related imports, markup, props, hooks, helper functions, CSS classes, or settings. Hero media is handled only by the later dedicated hero-media task; any request to change it during `/design-project` must stop and ask the user to run that task instead.
+
+Before any mutation, list the exact files and explicitly confirm for each one: **"theme/copy-only; hierarchy, media, and interactions preserved."** If the requested visual result cannot be achieved under that contract, stop and ask for separate, explicit redesign permission. Never treat approval of a palette as approval to change layout, motion, media, or component structure.
 
 ### 1. Inspect before proposing changes
 
@@ -33,11 +56,10 @@ Adapt the existing template in place. Allowed work includes:
 
 - updating the existing semantic color tokens to the approved palette;
 - revising starter copy in its current sections for the product;
-- refining existing components, spacing, typography, borders, imagery, and component states to match the approved theme;
-- making small, localized layout improvements inside an existing component when they preserve its purpose and surrounding information architecture; and
+- refining existing copy, spacing, typography, borders, and component states to match the approved theme, without changing the component's composition or interaction behavior;
 - carrying the approved tokens into related existing surfaces, such as login, forms, and email templates.
 
-These refinements must reuse the template's components and preserve its route structure, section order, navigation, footer, interactions, and established responsive behavior.
+These refinements must reuse the template's components and preserve its route structure, section order, navigation, footer, media, animations, interactions, and established responsive behavior.
 
 ### 4. What requires explicit separate permission
 
