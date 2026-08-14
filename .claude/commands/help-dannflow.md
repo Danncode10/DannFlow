@@ -82,7 +82,7 @@ Codex uses `.codex/commands/claude-command.md` as a bridge. The source-of-truth 
 |---|---|
 | `/new-feature <name>` | Scaffolds a feature with service, types, page, and form patterns. |
 | `/new-page <route>` | Scaffolds a Next.js App Router page. |
-| `/design-project ["section"]` | Replaces starter placeholders with project-specific design. |
+| `/design-project ["section"]` | Proposes an approved project-specific theme, then adapts the existing template in place. |
 | `/ui [target]` | Rewrites UI for responsiveness, accessibility, and semantic tokens. |
 
 ### Database & Supabase
