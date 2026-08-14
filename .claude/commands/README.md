@@ -10,7 +10,7 @@ Drop `.md` files in this folder to add custom slash commands. Each file becomes 
 | `/masterplan-init [--project-url <url>]` | **Initialize execution planning.** Accepts a GitHub Project URL, requires an existing Kanban-style board, then creates detailed Phase 0 cards. |
 | `/setup-supabase` | Guides the existing DannFlow template's Supabase environment values and dashboard settings without designing or changing project database schema. |
 | `/setup-auth` | Configures and verifies the template's email auth, Google sign-in, redirects, and branded Supabase email templates without changing schema. |
-| `/design-project ["section"]` | **Then design it.** Claude reads README + `PROJECT_CONTEXT` + code configuration and replaces template copy and design with a bespoke project. |
+| `/design-project ["section"]` | Applies approved product copy and semantic theme tokens to the existing template only; preserves all layout, interactions, animations, and hero media. |
 | `/init-claude` | Reads `README.md` + scans `src/` + `package.json`, then auto-rewrites `CLAUDE.md`, `SKILLS.md`, and refreshes this README to match the actual project state. |
 | `/help-dannflow` | Report-only command catalog. Shows how to run DannFlow commands in Claude and through the Codex bridge, grouped by category with a Mermaid graph. |
 | `/ask-command` | Meta-router. Describe what you want in plain English; it searches all commands here and returns the best one + a ready-to-paste prompt. |
