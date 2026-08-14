@@ -26,9 +26,14 @@ This Phase 0 command configures the template's existing email/password and Googl
    - Add the exact Supabase callback URL shown in Supabase's Google provider panel, normally `https://<project-ref>.supabase.co/auth/v1/callback`, as an authorized redirect URI.
    - In Supabase **Authentication > Providers > Google**, enable Google and paste the Client ID and Client Secret. Keep these credentials in Google Cloud and Supabase only—never in `.env.local`, source, or Git.
    - Use only `openid`, `email`, and `profile` unless a later feature explicitly needs more scopes.
-6. In Supabase **Authentication > Emails > Templates**, ask the user to paste the project-branded HTML from `docs/supabase/email-templates/` into **Confirm sign up** and **Reset password**. Preserve `{{ .ConfirmationURL }}` exactly. Do not paste templates automatically or claim they were saved without user confirmation.
-7. Run or guide smoke tests with an inbox the user controls: sign up with email/password and verify the confirmation link; request and complete a password reset; sign in with Google and confirm the browser returns through `/auth/callback` to `/dashboard`. State which tests cannot be completed until a production domain is available.
-8. Summarize enabled settings, deferred production settings, and test results. Store no secrets in tracked files.
+6. Configure Gmail SMTP for Supabase auth emails:
+   - Ask the user to enable 2-Step Verification on the sending Google account and create a Google App Password.
+   - In Supabase **Authentication > Emails > SMTP Settings**, enable **Custom SMTP** and enter `smtp.gmail.com` on port `465`, the sender email address and display name, the Gmail address as the username, and the App Password as the password.
+   - Enter SMTP credentials only in Supabase. Do not print, place in `.env.local`, or commit the Gmail password or App Password.
+   - Explain Gmail's sending limit (up to 500 emails/day for a standard Gmail account) and confirm the sender address belongs to the configured Gmail account.
+7. In Supabase **Authentication > Emails > Templates**, ask the user to paste the project-branded HTML from `docs/supabase/email-templates/` into **Confirm sign up** and **Reset password**. Preserve `{{ .ConfirmationURL }}` exactly. Do not paste templates automatically or claim they were saved without user confirmation.
+8. Run or guide smoke tests with an inbox the user controls: sign up with email/password and verify the confirmation link; request and complete a password reset; sign in with Google and confirm the browser returns through `/auth/callback` to `/dashboard`. State which tests cannot be completed until a production domain is available.
+9. Summarize enabled settings, deferred production settings, and test results. Store no secrets in tracked files.
 
 ## Constraints
 

@@ -62,7 +62,7 @@ GITHUB_PROJECT_ID=<project-id>
    - stable ordered IDs for every Phase 0 task.
 4. Phase 0 is **DannFlow template readiness**, not project feature design. Do not plan a product-specific relational database, schema migration, RLS policy, new auth provider, or application feature in this phase. Include only applicable work from this set:
    - Supabase template connection and environment values — `Run: /setup-supabase`;
-   - template Auth configuration: email settings, redirects, branded email templates, and the template's included Google sign-in — `Run: /setup-auth`;
+   - template Auth configuration: Gmail SMTP for Supabase auth emails, email settings, redirects, branded email templates, and the template's included Google sign-in — `Run: /setup-auth`;
    - project overview applied to the template UI: design direction, color system, landing-page copy, and template visual cleanup — `Run: /design-project`;
    - hero media brief and asset handoff — `Run: /hero-bg`;
    - template-level visual and quality review — `Run: /seo-check`, `/marketing-check`, and `/review`.
