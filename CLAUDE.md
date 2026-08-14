@@ -138,6 +138,12 @@ Before specialized work, verify these MCPs are connected:
 If a required MCP is missing, stop and tell the user:
 > ⚠️ [Tool Name] MCP Not Detected: I need this to [task]. Open Settings → MCP Store → install "[Tool Name]" using credentials from `.env.local`.
 
+### Connection reporting rule
+
+Keep three states separate: **connected**, **capability unavailable**, and **authorization denied**. The presence of any callable tool from an MCP, or a successful read-only call, means that MCP is connected. A missing task-specific tool or an API/CLI permission error must be reported as its exact capability or scope issue—not as a disconnected MCP. Use the missing-MCP message only when no tools from that MCP are available or a connection attempt fails. This applies equally to GitHub and Supabase.
+
+For GitHub Projects, if the authenticated `gh` CLI reports a missing `read:project` or `project` scope, report **GitHub connected; GitHub Projects authorization needs refresh** and instruct the user to run `gh auth refresh -s project`. After confirmation, retry the operation. Never turn this scope error into an MCP installation or reconnection request.
+
 ## Code conventions
 
 - Functional components + hooks. No classes.
