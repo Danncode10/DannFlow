@@ -38,6 +38,10 @@ To fix:
 > 2. Install "[Tool Name]" and follow the setup.
 > 3. Use your credentials from .env.local.
 
+**Connection, capability, and authorization are different checks:** Do not infer that an MCP is disconnected just because a task-specific tool is not exposed, a tool lacks a particular capability, or an API/CLI call returns an authorization or scope error. First inspect the available tools for that MCP and, when applicable, make one read-only capability check. If any tool from the MCP is available or responds, report it as **connected**. Then describe the precise blocker instead (for example, “GitHub Projects capability is not exposed in this session” or “the authenticated GitHub token lacks `project` scope”). Use the Missing Tool Alert only when the MCP itself has no available tools or an actual connection attempt fails. Apply this rule equally to GitHub and Supabase; never ask the user to reconnect an MCP that is already connected.
+
+**GitHub Projects CLI fallback:** If GitHub is connected but `gh project` reports a missing `read:project` or `project` scope, say exactly that GitHub is connected and instruct the user to run `gh auth refresh -s project`. Do not show the Missing Tool Alert, ask them to reconnect GitHub, or ask them to install an MCP. After the user confirms the refresh, retry the blocked GitHub Projects operation.
+
 ## Architectural Guardrails
 1.  **Separation of Concerns**: UI components must NOT contain database logic or direct API calls.
 2.  **Logic Layer**: All business logic and Supabase queries MUST live strictly within `src/services/`.
