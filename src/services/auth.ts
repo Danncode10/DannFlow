@@ -1,7 +1,7 @@
 'use client';
 
 import type { Provider } from '@supabase/supabase-js';
-import { createClient } from '@/utils/supabase/client';
+import { createClient, createRecoveryClient } from '@/utils/supabase/client';
 
 /**
  * Auth Service (Client-side)
@@ -64,7 +64,7 @@ export async function signInWithOAuthProvider(provider: Provider, next = '/dashb
 }
 
 export async function forgotPassword(email: string) {
-  const client = createClient();
+  const client = createRecoveryClient();
   const { error } = await client.auth.resetPasswordForEmail(email, {
     redirectTo: `${window.location.origin}/reset-password`,
   });
@@ -73,7 +73,7 @@ export async function forgotPassword(email: string) {
 }
 
 export async function resetPassword(password: string) {
-  const client = createClient();
+  const client = createRecoveryClient();
   const { error } = await client.auth.updateUser({
     password: password,
   });

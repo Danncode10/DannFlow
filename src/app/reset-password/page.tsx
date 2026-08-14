@@ -5,8 +5,12 @@ import { Lock, Loader2, AlertCircle, RefreshCcw, Eye, EyeOff } from 'lucide-reac
 import { resetPassword } from '@/services/auth';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
-import { createClient } from '@/utils/supabase/client';
+import { createRecoveryClient } from '@/utils/supabase/client';
 import Link from 'next/link';
+
+function errorMessage(error: unknown) {
+  return error instanceof Error ? error.message : 'Something went wrong. Please try again.';
+}
 
 function ResetPasswordForm() {
   const [password, setPassword] = useState('');
@@ -25,7 +29,7 @@ function ResetPasswordForm() {
 
   useEffect(() => {
     const checkSession = async () => {
-      const supabase = createClient();
+      const supabase = createRecoveryClient();
       const { data: { session } } = await supabase.auth.getSession();
       
       if (session) {
@@ -62,9 +66,9 @@ function ResetPasswordForm() {
         description: 'Your password has been reset successfully. You can now log in.',
       });
       router.push('/login');
-    } catch (err: any) {
+    } catch (err: unknown) {
       toast.error('Error resetting password', {
-        description: err.message || 'Something went wrong. Please try again.',
+        description: errorMessage(err),
       });
     } finally {
       setLoading(false);

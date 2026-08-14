@@ -2,6 +2,7 @@
 
 import { createClient } from '@/utils/supabase/server';
 import { verifyRateLimit } from '@/lib/ratelimit';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 
 const MIN_PASSWORD_SCORE = 3;
 
@@ -68,7 +69,20 @@ export async function forgotPasswordRateLimited(email: string, redirectUrl: stri
   const { success } = await verifyRateLimit(email, "password-reset");
   if (!success) throw new Error('Too many password reset attempts. Try again in a few moments.');
 
-  const supabase = await createClient();
+  // Recovery emails may be opened in a different browser from the one that
+  // requested them. Avoid PKCE's browser-local verifier for this one flow.
+  const supabase = createSupabaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      auth: {
+        autoRefreshToken: false,
+        detectSessionInUrl: false,
+        flowType: 'implicit',
+        persistSession: false,
+      },
+    },
+  );
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: redirectUrl,
   });

@@ -10,7 +10,11 @@ export function middleware(request: NextRequest) {
   const { pathname, searchParams } = request.nextUrl
 
   const code = searchParams.get('code')
-  if (code && pathname !== '/auth/callback') {
+  // Password-recovery links intentionally land on /reset-password. The browser
+  // Supabase client exchanges that code there, so forwarding it to /login would
+  // make the login layout redirect an authenticated recovery session to the
+  // dashboard before the user can choose a new password.
+  if (code && pathname !== '/auth/callback' && pathname !== '/reset-password') {
     const url = request.nextUrl.clone()
     url.pathname = '/auth/callback'
     // preserve `next` if it was passed, otherwise default to /login
