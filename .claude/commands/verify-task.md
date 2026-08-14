@@ -1,6 +1,6 @@
 ---
 description: Generate a human verification checklist for the current tracked task, then tell the user to run /close-task only after they confirm it works.
-argument-hint: "[task-id] [--project-owner <owner>] [--project-number <number>]"
+argument-hint: "[task-id] [--project-url <url>] [--project-owner <owner>] [--project-number <number>]"
 ---
 
 Help the user verify a tracked task before closing it. This command does not close the task, move Project cards, edit application code, or commit.
@@ -16,24 +16,25 @@ User input: **$ARGUMENTS**
    - If exactly one task is `In progress`, use that task.
    - If multiple tasks are `In progress`, ask the user which task to verify.
    - If no task is `In progress`, ask for a task ID.
-3. Resolve the task details from `MASTERPLAN.md`, phase docs, and the linked GitHub Project item by stable task ID prefix. For a Phase 0 setup task, include only its relevant dashboard, email, OAuth, browser, or terminal checks; do not invent feature-code checks.
-4. Inspect the local implementation:
+3. Resolve the linked Project from `--project-url`, then `GITHUB_PROJECT_URL` in `.env.local`. Accept `https://github.com/users/<owner>/projects/<number>` and `https://github.com/orgs/<owner>/projects/<number>`; strip `/views/...` and query strings, derive owner/number, and fetch the API ID. Use explicit or environment owner/number/ID values only as a legacy fallback.
+4. Resolve the task details from `MASTERPLAN.md`, phase docs, and the linked GitHub Project item by stable task ID prefix. For a Phase 0 setup task, include only its relevant dashboard, email, OAuth, browser, or terminal checks; do not invent feature-code checks.
+5. Inspect the local implementation:
    - `git status --short --branch`
    - unstaged and staged diffs
    - relevant files changed for the task
    - relevant docs or acceptance criteria for the task
-5. Run safe, task-appropriate automated verification commands when available.
+6. Run safe, task-appropriate automated verification commands when available.
    - Prefer fast checks first.
    - Do not run destructive commands.
    - Do not apply migrations to a remote database unless the user explicitly asked for that in the current invocation.
    - If live tooling or credentials are missing, state the exact verification that could not be performed.
-6. Convert the task into a human verification checklist:
+7. Convert the task into a human verification checklist:
    - Include concrete steps the user can perform in the browser, Supabase Dashboard, GitHub Project, email inbox, or local terminal.
    - Include expected results for each step.
    - Include any important negative/security checks, especially RLS or ownership checks.
    - Keep the checklist scoped to the selected task only.
-7. Ask the user to perform the checklist and report pass/fail.
-8. End by telling the user:
+8. Ask the user to perform the checklist and report pass/fail.
+9. End by telling the user:
    - If every human check passes, run `/close-task <task-id>`.
    - If anything fails, paste the failed step/error back into chat so it can be fixed before closing.
 

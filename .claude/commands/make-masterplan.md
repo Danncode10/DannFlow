@@ -1,6 +1,6 @@
 ---
 description: Expand one or more future MASTERPLAN phases into detailed ordered tasks and sync their cards to the linked GitHub Project.
-argument-hint: "<phase> [--project-owner <owner>] [--project-number <number>] [--dry-run]"
+argument-hint: "<phase> [--project-url <url>] [--project-owner <owner>] [--project-number <number>] [--dry-run]"
 ---
 
 # /make-masterplan
@@ -18,8 +18,8 @@ User input: **$ARGUMENTS**
    - If Projects APIs are not exposed through MCP, use authenticated `gh` CLI with the `project` scope.
    - If neither path is available, stop with the project's Missing Tool Alert Protocol for GitHub MCP.
 4. Resolve the GitHub Project:
-   - Prefer `GITHUB_PROJECT_OWNER`, `GITHUB_PROJECT_NUMBER`, and `GITHUB_PROJECT_ID` in `.env.local`.
-   - Use `--project-owner` and `--project-number` when provided.
+   - Prefer `--project-url`, then `GITHUB_PROJECT_URL` in `.env.local`. Accept `https://github.com/users/<owner>/projects/<number>` and `https://github.com/orgs/<owner>/projects/<number>`; strip `/views/...` and query strings, then derive the owner, number, and API ID.
+   - Use `--project-owner` and `--project-number`, or legacy `GITHUB_PROJECT_OWNER`, `GITHUB_PROJECT_NUMBER`, and `GITHUB_PROJECT_ID`, only when no URL binding is available.
    - Otherwise list projects for the current repo owner or authenticated user and ask only if the intended project is ambiguous.
 5. Require a target phase from `$ARGUMENTS` such as `Phase 1`, `P1`, or `Phase 2`. If it is ambiguous, ask which future phase to expand.
 6. Preserve Phase 0, completed tasks, task IDs, notes, and live Project statuses. Replace only the selected phase's placeholder with detailed ordered tasks.

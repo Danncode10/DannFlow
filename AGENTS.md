@@ -54,6 +54,7 @@ To fix:
 -   If you encounter a bug, fix it in the **Service** layer first.
 -   If you need a new data structure, define or request generation of its types in `src/types/` first.
 -   **Masterplan + GitHub Project Tracking**: For a new SaaS, `/new-project` must finish before `/masterplan-init`; the user must create a Kanban-style GitHub Project before `/masterplan-init` links it. Before later feature or task work, find the matching ordered task in `MASTERPLAN.md` and the linked GitHub Project when one exists. Use stable IDs like `[P2.1]`, `[P2.2]`, `[P3A.1]`; never create bare `[P2]` cards.
+    - Bind the board with `GITHUB_PROJECT_URL` in `.env.local`, using `https://github.com/users/<owner>/projects/<number>` or `https://github.com/orgs/<owner>/projects/<number>`. Ignore `/views/...` and query-string suffixes; derive legacy owner, number, and API ID values automatically when needed.
     - If the task exists, confirm the card when ambiguous, then move it to `In progress` when work starts.
     - If the task is not in `MASTERPLAN.md`, warn the user and ask whether to add it to `MASTERPLAN.md` and the GitHub Project before proceeding.
     - When finishing, check the task in `MASTERPLAN.md`, move the GitHub Project item to `Done`, and mention the task ID in the final response.
