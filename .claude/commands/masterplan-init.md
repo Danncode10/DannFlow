@@ -21,6 +21,15 @@ Treat the project as initialized only when all of the following are true:
 
 If the project is still the DannFlow template, or the record is incomplete, stop without editing files or GitHub. Say which signals were missing and tell the user to run `/new-project` first. Do not add prerequisite/admin tasks to `MASTERPLAN.md`.
 
+## Supabase project handoff
+
+`/new-project` deliberately does not collect or provision Supabase. This command owns that step.
+
+1. If `.env.local` has no non-placeholder `SUPABASE_PROJECT_ID`, ask the user to provide an existing Supabase project ID or say **provision a new one**.
+2. If provisioning is requested, follow the repository provisioning protocol: list organizations, ask for the project name and organization ID, check cost, confirm cost, then provision. Never create an application `organizations` table.
+3. Ask the user to add the Supabase URL, publishable key, service-role key, and `DATABASE_URL` to `.env.local`. Never write secrets to tracked files.
+4. Verify the project ID is non-placeholder before continuing. After credentials are available, run `pnpm db:migrate` and verify the required public tables and functions.
+
 ## GitHub Project prerequisite
 
 1. Verify GitHub Projects access. Prefer GitHub MCP; use authenticated `gh` CLI with the `project` scope only when MCP Projects APIs are unavailable.
