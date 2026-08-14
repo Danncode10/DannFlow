@@ -1,6 +1,6 @@
 ---
 description: Inspect MASTERPLAN.md and the linked GitHub Project, organize Ready tasks, and ask which task the user wants to handle next.
-argument-hint: "[--project-owner <owner>] [--project-number <number>] [--limit <n>] [--dry-run]"
+argument-hint: "[--project-url <url>] [--project-owner <owner>] [--project-number <number>] [--limit <n>] [--dry-run]"
 ---
 
 Organize the task board and help the user choose what to handle next. This command does not implement, edit application code, or start feature work.
@@ -15,8 +15,8 @@ User input: **$ARGUMENTS**
    - If Projects APIs are not exposed through MCP, use authenticated `gh` CLI with the `project` scope.
    - If neither is available, stop with the project's Missing Tool Alert Protocol for GitHub MCP.
 3. Resolve the GitHub Project:
-   - Prefer `GITHUB_PROJECT_OWNER`, `GITHUB_PROJECT_NUMBER`, and `GITHUB_PROJECT_ID` in `.env.local`.
-   - Use `--project-owner` and `--project-number` when provided.
+   - Prefer `--project-url`, then `GITHUB_PROJECT_URL` in `.env.local`. Accept `https://github.com/users/<owner>/projects/<number>` and `https://github.com/orgs/<owner>/projects/<number>`; strip `/views/...` and query strings, then derive the owner, number, and API ID.
+   - Use `--project-owner` and `--project-number`, or legacy `GITHUB_PROJECT_OWNER`, `GITHUB_PROJECT_NUMBER`, and `GITHUB_PROJECT_ID`, only when no URL binding is available.
    - Otherwise list projects and ask only if the intended Project is ambiguous.
 4. Fetch Project items and match them to `MASTERPLAN.md` tasks by stable task ID prefix:
    - valid: `[P2.1]`, `[P3A.2]`

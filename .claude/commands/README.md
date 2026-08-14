@@ -7,18 +7,18 @@ Drop `.md` files in this folder to add custom slash commands. Each file becomes 
 | Command | Purpose |
 |---|---|
 | `/new-project ["name"]` | **Start a new project.** Rebrands the code, creates a GitHub repo, and connects one dedicated Supabase project. |
-| `/masterplan-init [--project-owner <owner>] [--project-number <number>]` | **Initialize execution planning.** Detects a completed `/new-project`, requires an existing Kanban-style GitHub Project, then creates detailed Phase 0 cards. |
+| `/masterplan-init [--project-url <url>]` | **Initialize execution planning.** Accepts a GitHub Project URL, requires an existing Kanban-style board, then creates detailed Phase 0 cards. |
 | `/setup-supabase` | Guides the existing DannFlow template's Supabase environment values and dashboard settings without designing or changing project database schema. |
 | `/setup-auth` | Configures and verifies the template's email auth, Google sign-in, redirects, and branded Supabase email templates without changing schema. |
 | `/design-project ["section"]` | **Then design it.** Claude reads README + `PROJECT_CONTEXT` + code configuration and replaces template copy and design with a bespoke project. |
 | `/init-claude` | Reads `README.md` + scans `src/` + `package.json`, then auto-rewrites `CLAUDE.md`, `SKILLS.md`, and refreshes this README to match the actual project state. |
 | `/help-dannflow` | Report-only command catalog. Shows how to run DannFlow commands in Claude and through the Codex bridge, grouped by category with a Mermaid graph. |
 | `/ask-command` | Meta-router. Describe what you want in plain English; it searches all commands here and returns the best one + a ready-to-paste prompt. |
-| `/make-masterplan <phase> [--project-owner <owner>] [--project-number <number>]` | Expands a future phase without replacing initialized Phase 0, then syncs its ordered task cards. |
-| `/update-masterplan [--project-owner <owner>] [--project-number <number>]` | Syncs edits in `MASTERPLAN.md` to the linked GitHub Project, preserving ordered task IDs and live statuses. |
-| `/what-task [--project-owner <owner>] [--project-number <number>]` | Shows current task status, prepares Ready tasks when empty, and asks before moving one task to `In progress`; never implements the task. |
-| `/verify-task [task-id] [--project-owner <owner>] [--project-number <number>]` | Generates the human verification checklist for an `In progress` task and tells you to run `/close-task` only after it passes. |
-| `/close-task [task-id] [--project-owner <owner>] [--project-number <number>]` | After `/verify-task` is confirmed, commits completed work, marks the task complete in `MASTERPLAN.md`, and moves its Project item to `Done`. |
+| `/make-masterplan <phase> [--project-url <url>]` | Expands a future phase without replacing initialized Phase 0, then syncs its ordered task cards. |
+| `/update-masterplan [--project-url <url>]` | Syncs edits in `MASTERPLAN.md` to the linked GitHub Project, preserving ordered task IDs and live statuses. |
+| `/what-task [--project-url <url>]` | Shows current task status, prepares Ready tasks when empty, and asks before moving one task to `In progress`; never implements the task. |
+| `/verify-task [task-id] [--project-url <url>]` | Generates the human verification checklist for an `In progress` task and tells you to run `/close-task` only after it passes. |
+| `/close-task [task-id] [--project-url <url>]` | After `/verify-task` is confirmed, commits completed work, marks the task complete in `MASTERPLAN.md`, and moves its Project item to `Done`. |
 | `/security-audit` | Full security scan: secrets in client bundles, service-role key leaks, `dangerouslySetInnerHTML`, missing `'use server'`, XSS vectors. |
 | `/rls-check` | Walks `src/services/` and confirms every query filters by user/ownership. Cross-references `src/types/supabase.ts`. |
 | `/rls <table>` | Inspects RLS policies for a single table via Supabase MCP. Returns who can SELECT/INSERT/UPDATE/DELETE and any gaps. |

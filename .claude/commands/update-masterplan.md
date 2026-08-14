@@ -1,6 +1,6 @@
 ---
 description: Sync edits in MASTERPLAN.md to a linked GitHub Project while preserving ordered task IDs and live statuses.
-argument-hint: "[--project-owner <owner>] [--project-number <number>] [--prune] [--dry-run]"
+argument-hint: "[--project-url <url>] [--project-owner <owner>] [--project-number <number>] [--prune] [--dry-run]"
 ---
 
 # /update-masterplan
@@ -16,7 +16,7 @@ User input: **$ARGUMENTS**
    - Prefer GitHub MCP if it exposes GitHub Projects v2 item APIs.
    - If Projects APIs are not exposed through MCP, use authenticated `gh` CLI with the `project` scope.
    - If neither path is available, stop with the project's Missing Tool Alert Protocol for GitHub MCP.
-3. Resolve the GitHub Project from explicit args, then `GITHUB_PROJECT_OWNER`, `GITHUB_PROJECT_NUMBER`, and `GITHUB_PROJECT_ID` in `.env.local`, then by listing projects. If no linked Project exists, tell the user to create a Kanban-style Project and run `/masterplan-init`; do not create a Project automatically.
+3. Resolve the GitHub Project from `--project-url`, then `GITHUB_PROJECT_URL` in `.env.local`, then legacy explicit owner/number arguments and `GITHUB_PROJECT_OWNER`, `GITHUB_PROJECT_NUMBER`, and `GITHUB_PROJECT_ID`. Accept `https://github.com/users/<owner>/projects/<number>` and `https://github.com/orgs/<owner>/projects/<number>`; strip `/views/...` and query strings, derive owner/number, and fetch the API ID. Only then list projects. If no linked Project exists, tell the user to create a Kanban-style Project and run `/masterplan-init`; do not create a Project automatically.
 4. Parse all task checkboxes in `MASTERPLAN.md`.
 5. Validate every task title starts with a stable ID:
    - valid: `[P2.1] Build feature service`

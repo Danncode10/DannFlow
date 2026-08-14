@@ -29,6 +29,8 @@ Follow [MCP setup](mcp-setup.md) before beginning. GitHub MCP must be able to ac
 
 Create a non-draft GitHub Project in Kanban/Board layout with these Status values: `Backlog`, `Ready`, `In progress`, and `Done`.
 
+Copy the canonical board URL into `GITHUB_PROJECT_URL` in `.env.local`, for example `https://github.com/users/your-owner/projects/1`. Do not include a `/views/...` suffix or query string; DannFlow derives the owner, project number, and API ID from the URL.
+
 ### Step 4 — Run `/masterplan-init`
 
 In Claude Code, run:
@@ -69,7 +71,7 @@ Run `/ask-command <what you want>` if you don't remember which command to use.
 | `/new-project [name]` | Initializes the SaaS identity, repository, Supabase connection, and tracked schema. |
 | `/masterplan-init` | Requires an existing Kanban-style GitHub Project, then links it and creates detailed Phase 0 cards. |
 | `/make-masterplan <phase>` | Expands a later phase without overwriting Phase 0. |
-| `/update-masterplan [--project-owner <owner>] [--project-number <number>]` | Syncs `MASTERPLAN.md` edits to the linked GitHub Project while preserving task order and live statuses. |
+| `/update-masterplan [--project-url <url>]` | Syncs `MASTERPLAN.md` edits to the linked GitHub Project while preserving task order and live statuses. |
 
 ### Security & quality
 | Command | What it does |

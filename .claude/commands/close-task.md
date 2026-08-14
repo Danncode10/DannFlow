@@ -1,6 +1,6 @@
 ---
 description: Close a human-verified tracked task by committing completed work, recording a short verification note, then updating MASTERPLAN.md and the linked GitHub Project to Done.
-argument-hint: "[task-id] [--project-owner <owner>] [--project-number <number>] [--dry-run]"
+argument-hint: "[task-id] [--project-url <url>] [--project-owner <owner>] [--project-number <number>] [--dry-run]"
 ---
 
 Close a completed tracked task after human verification. If the user has not confirmed `/verify-task` passed, send them back to `/verify-task` first.
@@ -20,36 +20,37 @@ User input: **$ARGUMENTS**
    - Prefer GitHub MCP if it exposes Projects v2 item APIs.
    - If Projects APIs are not exposed through MCP, use authenticated `gh` CLI with the `project` scope.
    - If neither is available, stop with the project's Missing Tool Alert Protocol for GitHub MCP.
-4. Confirm the task exists in `MASTERPLAN.md` and the linked GitHub Project by stable task ID prefix.
-5. Confirm human verification:
+4. Resolve the linked Project from `--project-url`, then `GITHUB_PROJECT_URL` in `.env.local`. Accept `https://github.com/users/<owner>/projects/<number>` and `https://github.com/orgs/<owner>/projects/<number>`; strip `/views/...` and query strings, derive owner/number, and fetch the API ID. Use explicit or environment owner/number/ID values only as a legacy fallback.
+5. Confirm the task exists in `MASTERPLAN.md` and the linked GitHub Project by stable task ID prefix.
+6. Confirm human verification:
    - If the current conversation includes a clear user confirmation that `/verify-task <task-id>` passed, continue.
    - If not, stop and say: "Before closing, run `/verify-task <task-id>` and confirm the checklist passes."
    - Do not infer human verification from automated checks alone.
-6. Check whether the task appears complete:
+7. Check whether the task appears complete:
    - inspect `git status`
    - inspect unstaged and staged diffs
    - run task-appropriate verification commands when available
    - summarize what changed and what passed
-7. If completion is ambiguous, ask before closing.
-8. Commit completed work before updating task tracking:
+8. If completion is ambiguous, ask before closing.
+9. Commit completed work before updating task tracking:
    - follow the same safety rules as `/commit`
    - do not stage `.env*`, credentials, or unrelated files
    - stage only files that belong to the completed task
    - create a focused conventional commit
    - if the implementation was already committed and the worktree is clean, reuse that existing commit instead of creating an empty commit
-9. Create or update one short verification note before marking the task done:
+10. Create or update one short verification note before marking the task done:
    - path: `docs/tests/<task-id-lowercase>-<short-task-slug>.md`
    - keep it text-only by default; do not copy screenshots, images, or large artifacts into the repo
    - summarize screenshot evidence in one sentence when screenshots were discussed in chat
    - write for beginners: explain what was tested, why the task mattered, what passed, and what would count as a failure
    - keep the note concise; prefer 1-2 short paragraphs and a compact checklist
    - if `docs/tests/` does not exist, create it
-10. After the implementation commit succeeds and the verification note is ready, update task tracking:
+11. After the implementation commit succeeds and the verification note is ready, update task tracking:
    - mark the matching checkbox `[x]` in `MASTERPLAN.md`
    - move the GitHub Project item to `Done`
    - do not use `In review` unless the repository explicitly requires it
-11. Create a second small tracking commit for `MASTERPLAN.md` and the verification note unless the user explicitly asks to leave tracking uncommitted.
-12. Report the closed task, commit hash or hashes, verification note path, verification, and any remaining follow-up.
+12. Create a second small tracking commit for `MASTERPLAN.md` and the verification note unless the user explicitly asks to leave tracking uncommitted.
+13. Report the closed task, commit hash or hashes, verification note path, verification, and any remaining follow-up.
 
 ## Commit rules
 

@@ -1,6 +1,6 @@
 ---
 description: Verify a DannFlow project is initialized, require an existing Kanban-style GitHub Project, then create a detailed Phase 0 and sync its task cards.
-argument-hint: "[--project-owner <owner>] [--project-number <number>] [--dry-run]"
+argument-hint: "[--project-url <url>] [--project-owner <owner>] [--project-number <number>] [--dry-run]"
 ---
 
 # /masterplan-init
@@ -33,7 +33,7 @@ If the project is still the DannFlow template, or the record is incomplete, stop
 ## GitHub Project prerequisite
 
 1. Verify GitHub Projects access. Prefer GitHub MCP; use authenticated `gh` CLI with the `project` scope only when MCP Projects APIs are unavailable.
-2. Resolve the Project from command arguments, then `GITHUB_PROJECT_OWNER`, `GITHUB_PROJECT_NUMBER`, and `GITHUB_PROJECT_ID` in `.env.local`, then by listing Projects for the repository owner.
+2. Resolve the Project from `--project-url`, then `GITHUB_PROJECT_URL` in `.env.local`, then legacy `--project-owner`/`--project-number` arguments and `GITHUB_PROJECT_OWNER`, `GITHUB_PROJECT_NUMBER`, and `GITHUB_PROJECT_ID`. Accept canonical GitHub URLs in the form `https://github.com/users/<owner>/projects/<number>` or `https://github.com/orgs/<owner>/projects/<number>`; strip any `/views/...` suffix and query string before lookup. Derive the owner and number from the URL, then fetch the API ID. Only list Projects for the repository owner if no binding is present.
 3. If no matching Project exists, stop without editing `MASTERPLAN.md` or creating cards. Tell the user:
 
 ```text
@@ -46,9 +46,10 @@ No GitHub Project is linked to this SaaS yet. Create a GitHub Project in Kanban/
 ## Procedure
 
 1. Preserve completed tasks and existing IDs if `MASTERPLAN.md` was previously initialized. Do not duplicate tasks or cards when rerun.
-2. After selecting the Project, write its non-secret binding to `.env.local` and keep the placeholder names documented in `.env.example`:
+2. After selecting the Project, write its non-secret canonical binding to `.env.local`, derive the compatibility/API fields, and keep placeholder names documented in `.env.example`:
 
 ```env
+GITHUB_PROJECT_URL=https://github.com/users/<owner>/projects/<number>
 GITHUB_PROJECT_OWNER=<owner>
 GITHUB_PROJECT_NUMBER=<number>
 GITHUB_PROJECT_ID=<project-id>
