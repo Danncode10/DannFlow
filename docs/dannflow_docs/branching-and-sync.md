@@ -49,17 +49,17 @@ Your project has **rewritten git history** (from `guide.sh init`), so it shares 
 }
 ```
 
-This file is the anchor every sync reads and updates. If `dannflow.json` is missing, the repo was never adopted — run `/adopt-dannflow`.
+This file is the anchor every sync reads and updates. `install.sh` writes it automatically with the exact cloned DannFlow commit. If it is missing in an older DannFlow installation, run `/update-dannflow --init`; use `/adopt-dannflow` only for a repository that did not start from DannFlow and needs its full setup.
 
 ### The three commands
 
 | Command | Direction | What it does |
 |---|---|---|
 | **`/adopt-dannflow`** | setup (once) | Installs `ci.yml` (and proves it green), writes `dannflow.json`, creates `dev`, then runs the first sync. Turns a non-DannFlow repo into a first-class one. |
-| **`/sync-upstream`** | DannFlow → project | Copies new template files in. Lands them on `feat/sync-upstream-<sha>` and opens a PR into `dev` — so synced changes ride the same CI gate. Never touches `main` directly. |
+| **`/sync-upstream`** | DannFlow → project | Copies new template files in. Always lands them on `feat/sync-upstream-<sha>`, then opens a PR into the project `base_branch` (normally `main`). Never pushes directly to it. |
 | **`/sync-to-upstream`** | project → DannFlow | Copies a generic improvement back up via a clean clone → `feat/*` branch → PR into DannFlow `main`. |
 
-**Decision rule:** no `dannflow.json` → `/adopt-dannflow`. Has it → `/sync-upstream` to update, `/sync-to-upstream` to contribute.
+**Decision rule:** an older DannFlow installation without `dannflow.json` → `/update-dannflow --init`; an unrelated repo → `/adopt-dannflow`; an anchored project → `/sync-upstream` to update or `/sync-to-upstream` to contribute.
 
 ---
 

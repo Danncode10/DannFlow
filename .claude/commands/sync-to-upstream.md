@@ -14,7 +14,7 @@ Use this when:
 
 Because your project has **rewritten git history** (via `guide.sh init`), you cannot open a normal PR from this project checkout. This command handles that: it classifies your changes, refreshes generated command help when command prompts changed, extracts only the generic ones, and opens a clean PR from a clean clone.
 
-Strict output rule: `/sync-to-upstream` must end with either a GitHub PR URL or a clear blocker explaining why a PR could not be created. Do not present email patching or "patch saved for later" as a successful final output.
+**Successful-output rule:** after the PR is created, output **only its GitHub PR URL**. Do not present email patches, compare URLs, branch names, summaries, or next steps as successful final output. If a PR cannot be created, stop with an error rather than claiming success.
 
 ---
 
@@ -79,7 +79,7 @@ scripts/
 src/prompts/features/
 ```
 
-> Keep this list in sync with `/sync-upstream`'s default scan paths — the two commands should cover the same file set in both directions. **Exception:** `.github/workflows/ci.yml` is intentionally excluded here. Your project's `ci.yml` is tuned to *your* package manager and scripts; pushing it up would pollute the generic template. Contribute CI *improvements* by hand, not the tuned file.
+> This is the **outgoing candidate** list, not a mirror of `/sync-upstream`'s incoming list. Incoming sync may inspect project-facing files such as `PROJECT_CONTEXT.md` and `.github/`; outgoing sync excludes project context and CI because they are project-tuned. **Exception:** `.github/workflows/ci.yml` must never be contributed automatically. Contribute CI improvements by hand.
 
 **Exclude from scanning (always business-specific — never upstream candidates):**
 
@@ -259,9 +259,11 @@ Proceed directly with the PR flow unless a required tool or permission is missin
 
 1. Run the clone + branch creation:
    ```bash
+   PROJECT_SHA=$(git rev-parse --short HEAD)
+   CONTRIBUTION_BRANCH="feat/sync-to-upstream-$PROJECT_SHA"
    git clone https://github.com/Danncode10/DannFlow.git /tmp/dannflow-contrib
    cd /tmp/dannflow-contrib
-   git checkout -b <branch-name>
+   git switch -c "$CONTRIBUTION_BRANCH" main
    ```
 
 2. Copy selected files to their target paths (same relative path as in your project). If Step 5 refreshed `.claude/commands/help-dannflow.md`, include that file even if it was not in the user's original selection.
@@ -290,16 +292,13 @@ Proceed directly with the PR flow unless a required tool or permission is missin
 
 6. Ask before pushing:
    ```
-   Ready to push branch '<branch-name>' to origin (Danncode10/DannFlow)?
+   Ready to push branch '$CONTRIBUTION_BRANCH' to origin (Danncode10/DannFlow)?
    This will create a branch on the remote. (y/n)
    ```
 
-7. If confirmed: `git push origin <branch-name>`
+7. If confirmed: `git push origin "$CONTRIBUTION_BRANCH"`
 
-8. Open the PR directly via the GitHub MCP (`create_pull_request`) or `gh pr create --repo Danncode10/DannFlow --base main --head <branch-name>` — DannFlow has no `dev` branch, so contributions PR straight into `main`, where its CI gate keeps the template clean. If neither is available, print the compare URL as a blocker, not as success:
-   ```
-   https://github.com/Danncode10/DannFlow/compare/<branch-name>
-   ```
+8. Open the PR directly via the GitHub MCP (`create_pull_request`) or `gh pr create --repo Danncode10/DannFlow --base main --head "$CONTRIBUTION_BRANCH"` — DannFlow has no `dev` branch, so contributions PR straight into `main`, where its CI gate keeps the template clean. If neither is available, stop with an error; never print a compare URL as a substitute. Once created, end the command response with the PR URL alone.
 
 ---
 
@@ -307,7 +306,7 @@ Proceed directly with the PR flow unless a required tool or permission is missin
 
 - **Never** `git push` without asking first.
 - **Never** push to `main` or `upstream/main`. Always a feature branch.
-- **Never** finish successfully without a PR URL. A compare URL is only a blocker/fallback that still needs user action.
+- **Never** finish successfully without a PR URL. After creation, the final response is the PR URL alone.
 - **Never** contribute new or edited top-level `.claude/commands/*.md` files without first refreshing and locally committing `.claude/commands/help-dannflow.md`.
 - **Never** include files from the "never auto-touch" list unless the user typed the path explicitly.
 - **Never** include files with API keys, secrets, or env vars. Scan each selected file for common patterns (`sk-`, `eyJ`, `SUPABASE_`, `NEXT_PUBLIC_`) before including.
@@ -320,4 +319,4 @@ Proceed directly with the PR flow unless a required tool or permission is missin
 
 - Tables over paragraphs.
 - Show file paths verbatim.
-- End with a one-line summary of what was contributed (or skipped and why).
+- During selection and preparation, report the necessary classification and diffs. After a successful PR creation, replace the usual summary with the PR URL alone.

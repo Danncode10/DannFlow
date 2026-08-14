@@ -135,7 +135,7 @@ The project's own counters: `feat/* → dev → main`.
 
 ## Step 5 — First sync (hand off to `/sync-upstream`)
 
-Run `/sync-upstream` behavior to pull the template in for the first time. It lands changes on a `feat/sync-...` branch and opens a PR into `dev` (see that command). This is the "first grocery run."
+Run `/sync-upstream` behavior to pull the template in for the first time. It lands changes on a `feat/sync-...` branch and opens a PR into the configured base branch (see that command). This is the "first grocery run."
 
 ---
 

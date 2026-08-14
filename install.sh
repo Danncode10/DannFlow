@@ -62,6 +62,13 @@ echo -e "${CYAN}📦 Cloning DannFlow into ./${PKG_NAME}...${NC}"
 git clone https://github.com/Danncode10/DannFlow.git "$TARGET_DIR"
 cd "$TARGET_DIR"
 
+# Record the exact template revision before the project history is rebranded.
+# Both sync commands use this anchor to calculate safe, file-level updates.
+DANNFLOW_COMMIT=$(git rev-parse HEAD)
+DANNFLOW_SYNCED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+printf '{\n  "dannflow_commit": "%s",\n  "synced_at": "%s",\n  "repo": "https://github.com/Danncode10/DannFlow",\n  "base_branch": "main",\n  "dev_branch": "dev"\n}\n' "$DANNFLOW_COMMIT" "$DANNFLOW_SYNCED_AT" > dannflow.json
+echo -e "✅ Created dannflow.json for DannFlow commit ${DANNFLOW_COMMIT:0:12}"
+
 # DannFlow is the template. Keep it as fetch-only upstream so project work
 # cannot accidentally be pushed back into the template repository.
 git remote rename origin upstream

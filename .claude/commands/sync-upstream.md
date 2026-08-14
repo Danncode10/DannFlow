@@ -8,7 +8,9 @@ Pull selective updates from the DannFlow upstream repo without merging or rebasi
 
 > **Version-aware:** This command reads `dannflow.json` at the project root to know which DannFlow commit you last synced from, so it can show you only what's new since then.
 
-> **Branch flow (the "serving plate stays clean" rule).** Synced changes do **not** land on whatever branch you're standing on. They land on a fresh `feat/sync-upstream-<short-sha>` branch and open a **PR into `dev`** (the `dev_branch` from `dannflow.json`). That routes every synced change through the same CI gate as your own work, so `main` is never touched directly. `dev → main` stays a normal PR you open after eyeballing CI. If the repo has no `dev` branch yet, it hasn't been adopted — tell the user to run `/adopt-dannflow` first.
+> **Branch flow (the "serving plate stays clean" rule).** Synced changes never land on the current branch. They always land on a fresh `feat/sync-upstream-<short-sha>` branch, created from the project's `base_branch` and opened back into that branch (normally `main`). `dev` is not required or used by this command.
+
+**Successful-output rule:** after the PR is created, output **only its GitHub PR URL**. Do not end with a summary, compare URL, branch name, or next steps.
 
 **Two modes** — file-level is the default and recommended:
 
@@ -82,6 +84,7 @@ If the user didn't pass a path, scan these (in this order):
 ```
 .claude/commands/
 .claude/agents/
+.claude/skills/
 .codex/commands/
 .codex/context/
 .github/
@@ -132,13 +135,21 @@ src/prompts/features/
    - `none` / `q` to quit
    - For each modified file, also offer `view N` to show the diff before deciding
 
-5. **Create the landing branch first**, off the project's `dev` branch — so synced changes ride the CI gate instead of landing loose on `main`:
+5. **Create the hash-named landing branch first**, from the project's configured base branch (normally `main`):
    ```bash
    UPSTREAM_SHA=$(git rev-parse upstream/main)
    SHORT_SHA=$(git rev-parse --short upstream/main)
-   DEV_BRANCH=$(node -p "require('./dannflow.json').dev_branch || 'dev'")
-   git rev-parse --verify "$DEV_BRANCH" >/dev/null 2>&1 || { echo "No '$DEV_BRANCH' branch — run /adopt-dannflow first."; exit 1; }
-   git checkout -b "feat/sync-upstream-$SHORT_SHA" "$DEV_BRANCH"
+   BASE_BRANCH=$(node -p "require('./dannflow.json').base_branch || 'main'")
+   TARGET_BRANCH="$BASE_BRANCH"
+   if git show-ref --verify --quiet "refs/heads/$BASE_BRANCH"; then
+     TARGET_REF="$BASE_BRANCH"
+   elif git show-ref --verify --quiet "refs/remotes/origin/$BASE_BRANCH"; then
+     TARGET_REF="origin/$BASE_BRANCH"
+   else
+     echo "Configured base branch '$BASE_BRANCH' does not exist locally or on origin."
+     exit 1
+   fi
+   git switch -c "feat/sync-upstream-$SHORT_SHA" "$TARGET_REF"
    ```
 
 6. **Apply the user's choices** onto that branch, file by file:
@@ -172,18 +183,18 @@ src/prompts/features/
    ```
    The subject describes *what files changed*; the trailers record *which template commit it came from*. The `DannFlow-Source` SHA must match `dannflow.json`'s `dannflow_commit`.
 
-9. **Open a PR into `dev`** (use the GitHub MCP / `gh pr create`), so CI gates the synced changes. Ask before pushing. Stop here — do **not** auto-merge to `main`; that promotion is a human checkpoint after CI goes green:
+9. **Open a PR into the project base branch** (use the GitHub MCP or `gh pr create`), so CI gates the sync. Ask before pushing. Do not auto-merge it. If neither tool can create a PR, stop with an error; never substitute a compare URL:
    ```bash
    git push -u origin "feat/sync-upstream-$SHORT_SHA"
-   gh pr create --base "$DEV_BRANCH" --head "feat/sync-upstream-$SHORT_SHA" \
+   gh pr create --base "$TARGET_BRANCH" --head "feat/sync-upstream-$SHORT_SHA" \
      --title "chore(sync): DannFlow @$SHORT_SHA" --body "Synced from Danncode10/DannFlow@$SHORT_SHA"
    ```
-   If `gh` is unavailable, fall back to leaving the committed branch and printing the compare URL.
+   Once created, end the command response with the PR URL alone.
 
 ### Safety rules for file-level mode
 
 - **Never** `git checkout upstream/main -- .` (whole tree). Always scoped paths.
-- **Never** land synced changes directly on `main` or `dev`. Always the `feat/sync-upstream-<sha>` branch → PR into `dev`. If there's no `dev` branch, stop and point the user to `/adopt-dannflow`.
+- **Never** land synced changes directly on the project base branch. Always use `feat/sync-upstream-<sha>` → PR into that branch.
 - **Never** auto-merge the sync PR to `main` — that promotion is a human checkpoint after CI passes.
 - **Never** `git checkout upstream/main` over `.github/workflows/ci.yml` — diff-only (it's project-tuned).
 - **Never** auto-overwrite a modified file without showing the diff first.
@@ -235,7 +246,7 @@ For when the user explicitly wants to see upstream commits and pick one. **Expec
 
 - Be concise. Tables and short prompts beat walls of text.
 - Always show file paths and SHAs verbatim (never abbreviate truncated forms).
-- After any operation, end with a one-line conventional commit suggestion for `/commit` to use.
+- During inspection and selection, report the necessary table, diffs, and decision prompts. After a successful PR creation, end with the PR URL alone; do not append a commit suggestion.
 
 ## When to refuse
 

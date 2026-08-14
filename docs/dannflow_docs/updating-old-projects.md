@@ -36,7 +36,7 @@ Steps:
 4. Bootstrap the latest commands ONLY (this is a file copy, NOT a merge): git checkout upstream/main -- .claude/commands/ — then commit it as "chore: bootstrap latest DannFlow commands from upstream". This copy never deletes my custom commands; it only adds/overwrites DannFlow's.
 5. Read the file .claude/commands/adopt-dannflow.md and execute its steps exactly, as if I had run `/adopt-dannflow --force`. You do NOT need the slash command registered — just follow the file. This installs CI, writes dannflow.json, creates the dev branch, and runs the first sync.
 6. When you create any PR with `gh`, ALWAYS pass `--repo <my origin owner/repo>` explicitly. My repo has two remotes (origin + upstream), which otherwise confuses gh and makes PR creation fail with a misleading "No commits between" / "Head sha can't be blank" error.
-7. Land changes on a feature branch and open a PR into `dev` (never commit straight to main).
+7. Land changes on a feature branch and open a PR into the configured base branch (never commit straight to it).
 
 Note: if branch protection on main returns HTTP 403 ("Upgrade to GitHub Pro or make this repository public"), that's a GitHub plan limit, not an error — just report it and continue. Everything else should still complete.
 

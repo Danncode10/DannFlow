@@ -170,8 +170,14 @@ restaurant-website  (a specific client project)
 git clone https://github.com/Danncode10/DannFlow.git my-template
 cd my-template
 
+# 1a. Record the installed template revision for future safe syncs
+DANNFLOW_COMMIT=$(git rev-parse HEAD)
+DANNFLOW_SYNCED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+printf '{\n  "dannflow_commit": "%s",\n  "synced_at": "%s",\n  "repo": "https://github.com/Danncode10/DannFlow",\n  "base_branch": "main",\n  "dev_branch": "dev"\n}\n' "$DANNFLOW_COMMIT" "$DANNFLOW_SYNCED_AT" > dannflow.json
+
 # 2. Label DannFlow as "upstream" (where updates come from)
 git remote rename origin upstream
+git remote set-url --push upstream DISABLED
 
 # 3. Create your own GitHub repo and set it as origin
 git remote add origin https://github.com/YOUR_USERNAME/my-template.git
@@ -199,7 +205,7 @@ feat/*  →  dev  →  main
   prep      test    release
 ```
 
-Every promotion runs the CI check (`.github/workflows/ci.yml`), so nothing reaches `main` un-tested. `/sync-upstream` respects this — synced changes land on a `feat/sync-*` branch and open a PR into `dev`, never straight onto `main`. DannFlow itself stays on `main`-only (no `dev`) so the template is always green.
+Every promotion runs the CI check (`.github/workflows/ci.yml`), so nothing reaches `main` un-tested. `/sync-upstream` always creates a `feat/sync-*` branch and targets the configured project base branch (normally `main`); it never pushes synced files straight onto that branch. DannFlow itself stays on `main`-only (no `dev`) so the template is always green.
 
 → Full details in [docs/dannflow_docs/branching-and-sync.md](docs/dannflow_docs/branching-and-sync.md).
 
@@ -377,7 +383,7 @@ DannFlow commands. The repository also includes additional command packs under
 | `/init-claude` | Tailor CLAUDE.md + SKILLS.md to your project |
 | `/make-command <name>` | Create a new slash command |
 | `/adopt-dannflow` | Bootstrap a non-DannFlow repo: CI + dannflow.json + dev branch, then sync |
-| `/sync-upstream` | Pull selective updates from the parent template (PRs into `dev`) |
+| `/sync-upstream` | Pull selective updates from the parent template (hash-named branch → configured base branch) |
 | `/checkpoint` | Snapshot DB before risky schema changes |
 | `/sync-types` | Regenerate Supabase types when needed |
 | `/migrate` | Edit `db/schema/*.ts`, generate SQL, apply with `pnpm db:migrate` |
