@@ -1,5 +1,5 @@
 ---
-description: Verify a DannFlow project is initialized, require an existing Kanban-style GitHub Project, then create a detailed Phase 0 and sync its task cards.
+description: Verify a DannFlow project is initialized, require an existing Kanban-style GitHub Project, then create detailed Phase 0 readiness cards including Vercel deployment setup.
 argument-hint: "[--project-url <url>] [--project-owner <owner>] [--project-number <number>] [--dry-run]"
 ---
 
@@ -66,6 +66,7 @@ GITHUB_PROJECT_ID=<project-id>
    - `[P0.3]` template Auth configuration: Gmail SMTP for Supabase auth emails, email settings, redirects, branded email templates, and the template's included Google sign-in — `Run: /setup-auth`; depend on `[P0.1]` and `[P0.2]` because branded email templates must use the established visual system;
    - `[P0.4]` hero media brief and asset handoff — `Run: /hero-bg`; depend on `[P0.2]`;
    - `[P0.5]` template-level visual and quality review — `Run: /seo-check`, `/marketing-check`, and `/review`; depend on the applicable earlier Phase 0 tasks.
+   - `[P0.6]` Vercel production deployment and authentication URL registration: import the Git repository, configure only runtime environment variables required by the deployed app, deploy, set `NEXT_PUBLIC_SITE_URL` to the canonical HTTPS production origin, add that origin to Supabase Auth Site URL and exact app redirect URLs, add it as a Google Cloud Authorized JavaScript origin, retain the Google-to-Supabase callback URI, redeploy after environment changes, and verify email confirmation, password recovery, and Google sign-in in production — `Run: /setup-vercel`; depend on `[P0.1]`, `[P0.2]`, `[P0.3]`, and `[P0.5]`.
 5. Put project-specific database design, relationships, new tables, RLS changes, new provider implementation, and product features into later phases created with `/make-masterplan`.
 6. Every Phase 0 task must include a short goal, dependencies, acceptance criteria, and one or more `Run: /...` handoffs. Do not put long dashboard tutorials in `MASTERPLAN.md`; they belong in the referenced command.
 7. Sync every Phase 0 task to one matching real GitHub Issue and add that Issue to the Project by stable ID prefix. New unchecked items start in `Backlog`; checked items map to `Done`; preserve existing `Ready` and `In progress` states. Never create a Project draft item.
@@ -93,4 +94,6 @@ Next:
 - Never create a GitHub Project automatically.
 - Never create a draft Project or draft card; use real GitHub Issues as cards.
 - Never store credentials, database URLs, or tokens in `.env.example` or tracked files.
+- Vercel deployment instructions must distinguish browser-safe `NEXT_PUBLIC_*` values from server-only secrets; never recommend adding `DATABASE_URL` merely to deploy the application.
+- For Google OAuth, the deployed app origin belongs in **Authorized JavaScript origins**. The **Authorized redirect URI** remains the Supabase callback (`https://<project-ref>.supabase.co/auth/v1/callback`), while Supabase allow-lists the app's `/auth/callback` and recovery routes.
 - Do not modify application code while initializing the plan.
