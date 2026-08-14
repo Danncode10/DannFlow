@@ -38,17 +38,35 @@ For the complete local redirect URL and email template setup, use the [Supabase 
 
 ## Google Cloud OAuth
 
-Create a Google OAuth client:
+Google sign-in has two redirect layers. Both must be configured, but they belong in different dashboards:
 
-1. Open Google Cloud Console.
-2. Configure the OAuth consent screen for the app brand.
-3. Create an OAuth Client ID with type **Web application**.
-4. Add authorized JavaScript origins:
+```text
+Browser → Google → Supabase Auth callback → app /auth/callback → /dashboard
+```
+
+### 1. Create the Google OAuth client
+
+1. Open [Google Cloud Console](https://console.cloud.google.com/) and create or select the product project.
+2. Open **Google Auth platform > Branding** (or **OAuth consent screen**) and set the app name, support email, and developer contact email. Add the authorized production domain when one exists.
+3. If publishing remains in **Testing**, add each person who will test sign-in under **Audience > Test users**.
+4. Open **Google Auth platform > Clients**, create an OAuth Client ID, and choose **Web application**.
+5. Under **Authorized JavaScript origins**, add:
    - `http://localhost:3000`
    - `https://your-domain.com`
-5. Add the authorized redirect URI from the Supabase Google provider screen:
+6. Under **Authorized redirect URIs**, add the exact value shown in Supabase **Authentication > Sign In / Providers > Google**:
    - `https://YOUR_PROJECT_REF.supabase.co/auth/v1/callback`
-6. Copy the Client ID and Client Secret into the Supabase Google provider.
+
+This redirect URI sends Google back to Supabase. It is not the same as the app's `/auth/callback` route.
+
+### 2. Complete Supabase configuration
+
+1. In **Authentication > Sign In / Providers > Google**, enable Google and paste the Google Client ID and Client Secret.
+2. In **Authentication > URL Configuration**, set the local Site URL to `http://localhost:3000` and allow:
+   - `http://localhost:3000/auth/callback`
+   - `http://localhost:3000/reset-password`
+3. Add equivalent production URLs after deployment, including `https://your-domain.com/auth/callback`.
+
+The URL Configuration values are Supabase's approved destinations after it receives the Google response. Keep Google credentials only in Google Cloud and Supabase; do not add them to `.env.local` or source control.
 
 Required Google scopes:
 
@@ -80,6 +98,8 @@ The login UI maps common failures to user-facing messages:
 - Supabase unavailable or paused: tells the user to check project status and environment URL.
 - Invalid email/password: explains that credentials do not match.
 - Google provider not configured: points to Supabase provider and redirect URL setup.
+- Google shows an access-blocked or testing message: add the account to the Google OAuth consent screen's test-user list, or publish the consent screen when ready.
+- Google reports a redirect mismatch: compare the exact Google authorized redirect URI with the Supabase provider callback URL. Do not use the app's `/auth/callback` URL in Google Cloud.
 - Forgot password: reuses the email already entered on the login form and sends a setup link without asking for the old password.
 
 Password signup currently requires at least 3 of these 4 checks:
@@ -98,7 +118,8 @@ The server action repeats the password check so users cannot bypass it by editin
 - Open `http://localhost:3000/login`.
 - Confirm weak passwords do not submit signup.
 - Confirm `Continue with Google` redirects to Google.
-- Confirm Google returns to `/auth/callback` and then `/dashboard`.
+- Confirm the Google account is permitted by the consent-screen audience.
+- Confirm Google returns through the Supabase callback, then `/auth/callback`, and finally `/dashboard`.
 - Open `http://localhost:3000/forgot-password`.
 - Confirm the page matches the login theme on mobile and desktop.
 
