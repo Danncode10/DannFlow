@@ -17,9 +17,10 @@ Unless the user explicitly requests a named redesign, a `/design-project` run is
 - the existing page and component hierarchy, section order, route structure, and navigation;
 - the existing hero composition, media, video, typewriter, animations, and interaction patterns;
 - the existing feature, pricing, blog, CTA, navbar, and footer components, including their current layout behavior; and
+- the existing sign-in page at `src/app/login/page.tsx`, including its sign-in, sign-up, password-recovery, Google OAuth, validation, loading, success, and responsive behaviors; and
 - existing client/server boundaries, data wiring, loading states, and responsive behavior.
 
-Do not delete a component, replace an entire component implementation, substitute a different preview or visual concept, remove an animation or media asset, or convert one section into a different kind of section. Do not add, remove, merge, or reorder sections. A color/theme update must be expressed through existing semantic tokens; copy updates must stay within the existing component's current content slots.
+Do not delete a component, replace an entire component implementation, substitute a different preview or visual concept, remove an animation or media asset, or convert one section into a different kind of section. Do not add, remove, merge, or reorder sections. A color/theme update must be expressed through existing semantic tokens; copy updates must stay within the existing component's current content slots. The sign-in page must receive the same project copy and visual treatment as the landing page; preserve its format and all auth behavior while replacing template-branded text and stale visual styling.
 
 ### Hero-media freeze — absolute
 
@@ -59,6 +60,8 @@ Adapt the existing template in place. Allowed work includes:
 - refining existing copy, spacing, typography, borders, and component states to match the approved theme, without changing the component's composition or interaction behavior;
 - carrying the approved tokens into related existing surfaces, such as login, forms, and email templates.
 
+The sign-in page is an in-scope dependent surface on every run. Update its existing brand label, headings, explanatory copy, feature list, form and button surfaces, success/error states, and footer to match the product and approved semantic tokens. Do not change the login page's structure, auth handlers, form fields, route, mode switching, or responsive breakpoint behavior.
+
 These refinements must reuse the template's components and preserve its route structure, section order, navigation, footer, media, animations, interactions, and established responsive behavior.
 
 ### 4. What requires explicit separate permission
@@ -68,5 +71,9 @@ Do not replace the landing page, rebuild its sections, swap the navigation or fo
 If a proposed change could alter more than a small existing component, stop and show the exact files and template areas that would change. Wait for confirmation before editing.
 
 For email templates or other dependent surfaces, document the approved visual direction first; do not redesign the public UI solely to create a palette.
+
+### 5. Visible verification — mandatory
+
+After editing, run the local app and inspect `/login` at desktop and mobile widths. Show the updated sign-in page to the user through the available browser preview or a rendered screenshot, then report the verified viewports and any unavailable interaction checks. Do not claim the sign-in page has been updated until its project copy and visual treatment are visibly verified.
 
 Use data only through `src/services/`. DannFlow uses one application per Supabase project: do not introduce `app_id`, `organization_id`, tenant filters, or organization setup. Respect the table's actual RLS policy, user ownership where present, and intentional public-read policies.
