@@ -20,6 +20,9 @@ export const metadata: Metadata = {
   title: `${siteConfig.name} — AI-Native Starter for Builders`,
   description: "The backbone template for websites, management systems, apps, and startup ideas. Built with Next.js, Supabase, and Tailwind CSS.",
   metadataBase: new URL(siteConfig.url),
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -27,11 +30,13 @@ export const metadata: Metadata = {
     title: `${siteConfig.name} — AI-Native Starter for Builders`,
     description: "The backbone template for websites, management systems, apps, and startup ideas. Built with Next.js, Supabase, and Tailwind CSS.",
     siteName: siteConfig.name,
+    images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: `${siteConfig.name} — AI-Native Starter for Builders`,
     description: "The backbone template for websites, management systems, apps, and startup ideas. Built with Next.js, Supabase, and Tailwind CSS.",
+    images: ["/opengraph-image"],
   },
 };
 

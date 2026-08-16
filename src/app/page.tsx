@@ -8,7 +8,7 @@ import { Pricing } from "@/components/landing/pricing";
 import { CtaBanner } from "@/components/landing/cta-banner";
 import { Typewriter } from "@/components/landing/typewriter";
 import { BlogPreview } from "@/components/landing/blog-preview";
-import { creatorRepos } from "@/lib/config";
+import { creatorRepos, siteConfig } from "@/lib/config";
 
 
 export default async function Home() {
@@ -17,9 +17,20 @@ export default async function Home() {
   const profile = session?.profile;
   const profiles = await getVibeCheckData() || [];
   const repos = creatorRepos;
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: siteConfig.name,
+    description: siteConfig.description,
+    url: siteConfig.url,
+  };
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Navbar user={user} />
 
       <Hero isAuthed={!!user} />
