@@ -20,12 +20,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'daily',
       priority: 0.8,
     },
-    {
-      url: `${base}/dashboard`,
-      lastModified: new Date(),
-      changeFrequency: 'always',
-      priority: 0.8,
-    },
   ];
 
   // Add every published blog post (best-effort — sitemap still works without)
