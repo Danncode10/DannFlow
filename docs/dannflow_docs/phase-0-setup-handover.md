@@ -201,7 +201,7 @@ When a setting, provider, URL, or workflow changes, update this file in the same
 
 1. Run `pnpm lint` and `pnpm build`.
 2. Choose one **canonical production origin**. Prefer a verified custom domain; otherwise temporarily use the stable Vercel production domain. Do not use a branch, commit preview, or localhost URL.
-3. Keep the origin exact: HTTPS, no path, and no trailing slash. In this section, replace `<PRODUCTION_ORIGIN>` with that value.
+3. Keep the origin exact: it must start with `https://`, have no path, and have no trailing slash. For example: `https://your-app.vercel.app`. In this section, replace `<PRODUCTION_ORIGIN>` with that complete value; never use a bare domain.
 
 ### A. Create the Vercel project
 
@@ -212,14 +212,14 @@ When a setting, provider, URL, or workflow changes, update this file in the same
 
 ### Required post-deployment URL handoff
 
-1. The initial deployment uses the current `NEXT_PUBLIC_SITE_URL`. In Vercel, replace it with `<PRODUCTION_ORIGIN>`, then redeploy production.
+1. The initial deployment uses the current `NEXT_PUBLIC_SITE_URL`. In Vercel, replace only that variable with the complete `<PRODUCTION_ORIGIN>` (for example, `https://your-app.vercel.app`), then redeploy production. Do not change `NEXT_PUBLIC_SUPABASE_URL`: it must remain `https://<SUPABASE_PROJECT_REF>.supabase.co`.
 2. Complete sections B and C below with that same exact origin.
 3. Complete the three production authentication tests in section D.
 
 ### B. Register the deployed origin in Supabase
 
 1. Open **Supabase → Authentication → URL Configuration**.
-2. During testing, keep **Site URL** as `http://localhost:3000` when local development is the intended fallback. This does not prevent production testing when the production redirect URLs below are allow-listed. Set Site URL to `<PRODUCTION_ORIGIN>` only when production becomes the intended public-launch fallback for authentication emails and templates.
+2. During testing, keep **Site URL** as `http://localhost:3000` when local development is the intended fallback. This does not prevent production testing when the production redirect URLs below are allow-listed. Set Site URL to the complete `<PRODUCTION_ORIGIN>` only when production becomes the intended public-launch fallback for authentication emails and templates. It must include `https://`; a bare domain is invalid.
 3. Retain localhost URLs and add:
 
    ```text
@@ -258,6 +258,7 @@ The canonical production URL is deployed, its Vercel production variables are co
 
 | Platform | Setting | Value |
 | --- | --- | --- |
+| Vercel | `NEXT_PUBLIC_SUPABASE_URL` | `https://<SUPABASE_PROJECT_REF>.supabase.co` — never the production app URL |
 | Vercel | `NEXT_PUBLIC_SITE_URL` (Production) | `<PRODUCTION_ORIGIN>` |
 | Supabase | Site URL | Keep the intended fallback during testing; set `<PRODUCTION_ORIGIN>` at public launch |
 | Supabase | Redirect URLs | `<PRODUCTION_ORIGIN>/auth/callback`, `<PRODUCTION_ORIGIN>/reset-password` |
