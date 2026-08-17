@@ -17,20 +17,21 @@ Read `.env.example`, `.env.local`, `src/lib/config.ts`, `src/services/auth-serve
 
 1. Run `pnpm lint` and `pnpm build`. Stop and report failures before creating or changing a production deployment.
 2. Guide the user in Vercel: **Add New → Project**, import the correct Git repository, choose the correct team/account, verify Next.js detection, and leave the root directory at the repository root unless the app is intentionally in a monorepo subdirectory.
-3. In **Project → Settings → Environment Variables**, ask the user to copy values from their private `.env.local` into Vercel rather than sharing values in chat. Configure the appropriate deployment environments:
+3. In **Project → Settings → Environment Variables**, ask the user to copy only the required deployment runtime values from their private `.env.local` into Vercel rather than sharing values in chat. Never copy the entire file. Configure the appropriate deployment environments:
    - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_SITE_NAME`, and `NEXT_PUBLIC_GITHUB_URL` for Production and any Preview environment that will be tested.
    - `SUPABASE_SERVICE_ROLE_KEY`, `UPSTASH_REDIS_REST_URL`, and `UPSTASH_REDIS_REST_TOKEN` only where the deployed server runtime requires them. They must never use the `NEXT_PUBLIC_` prefix.
-   - `NEXT_PUBLIC_SITE_URL` in Production as the canonical HTTPS production origin. Preview can use a deliberately configured preview value only when the app supports it.
+   - Copy the current `NEXT_PUBLIC_SITE_URL` value from `.env.local` for the initial deployment, even when it is the local development origin. Once Vercel reveals the canonical HTTPS production origin, replace the Production value in step 5. Preview can use a deliberately configured preview value only when the app supports it.
    - Do not add `DATABASE_URL`, `SUPABASE_PROJECT_ID`, or GitHub Project board variables merely for deployment. Migrations must not run from Vercel builds.
-4. Deploy. Determine the canonical production origin from the supplied argument, a verified custom domain, or the stable Vercel production domain. Reject preview, branch, commit, and localhost URLs as the canonical production origin.
-5. In **Supabase → Authentication → URL Configuration**:
+4. Deploy, or accept a production URL the user supplies after deploying. Determine the canonical production origin from the supplied argument, a verified custom domain, or the stable Vercel production domain. Reject preview, branch, commit, and localhost URLs as the canonical production origin. A live deployment is an intermediate checkpoint: do not report this task complete until steps 5–10 are finished.
+5. In **Vercel → Project → Settings → Environment Variables**, replace the initial `NEXT_PUBLIC_SITE_URL` value with `<PRODUCTION_ORIGIN>`, then create a new production deployment. Do not treat the deployment that revealed the URL as using this new value.
+6. In **Supabase → Authentication → URL Configuration**:
    - Set **Site URL** to `<PRODUCTION_ORIGIN>`.
    - Retain localhost entries and add exact redirect URLs: `<PRODUCTION_ORIGIN>/auth/callback` and `<PRODUCTION_ORIGIN>/reset-password`.
    - Add `https://*-<team-or-account-slug>.vercel.app/**` only if preview authentication is intentionally supported; keep production paths exact.
-6. In **Google Cloud → Google Auth Platform → Clients**, add `<PRODUCTION_ORIGIN>` under **Authorized JavaScript origins**. Keep the **Authorized redirect URI** as the exact Supabase provider callback: `https://<SUPABASE_PROJECT_REF>.supabase.co/auth/v1/callback`. Do not replace it with the app callback URL.
-7. When a custom production domain is used, add it in Google Auth Platform **Branding → Authorized domains** if required. Complete any required brand verification before public launch.
-8. Redeploy after changing Vercel environment variables. Test email confirmation, password recovery, and Google sign-in on the canonical production origin, verifying Google reaches `/dashboard` through `/auth/callback`.
-9. Record only non-secret configuration status, canonical origin, and test results in the handover or task record. Do not paste credentials, API keys, database URLs, or full `.env.local` contents into tracked files, tickets, logs, or chat.
+7. In **Google Cloud → Google Auth Platform → Clients**, add `<PRODUCTION_ORIGIN>` under **Authorized JavaScript origins**. Keep the **Authorized redirect URI** as the exact Supabase provider callback: `https://<SUPABASE_PROJECT_REF>.supabase.co/auth/v1/callback`. Do not replace it with the app callback URL.
+8. When a custom production domain is used, add it in Google Auth Platform **Branding → Authorized domains** if required. Complete any required brand verification before public launch.
+9. Test email confirmation, password recovery, and Google sign-in on the new production deployment, verifying Google reaches `/dashboard` through `/auth/callback`.
+10. Record only non-secret configuration status, canonical origin, and test results in the handover or task record. Do not paste credentials, API keys, database URLs, or full `.env.local` contents into tracked files, tickets, logs, or chat.
 
 ## URL map
 
