@@ -78,6 +78,9 @@ Follow these stages in order. Configure the **GitHub MCP** and **Supabase MCP** 
 
 After Stage 4, run `/what-task` to select the first Phase 0 task.
 
+For the dashboard settings, verification checks, and deployment handoff that
+complete Phase 0, follow the [Phase 0 setup handover runbook](docs/dannflow_docs/phase-0-setup-handover.md).
+
 Then start development:
 ```bash
 npm run dev
