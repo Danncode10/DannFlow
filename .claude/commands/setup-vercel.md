@@ -25,10 +25,11 @@ Read `.env.example`, `.env.local`, `src/lib/config.ts`, `src/services/auth-serve
 4. Deploy, or accept a production URL the user supplies after deploying. Determine the canonical production origin from the supplied argument, a verified custom domain, or the stable Vercel production domain. Reject preview, branch, commit, and localhost URLs as the canonical production origin. A live deployment is an intermediate checkpoint: do not report this task complete until steps 5–10 are finished.
 5. In **Vercel → Project → Settings → Environment Variables**, replace the initial `NEXT_PUBLIC_SITE_URL` value with `<PRODUCTION_ORIGIN>`, then create a new production deployment. Do not treat the deployment that revealed the URL as using this new value.
 6. In **Supabase → Authentication → URL Configuration**:
-   - Set **Site URL** to `<PRODUCTION_ORIGIN>`.
-   - Retain localhost entries and add exact redirect URLs: `<PRODUCTION_ORIGIN>/auth/callback` and `<PRODUCTION_ORIGIN>/reset-password`.
+   - During testing, keep the existing **Site URL** (often `http://localhost:3000`) if local development remains the intended fallback. The Site URL is used only when an authentication flow does not supply or match an allowed redirect URL.
+   - Retain localhost entries and add exact redirect URLs: `<PRODUCTION_ORIGIN>/auth/callback` and `<PRODUCTION_ORIGIN>/reset-password`. With both local and production URLs allow-listed, accounts can be created and tested from either origin.
+   - At public launch, set **Site URL** to `<PRODUCTION_ORIGIN>` when production should become the default fallback destination for authentication emails and templates.
    - Add `https://*-<team-or-account-slug>.vercel.app/**` only if preview authentication is intentionally supported; keep production paths exact.
-7. In **Google Cloud → Google Auth Platform → Clients**, add `<PRODUCTION_ORIGIN>` under **Authorized JavaScript origins**. Keep the **Authorized redirect URI** as the exact Supabase provider callback: `https://<SUPABASE_PROJECT_REF>.supabase.co/auth/v1/callback`. Do not replace it with the app callback URL.
+7. In Google Cloud, search for **Google Auth Platform**, open **Clients**, then open the existing **Web application** client. Under **Authorized JavaScript origins**, click **Add URI** and enter `<PRODUCTION_ORIGIN>` with no path. Keep the **Authorized redirect URI** as the exact Supabase provider callback: `https://<SUPABASE_PROJECT_REF>.supabase.co/auth/v1/callback`. Do not replace it with the app callback URL. Click **Save**.
 8. When a custom production domain is used, add it in Google Auth Platform **Branding → Authorized domains** if required. Complete any required brand verification before public launch.
 9. Test email confirmation, password recovery, and Google sign-in on the new production deployment, verifying Google reaches `/dashboard` through `/auth/callback`.
 10. Record only non-secret configuration status, canonical origin, and test results in the handover or task record. Do not paste credentials, API keys, database URLs, or full `.env.local` contents into tracked files, tickets, logs, or chat.
@@ -38,7 +39,7 @@ Read `.env.example`, `.env.local`, `src/lib/config.ts`, `src/services/auth-serve
 | Platform | Setting | Value |
 | --- | --- | --- |
 | Vercel | `NEXT_PUBLIC_SITE_URL` | `<PRODUCTION_ORIGIN>` |
-| Supabase | Site URL | `<PRODUCTION_ORIGIN>` |
+| Supabase | Site URL | Keep the intended fallback during testing; set `<PRODUCTION_ORIGIN>` at public launch |
 | Supabase | Redirect URLs | `<PRODUCTION_ORIGIN>/auth/callback`, `<PRODUCTION_ORIGIN>/reset-password` |
 | Google Cloud | Authorized JavaScript origin | `<PRODUCTION_ORIGIN>` |
 | Google Cloud | Authorized redirect URI | `https://<SUPABASE_PROJECT_REF>.supabase.co/auth/v1/callback` |
@@ -47,5 +48,5 @@ Read `.env.example`, `.env.local`, `src/lib/config.ts`, `src/services/auth-serve
 
 - The production deployment is live at one canonical HTTPS origin.
 - Vercel has all and only the required runtime environment variables for that deployment.
-- Supabase and Google Cloud contain the correct, distinct production URL settings.
+- Supabase and Google Cloud contain the correct production redirect/origin settings, and the Supabase Site URL is intentionally set for the current testing or launch stage.
 - Email confirmation, password recovery, and Google sign-in pass in production.
