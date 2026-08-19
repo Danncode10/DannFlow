@@ -41,7 +41,10 @@ User input: **$ARGUMENTS**
 10. Create or update one short verification note before marking the task done:
    - path: `docs/tests/<task-id-lowercase>-<short-task-slug>.md`
    - keep it text-only by default; do not copy screenshots, images, or large artifacts into the repo
-   - summarize screenshot evidence in one sentence when screenshots were discussed in chat
+   - review the current task conversation and document the human verification that actually occurred
+   - under `## Human Evidence`, use a compact checklist that names each human action, its observed result, and any screenshot-backed result; preserve the order in which the checks occurred
+   - summarize screenshots in text only, including what they demonstrated; never copy images into the repository
+   - do not invent checks, results, or user actions that are not supported by the conversation
    - write for beginners: explain what was tested, why the task mattered, what passed, and what would count as a failure
    - keep the note concise; prefer 1-2 short paragraphs and a compact checklist
    - if `docs/tests/` does not exist, create it
@@ -80,7 +83,14 @@ Use this compact shape for `docs/tests/<task-id-lowercase>-<short-task-slug>.md`
 - <human app check>: <pass/fail and short note>
 
 ## Human Evidence
-<short text summary of what the user did in the app. If screenshots were provided, summarize what they showed instead of storing the images.>
+
+Review the current conversation and record the human verification as a short ordered checklist. Every item must state the action and its observed result. For example:
+
+- [x] Performed `<verification action>` → observed `<expected result>`.
+- [x] Tested an authorized workflow → the permitted outcome completed successfully.
+- [x] Tested an unauthorized action → access was denied and no data changed.
+
+If screenshots were provided, add only a concise text description of what each screenshot demonstrated. Do not store the image files. Do not list automated checks here unless a person directly observed or ran them during the verification.
 
 ## Result
 Pass. <one sentence on why it is safe to close.>
