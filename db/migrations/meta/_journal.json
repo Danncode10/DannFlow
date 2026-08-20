@@ -8,6 +8,13 @@
       "when": 1786594132769,
       "tag": "0000_single_project_baseline",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1787228841120,
+      "tag": "0001_add_team_management",
+      "breakpoints": true
     }
   ]
 }
