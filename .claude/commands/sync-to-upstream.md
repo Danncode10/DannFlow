@@ -1,6 +1,6 @@
 ---
-description: Contribute local improvements back to DannFlow upstream. Classifies generic changes, refreshes command help when command prompts changed, commits clean docs first, and opens a PR.
-argument-hint: (optional --dry-run to preview without touching git)
+description: Contribute generic improvements back to DannFlow upstream, including explicitly approved reusable schema changes that are verified against the template database before PR creation.
+argument-hint: "[path] [--dry-run]"
 ---
 
 # /sync-to-upstream
@@ -11,10 +11,11 @@ Use this when:
 - You improved a `.claude/commands/` or `.codex/commands/` file that would benefit every DannFlow project
 - You wrote a new doc, script, or skill that belongs in the template
 - You found and fixed a bug that exists in the upstream source
+- You built a project feature with a **generic** database primitive that should become part of every DannFlow project
 
 Because your project has **rewritten git history** (via `guide.sh init`), you cannot open a normal PR from this project checkout. This command handles that: it classifies your changes, refreshes generated command help when command prompts changed, extracts only the generic ones, and opens a clean PR from a clean clone.
 
-**Successful-output rule:** after the PR is created, output **only its GitHub PR URL**. Do not present email patches, compare URLs, branch names, summaries, or next steps as successful final output. If a PR cannot be created, stop with an error rather than claiming success.
+**Successful-output rule:** output a GitHub PR URL only after the contribution commit is pushed, the PR is created from that exact remote commit, and a verification checklist comment is successfully posted. Do not present email patches, compare URLs, branch names, summaries, or next steps as successful final output. If any required step fails, stop with an error rather than claiming success.
 
 ---
 
@@ -23,6 +24,9 @@ Because your project has **rewritten git history** (via `guide.sh init`), you ca
 - `/sync-to-upstream` → interactive mode — scans default paths, classifies, asks which to include
 - `/sync-to-upstream --dry-run` → show the classification report, make no git changes
 - `/sync-to-upstream <path>` → scope the scan to one file or directory
+Database handling is automatic: if a selected candidate includes `db/schema/`, `db/migrations/`, or `src/types/supabase.ts`, enter the **template-schema verification** flow below. This is also required when the selected diff changes database objects, RLS, functions, triggers, Storage policies, or generated Supabase types—even if the changed file is a script or command document.
+
+Template-schema verification never applies a migration to the source project's database. It uses the dedicated DannFlow template verification project defined below.
 
 ---
 
@@ -77,6 +81,9 @@ guide.sh
 docs/dannflow_docs/
 scripts/
 src/prompts/features/
+db/schema/
+db/migrations/
+src/types/supabase.ts
 ```
 
 > This is the **outgoing candidate** list, not a mirror of `/sync-upstream`'s incoming list. Incoming sync may inspect project-facing files such as `PROJECT_CONTEXT.md` and `.github/`; outgoing sync excludes project context and CI because they are project-tuned. **Exception:** `.github/workflows/ci.yml` must never be contributed automatically. Contribute CI improvements by hand.
@@ -100,6 +107,8 @@ PROJECT_CONTEXT.md
 next.config.ts
 tsconfig.json
 ```
+
+`db/schema/`, `db/migrations/`, and `src/types/supabase.ts` are eligible only when their selected diff is generic. Automatically mark the contribution as requiring template-schema verification when any of these paths—or database SQL/RLS/Storage changes elsewhere—are selected.
 
 Build the candidate list using the `dannflow_commit` SHA from `dannflow.json` as the base — this is more precise than `upstream/main` because it reflects exactly what you last synced from, not the current tip:
 ```bash
@@ -137,10 +146,13 @@ Scan the file content for signals that it's project-specific:
 - Docs describe DannFlow methodology (not your client's requirements)
 - Script improves DannFlow developer tooling (checkpoint, update-types, etc.)
 - Skill adds general-purpose capability any DannFlow project would want
+- Schema represents an application-agnostic primitive (for example profiles, memberships, audit logging, feature flags, or a safe reusable authorization pattern) and contains no project-domain fields
 
 **Ambiguous (classify as 🟡 REVIEW NEEDED):**
 - Mix of generic and specific content
 - Not sure — let the user decide
+
+**Database promotion gate:** Never classify a database artifact as upstream-ready merely because its code is generic. Automatically require a dedicated DannFlow template verification database and a reviewed migration whenever database work is detected. Veterinary, booking, vehicle, customer, tenant, client, or other vertical-specific tables/columns remain 🔒 KEEP LOCAL.
 
 ---
 
@@ -270,6 +282,43 @@ Proceed directly with the PR flow unless a required tool or permission is missin
 
 3. Run `git diff` in the clean clone to confirm only the right changes are staged.
 
+### Required template-schema verification
+
+Run this section automatically when selected files include `db/schema/`, `db/migrations/`, or `src/types/supabase.ts`, or when the selected diff changes database SQL, RLS, functions, triggers, Storage policies, or generated types. Do not skip it, and do not use the source project's `DATABASE_URL` or `SUPABASE_PROJECT_ID`.
+
+1. Require these non-placeholder, untracked environment values in the source project before creating the clean clone's `.env.local`:
+
+   ```text
+   DANNFLOW_TEMPLATE_SUPABASE_PROJECT_ID
+   DANNFLOW_TEMPLATE_DATABASE_URL
+   ```
+
+   They must point to a disposable/shared **DannFlow template verification** project—not E‑VetDoc, the source SaaS, or production. If either value is missing, stop before commit, push, or PR creation and explain the blocker.
+
+2. In the clean clone only, create an untracked `.env.local` using those values:
+
+   ```env
+   SUPABASE_PROJECT_ID=<DANNFLOW_TEMPLATE_SUPABASE_PROJECT_ID>
+   DATABASE_URL=<DANNFLOW_TEMPLATE_DATABASE_URL>
+   ```
+
+   Never print, commit, copy, or include these secrets in the patch.
+
+3. Review every selected migration. A normal table/column/index change must originate in `db/schema/`, then use the generated Drizzle migration. RLS, functions, triggers, grants, Storage policies, and extensions must be reviewed as explicit SQL in the tracked migration. Confirm every exposed table has RLS and an ownership/admin policy.
+
+4. Apply and verify the complete template migration history from the clean clone:
+
+   ```bash
+   npm run db:migrate
+   npm exec drizzle-kit check
+   npx tsc --noEmit
+   npm run build
+   ```
+
+   Then use Supabase MCP to list the resulting public tables, functions, triggers, policies, and relevant Storage policies. Run database advisors when available. Verify the changed objects exist and that a normal authenticated user cannot bypass the new RLS policy. Record exact pass/fail results for the PR comment.
+
+5. Regenerate `src/types/supabase.ts` from the template verification database. Include it in the contribution only when its diff reflects the reviewed generic schema change. Do not copy the source project's generated types.
+
 4. Create a commit with provenance trailers (see the canonical spec in `/adopt-dannflow`). Record where the contribution came FROM — the origin repo and commit — so DannFlow history shows which project each improvement originated in:
    ```
    feat: <contribution description>
@@ -296,9 +345,19 @@ Proceed directly with the PR flow unless a required tool or permission is missin
    This will create a branch on the remote. (y/n)
    ```
 
-7. If confirmed: `git push origin "$CONTRIBUTION_BRANCH"`
+7. If confirmed: `git push origin "$CONTRIBUTION_BRANCH"`. Verify that the pushed branch points to the local contribution commit before creating the PR:
 
-8. Open the PR directly via the GitHub MCP (`create_pull_request`) or `gh pr create --repo Danncode10/DannFlow --base main --head "$CONTRIBUTION_BRANCH"` — DannFlow has no `dev` branch, so contributions PR straight into `main`, where its CI gate keeps the template clean. If neither is available, stop with an error; never print a compare URL as a substitute. Once created, end the command response with the PR URL alone.
+   ```bash
+   LOCAL_SHA=$(git rev-parse HEAD)
+   REMOTE_SHA=$(git ls-remote origin "refs/heads/$CONTRIBUTION_BRANCH" | awk '{print $1}')
+   test "$LOCAL_SHA" = "$REMOTE_SHA"
+   ```
+
+   If the SHAs differ, stop. Never create or return a PR URL for an unpushed or different commit.
+
+8. Open the PR directly via the GitHub MCP (`create_pull_request`) or `gh pr create --repo Danncode10/DannFlow --base main --head "$CONTRIBUTION_BRANCH"` — DannFlow has no `dev` branch, so contributions PR straight into `main`, where its CI gate keeps the template clean. If neither is available, stop with an error; never print a compare URL as a substitute.
+
+9. Post a follow-up PR comment before returning the URL. The comment must name the pushed commit SHA, list changed files, state whether template-schema verification ran, include every automated check's pass/fail result, and give a short human verification checklist for the changed behavior. For schema work, the checklist must include RLS/authorization and migration verification. If the comment cannot be posted, report that as a blocker and do not return the PR URL.
 
 ---
 
@@ -307,6 +366,8 @@ Proceed directly with the PR flow unless a required tool or permission is missin
 - **Never** `git push` without asking first.
 - **Never** push to `main` or `upstream/main`. Always a feature branch.
 - **Never** finish successfully without a PR URL. After creation, the final response is the PR URL alone.
+- **Never** return a PR URL until a contribution commit exists, the exact commit is pushed to the PR branch, and the required verification comment has been posted successfully.
+- **Never** promote automatically detected database changes without a clean-clone migration against the dedicated DannFlow template verification database, regenerated types, and Supabase verification.
 - **Never** contribute new or edited top-level `.claude/commands/*.md` files without first refreshing and locally committing `.claude/commands/help-dannflow.md`.
 - **Never** include files from the "never auto-touch" list unless the user typed the path explicitly.
 - **Never** include files with API keys, secrets, or env vars. Scan each selected file for common patterns (`sk-`, `eyJ`, `SUPABASE_`, `NEXT_PUBLIC_`) before including.

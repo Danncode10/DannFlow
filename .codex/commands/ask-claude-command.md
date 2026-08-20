@@ -12,6 +12,7 @@ The user's goal: **$ARGUMENTS**
 3. For each command, read only the YAML frontmatter and first heading or opening paragraph.
 4. Choose the command or short command chain that best matches the user's goal.
    - For a new SaaS plan/task board, choose `/claude-command masterplan-init` only after `/new-project` and an existing Kanban-style GitHub Project; use `/claude-command make-masterplan Phase 1` only for later-phase expansion.
+   - For a reusable project improvement that should be promoted to DannFlow—especially a generic schema, RLS, authorization, Auth, or migration improvement—choose `/claude-command sync-to-upstream`. It automatically detects database work and verifies it against the dedicated DannFlow template database, not the source project database, before committing, pushing, opening the PR, and posting its verification checklist.
 5. Return a ready-to-run Codex prompt that uses `/claude-command`.
 
 ## Output Format
