@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import type { Metadata } from 'next'
-import { createClient } from '@/utils/supabase/server'
+import { getUserProfile } from '@/services/dashboard'
 
 export const metadata: Metadata = {
   title: 'Sign in',
@@ -11,10 +11,12 @@ export const metadata: Metadata = {
 }
 
 export default async function LoginLayout({ children }: { children: React.ReactNode }) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  // A Supabase session alone is not enough to enter the dashboard. This also
+  // checks that the corresponding profile exists and is active, preventing a
+  // /login <-> /dashboard redirect loop for deactivated accounts.
+  const session = await getUserProfile()
 
-  if (user) redirect('/dashboard')
+  if (session) redirect('/dashboard')
 
   return <>{children}</>
 }
