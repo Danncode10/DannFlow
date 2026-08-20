@@ -63,6 +63,8 @@ export async function getUserProfile() {
       .eq('id', user.id)
       .single();
 
+    if (!profile?.is_active) return null;
+
     return { user, profile };
   } catch (err) {
     return null;

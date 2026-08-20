@@ -18,6 +18,8 @@ Figure out:
 
 For a newly described SaaS that needs its execution plan or task board, recommend `/masterplan-init` only after `/new-project` is complete and the user has created a Kanban-style GitHub Project. Do not recommend `/make-masterplan` for initial planning; it expands later phases.
 
+When the user is working in a project repository and describes a completed or proposed feature that is generic enough for every DannFlow project—especially a reusable schema, RLS, authorization, Auth, migration, or developer-workflow improvement—recommend `/sync-to-upstream` after the project-side change is complete. It automatically detects database changes, validates them in a dedicated DannFlow template database, and creates a committed, pushed upstream PR with a verification-comment handoff; it must never migrate the source project's database as part of the upstream promotion.
+
 ## Step 3 — Output a ready-to-paste prompt
 
 Your ONLY output is the prompt block below. Nothing before it, nothing after it — no explanations, no meta-commentary. The user will copy this and paste it directly into Claude.

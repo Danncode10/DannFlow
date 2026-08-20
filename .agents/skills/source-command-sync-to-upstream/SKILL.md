@@ -1,6 +1,6 @@
 ---
 name: "source-command-sync-to-upstream"
-description: "Contribute local improvements back to DannFlow upstream. Classifies generic changes, refreshes command help when command prompts changed, commits clean docs first, and opens a PR."
+description: "Contribute generic improvements back to DannFlow upstream, including explicitly approved reusable schema changes verified against the template database before PR creation."
 ---
 
 # source-command-sync-to-upstream
@@ -20,7 +20,7 @@ Use this when:
 
 Because your project has **rewritten git history** (via `guide.sh init`), you cannot open a normal PR from this project checkout. This command handles that: it classifies your changes, refreshes generated command help when command prompts changed, extracts only the generic ones, and opens a clean PR from a clean clone.
 
-Strict output rule: `/sync-to-upstream` must end with either a GitHub PR URL or a clear blocker explaining why a PR could not be created. Do not present email patching or "patch saved for later" as a successful final output.
+Strict output rule: `/sync-to-upstream` may return a GitHub PR URL only after the contribution is committed, the exact commit is pushed, and a follow-up verification checklist comment is posted. Otherwise, end with a clear blocker.
 
 ---
 
@@ -29,6 +29,7 @@ Strict output rule: `/sync-to-upstream` must end with either a GitHub PR URL or 
 - `/sync-to-upstream` → interactive mode — scans default paths, classifies, asks which to include
 - `/sync-to-upstream --dry-run` → show the classification report, make no git changes
 - `/sync-to-upstream <path>` → scope the scan to one file or directory
+Database handling is automatic: selected `db/schema/`, `db/migrations/`, `src/types/supabase.ts`, or database SQL/RLS/function/trigger/Storage-policy changes require template-schema verification against a dedicated DannFlow template database. It must never migrate the source project's database while preparing an upstream contribution.
 
 ---
 
@@ -83,6 +84,9 @@ guide.sh
 docs/dannflow_docs/
 scripts/
 src/prompts/features/
+db/schema/
+db/migrations/
+src/types/supabase.ts
 ```
 
 > Keep this list in sync with `/sync-upstream`'s default scan paths — the two commands should cover the same file set in both directions. **Exception:** `.github/workflows/ci.yml` is intentionally excluded here. Your project's `ci.yml` is tuned to *your* package manager and scripts; pushing it up would pollute the generic template. Contribute CI *improvements* by hand, not the tuned file.
@@ -106,6 +110,8 @@ PROJECT_CONTEXT.md
 next.config.ts
 tsconfig.json
 ```
+
+`db/schema/`, `db/migrations/`, and `src/types/supabase.ts` are eligible only when their selected diff is generic; automatically require template-schema verification when any of these artifacts are selected.
 
 Build the candidate list using the `dannflow_commit` SHA from `dannflow.json` as the base — this is more precise than `upstream/main` because it reflects exactly what you last synced from, not the current tip:
 ```bash
@@ -143,10 +149,13 @@ Scan the file content for signals that it's project-specific:
 - Docs describe DannFlow methodology (not your client's requirements)
 - Script improves DannFlow developer tooling (checkpoint, update-types, etc.)
 - Skill adds general-purpose capability any DannFlow project would want
+- Schema is a domain-neutral primitive with no project-specific tables, columns, terminology, or identifiers
 
 **Ambiguous (classify as 🟡 REVIEW NEEDED):**
 - Mix of generic and specific content
 - Not sure — let the user decide
+
+**Database promotion gate:** A generic-looking database artifact is not upstream-ready until the migration is reviewed and automatically passes template-database verification. Veterinary, booking, vehicle, customer, tenant, client, and other vertical-specific data models stay local.
 
 ---
 
@@ -274,6 +283,12 @@ Proceed directly with the PR flow unless a required tool or permission is missin
 
 3. Run `git diff` in the clean clone to confirm only the right changes are staged.
 
+### Required template-schema verification
+
+When selected files include `db/schema/`, `db/migrations/`, or `src/types/supabase.ts`—or the selected diff changes database SQL, RLS, functions, triggers, Storage policies, or generated types—automatically enter this verification path. Stop unless the source project's untracked environment provides non-placeholder `DANNFLOW_TEMPLATE_SUPABASE_PROJECT_ID` and `DANNFLOW_TEMPLATE_DATABASE_URL`. They must identify a dedicated DannFlow template verification project, never the source project or production.
+
+In the clean clone only, write those values to untracked `.env.local` as `SUPABASE_PROJECT_ID` and `DATABASE_URL`. Review every migration, run `npm run db:migrate`, `npm exec drizzle-kit check`, `npx tsc --noEmit`, and `npm run build`, then use Supabase MCP to verify changed tables, functions, triggers, RLS/policies, and relevant Storage policies. Regenerate `src/types/supabase.ts` from that verification database and include it only when its diff is part of the reviewed generic change. Record every result for the PR comment. Never copy source-project credentials or types.
+
 4. Create a commit with provenance trailers (see the canonical spec in `/adopt-dannflow`). Record where the contribution came FROM — the origin repo and commit — so DannFlow history shows which project each improvement originated in:
    ```
    feat: <contribution description>
@@ -300,12 +315,17 @@ Proceed directly with the PR flow unless a required tool or permission is missin
    This will create a branch on the remote. (y/n)
    ```
 
-7. If confirmed: `git push origin <branch-name>`
+7. If confirmed: `git push origin <branch-name>`. Before creating the PR, verify the remote branch is the exact local contribution commit:
+   ```bash
+   LOCAL_SHA=$(git rev-parse HEAD)
+   REMOTE_SHA=$(git ls-remote origin "refs/heads/<branch-name>" | awk '{print $1}')
+   test "$LOCAL_SHA" = "$REMOTE_SHA"
+   ```
+   If the SHAs differ, stop.
 
-8. Open the PR directly via the GitHub MCP (`create_pull_request`) or `gh pr create --repo Danncode10/DannFlow --base main --head <branch-name>` — DannFlow has no `dev` branch, so contributions PR straight into `main`, where its CI gate keeps the template clean. If neither is available, print the compare URL as a blocker, not as success:
-   ```
-   https://github.com/Danncode10/DannFlow/compare/<branch-name>
-   ```
+8. Open the PR directly via the GitHub MCP (`create_pull_request`) or `gh pr create --repo Danncode10/DannFlow --base main --head <branch-name>` — DannFlow has no `dev` branch, so contributions PR straight into `main`, where its CI gate keeps the template clean. If neither is available, stop with a blocker; never present a compare URL as success.
+
+9. Post a follow-up PR comment before returning the URL. It must identify the pushed commit, changed files, template-schema verification status, automated pass/fail results, and a human verification checklist. Schema work must explicitly cover migration and RLS/authorization verification.
 
 ---
 
@@ -313,7 +333,9 @@ Proceed directly with the PR flow unless a required tool or permission is missin
 
 - **Never** `git push` without asking first.
 - **Never** push to `main` or `upstream/main`. Always a feature branch.
-- **Never** finish successfully without a PR URL. A compare URL is only a blocker/fallback that still needs user action.
+- **Never** finish successfully without a PR URL.
+- **Never** return a PR URL until the exact contribution commit is pushed and the required verification comment has been posted.
+- **Never** promote automatically detected database changes without a clean-clone migration against the dedicated DannFlow template verification database, regenerated types, and Supabase verification.
 - **Never** contribute new or edited top-level `.claude/commands/*.md` files without first refreshing and locally committing `.claude/commands/help-dannflow.md`.
 - **Never** include files from the "never auto-touch" list unless the user typed the path explicitly.
 - **Never** include files with API keys, secrets, or env vars. Scan each selected file for common patterns (`sk-`, `eyJ`, `SUPABASE_`, `NEXT_PUBLIC_`) before including.
@@ -326,4 +348,4 @@ Proceed directly with the PR flow unless a required tool or permission is missin
 
 - Tables over paragraphs.
 - Show file paths verbatim.
-- End with a one-line summary of what was contributed (or skipped and why).
+- On success, output the PR URL alone. Otherwise, end with the exact blocker.

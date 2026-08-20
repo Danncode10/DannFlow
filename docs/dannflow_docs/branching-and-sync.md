@@ -57,7 +57,7 @@ This file is the anchor every sync reads and updates. `install.sh` writes it aut
 |---|---|---|
 | **`/adopt-dannflow`** | setup (once) | Installs `ci.yml` (and proves it green), writes `dannflow.json`, creates `dev`, then runs the first sync. Turns a non-DannFlow repo into a first-class one. |
 | **`/sync-upstream`** | DannFlow → project | Copies new template files in. Always lands them on `feat/sync-upstream-<sha>`, then opens a PR into the project `base_branch` (normally `main`). Never pushes directly to it. |
-| **`/sync-to-upstream`** | project → DannFlow | Copies a generic improvement back up via a clean clone → `feat/*` branch → PR into DannFlow `main`. |
+| **`/sync-to-upstream`** | project → DannFlow | Copies a generic improvement back up via a clean clone → `feat/*` branch → PR into DannFlow `main`. It automatically detects reusable database changes and migrates/verifies a dedicated DannFlow template database, never the source project database. |
 
 **Decision rule:** an older DannFlow installation without `dannflow.json` → `/update-dannflow --init`; an unrelated repo → `/adopt-dannflow`; an anchored project → `/sync-upstream` to update or `/sync-to-upstream` to contribute.
 

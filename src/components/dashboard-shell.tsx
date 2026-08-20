@@ -15,9 +15,10 @@ import {
   PanelLeft,
   X,
   Menu,
+  ShieldCheck,
   type LucideIcon,
 } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { siteConfig } from "@/lib/config";
@@ -40,23 +41,27 @@ const ICONS: Record<DashboardTabId, LucideIcon> = {
   bookings: Calendar,
   blog: BookOpen,
   analytics: BarChart3,
+  team: ShieldCheck,
   settings: Settings,
 };
 
 interface DashboardShellProps {
   user: SupabaseUser;
   profile: { full_name?: string | null; role?: string | null } | null;
+  children?: React.ReactNode;
 }
 
-export function DashboardShell({ user, profile }: DashboardShellProps) {
+export function DashboardShell({ user, profile, children }: DashboardShellProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
-  const enabledTabs = React.useMemo(() => getEnabledTabs(), []);
+  const userRole = profile?.role ?? "user";
+  const enabledTabs = React.useMemo(() => getEnabledTabs(userRole), [userRole]);
   const validIds = React.useMemo(() => new Set(enabledTabs.map((t) => t.id)), [enabledTabs]);
 
   const initialTab = (() => {
     const fromQuery = searchParams.get("tab") as DashboardTabId | null;
-    return fromQuery && validIds.has(fromQuery) ? fromQuery : "overview";
+    return fromQuery && fromQuery !== "team" && validIds.has(fromQuery) ? fromQuery : "overview";
   })();
 
   const [activeTab, setActiveTabLocal] = React.useState<DashboardTabId>(initialTab);
@@ -67,8 +72,19 @@ export function DashboardShell({ user, profile }: DashboardShellProps) {
   const displayName = profile?.full_name || user.email?.split("@")[0] || "there";
   const initials = displayName.split(" ").map((n: string) => n[0]).join("").slice(0, 2).toUpperCase();
 
+  React.useEffect(() => {
+    if (userRole === "admin") router.prefetch("/dashboard/team");
+  }, [router, userRole]);
+
   const setTab = React.useCallback((tab: DashboardTabId) => {
     if (!validIds.has(tab)) return;
+
+    if (tab === "team") {
+      router.push("/dashboard/team");
+      setSidebarOpen(false);
+      return;
+    }
+
     setActiveTabLocal(tab);
     router.push(`/dashboard?tab=${tab}`, { scroll: false });
     setSidebarOpen(false);
@@ -82,7 +98,8 @@ export function DashboardShell({ user, profile }: DashboardShellProps) {
   };
 
   const mainTabs = enabledTabs.filter((t) => t.id !== "settings");
-  const activeLabel = enabledTabs.find((t) => t.id === activeTab)?.label ?? "Overview";
+  const activeTabId = pathname === "/dashboard/team" ? "team" : activeTab;
+  const activeLabel = enabledTabs.find((t) => t.id === activeTabId)?.label ?? "Overview";
 
   return (
     <div className="h-screen bg-background flex overflow-hidden">
@@ -135,11 +152,13 @@ export function DashboardShell({ user, profile }: DashboardShellProps) {
           )}
           {mainTabs.map(({ id, label }) => {
             const Icon = ICONS[id];
-            const isActive = activeTab === id;
+            const isActive = activeTabId === id;
             return (
               <button
                 key={id}
                 onClick={() => setTab(id)}
+                onMouseEnter={() => id === "team" && router.prefetch("/dashboard/team")}
+                onFocus={() => id === "team" && router.prefetch("/dashboard/team")}
                 title={collapsed ? label : undefined}
                 className={`w-full flex items-center gap-3 rounded-lg text-[13px] transition-colors
                   ${collapsed ? "md:justify-center px-0 py-2.5" : "px-3 py-2"}
@@ -156,7 +175,7 @@ export function DashboardShell({ user, profile }: DashboardShellProps) {
         </nav>
 
         <div className="shrink-0 border-t border-border p-2 space-y-0.5">
-          {isFeatureEnabled("always") && (
+          {isFeatureEnabled("always", userRole) && (
             <button
               onClick={() => setTab("settings")}
               title={collapsed ? "Settings" : undefined}
@@ -229,13 +248,17 @@ export function DashboardShell({ user, profile }: DashboardShellProps) {
         </header>
 
         <main className="flex-1 overflow-y-auto p-6 md:p-8">
-          {activeTab === "overview"  && <OverviewTab displayName={displayName} setTab={setTab} />}
-          {activeTab === "services"  && <ServicesTab />}
-          {activeTab === "leads"     && <LeadsTab />}
-          {activeTab === "bookings"  && <BookingsTab />}
-          {activeTab === "blog"      && <BlogTab />}
-          {activeTab === "analytics" && <AnalyticsTab />}
-          {activeTab === "settings"  && <SettingsTab />}
+          {pathname === "/dashboard/team" && children ? children : (
+            <>
+              {activeTab === "overview"  && <OverviewTab displayName={displayName} setTab={setTab} />}
+              {activeTab === "services"  && <ServicesTab />}
+              {activeTab === "leads"     && <LeadsTab />}
+              {activeTab === "bookings"  && <BookingsTab />}
+              {activeTab === "blog"      && <BlogTab />}
+              {activeTab === "analytics" && <AnalyticsTab />}
+              {activeTab === "settings"  && <SettingsTab />}
+            </>
+          )}
         </main>
       </div>
     </div>

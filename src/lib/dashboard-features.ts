@@ -5,6 +5,7 @@ export type DashboardTabId =
   | "bookings"
   | "blog"
   | "analytics"
+  | "team"
   | "settings";
 
 export type FeatureFlag =
@@ -15,6 +16,7 @@ export type FeatureFlag =
   | "analytics"
   | "testimonials"
   | "teamPage"
+  | "admin-only"
   | "blog";
 
 interface TabConfig {
@@ -30,13 +32,15 @@ export const TAB_CONFIG: TabConfig[] = [
   { id: "bookings",   label: "Bookings",   feature: "contactForm" },
   { id: "blog",       label: "Blog",       feature: "blog" },
   { id: "analytics",  label: "Analytics",  feature: "analytics" },
+  { id: "team",       label: "Team",       feature: "admin-only" },
   { id: "settings",   label: "Settings",   feature: "always" },
 ];
 
-export function isFeatureEnabled(flag: FeatureFlag): boolean {
+export function isFeatureEnabled(flag: FeatureFlag, role: string | null | undefined = "user"): boolean {
+  if (flag === "admin-only") return role === "admin";
   return flag === "always" || flag === "pricing" || flag === "contactForm" || flag === "blog";
 }
 
-export function getEnabledTabs(): TabConfig[] {
-  return TAB_CONFIG.filter((t) => isFeatureEnabled(t.feature));
+export function getEnabledTabs(role: string | null | undefined = "user"): TabConfig[] {
+  return TAB_CONFIG.filter((t) => isFeatureEnabled(t.feature, role));
 }

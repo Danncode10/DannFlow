@@ -4,6 +4,12 @@ When you are "Vibe Coding," you will change your database frequently. This loop 
 
 > **Two kinds of "sync" in DannFlow.** This doc covers **database** sync — keeping `src/types/supabase.ts` and your backups aligned with the live schema. For **template** sync — pulling command/doc updates from DannFlow upstream — see [branching-and-sync.md](branching-and-sync.md).
 
+## Promoting a reusable database improvement to DannFlow
+
+When a feature built in a project reveals a generic DannFlow primitive—such as hardened profile authorization, reusable memberships, audit logging, or a safer RLS pattern—use `/sync-to-upstream` from the project repository. It automatically detects selected schema, migration, RLS, function, trigger, Storage-policy, and generated-type changes. It must never migrate the project database while preparing an upstream contribution. Instead, it applies the reviewed tracked migrations in a clean DannFlow clone against a dedicated template verification project, regenerates types, verifies the live schema/RLS, commits and pushes the exact PR branch, and posts the PR's human verification checklist before returning its URL.
+
+Project-specific tables, vertical terminology, and client data stay in the project. A reusable pattern belongs upstream only after that generic boundary is clear.
+
 ## The loop
 
 1. **Author schema**: Edit `db/schema/*.ts` directly or run `/migrate <description>`.

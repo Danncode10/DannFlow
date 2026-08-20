@@ -117,7 +117,7 @@ Run `/ask-command <what you want>` if you don't remember which command to use.
 | `/auto-docs` | Broader superset of `/sync-commands`. Audits commands, skills, npm scripts, env vars, tech stack, and folder structure for drift. `--fix` auto-patches the safe categories (commands/skills/scripts/env); stack and structure are report-only. |
 | `/init-update` | Update your DannFlow project to the latest version — pull new commands, scripts, guide, skills, and more while preserving your code. Interactive menu or `--all` for one-command full update. |
 | `/sync-upstream [path|--commits [N]]` | Pull selective file or commit updates from DannFlow upstream. File-level diff is default — safe for forked repos with no common git ancestry. |
-| `/sync-to-upstream` | Reverse of `/sync-upstream`. Classifies your local changes as generic (upstream candidates) vs. business-specific (keep local), then prepares a clean patch or GitHub PR to contribute back to DannFlow. |
+| `/sync-to-upstream` | Reverse of `/sync-upstream`. Classifies local changes as generic vs. business-specific, automatically verifies detected reusable DB/RLS/Auth changes in the template database instead of the project database, then creates a committed, pushed PR back to DannFlow with a verification comment. |
 | `/no-conflict` | Audits repo for conflicts between documentation (README, CLAUDE.md) and actual code — versions, features, commands, RLS, semantic tokens, folder structure. Reports only. |
 | `/ruflo-upgrade` | Re-applies Ruflo memory + parallel-agent patterns to the 5 core commands (`/new-feature`, `/new-page`, `/security-audit`, `/seo-fix`, `/migrate`). Safe to re-run after `/init-update`. |
 
