@@ -56,7 +56,7 @@ This file is the anchor every sync reads and updates. `install.sh` writes it aut
 | Command | Direction | What it does |
 |---|---|---|
 | **`/adopt-dannflow`** | setup (once) | Installs `ci.yml` (and proves it green), writes `dannflow.json`, creates `dev`, then runs the first sync. Turns a non-DannFlow repo into a first-class one. |
-| **`/sync-upstream`** | DannFlow → project | Copies new template files in. Always lands them on `feat/sync-upstream-<sha>`, then opens a PR into the project `base_branch` (normally `main`). Never pushes directly to it. |
+| **`/sync-upstream`** | DannFlow → project | Mirrors `.claude/commands/` exactly, detects required template schema changes, applies reviewed migrations and regenerated types to the project database, then lands updates on `feat/sync-upstream-<sha>` for a PR into the project `base_branch` (normally `main`). Never pushes directly to it. |
 | **`/sync-to-upstream`** | project → DannFlow | Copies a generic improvement back up via a clean clone → `feat/*` branch → PR into DannFlow `main`. It automatically detects reusable database changes and migrates/verifies a dedicated DannFlow template database, never the source project database. |
 
 **Decision rule:** an older DannFlow installation without `dannflow.json` → `/update-dannflow --init`; an unrelated repo → `/adopt-dannflow`; an anchored project → `/sync-upstream` to update or `/sync-to-upstream` to contribute.
@@ -90,7 +90,7 @@ Why trailers instead of writing it in the subject:
 
 ## What's safe to sync (and what's never touched)
 
-`/sync-upstream` only ever copies **template files** — commands, agents, docs, scripts, blueprints. It **never** auto-touches your app code (`src/app/`, `src/services/`, `src/components/`, `config.ts`, `package.json`, `supabase/`, env files, etc.).
+`/sync-upstream` only ever copies **template files** — commands, agents, docs, scripts, blueprints, and reviewed generic schema artifacts. It **never** auto-touches your app code (`src/app/`, `src/services/`, `src/components/`, `config.ts`, `package.json`, `supabase/`, env files, etc.). `.claude/commands/` is template-owned and mirrored byte-for-byte; project-only commands must live elsewhere. When upstream includes a new tracked migration, sync detects it automatically, checks for local migration/schema conflicts, runs the project migration and type generation, then verifies the resulting database before opening the sync PR.
 
 One special case: **`.github/workflows/ci.yml` is diff-only, never auto-pulled.** It's tuned to *your* project; overwriting it with the generic template version would break your CI gate. The command shows you the diff and lets you hand-merge.
 

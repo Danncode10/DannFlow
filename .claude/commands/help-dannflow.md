@@ -123,7 +123,7 @@ Codex uses `.codex/commands/claude-command.md` as a bridge. The source-of-truth 
 | Command | Says |
 |---|---|
 | `/commit` | Stages changes and drafts a conventional commit message. |
-| `/sync-upstream [path\|--commits N]` | Pulls selected upstream DannFlow updates into the project. |
+| `/sync-upstream [path\|--commits N]` | Pulls DannFlow updates into a sync PR, exactly mirrors `.claude/commands/`, and automatically applies and verifies required template migrations. |
 | `/sync-to-upstream [path\|--dry-run]` | Promotes generic improvements upstream and automatically verifies detected database changes in the dedicated DannFlow template database before PR creation. |
 | `/github/*` | Advanced GitHub workflows: PRs, issues, releases, repo analysis, project sync. |
 
