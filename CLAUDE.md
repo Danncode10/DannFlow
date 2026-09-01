@@ -24,12 +24,13 @@ Select one mode and follow its rules:
 If folder name and remotes disagree, stop before editing and explain the mismatch. A non-`Dannflow` checkout with only `upstream → DannFlow` is not ready for project work; configure `origin` and make `upstream` fetch-only first. Never infer mode from the files being viewed—use the repository root folder and remote configuration.
 
 ```
-edit db/schema/*.ts → pnpm db:generate → review db/migrations/*.sql
-pnpm db:migrate    → apply to Supabase + refresh src/types/supabase.ts
+pnpm db:setup (local Studio) → make schema changes visually
+pnpm db:generate <name>      → capture SQL via `supabase db diff`
+pnpm db:migrate              → apply to Supabase + refresh src/types/supabase.ts
 pnpm checkpoint    → snapshot live schema (RLS, triggers, enums) to supabase/backups/
 ```
 
-The agent reads `db/schema/*.ts`, `db/migrations/`, and `src/types/supabase.ts` before touching database-backed code, so it never guesses schema shape.
+The agent reads `supabase/migrations/`, `db/schema/*.ts`, and `src/types/supabase.ts` before touching database-backed code, so it never guesses schema shape.
 
 For the full marketing/setup story, see [README.md](README.md). For deeper docs, see [docs/dannflow_docs/](docs/dannflow_docs/).
 
@@ -37,7 +38,7 @@ For the full marketing/setup story, see [README.md](README.md). For deeper docs,
 
 - **Framework**: Next.js 16 (App Router), React 19
 - **DB / Auth**: Supabase (`@supabase/ssr`, `@supabase/supabase-js`)
-- **Schema / Migrations**: Drizzle (`db/schema/*.ts` → `db/migrations/*.sql`)
+- **Schema / Migrations**: Supabase CLI (`supabase/migrations/`)
 - **Styling**: Tailwind CSS v4 + Shadcn/UI primitives
 - **State / Data**: TanStack Query, React Server Components by default
 - **Rate limiting**: Upstash Redis helper for production-sensitive paths
@@ -60,11 +61,10 @@ src/
     └── supabase/       # Supabase client helpers (server, client, middleware)
 
 db/
-├── schema/             # ✍️ Drizzle schema source of truth
-├── migrations/         # 📦 Generated SQL from pnpm db:generate
-└── migrate.ts          # Applies migrations using DATABASE_URL
+└── schema/             # Drizzle schemas (used strictly for querying)
 
 supabase/
+├── migrations/         # ✍️ Generated SQL from pnpm db:generate (Supabase CLI source of truth)
 └── backups/            # 📋 Timestamped DDL snapshots from pnpm checkpoint
 ```
 
@@ -101,17 +101,17 @@ Use ONLY Tailwind/Shadcn semantic tokens. **Stating hex codes, `rgba()`, or hard
 
 Theme variables live in `src/app/globals.css` under `@theme`.
 
-## Database workflow (Drizzle + Supabase)
+## Database workflow (Supabase CLI)
 
-1. **Schema source of truth** — author tables, columns, indexes, and relations in `db/schema/*.ts`.
-2. **Generate SQL** — run `pnpm db:generate` and review the generated `db/migrations/*.sql`.
-3. **Supabase platform SQL** — add RLS policies, auth triggers, functions, storage buckets, extensions, and grants directly to the SQL migration when needed.
-4. **Apply and sync** — run `pnpm db:migrate` with `DATABASE_URL`; it applies `db/migrations/` and refreshes `src/types/supabase.ts`.
-5. **Checkpoint live state** — before risky/destructive changes, run `pnpm checkpoint` to snapshot the live project into `supabase/backups/`.
+1. **Schema source of truth** — Database schema and migrations are managed natively via Supabase CLI in `supabase/migrations/`.
+2. **Generate SQL** — Make changes in local Supabase Studio (`pnpm db:setup`), then run `pnpm db:generate <name>` to capture changes (runs `supabase db diff`).
+3. **Supabase platform SQL** — You can also manually add RLS policies, auth triggers, and functions directly to the generated SQL migration when needed.
+4. **Apply and sync** — Run `pnpm db:migrate`; it pushes to your remote database and refreshes `src/types/supabase.ts`.
+5. **Checkpoint live state** — Before risky/destructive changes, run `pnpm checkpoint` to snapshot the live project into `supabase/backups/`.
 
-Do **not** use Supabase MCP `apply_migration` for normal schema changes. Supabase MCP is for reading, verifying, advisors, provisioning, and checkpointing. If an emergency live SQL change is explicitly requested, backport it immediately into `db/schema/*.ts` and `db/migrations/`.
+Do **not** use Supabase MCP `apply_migration` for normal schema changes. Supabase MCP is for reading, verifying, advisors, provisioning, and checkpointing. If an emergency live SQL change is explicitly requested, generate a migration and run `pnpm db:migrate`.
 
-Use `.claude/commands/schema-change.md` only when the user explicitly wants to manipulate the live Supabase schema through MCP or needs an emergency live SQL change captured in git. That command checkpoints the live schema, writes the approved SQL to `db/migrations/YYYYMMDDHHMMSS_<name>.sql`, applies it through Supabase MCP `apply_migration`, regenerates `src/types/supabase.ts`, verifies the live database, and backports app-owned table changes into `db/schema/*.ts`.
+Use `.claude/commands/schema-change.md` only when the user explicitly wants to manipulate the live Supabase schema through MCP or needs an emergency live SQL change captured in git. That command checkpoints the live schema, writes the approved SQL to `supabase/migrations/YYYYMMDDHHMMSS_<name>.sql`, applies it through Supabase MCP `apply_migration`, regenerates `src/types/supabase.ts`, and verifies the live database.
 
 ### Checkpoint protocol
 When the user runs `pnpm checkpoint` and provides the generated prompt:
