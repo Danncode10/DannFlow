@@ -5,7 +5,7 @@ argument-hint: <plain-english schema change>
 
 Execute a complete tracked Supabase schema change described by `$ARGUMENTS`.
 
-Use this command when the user explicitly wants to manipulate the live Supabase schema through MCP or needs to backport an emergency live SQL change into the repo. For normal planned app schema work, prefer `/migrate`, which edits `db/schema/*.ts`, generates `db/migrations/*.sql`, runs `pnpm db:migrate`, and keeps Drizzle as the source of truth.
+Use this command when the user explicitly wants to manipulate the live Supabase schema through MCP or needs to backport an emergency live SQL change into the repo. For normal planned app schema work, prefer making changes in local Supabase Studio and capturing them with `pnpm db:generate`, which keeps Supabase CLI as the source of truth.
 
 This command chains:
 
@@ -65,11 +65,11 @@ Before applying the SQL, save the exact approved SQL to a tracked migration file
 
 Preferred location for this repo:
 
-`db/migrations/YYYYMMDDHHMMSS_<snake_case_name>.sql`
+`supabase/migrations/YYYYMMDDHHMMSS_<snake_case_name>.sql`
 
 Use the current local timestamp and a concise snake_case name derived from the request, for example:
 
-`db/migrations/20260628143000_add_bio_to_profiles.sql`
+`supabase/migrations/20260628143000_add_bio_to_profiles.sql`
 
 The file must include a short header comment:
 
@@ -114,15 +114,7 @@ Summarize the generated type drift:
 
 ### Step 7 - Backport schema source when needed
 
-If this live change affects app-owned tables represented in `db/schema/*.ts`, update the matching Drizzle schema files after the MCP migration succeeds.
-
-Then run:
-
-```bash
-pnpm db:generate
-```
-
-If Drizzle generates an overlapping migration, reconcile it with the tracked SQL file so the repo has one authoritative migration for the change.
+If this live change affects app-owned tables, update the matching Drizzle schema files in `db/schema/*.ts` so that your application queries continue to work correctly.
 
 ### Step 8 - Verify live database state
 
@@ -141,7 +133,7 @@ Report in this format:
 Schema change applied: <migration_name>
 
 Files:
-  - Migration: db/migrations/<timestamp>_<name>.sql
+  - Migration: supabase/migrations/<timestamp>_<name>.sql
   - Types: src/types/supabase.ts
   - Checkpoint: supabase/backups/<checkpoint>.sql
   - Schema source: db/schema/<file>.ts or n/a

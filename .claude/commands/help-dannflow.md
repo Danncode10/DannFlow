@@ -90,7 +90,7 @@ Codex uses `.codex/commands/claude-command.md` as a bridge. The source-of-truth 
 
 | Command | Says |
 |---|---|
-| `/migrate <description>` | Runs the tracked Drizzle migration workflow. |
+| `/migrate <description>` | Runs the tracked Supabase CLI migration workflow. |
 | `/schema-change <description>` | Runs the explicit live Supabase MCP schema-change workflow. |
 | `/checkpoint` | Snapshots the live Supabase schema. |
 | `/start-supabase [project ref\|name] [--pause <project ref>]` | Starts or restores a paused Supabase project and handles free-plan active-project limits. |
