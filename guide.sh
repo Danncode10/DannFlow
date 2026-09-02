@@ -177,7 +177,7 @@ show_supabase() {
     echo -e "   ${CYAN}\"I've created a new Supabase project. Ask me for the Project"
     echo -e "   Reference ID. Once provided:"
     echo -e "   1. Connect to the project via Supabase MCP."
-    echo -e "   2. Run pnpm db:migrate to apply the tracked Drizzle migrations."
+    echo -e "   2. Run npm run db:migrate to apply the tracked SQL migrations."
     echo -e "   3. MANDATORY: list all tables and functions in the public schema."
     echo -e "   4. Confirm the 'profiles' table and 'handle_new_user' function exist."
     echo -e "   Do not report success until you can see them in the live DB.\"${NC}\n"
@@ -186,7 +186,7 @@ show_supabase() {
     echo -e "   After the schema is applied, paste this to your AI:\n"
     echo -e "   ${CYAN}\"Schema applied successfully. Now:"
     echo -e "   1. Run /checkpoint to snapshot the current state."
-    echo -e "   2. Confirm pnpm db:migrate regenerated TypeScript types."
+    echo -e "   2. Confirm npm run db:migrate regenerated TypeScript types."
     echo -e "   3. Confirm src/types/supabase.ts was regenerated."
     echo -e "   Report the list of generated types.\"${NC}\n"
 

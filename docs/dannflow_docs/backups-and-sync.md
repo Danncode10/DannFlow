@@ -12,10 +12,10 @@ Project-specific tables, vertical terminology, and client data stay in the proje
 
 ## The loop
 
-1. **Author schema**: Edit `db/schema/*.ts` directly or run `/migrate <description>`.
-2. **Generate SQL**: Run `pnpm db:generate` and review `db/migrations/*.sql`.
-3. **Apply + sync types**: Run `pnpm db:migrate` to apply migrations and refresh `src/types/supabase.ts`.
-4. **Checkpoint**: Every time you finish a feature, run `pnpm checkpoint` (or `/checkpoint`).
+1. **Author schema**: Create or edit SQL files in `supabase/migrations/*.sql` directly or run `/migrate <description>`.
+2. **Generate SQL**: Run `npm run db:generate` to capture a new migration or diff.
+3. **Apply + sync types**: Run `npm run db:migrate` to apply migrations and refresh `src/types/supabase.ts`.
+4. **Checkpoint**: Every time you finish a feature, run `npm run checkpoint` (or `/checkpoint`).
    - The script verifies your Supabase MCP connection and generates a prompt.
    - Claude Code reads your live Supabase schema (tables, enums, RLS policies, triggers, functions) via MCP.
    - It writes a new timestamped DDL snapshot under `supabase/backups/`.
@@ -27,35 +27,35 @@ If you ever break your DB, "restore" by copying the SQL from your most recent ch
 
 ## The golden rule
 
-**Schema → Generate SQL → Migrate → Checkpoint.** Do not alter live Supabase schema directly for normal work. If an emergency direct SQL change is explicitly requested, backport it immediately into `db/schema/*.ts` and `db/migrations/`.
+**Schema → Generate SQL → Migrate → Checkpoint.** Do not alter live Supabase schema directly for normal work. If an emergency direct SQL change is explicitly requested, backport it immediately into `supabase/migrations/`.
 
 ## Local contributor setup
 
 New contributors should not need access to the hosted Supabase project just to boot the app. Use the local database flow:
 
 ```bash
-pnpm db:setup
+npm run db:setup
 ```
 
-This runs local Supabase, applies `db/migrations/`, and generates `src/types/supabase.ts` from the local database.
+This runs local Supabase, applies `supabase/migrations/`, and generates `src/types/supabase.ts` from the local database.
 
-When `db/schema/*.ts` changes are ready to save:
+When `supabase/migrations/*.sql` changes are ready to save:
 
 ```bash
-pnpm db:generate add_feature_tables
+npm run db:generate add_feature_tables
 ```
 
-This creates a SQL migration under `db/migrations/`. Review that SQL before applying it to the hosted project:
+This creates a SQL migration under `supabase/migrations/`. Review that SQL before applying it to the hosted project:
 
 ```bash
-pnpm db:migrate
+npm run db:migrate
 ```
 
 For hosted projects, use:
 
 ```bash
-pnpm db:types:remote
-pnpm checkpoint
+npm run db:types:remote
+npm run checkpoint
 ```
 
 Remote type generation requires `SUPABASE_PROJECT_ID` in `.env.local`.

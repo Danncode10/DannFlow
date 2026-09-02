@@ -88,37 +88,30 @@ npm run dev
 
 ### Database setup for contributors
 
-DannFlow keeps Supabase as the database/auth layer. Database schema is authored in TypeScript with Drizzle:
+DannFlow keeps Supabase as the database/auth layer. Database schema is authored as raw SQL migrations in:
 
 ```text
-db/schema/*.ts
-```
-
-Generated SQL migrations live in:
-
-```text
-db/migrations/*.sql
+supabase/migrations/*.sql
 ```
 
 For a fresh local clone:
 
 ```bash
-pnpm install
+npm install
 cp .env.example .env.local
-pnpm db:setup
-pnpm dev
+npm run db:setup
+npm run dev
 ```
 
-`pnpm db:setup` starts local Supabase, applies `db/migrations/`, and regenerates `src/types/supabase.ts` from the local database. Hosted projects can use `pnpm db:types:remote` after setting `SUPABASE_PROJECT_ID` in `.env.local`.
+`npm run db:setup` starts local Supabase, applies migrations in `supabase/migrations/`, and regenerates `src/types/supabase.ts` from the local database. Hosted projects can use `npm run db:types:remote` after setting `SUPABASE_PROJECT_ID` in `.env.local`.
 
-When you change `db/schema/*.ts`:
+When you want to apply migrations to production:
 
 ```bash
-pnpm db:generate add_profiles_table
-pnpm db:migrate
+npm run db:migrate
 ```
 
-`pnpm db:generate` writes SQL into `db/migrations/`. `pnpm db:migrate` applies those migrations to Supabase with `DATABASE_URL` and refreshes remote types.
+`npm run db:migrate` pushes `supabase/migrations/` to the remote Supabase project using `DATABASE_URL` and refreshes remote types.
 
 **Want Claude to design the whole site for you?** Your detailed Phase 0 will direct you to **`/design-project`** at the right point. It reads your `README`, `PROJECT_CONTEXT`, and code configuration, then designs and builds a bespoke project.
 
@@ -297,20 +290,17 @@ UPSTASH_REDIS_REST_TOKEN=AAAx...
 
 ## 🗃️ Database Workflow (Zero-Hallucination Loop)
 
-Never let your AI guess about your database schema. Schema changes start in `db/schema/*.ts` and flow through reviewed SQL:
+Never let your AI guess about your database schema. Schema changes are made as native SQL migrations:
 
 ```bash
-# Edit schema
-$EDITOR db/schema/*.ts
-
-# Generate and review SQL
-pnpm db:generate        # writes db/migrations/*.sql
+# Add a new schema migration (use Supabase MCP, Studio, or hand-write)
+$EDITOR supabase/migrations/2026..._feature.sql
 
 # Apply to Supabase and refresh generated app types
-pnpm db:migrate         # applies db/migrations/ + refreshes src/types/supabase.ts
+npm run db:migrate
 
 # Before risky/destructive work
-pnpm checkpoint         # snapshots live schema → supabase/backups/
+npm run checkpoint      # snapshots live schema → supabase/backups/
 
 # Verify before committing
 /review                 # lint + typecheck + guardrail check
@@ -318,10 +308,9 @@ pnpm checkpoint         # snapshots live schema → supabase/backups/
 
 **Session starter prompt** (paste this to Claude at the start of every session):
 ```
-Read CLAUDE.md before doing anything. For schema changes, edit
-db/schema/*.ts first, generate SQL with pnpm db:generate, then apply
-with pnpm db:migrate. Use Supabase MCP only to read, verify, checkpoint,
-or inspect the live project.
+Read CLAUDE.md before doing anything. For schema changes, write standard
+SQL migrations in supabase/migrations/ and apply with npm run db:migrate.
+Use Supabase MCP only to read, verify, checkpoint, or inspect the live project.
 ```
 
 ---
@@ -352,12 +341,8 @@ src/
 ├── types/supabase.ts # Auto-generated — never edit manually
 └── utils/supabase/   # Supabase client helpers
 
-db/
-├── schema/           # Drizzle schema source of truth
-├── migrations/       # Generated/reviewed SQL migrations
-└── migrate.ts        # Applies migrations with DATABASE_URL
-
 supabase/
+├── migrations/       # Generated/reviewed SQL migrations
 └── backups/          # Live schema snapshots from pnpm checkpoint
 
 .claude/
@@ -389,7 +374,7 @@ DannFlow commands. The repository also includes additional command packs under
 | `/sync-upstream` | Pull selective updates from the parent template (hash-named branch → configured base branch) |
 | `/checkpoint` | Snapshot DB before risky schema changes |
 | `/sync-types` | Regenerate Supabase types when needed |
-| `/migrate` | Edit `db/schema/*.ts`, generate SQL, apply with `pnpm db:migrate` |
+| `/migrate` | Write SQL migration in `supabase/migrations/*.sql`, apply with `npm run db:migrate` |
 | `/new-feature <name>` | Scaffold service + page + form |
 | `/review` | Pre-commit lint + typecheck + guardrail check |
 | `/commit` | Stage + draft conventional commit message |

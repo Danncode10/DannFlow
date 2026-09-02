@@ -4,7 +4,7 @@ To make "DannFlow" work, the AI needs three sets of tools:
 
 ### 1. Supabase MCP (The Database Brain)
 - **Purpose**: Allows the AI to read live schema, verify migrations, inspect RLS policies, run advisors, and manage Supabase projects.
-- **Important**: Normal schema changes are tracked in `db/schema/*.ts` and `db/migrations/*.sql`. Do not use Supabase MCP to create or alter app tables unless the user explicitly requests an emergency live hotfix.
+- **Important**: Normal schema changes are tracked in `supabase/migrations/*.sql`. Do not use Supabase MCP to create or alter app tables unless the user explicitly requests an emergency live hotfix.
 - **Setup**: Use your Supabase Access Token from Account Settings.
 
 ### 2. GitHub MCP (The Memory)
@@ -14,7 +14,7 @@ To make "DannFlow" work, the AI needs three sets of tools:
 > `/masterplan-init` does not create a Project. Create a non-draft GitHub Project in Kanban/Board layout first, with `Backlog`, `Ready`, `In progress`, and `Done` Status values.
 
 ### 3. Terminal MCP (The Hands)
-- **Purpose**: Allows the AI to run commands like `pnpm db:generate`, `pnpm db:migrate`, and `pnpm db:types` for you.
+- **Purpose**: Allows the AI to run commands like `npm run db:generate`, `npm run db:migrate`, and `npm run db:types` for you.
 - **Setup**: Enable "Terminal" or "Shell" access in your agent settings (Claude Code, Cursor, or Antigravity).
 
 ### 4. Ruflo MCP (Memory + Orchestration) — Beta

@@ -62,8 +62,8 @@ src/
     └── supabase/       # Supabase client helpers (server, client, middleware)
 
 supabase/
-├── migrations/         # ✍️ Generated SQL from pnpm db:generate (Supabase CLI source of truth)
-└── backups/            # 📋 Timestamped DDL snapshots from pnpm checkpoint
+├── migrations/         # ✍️ Generated SQL from npm run db:generate (Supabase CLI source of truth)
+└── backups/            # 📋 Timestamped DDL snapshots from npm run checkpoint
 ```
 
 ## Architectural guardrails (non-negotiable)

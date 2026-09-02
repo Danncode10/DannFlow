@@ -42,16 +42,15 @@ After initialization, use `/what-task` to start the current Phase 0 work. `/make
 
 ## Database setup for contributors
 
-DannFlow uses Supabase for hosted Postgres/Auth and Drizzle for schema authoring. The database source of truth is:
+DannFlow uses native Supabase SQL migrations. The database source of truth is:
 
 ```text
-db/schema/*.ts
+supabase/migrations/*.sql
 ```
 
 Generated files are:
 
 ```text
-db/migrations/*.sql
 src/types/supabase.ts
 supabase/backups/*.sql
 ```
@@ -59,37 +58,35 @@ supabase/backups/*.sql
 For a fresh local clone, run:
 
 ```bash
-pnpm install
+npm install
 cp .env.example .env.local
-pnpm db:setup
-pnpm dev
+npm run db:setup
+npm run dev
 ```
 
-`pnpm db:setup` starts local Supabase, applies every migration in `db/migrations/`, and regenerates `src/types/supabase.ts` from the local database. This gives every contributor the same database shape without requiring access to Dann's hosted Supabase project.
+`npm run db:setup` starts local Supabase, applies every migration in `supabase/migrations/`, and regenerates `src/types/supabase.ts` from the local database. This gives every contributor the same database shape without requiring access to Dann's hosted Supabase project.
 
 Use these commands while developing:
 
 | Command | Purpose |
 |---|---|
-| `pnpm db:setup` | Start local Supabase, reset the local DB, apply migrations, and generate local types. |
-| `pnpm db:generate <name>` | Generate a SQL migration in `db/migrations/` from `db/schema/*.ts`. |
-| `pnpm db:migrate` | Apply `db/migrations/` to Supabase using `DATABASE_URL` and refresh remote types. |
-| `pnpm db:types` | Regenerate `src/types/supabase.ts` from the local DB. |
-| `pnpm db:types:remote` | Regenerate types from the hosted project using `SUPABASE_PROJECT_ID`. |
+| `npm run db:setup` | Start local Supabase, reset the local DB, apply migrations, and generate local types. |
+| `npm run db:generate <name>` | Start a new empty SQL migration or capture a diff. |
+| `npm run db:migrate` | Apply `supabase/migrations/` to Supabase using `DATABASE_URL` and refresh remote types. |
+| `npm run db:types` | Regenerate `src/types/supabase.ts` from the local DB. |
+| `npm run db:types:remote` | Regenerate types from the hosted project using `SUPABASE_PROJECT_ID`. |
 
 The normal schema loop is:
 
 ```bash
-pnpm db:setup
-# edit db/schema/*.ts
-pnpm db:generate add_feature_tables
-# review the generated SQL
-pnpm db:migrate
+npm run db:setup
+# edit or create new supabase/migrations/*.sql
+npm run db:migrate
 ```
 
 ### What belongs in SQL migrations?
 
-Drizzle owns tables, columns, indexes, and relations. Supabase-specific features such as RLS policies, auth triggers, functions, storage buckets, extensions, and grants still belong in the generated SQL migrations as explicit SQL. Review those migrations before applying them.
+Everything. Tables, columns, indexes, RLS policies, auth triggers, functions, storage buckets, extensions, and grants all belong in the generated SQL migrations as explicit SQL. Review those migrations before applying them.
 
 ---
 
@@ -156,7 +153,7 @@ Step 5 — Run /no-conflict
 | `SKILLS.md` | Which skills are relevant + when | `/init-claude` | Claude when choosing a skill |
 | `PROJECT_CONTEXT.md` | Project-specific decisions (audience, stack, design, tone) | **You** | Skills + commands before acting |
 | `.claude/commands/*.md` | Slash command definitions | DannFlow + `/init-claude` | Claude when you run `/command` |
-| `src/types/supabase.ts` | Auto-generated Supabase types | `pnpm db:migrate`, `pnpm db:types`, or `pnpm db:types:remote` | All service files + Claude |
+| `src/types/supabase.ts` | Auto-generated Supabase types | `npm run db:migrate`, `npm run db:types`, or `npm run db:types:remote` | All service files + Claude |
 
 ---
 
