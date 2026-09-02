@@ -15,10 +15,10 @@ Scaffold a new feature: **$ARGUMENTS**
    - What's the primary user action? (create / view / edit / delete data?)
    - Does it need a new Supabase table? If yes:
      - Suggest running `/checkpoint` first
-     - Add or update a Drizzle schema file in `db/schema/`
-     - Run `pnpm db:generate` and review the generated SQL in `db/migrations/`
+     - Write an SQL migration file in `supabase/migrations/`
+     - (Optional) If using local Studio, run `npm run db:generate` and review the SQL in `supabase/migrations/`
      - Add RLS policies, triggers, functions, or storage SQL directly to the generated migration when needed
-     - Apply with `pnpm db:migrate`; do not use Supabase MCP `apply_migration` for normal tracked schema changes
+     - Apply with `npm run db:migrate`; do not use Supabase MCP `apply_migration` for normal tracked schema changes
      - Define RLS policies enforcing the actual ownership or admin access model before applying the migration
    - Should it be a protected route (under `src/app/dashboard/`) or public?
 
@@ -65,4 +65,4 @@ Scaffold a new feature: **$ARGUMENTS**
 - Never use `any`. If a type is missing, generate it in `src/types/` or use a `Database['public']['Tables'][...]` lookup.
 - Never put DB calls in components. All Supabase queries go in `src/services/<feature-name>.ts`.
 - Default to Server Components. Add `'use client'` only when state/events/browser APIs require it.
-- Normal schema changes start in `db/schema/*.ts`, not Supabase MCP. Direct live SQL must be explicitly requested and backported into Drizzle schema/migrations.
+- Normal schema changes start in `supabase/migrations/*.sql`, not Supabase MCP. Direct live SQL must be explicitly requested and backported into tracked SQL migrations.

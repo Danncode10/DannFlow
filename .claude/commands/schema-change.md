@@ -5,7 +5,7 @@ argument-hint: <plain-english schema change>
 
 Execute a complete tracked Supabase schema change described by `$ARGUMENTS`.
 
-Use this command when the user explicitly wants to manipulate the live Supabase schema through MCP or needs to backport an emergency live SQL change into the repo. For normal planned app schema work, prefer making changes in local Supabase Studio and capturing them with `pnpm db:generate`, which keeps Supabase CLI as the source of truth.
+Use this command when the user explicitly wants to manipulate the live Supabase schema through MCP or needs to backport an emergency live SQL change into the repo. For normal planned app schema work, prefer making changes in local Supabase Studio and capturing them with `npm run db:generate`, which keeps Supabase CLI as the source of truth.
 
 This command chains:
 
@@ -114,7 +114,7 @@ Summarize the generated type drift:
 
 ### Step 7 - Backport schema source when needed
 
-If this live change affects app-owned tables, update the matching Drizzle schema files in `db/schema/*.ts` so that your application queries continue to work correctly.
+If this live change affects app-owned tables, ensure the tracked SQL migration in `supabase/migrations/` is up to date.
 
 ### Step 8 - Verify live database state
 
@@ -136,7 +136,6 @@ Files:
   - Migration: supabase/migrations/<timestamp>_<name>.sql
   - Types: src/types/supabase.ts
   - Checkpoint: supabase/backups/<checkpoint>.sql
-  - Schema source: db/schema/<file>.ts or n/a
 
 Verified:
   - <specific live database verification>
@@ -152,7 +151,7 @@ Suggested commit:
 - Always save the approved SQL to a tracked migration file before applying it.
 - Always apply the exact approved SQL with Supabase MCP `apply_migration`.
 - Always regenerate `src/types/supabase.ts` after a successful schema change.
-- Backport app-owned table changes into `db/schema/*.ts`.
+- Backport app-owned table changes into `supabase/migrations/`.
 - Never manually edit generated types.
 - Never report success until live verification is complete.
 - Never `git add` or `git commit` from this command.

@@ -1,11 +1,11 @@
 ---
-description: Safely changes database schema through Drizzle schema files, generated SQL migrations, Supabase verification, and synced types.
+description: Safely changes database schema through SQL migration files, Supabase verification, and synced types.
 argument-hint: <plain-english description of the schema change>
 ---
 
 Execute a complete DannFlow database migration described by `$ARGUMENTS`.
 
-The source of truth is `db/schema/*.ts`. Do **not** use Supabase MCP `apply_migration` for normal schema changes.
+The source of truth is `supabase/migrations/`. Do **not** use Supabase MCP `apply_migration` for normal schema changes.
 
 ## Procedure
 
@@ -18,8 +18,8 @@ Before changing schema, search ruflo memory for prior decisions related to this 
 Parse `$ARGUMENTS` into a concrete schema change.
 
 Examples:
-- "add a `bio` text column to profiles" → edit `db/schema/core.ts`
-- "create a `posts` table with a user_id FK" → add a table file or extend an existing schema module, then include RLS SQL in the generated migration
+- "add a `bio` text column to profiles" → create a new SQL file in `supabase/migrations/`
+- "create a `posts` table with a user_id FK" → create a new migration SQL file, then include RLS SQL
 - "drop the `legacy_field` from users" → destructive — require explicit confirmation
 
 If the request is ambiguous, ask one clarifying question.
@@ -30,25 +30,24 @@ For destructive or live-project changes, run `/checkpoint` first to snapshot the
 
 For purely local additive changes, a checkpoint is recommended but not required.
 
-### Step 3 — Edit Drizzle schema
+### Step 3 — Edit Schema
 
-Edit the appropriate file under `db/schema/`.
+Write the appropriate SQL in a new file under `supabase/migrations/` (or use local Studio via `npm run db:setup` and capture with `npm run db:generate`).
 
 Rules:
-- Tables, columns, indexes, enums, and relations belong in `db/schema/*.ts`.
-- Split large domains into focused files and re-export from `db/schema/index.ts`.
+- Tables, columns, indexes, enums, and relations belong in `supabase/migrations/`.
 - Never edit `src/types/supabase.ts` manually.
 - New tables must include only the ownership columns required by their actual access model.
 
 ### Step 4 — Generate and review SQL
 
-Run:
+Run (optional, if you used local Studio):
 
 ```bash
-pnpm db:generate
+npm run db:generate
 ```
 
-Review the generated SQL in `db/migrations/`.
+Review the SQL in `supabase/migrations/`.
 
 Add Supabase-specific SQL directly to the generated migration when needed:
 - `ALTER TABLE ... ENABLE ROW LEVEL SECURITY`
@@ -64,15 +63,15 @@ Every new exposed table must have RLS before the migration is applied.
 After showing the migration summary and getting confirmation for destructive changes, run:
 
 ```bash
-pnpm db:migrate
+npm run db:migrate
 ```
 
-This applies `db/migrations/` using `DATABASE_URL` and refreshes `src/types/supabase.ts`.
+This applies `supabase/migrations/` using `DATABASE_URL`. Run `npm run db:types` to refresh `src/types/supabase.ts`.
 
 If migration fails:
 - Report the exact error.
 - Do not hand-edit the live database unless the user explicitly requests an emergency hotfix.
-- Fix `db/schema/*.ts` or the generated migration, then retry.
+- Fix the migration in `supabase/migrations/`, then retry.
 
 ### Step 6 — Verify
 
@@ -96,8 +95,7 @@ Use this format:
 ✅ Migration prepared/applied: <short name>
 
 Changed:
-  - db/schema/<file>.ts
-  - db/migrations/<file>.sql
+  - supabase/migrations/<file>.sql
   - src/types/supabase.ts
 
 Verified:
@@ -111,10 +109,9 @@ Save a concise ruflo memory entry after a successful migration.
 
 ## Constraints
 
-- `db/schema/*.ts` is the schema source of truth.
-- `db/migrations/*.sql` is the reviewed/applyable SQL history.
+- `supabase/migrations/*.sql` is the schema source of truth and applyable history.
 - `src/types/supabase.ts` is generated output.
 - Do not use Supabase MCP `apply_migration` for normal tracked changes.
-- Emergency direct SQL changes must be backported immediately into `db/schema/*.ts` and `db/migrations/`.
+- Emergency direct SQL changes must be backported immediately into `supabase/migrations/`.
 - Destructive operations require explicit `yes`.
 - Never `git add` or `git commit`; leave that for the user or `/commit`.

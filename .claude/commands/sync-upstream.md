@@ -98,7 +98,6 @@ guide.sh
 docs/dannflow_docs/
 scripts/
 src/prompts/features/
-db/schema/
 db/migrations/
 src/types/supabase.ts
 ```
@@ -133,7 +132,6 @@ Never present individual `.claude/commands/` files for selection or offer a manu
 Compare `dannflow_commit..upstream/main` before the selection table. A template database update is **required** when that range changes any of:
 
 ```text
-db/schema/
 db/migrations/
 src/types/supabase.ts
 ```
@@ -211,14 +209,13 @@ When required, include the migration files automatically; do not let the user ac
    - 🗑️ DELETED: just inform the user — do NOT delete their local file unless they explicitly say to
 
 7. **Apply a required schema sync before committing.** This is automatic once the user approves the sync branch; do not treat it as an optional documentation copy.
-   - Copy reviewed, non-conflicting template `db/schema/` and appended `db/migrations/` files.
+   - Copy reviewed, non-conflicting template appended `db/migrations/` files.
    - Do **not** copy `src/types/supabase.ts` from the template. It is generated from the target project's live database after migration.
    - Confirm a non-placeholder `DATABASE_URL` is available for the target project. If it is missing or unreachable, stop before commit/push/PR and report the exact migration blocker.
    - Run the project’s normal tracked schema flow, using its detected package manager:
      ```bash
      <package-manager> run db:migrate
      <package-manager> run db:types
-     <package-manager> exec drizzle-kit check
      <package-manager> exec tsc --noEmit
      <package-manager> run build
      ```

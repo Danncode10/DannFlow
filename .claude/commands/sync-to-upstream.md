@@ -24,7 +24,7 @@ Because your project has **rewritten git history** (via `guide.sh init`), you ca
 - `/sync-to-upstream` → interactive mode — scans default paths, classifies, asks which to include
 - `/sync-to-upstream --dry-run` → show the classification report, make no git changes
 - `/sync-to-upstream <path>` → scope the scan to one file or directory
-Database handling is automatic: if a selected candidate includes `db/schema/`, `db/migrations/`, or `src/types/supabase.ts`, enter the **template-schema verification** flow below. This is also required when the selected diff changes database objects, RLS, functions, triggers, Storage policies, or generated Supabase types—even if the changed file is a script or command document.
+Database handling is automatic: if a selected candidate includes `supabase/migrations/`, or `src/types/supabase.ts`, enter the **template-schema verification** flow below. This is also required when the selected diff changes database objects, RLS, functions, triggers, Storage policies, or generated Supabase types—even if the changed file is a script or command document.
 
 Template-schema verification never applies a migration to the source project's database. It uses the dedicated DannFlow template verification project defined below.
 
@@ -81,7 +81,6 @@ guide.sh
 docs/dannflow_docs/
 scripts/
 src/prompts/features/
-db/schema/
 db/migrations/
 src/types/supabase.ts
 ```
@@ -108,7 +107,7 @@ next.config.ts
 tsconfig.json
 ```
 
-`db/schema/`, `db/migrations/`, and `src/types/supabase.ts` are eligible only when their selected diff is generic. Automatically mark the contribution as requiring template-schema verification when any of these paths—or database SQL/RLS/Storage changes elsewhere—are selected.
+`db/migrations/`, and `src/types/supabase.ts` are eligible only when their selected diff is generic. Automatically mark the contribution as requiring template-schema verification when any of these paths—or database SQL/RLS/Storage changes elsewhere—are selected.
 
 Build the candidate list using the `dannflow_commit` SHA from `dannflow.json` as the base — this is more precise than `upstream/main` because it reflects exactly what you last synced from, not the current tip:
 ```bash
@@ -284,7 +283,7 @@ Proceed directly with the PR flow unless a required tool or permission is missin
 
 ### Required template-schema verification
 
-Run this section automatically when selected files include `db/schema/`, `db/migrations/`, or `src/types/supabase.ts`, or when the selected diff changes database SQL, RLS, functions, triggers, Storage policies, or generated types. Do not skip it, and do not use the source project's `DATABASE_URL` or `SUPABASE_PROJECT_ID`.
+Run this section automatically when selected files include `db/migrations/`, or `src/types/supabase.ts`, or when the selected diff changes database SQL, RLS, functions, triggers, Storage policies, or generated types. Do not skip it, and do not use the source project's `DATABASE_URL` or `SUPABASE_PROJECT_ID`.
 
 1. Require these non-placeholder, untracked environment values in the source project before creating the clean clone's `.env.local`:
 
@@ -304,13 +303,12 @@ Run this section automatically when selected files include `db/schema/`, `db/mig
 
    Never print, commit, copy, or include these secrets in the patch.
 
-3. Review every selected migration. A normal table/column/index change must originate in `db/schema/`, then use the generated Drizzle migration. RLS, functions, triggers, grants, Storage policies, and extensions must be reviewed as explicit SQL in the tracked migration. Confirm every exposed table has RLS and an ownership/admin policy.
+3. Review every selected migration. A normal table/column/index change must originate in `supabase/migrations/` as an explicit SQL file. RLS, functions, triggers, grants, Storage policies, and extensions must be reviewed as explicit SQL in the tracked migration. Confirm every exposed table has RLS and an ownership/admin policy.
 
 4. Apply and verify the complete template migration history from the clean clone:
 
    ```bash
    npm run db:migrate
-   npm exec drizzle-kit check
    npx tsc --noEmit
    npm run build
    ```
