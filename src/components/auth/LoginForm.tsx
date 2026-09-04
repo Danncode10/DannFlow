@@ -28,7 +28,7 @@ export default function LoginForm() {
         router.refresh();
       }
     } catch (err: unknown) {
-      setError(err.message || "An unknown error occurred");
+      setError((err as Error).message || "An unknown error occurred");
     } finally {
       setLoading(false);
     }
