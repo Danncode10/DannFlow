@@ -1,35 +1,34 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Mail, Lock, Loader2 } from 'lucide-react';
-import { signInWithEmail } from '@/services/auth';
-import { useRouter } from 'next/navigation';
-import { siteConfig } from '@/lib/config';
-import Link from 'next/link';
-
+import { useState } from "react";
+import { Mail, Lock, Loader2 } from "lucide-react";
+import { signInWithEmail } from "@/services/auth";
+import { useRouter } from "next/navigation";
+import { siteConfig } from "@/lib/config";
+import Link from "next/link";
 
 export default function LoginForm() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
 
     try {
       const result = await signInWithEmail(email, password);
 
       if (result.requiresMFA) {
-        router.push('/auth/2fa');
+        router.push("/auth/2fa");
       } else {
         router.refresh();
       }
-    } catch (err: any) {
-      setError(err.message || 'An unknown error occurred');
+    } catch (err: unknown) {
+      setError(err.message || "An unknown error occurred");
     } finally {
       setLoading(false);
     }
@@ -39,7 +38,9 @@ export default function LoginForm() {
     <div className="w-full max-w-md mx-auto bg-zinc-900 border border-zinc-800 rounded-2xl p-8 shadow-2xl flex flex-col items-center">
       <div className="w-full text-center mb-8">
         <h2 className="text-2xl font-semibold text-zinc-100">Welcome Back</h2>
-        <p className="text-zinc-400 text-sm mt-2">Sign in to your {siteConfig.name} account</p>
+        <p className="text-zinc-400 text-sm mt-2">
+          Sign in to your {siteConfig.name} account
+        </p>
       </div>
 
       {error && (
@@ -84,8 +85,8 @@ export default function LoginForm() {
         </div>
 
         <div className="flex justify-end px-1">
-          <Link 
-            href="/forgot-password" 
+          <Link
+            href="/forgot-password"
             className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
           >
             Forgot password?
@@ -97,8 +98,10 @@ export default function LoginForm() {
           disabled={loading}
           className="w-full flex justify-center items-center px-4 py-3 border border-transparent rounded-xl shadow-sm text-sm font-semibold text-zinc-950 bg-zinc-100 hover:bg-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-500 focus:ring-offset-zinc-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all mt-4"
         >
-          {loading && <Loader2 className="animate-spin -ml-1 mr-2 h-4 w-4 text-zinc-950" />}
-          {loading ? 'Signing in...' : 'Sign in'}
+          {loading && (
+            <Loader2 className="animate-spin -ml-1 mr-2 h-4 w-4 text-zinc-950" />
+          )}
+          {loading ? "Signing in..." : "Sign in"}
         </button>
       </form>
     </div>
