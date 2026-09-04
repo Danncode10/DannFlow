@@ -1,0 +1,108 @@
+
+> my-structure@0.1.0 lint
+> eslint
+
+
+/Users/lesterdannlopez/Desktop/Dann_Folder/MyProjects/Work/Dannflow/src/app/blog/[slug]/page.tsx
+  98:13  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+/Users/lesterdannlopez/Desktop/Dann_Folder/MyProjects/Work/Dannflow/src/app/blog/page.tsx
+  68:19  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+/Users/lesterdannlopez/Desktop/Dann_Folder/MyProjects/Work/Dannflow/src/app/dashboard/pages/page.tsx
+  11:63  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/Users/lesterdannlopez/Desktop/Dann_Folder/MyProjects/Work/Dannflow/src/components/auth/LoginForm.tsx
+  31:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/lesterdannlopez/Desktop/Dann_Folder/MyProjects/Work/Dannflow/src/components/dashboard-shell.tsx
+  123:11  error  Do not use an `<a>` element to navigate to `/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+
+/Users/lesterdannlopez/Desktop/Dann_Folder/MyProjects/Work/Dannflow/src/components/dashboard/blog-editor-page.tsx
+  136:13  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  182:11  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  466:23  error    React Hook "useRef" is called conditionally. React Hooks must be called in the exact same order in every component render                                                                                                                                                                react-hooks/rules-of-hooks
+  467:43  error    React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render                                                                                                                                                              react-hooks/rules-of-hooks
+
+/Users/lesterdannlopez/Desktop/Dann_Folder/MyProjects/Work/Dannflow/src/components/dashboard/tabs/blog-tab.tsx
+   80:13  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  184:57  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                                                                                                                                                                                          react/no-unescaped-entities
+
+/Users/lesterdannlopez/Desktop/Dann_Folder/MyProjects/Work/Dannflow/src/components/dashboard/tabs/gallery-tab.tsx
+  76:39  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  76:49  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+/Users/lesterdannlopez/Desktop/Dann_Folder/MyProjects/Work/Dannflow/src/components/dashboard/tabs/leads-tab.tsx
+  76:67  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/Users/lesterdannlopez/Desktop/Dann_Folder/MyProjects/Work/Dannflow/src/components/landing/blog-preview.tsx
+  21:11  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+/Users/lesterdannlopez/Desktop/Dann_Folder/MyProjects/Work/Dannflow/src/components/landing/typewriter.tsx
+  66:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/lesterdannlopez/Desktop/Dann_Folder/MyProjects/Work/Dannflow/src/components/landing/typewriter.tsx:66:7
+  64 |     const isAnchorNavigation = window.location.hash.length > 0;
+  65 |     if (reduce || skipAnimation || isAnchorNavigation) {
+> 66 |       setShown(text.length);
+     |       ^^^^^^^^ Avoid calling setState() directly within an effect
+  67 |       if (!completedRef.current) {
+  68 |         completedRef.current = true;
+  69 |         onCompleteRef.current?.();  react-hooks/set-state-in-effect
+
+/Users/lesterdannlopez/Desktop/Dann_Folder/MyProjects/Work/Dannflow/src/components/landing/water-particles.tsx
+  27:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/lesterdannlopez/Desktop/Dann_Folder/MyProjects/Work/Dannflow/src/components/landing/water-particles.tsx:27:5
+  25 |   useEffect(() => {
+  26 |     if (!active) return;
+> 27 |     setMounted(true);
+     |     ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  28 |   }, [active]);
+  29 |
+  30 |   useEffect(() => {  react-hooks/set-state-in-effect
+
+/Users/lesterdannlopez/Desktop/Dann_Folder/MyProjects/Work/Dannflow/src/components/profile-form.tsx
+  37:9  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/lesterdannlopez/Desktop/Dann_Folder/MyProjects/Work/Dannflow/src/components/profile-form.tsx:37:9
+  35 |       if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
+  36 |       if (age >= 0 && formData.age !== String(age)) {
+> 37 |         setFormData(prev => ({ ...prev, age: String(age) }));
+     |         ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  38 |       }
+  39 |     }
+  40 |   }, [formData.birthday]);  react-hooks/set-state-in-effect
+  40:6  warning  React Hook useEffect has a missing dependency: 'formData.age'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 react-hooks/exhaustive-deps
+
+/Users/lesterdannlopez/Desktop/Dann_Folder/MyProjects/Work/Dannflow/src/components/ui/avatar.tsx
+  18:10  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+/Users/lesterdannlopez/Desktop/Dann_Folder/MyProjects/Work/Dannflow/src/components/ui/pill-tabs.tsx
+  4:18  warning  'AnimatePresence' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/lesterdannlopez/Desktop/Dann_Folder/MyProjects/Work/Dannflow/src/services/dashboard.ts
+  25:12  warning  'err' is defined but never used  @typescript-eslint/no-unused-vars
+  49:12  warning  'err' is defined but never used  @typescript-eslint/no-unused-vars
+  69:12  warning  'err' is defined but never used  @typescript-eslint/no-unused-vars
+
+✖ 24 problems (12 errors, 12 warnings)
+

@@ -1,6 +1,6 @@
 # 🚀 DannFlow (2026 Edition)
 
-**The AI-agent-optimized SaaS Starter.** Built for AI-assisted development with Claude Code, Codex, Cursor, or Antigravity — Next.js 16, Supabase, Tailwind v4, Shadcn UI, with auth, dashboard, RLS-first design, and a reusable command system.
+**The AI-agent-optimized SaaS Starter.** Built for AI-assisted development with Claude Code, Codex, Cursor, or Antigravity — Next.js 16, Supabase, Tailwind v4, Shadcn UI, Husky git hooks, with auth, dashboard, RLS-first design, and a reusable command system.
 
 > **Built for Speed. Structured for Agents. Optimized for the Vibe.**
 
@@ -18,6 +18,7 @@ curl -sSL https://raw.githubusercontent.com/Danncode10/DannFlow/main/install.sh 
 ```
 
 That's it. The installer:
+
 1. Asks for your app name
 2. Clones DannFlow into a new folder
 3. Installs npm dependencies + `.env.local`
@@ -26,6 +27,7 @@ That's it. The installer:
 6. Runs `guide.sh init` to rebrand the project to your app name
 
 **Windows?** Use WSL or Git Bash and run the same command. Or use the PowerShell version:
+
 ```powershell
 powershell -ExecutionPolicy Bypass -Command "iex (irm https://raw.githubusercontent.com/Danncode10/DannFlow/main/install.ps1)"
 ```
@@ -82,6 +84,7 @@ For the dashboard settings, verification checks, and deployment handoff that
 complete Phase 0, follow the [Phase 0 setup handover runbook](docs/dannflow_docs/phase-0-setup-handover.md).
 
 Then start development:
+
 ```bash
 npm run dev
 ```
@@ -161,6 +164,7 @@ restaurant-website  (a specific client project)
 ```
 
 **Create a template from DannFlow:**
+
 ```bash
 # 1. Clone DannFlow as a starting point
 git clone https://github.com/Danncode10/DannFlow.git my-template
@@ -180,12 +184,14 @@ git remote add origin https://github.com/YOUR_USERNAME/my-template.git
 git push -u origin main
 ```
 
-**Already have a repo that *didn't* start from DannFlow?** Adopt it in one command:
+**Already have a repo that _didn't_ start from DannFlow?** Adopt it in one command:
+
 ```bash
 /adopt-dannflow   # installs CI, creates the dannflow.json anchor + dev branch, then syncs
 ```
 
 **Sync updates from the parent later:**
+
 ```bash
 /sync-upstream   # pulls selective updates from upstream into your project
 ```
@@ -226,12 +232,12 @@ npx ruflo@latest init wizard
 
 **What the wizard adds to your repo:**
 
-| Location | Purpose | Commit? |
-|---|---|---|
-| `.claude-flow/config.yaml`, `agents/`, `hooks/`, `workflows/` | Ruflo project config | ✅ Yes |
-| `.claude-flow/data/`, `logs/`, `sessions/`, `metrics/` | Runtime state | ❌ Gitignored |
-| `.claude/agents/`, `.claude/skills/`, `.claude/helpers/` | Agents + skills + hook handler | ✅ Yes |
-| `.claude/settings.json` | Hook wiring into Claude Code | ✅ Yes |
+| Location                                                      | Purpose                        | Commit?       |
+| ------------------------------------------------------------- | ------------------------------ | ------------- |
+| `.claude-flow/config.yaml`, `agents/`, `hooks/`, `workflows/` | Ruflo project config           | ✅ Yes        |
+| `.claude-flow/data/`, `logs/`, `sessions/`, `metrics/`        | Runtime state                  | ❌ Gitignored |
+| `.claude/agents/`, `.claude/skills/`, `.claude/helpers/`      | Agents + skills + hook handler | ✅ Yes        |
+| `.claude/settings.json`                                       | Hook wiring into Claude Code   | ✅ Yes        |
 
 ---
 
@@ -240,26 +246,30 @@ npx ruflo@latest init wizard
 The installer ships 8 skill packs across 3 categories:
 
 **Design Taste**
-| Pack | What it adds |
-|---|---|
+
+| Pack                                                            | What it adds                                                                |
+| --------------------------------------------------------------- | --------------------------------------------------------------------------- |
 | [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill) | 12 design skills — minimalist UI, high-end visual design, redesign guidance |
-| [emilkowalski/skill](https://github.com/emilkowalski/skill) | Animation + micro-interaction craft (pairs with Framer Motion) |
-| [pbakaus/impeccable](https://github.com/pbakaus/impeccable) | 27 UI anti-pattern rules + `npx impeccable detect` CLI ⚠️ Medium risk |
+| [emilkowalski/skill](https://github.com/emilkowalski/skill)     | Animation + micro-interaction craft (pairs with Framer Motion)              |
+| [pbakaus/impeccable](https://github.com/pbakaus/impeccable)     | 27 UI anti-pattern rules + `npx impeccable detect` CLI ⚠️ Medium risk       |
 
 **Code Quality**
-| Pack | What it adds |
-|---|---|
-| `anthropics/claude-api` | Anthropic SDK guidance — prompt caching, tool use, model IDs |
-| `shadcn/ui` | Official Shadcn component docs + composition patterns |
-| `alirezarezvani/a11y-audit` | WCAG 2.2 scanning + fixes for React/Next.js |
+
+| Pack                        | What it adds                                                 |
+| --------------------------- | ------------------------------------------------------------ |
+| `anthropics/claude-api`     | Anthropic SDK guidance — prompt caching, tool use, model IDs |
+| `shadcn/ui`                 | Official Shadcn component docs + composition patterns        |
+| `alirezarezvani/a11y-audit` | WCAG 2.2 scanning + fixes for React/Next.js                  |
 
 **SEO + Marketing**
-| Pack | What it adds |
-|---|---|
+
+| Pack                            | What it adds                                                     |
+| ------------------------------- | ---------------------------------------------------------------- |
 | `coreyhaines31/marketingskills` | 30+ skills — SEO, copywriting, CRO, pricing, launch, ads, emails |
-| `addyosmani/web-quality-skills` | Technical SEO + Core Web Vitals (from Google Chrome team) |
+| `addyosmani/web-quality-skills` | Technical SEO + Core Web Vitals (from Google Chrome team)        |
 
 **Update all packs:**
+
 ```bash
 ./guide.sh skills-update
 ```
@@ -307,6 +317,7 @@ npm run checkpoint      # snapshots live schema → supabase/backups/
 ```
 
 **Session starter prompt** (paste this to Claude at the start of every session):
+
 ```
 Read CLAUDE.md before doing anything. For schema changes, write standard
 SQL migrations in supabase/migrations/ and apply with npm run db:migrate.
@@ -317,16 +328,16 @@ Use Supabase MCP only to read, verify, checkpoint, or inspect the live project.
 
 ## 🏗️ What's Included
 
-| Feature | Location |
-|---|---|
+| Feature                                     | Location                                                |
+| ------------------------------------------- | ------------------------------------------------------- |
 | Auth (login, signup, forgot/reset password) | `src/app/login/`, `forgot-password/`, `reset-password/` |
-| Protected Dashboard | `src/app/dashboard/` |
-| Profile + Security Settings | `src/components/profile-form.tsx`, `security-form.tsx` |
-| GitHub Repos Tab | `dashboard-shell.tsx` — paginated, 5/page |
-| TanStack Query caching | `src/hooks/` |
-| Toast notifications | Sonner — global |
-| Rate limiting | Upstash Redis helper for production-sensitive paths |
-| RLS-first service layer | `src/services/` |
+| Protected Dashboard                         | `src/app/dashboard/`                                    |
+| Profile + Security Settings                 | `src/components/profile-form.tsx`, `security-form.tsx`  |
+| GitHub Repos Tab                            | `dashboard-shell.tsx` — paginated, 5/page               |
+| TanStack Query caching                      | `src/hooks/`                                            |
+| Toast notifications                         | Sonner — global                                         |
+| Rate limiting                               | Upstash Redis helper for production-sensitive paths     |
+| RLS-first service layer                     | `src/services/`                                         |
 
 ---
 
@@ -365,20 +376,20 @@ Run `./guide.sh commands` or read `.claude/commands/README.md` to see the core
 DannFlow commands. The repository also includes additional command packs under
 `.claude/commands/`. Key ones:
 
-| Command | When to use |
-|---|---|
-| `/ask-command <intent>` | Don't know which command? This routes you. |
-| `/init-claude` | Tailor CLAUDE.md + SKILLS.md to your project |
-| `/make-command <name>` | Create a new slash command |
-| `/adopt-dannflow` | Bootstrap a non-DannFlow repo: CI + dannflow.json + dev branch, then sync |
-| `/sync-upstream` | Pull selective updates from the parent template (hash-named branch → configured base branch) |
-| `/checkpoint` | Snapshot DB before risky schema changes |
-| `/sync-types` | Regenerate Supabase types when needed |
-| `/migrate` | Write SQL migration in `supabase/migrations/*.sql`, apply with `npm run db:migrate` |
-| `/new-feature <name>` | Scaffold service + page + form |
-| `/review` | Pre-commit lint + typecheck + guardrail check |
-| `/commit` | Stage + draft conventional commit message |
-| `/rls-check` | Audit RLS policies for missing ownership or admin authorization |
+| Command                 | When to use                                                                                  |
+| ----------------------- | -------------------------------------------------------------------------------------------- |
+| `/ask-command <intent>` | Don't know which command? This routes you.                                                   |
+| `/init-claude`          | Tailor CLAUDE.md + SKILLS.md to your project                                                 |
+| `/make-command <name>`  | Create a new slash command                                                                   |
+| `/adopt-dannflow`       | Bootstrap a non-DannFlow repo: CI + dannflow.json + dev branch, then sync                    |
+| `/sync-upstream`        | Pull selective updates from the parent template (hash-named branch → configured base branch) |
+| `/checkpoint`           | Snapshot DB before risky schema changes                                                      |
+| `/sync-types`           | Regenerate Supabase types when needed                                                        |
+| `/migrate`              | Write SQL migration in `supabase/migrations/*.sql`, apply with `npm run db:migrate`          |
+| `/new-feature <name>`   | Scaffold service + page + form                                                               |
+| `/review`               | Pre-commit lint + typecheck + guardrail check                                                |
+| `/commit`               | Stage + draft conventional commit message                                                    |
+| `/rls-check`            | Audit RLS policies for missing ownership or admin authorization                              |
 
 ### Running Claude commands from Codex
 
@@ -406,17 +417,17 @@ agent guardrails.
 
 ## 📚 Docs
 
-| Doc | What it covers |
-|---|---|
-| [docs/dannflow_docs/claude-workflow.md](docs/dannflow_docs/claude-workflow.md) | **START HERE** — daily loop, all 34 commands |
-| [docs/dannflow_docs/methodology.md](docs/dannflow_docs/methodology.md) | Vibe Coding + Zero-Hallucination philosophy |
-| [docs/dannflow_docs/the-holy-trinity.md](docs/dannflow_docs/the-holy-trinity.md) | Types + Schema + Services model |
-| [docs/dannflow_docs/mcp-setup.md](docs/dannflow_docs/mcp-setup.md) | Supabase + GitHub MCP setup |
-| [docs/dannflow_docs/branching-and-sync.md](docs/dannflow_docs/branching-and-sync.md) | **Branch flow** (feat→dev→main), CI gate, adopt/sync/contribute model |
+| Doc                                                                                        | What it covers                                                                   |
+| ------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------- |
+| [docs/dannflow_docs/claude-workflow.md](docs/dannflow_docs/claude-workflow.md)             | **START HERE** — daily loop, all 34 commands                                     |
+| [docs/dannflow_docs/methodology.md](docs/dannflow_docs/methodology.md)                     | Vibe Coding + Zero-Hallucination philosophy                                      |
+| [docs/dannflow_docs/the-holy-trinity.md](docs/dannflow_docs/the-holy-trinity.md)           | Types + Schema + Services model                                                  |
+| [docs/dannflow_docs/mcp-setup.md](docs/dannflow_docs/mcp-setup.md)                         | Supabase + GitHub MCP setup                                                      |
+| [docs/dannflow_docs/branching-and-sync.md](docs/dannflow_docs/branching-and-sync.md)       | **Branch flow** (feat→dev→main), CI gate, adopt/sync/contribute model            |
 | [docs/dannflow_docs/updating-old-projects.md](docs/dannflow_docs/updating-old-projects.md) | Bring an **old DannFlow project** current — bootstrap new commands, then upgrade |
-| [docs/dannflow_docs/backups-and-sync.md](docs/dannflow_docs/backups-and-sync.md) | Checkpoint + sync-types loop |
-| [docs/dannflow_docs/ui-system.md](docs/dannflow_docs/ui-system.md) | Semantic tokens + UI standards |
+| [docs/dannflow_docs/backups-and-sync.md](docs/dannflow_docs/backups-and-sync.md)           | Checkpoint + sync-types loop                                                     |
+| [docs/dannflow_docs/ui-system.md](docs/dannflow_docs/ui-system.md)                         | Semantic tokens + UI standards                                                   |
 
 ---
 
-*Built for speed. Structured for Agents. Optimized for the Vibe.*
+_Built for speed. Structured for Agents. Optimized for the Vibe._
