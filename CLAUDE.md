@@ -46,6 +46,7 @@ For the full marketing/setup story, see [README.md](README.md). For deeper docs,
 - **Animation**: Framer Motion
 - **Toasts**: Sonner
 - **Icons**: lucide-react
+- **Git Hooks**: Husky + lint-staged (Fast commits, strict-lite pushes to prevent Vercel errors)
 
 ## Project structure
 
@@ -112,13 +113,17 @@ Do **not** use Supabase MCP `apply_migration` for normal schema changes. Supabas
 Use `.claude/commands/schema-change.md` only when the user explicitly wants to manipulate the live Supabase schema through MCP or needs an emergency live SQL change captured in git. That command checkpoints the live schema, writes the approved SQL to `supabase/migrations/YYYYMMDDHHMMSS_<name>.sql`, applies it through Supabase MCP `apply_migration`, regenerates `src/types/supabase.ts`, and verifies the live database.
 
 ### Checkpoint protocol
+
 When the user runs `npm run checkpoint` and provides the generated prompt:
+
 1. Verify Supabase MCP connection.
 2. Read live schema (tables, enums, RLS policies, triggers, functions) for the specified project ID.
 3. Generate full DDL and save it to the timestamped `.sql` file in `supabase/backups/`.
 
 ### Project provisioning
+
 When asked to create a new Supabase project + apply schema:
+
 1. `list_organizations` → let user choose.
 2. Ask for Project Name and Organization ID.
 3. `get_cost` → `confirm_cost` BEFORE `create_project`.
@@ -134,6 +139,7 @@ Before specialized work, verify these MCPs are connected:
 - **Terminal MCP** — local commands like `npm run db:generate`, `npm run db:migrate`, and `npm run checkpoint`
 
 If a required MCP is missing, stop and tell the user:
+
 > ⚠️ [Tool Name] MCP Not Detected: I need this to [task]. Open Settings → MCP Store → install "[Tool Name]" using credentials from `.env.local`.
 
 ### Connection reporting rule
@@ -153,14 +159,14 @@ For GitHub Projects, if the authenticated `gh` CLI reports a missing `read:proje
 
 ## Claude environment in this repo
 
-| File / Folder | Purpose |
-|---|---|
-| `CLAUDE.md` (this file) | Authoritative Claude Code config |
-| [SKILLS.md](SKILLS.md) | Which Claude Code skills are relevant + when to invoke them |
-| [MASTERPLAN.md](MASTERPLAN.md) | Ordered build plan — check before starting any feature or task |
-| `.claude/commands/` | Custom slash commands (see its README for the list) |
-| `AGENTS.md` | Cross-tool agent standard (Cursor/Antigravity/etc.) — kept for compatibility |
-| `.codex/` | Codex compatibility layer that loads `.claude/commands/` through `/claude-command` |
+| File / Folder                  | Purpose                                                                            |
+| ------------------------------ | ---------------------------------------------------------------------------------- |
+| `CLAUDE.md` (this file)        | Authoritative Claude Code config                                                   |
+| [SKILLS.md](SKILLS.md)         | Which Claude Code skills are relevant + when to invoke them                        |
+| [MASTERPLAN.md](MASTERPLAN.md) | Ordered build plan — check before starting any feature or task                     |
+| `.claude/commands/`            | Custom slash commands (see its README for the list)                                |
+| `AGENTS.md`                    | Cross-tool agent standard (Cursor/Antigravity/etc.) — kept for compatibility       |
+| `.codex/`                      | Codex compatibility layer that loads `.claude/commands/` through `/claude-command` |
 
 If you don't know which custom command fits a task, run `/ask-command <your intent>`.
 
