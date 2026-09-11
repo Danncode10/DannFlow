@@ -59,6 +59,7 @@ You're done with setup. From here on, the daily loop is:
 - **The Ledger (`docs/PENDING_DOC_UPDATES.md`)**: Whenever code is written that touches services, types, DB schemas, or APIs, a concise note is appended.
 - **Revision & Pruning**: If code is revised or discarded, the corresponding entry in the ledger is immediately edited or deleted.
 - **Git Hook Gate (`.husky/pre-push`)**: Pushing to `main` is blocked if unaddressed entries remain in `docs/PENDING_DOC_UPDATES.md`.
+- **Commit Formatting (`.husky/commit-msg`)**: Supports standard conventional commits and `close(pX.Y):` prefixes for task closures.
 - **Clearance**: Before merging to `main` or completing a task (`/close-task`), all entries are transferred to permanent `docs/` and `docs/diagrams/`, unblocking the push.
 
 ---
@@ -134,6 +135,18 @@ Run `/ask-command <what you want>` if you don't remember which command to use.
 | `/sync-to-upstream`   | Reverse of `/sync-upstream`. Classifies local changes as generic vs. business-specific, automatically verifies detected reusable DB/RLS/Auth changes in the template database instead of the project database, then creates a committed, pushed PR back to DannFlow with a verification comment. |
 | `/no-conflict`        | Audits repo for conflicts between documentation (README, CLAUDE.md) and actual code — versions, features, commands, RLS, semantic tokens, folder structure. Reports only.                                                                                                                        |
 | `/ruflo-upgrade`      | Re-applies Ruflo memory + parallel-agent patterns to the 5 core commands (`/new-feature`, `/new-page`, `/security-audit`, `/seo-fix`, `/migrate`). Safe to re-run after `/init-update`.                                                                                                          |
+
+---
+
+## Core DannFlow Agent Skills
+
+In addition to custom slash commands, DannFlow ships with three core native agent skills to orchestrate massive project workflows autonomously:
+
+- **`dannflow-masterplan`**: Run this to start a new project, generate a Masterplan, sync a GitHub Project board, or initialize infrastructure.
+- **`dannflow-task`**: Run this to execute a specific task from `MASTERPLAN.md` end-to-end (includes automated quality gates and human verification steps). It automatically handles updating `docs/PENDING_DOC_UPDATES.md` and closing out the task.
+- **`dannflow-update`**: Run this to safely and surgically update an old DannFlow repository from upstream without destroying custom business logic. Note: updating older repositories requires a manual AI brain upgrade first, as detailed in [updating-old-repo.md](../setup/updating-old-repo.md).
+
+These skills are natively compatible with `.agents/skills/` (copied from `.claude/skills/`) and can be invoked directly by the AI when asked to perform these high-level workflows.
 
 ---
 

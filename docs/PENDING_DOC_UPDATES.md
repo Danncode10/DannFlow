@@ -1,6 +1,1 @@
-- [Framework] Updated `.husky/commit-msg` to support `close(pX.Y):` commit prefixes.
-- [Skills] Added `.claude/skills/dannflow-task/SKILL.md` task orchestration skill.
-- [Skills] Added `.claude/skills/dannflow-masterplan/SKILL.md` SaaS onboarding, Masterplan, and GitHub Project sync skill.
-- [Skills] Added `.claude/skills/dannflow-update/SKILL.md` update agent skill for surgical updates of legacy repos.
-- [Docs] Added `docs/dannflow_docs/setup/updating-old-repo.md` detailing the manual AI brain upgrade prerequisite.
-- Copied `.claude/skills` to .`.agents/Skills` updated CLAUDE.md, SKILLS.md and AGENTS.md
+<!-- Ledger cleared. Log new pending documentation updates here. -->
