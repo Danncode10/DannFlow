@@ -18,11 +18,11 @@ After Phase 0 is initialized, run `/make-masterplan Phase 1` when you are ready 
 
 ....
 
-
 ## **Notes**
 
 - Use ordered task IDs in every phase task: `[P0.1]`, `[P0.2]`, `[P1.1]`, `[P2.1]`.
 - If a phase has lettered subphases, keep the letter in the task ID: `[P3A.1]`, `[P3B.1]`.
+- **Documentation Requirement**: Every phase must conclude with a mandatory final task: `[PX.DOC] Finalize Phase X Documentation & Diagrams`.
 - Run `/update-masterplan` after editing tasks so the linked GitHub Project stays in sync.
 
 ---

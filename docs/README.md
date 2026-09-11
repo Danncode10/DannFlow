@@ -38,6 +38,18 @@ Welcome to the central documentation hub for **DannFlow** — the Next.js 16 + S
 
 - [**Feature Documentation Template**](templates/feature-doc-template.md) — Standardized template for new feature documentation.
 - [**Architecture Decision Record (ADR) Template**](templates/adr-template.md) — Template for logging major tech decisions.
+- [**Product Requirements Document (PRD) Template**](templates/prd-template.md) — Template for scoping features and product goals.
+- [**Technical Design Document Template**](templates/design-doc-template.md) — Template for technical architecture and schema design.
+- [**User Manual Template**](templates/user-manual-template.md) — Template for end-user instruction guides.
+
+### 📝 6. Project Documentation (`project/`)
+
+> _Store all project-specific documents (e.g., PRDs, Design Docs, User Manuals) in the `project/` folder. These files come pre-filled with DannFlow's baseline features to act as your starting point._
+
+- [**Product Requirements (PRD)**](project/PRD.md) — What we are building and why.
+- [**Visual UI/UX Design System**](project/DESIGN.md) — Colors, fonts, and theme rules.
+- [**Technical Architecture & API Specs**](project/technical-spec.md) — The technical specs and service layer structure.
+- [**End-user & Client Admin Guide**](project/user-manual.md) — User instructions and core workflows.
 
 ---
 
