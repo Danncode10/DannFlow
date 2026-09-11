@@ -6,13 +6,10 @@ else
   COMMIT_MSG=""
 fi
 
-# Check if staged files include architectural, service, type, or database changes
-STAGED_CORE_CODE=$(git diff --cached --name-only | grep -E '^(src/services/|src/types/|supabase/migrations/|src/app/api/)' || true)
+# Track ALL changes EXCEPT documentation, static assets, scripts, and lockfiles
+STAGED_CHANGES=$(git diff --cached --name-only | grep -vE '^(docs/|public/|scripts/|README\.md$|\.gitignore$|package-lock\.json$|pnpm-lock\.yaml$|yarn\.lock$)' || true)
 
-# Check if staged files include configuration, AI instructions, or package changes
-STAGED_CONFIG_CODE=$(git diff --cached --name-only | grep -E '^(\.agents/|\.claude/|\.codex/|\.github/|\.husky/|\.env\.example|CLAUDE\.md|AGENTS\.md|MASTERPLAN\.md|package\.json)' || true)
-
-if [ -n "$STAGED_CORE_CODE" ] || [ -n "$STAGED_CONFIG_CODE" ]; then
+if [ -n "$STAGED_CHANGES" ]; then
   # Check if docs/PENDING_DOC_UPDATES.md was also staged
   DOCS_STAGED=$(git diff --cached --name-only | grep -E '^docs/PENDING_DOC_UPDATES.md$' || true)
   
@@ -24,12 +21,7 @@ if [ -n "$STAGED_CORE_CODE" ] || [ -n "$STAGED_CONFIG_CODE" ]; then
     echo "🚨 COMMIT BLOCKED: Code or configuration was modified without logging pending documentation!"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo "Modified files requiring documentation note:"
-    if [ -n "$STAGED_CORE_CODE" ]; then
-      echo "$STAGED_CORE_CODE"
-    fi
-    if [ -n "$STAGED_CONFIG_CODE" ]; then
-      echo "$STAGED_CONFIG_CODE"
-    fi
+    echo "$STAGED_CHANGES"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo "👉 How to proceed:"
     echo "1. Log your change in docs/PENDING_DOC_UPDATES.md and stage it: git add docs/PENDING_DOC_UPDATES.md"
