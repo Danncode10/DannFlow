@@ -1,0 +1,2 @@
+- [Framework] Updated `.husky/commit-msg` to support `close(pX.Y):` commit prefixes.
+- [Skills] Added `.claude/skills/dannflow-task/SKILL.md` task orchestration skill.
