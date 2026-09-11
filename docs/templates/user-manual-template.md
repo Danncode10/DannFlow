@@ -1,7 +1,9 @@
 # User Manual
 
-**Product/Feature Name:** [Product Name]  
-**Last Updated:** [YYYY-MM-DD]
+**Project/Feature Name:** [Product Name]  
+**Date:** [YYYY-MM-DD]  
+**Author:** [Your Name]  
+**Status:** [Draft / Under Review / Approved]
 
 ---
 

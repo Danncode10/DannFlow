@@ -38,18 +38,19 @@ Welcome to the central documentation hub for **DannFlow** — the Next.js 16 + S
 
 - [**Feature Documentation Template**](templates/feature-doc-template.md) — Standardized template for new feature documentation.
 - [**Architecture Decision Record (ADR) Template**](templates/adr-template.md) — Template for logging major tech decisions.
-- [**Product Requirements Document (PRD) Template**](templates/prd-template.md) — Template for scoping features and product goals.
-- [**Technical Design Document Template**](templates/design-doc-template.md) — Template for technical architecture and schema design.
+- [**Requirements Document Template**](templates/requirements-document-template.md) — Template for scoping user needs and specs.
+- [**Design Document Template**](templates/design-document-template.md) — Template for UML diagrams and structural plans.
+- [**Technical Document Template**](templates/technical-document-template.md) — Template for source code logic and DB architectures.
 - [**User Manual Template**](templates/user-manual-template.md) — Template for end-user instruction guides.
 
 ### 📝 6. Project Documentation (`project/`)
 
-> _Store all project-specific documents (e.g., PRDs, Design Docs, User Manuals) in the `project/` folder. These files come pre-filled with DannFlow's baseline features to act as your starting point._
+> _Store all project-specific documents in the `project/` folder. These files come pre-filled with DannFlow's baseline features to act as your starting point._
 
-- [**Product Requirements (PRD)**](project/PRD.md) — What we are building and why.
-- [**Visual UI/UX Design System**](project/DESIGN.md) — Colors, fonts, and theme rules.
-- [**Technical Architecture & API Specs**](project/technical-spec.md) — The technical specs and service layer structure.
-- [**End-user & Client Admin Guide**](project/user-manual.md) — User instructions and core workflows.
+- [**Requirements Document**](project/requirements-document.md) — Catalogs all user needs and system specifications.
+- [**Design Document**](project/design-document.md) — Archives all UML diagrams and architectural structural plans.
+- [**Technical Document**](project/technical-document.md) — Explains source code logic and database architectures.
+- [**User Manual**](project/user-manual.md) — The operational guide for end-users interacting with the system.
 
 ---
 

@@ -1,4 +1,4 @@
-# End-User & Client Admin Guide
+# User Manual
 
 **Project Name:** [Your Project Name] (Built on DannFlow)
 **Date:** [YYYY-MM-DD]
@@ -27,9 +27,9 @@ Out of the box, DannFlow provides the following user workflows. _(Update these a
 - **Navigation:** Users can manage their account settings via the profile dropdown.
 - **Capabilities:** View account details, update basic profile information (driven by the `profiles` table in Supabase), and securely log out.
 
-## 2. Project-Specific Workflows
+## 2. Project-Specific Operational Guide
 
-_(Document the primary ways an end-user or admin interacts with your specific application here.)_
+_(Document the primary ways an end-user or admin interacts with your specific application here. Provide clear operational guides for the system.)__
 
 ### [Specific Workflow 1: e.g., Creating a Dashboard]
 
