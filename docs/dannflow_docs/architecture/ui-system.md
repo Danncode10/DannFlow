@@ -6,13 +6,13 @@ The DannFlow UI is built on the principles of **Clarity, Contrast, and Context**
 
 We use the `oklch` color space in Tailwind 4.0 for more perceptual uniformity and vibrant gradients.
 
-| Variable | Usage | Vibe |
-| :--- | :--- | :--- |
-| `background` | Page background | Deep neutral (Dark Mode by default) |
-| `primary` | Call to actions | High contrast, bold |
-| `accent` | Secondary highlights | Subtle interaction feedback |
-| `muted` | De-emphasized text | Secondary metadata, labels |
-| `border` | Component boundaries | Fine lines, consistent spacing |
+| Variable     | Usage                | Vibe                                |
+| :----------- | :------------------- | :---------------------------------- |
+| `background` | Page background      | Deep neutral (Dark Mode by default) |
+| `primary`    | Call to actions      | High contrast, bold                 |
+| `accent`     | Secondary highlights | Subtle interaction feedback         |
+| `muted`      | De-emphasized text   | Secondary metadata, labels          |
+| `border`     | Component boundaries | Fine lines, consistent spacing      |
 
 To edit the entire theme, simply modify the variables in `src/app/globals.css`.
 

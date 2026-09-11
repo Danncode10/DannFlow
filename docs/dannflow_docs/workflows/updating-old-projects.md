@@ -3,7 +3,8 @@
 Got a project that was built on an **older version of DannFlow** — one that doesn't have the newer commands (`/adopt-dannflow`), the `feat → dev → main` branch flow, or an up-to-date `/sync-upstream`? This guide gets it current.
 
 > **Which guide do I need?**
-> - Project **already is** a DannFlow project (built from the template) but is *behind* → **you're in the right place.**
+>
+> - Project **already is** a DannFlow project (built from the template) but is _behind_ → **you're in the right place.**
 > - Repo that was **never** a DannFlow project → see [branching-and-sync.md](branching-and-sync.md) and use `/adopt-dannflow`.
 
 ---
@@ -13,10 +14,12 @@ Got a project that was built on an **older version of DannFlow** — one that do
 Don't want to type any of the steps below? Do this instead.
 
 **1. Open the old project in Claude Code on Opus:**
+
 ```bash
 cd ~/path/to/your-old-project
 claude --model opus
 ```
+
 > `--model opus` sets the session to Claude Opus automatically. (Already in a session? Just run `/model opus` once.)
 
 **2. Paste this whole block into Claude and send it:**
@@ -88,11 +91,11 @@ git checkout upstream/main -- .claude/commands/
 > ⚠️ **Copy `.claude/commands/` ONLY — never the whole `.claude/` folder.**
 > The rest of `.claude/` is personal to your project:
 >
-> | Inside `.claude/` | Copy it? |
-> |---|---|
-> | `commands/` | ✅ Yes — the files you need |
-> | `settings.json` | ❌ No — wires *your* hooks + permissions; overwriting can break them |
-> | `agents/`, `skills/` | ⚠️ No — may hold project-specific or installed packs |
+> | Inside `.claude/`    | Copy it?                                                             |
+> | -------------------- | -------------------------------------------------------------------- |
+> | `commands/`          | ✅ Yes — the files you need                                          |
+> | `settings.json`      | ❌ No — wires _your_ hooks + permissions; overwriting can break them |
+> | `agents/`, `skills/` | ⚠️ No — may hold project-specific or installed packs                 |
 >
 > Copying the whole folder can also **wipe any custom commands you wrote yourself**. The `git checkout` above touches only `commands/`, so your settings and custom files stay safe.
 
@@ -116,16 +119,20 @@ Now the new commands (`/adopt-dannflow`, the updated `/sync-upstream`, etc.) act
 You have two things to bring current: the **files** and the **setup**.
 
 **a) Update the rest of the template files** (docs, scripts, blueprints):
+
 ```
 /sync-upstream
 ```
+
 This pulls everything new since your last sync. It works no matter how far behind you are — 3 changes or 300.
 
 **b) Add the modern setup** (the part copying files alone doesn't give you — `dannflow.json` version anchor, CI workflow, the `dev` branch):
+
 ```
 /adopt-dannflow --force
 ```
-`--force` is made for exactly this: a project that's *already* a DannFlow project but predates the newer setup. It adds what's missing without starting over.
+
+`--force` is made for exactly this: a project that's _already_ a DannFlow project but predates the newer setup. It adds what's missing without starting over.
 
 ---
 
@@ -135,8 +142,8 @@ This pulls everything new since your last sync. It works no matter how far behin
 copy commands/  →  restart claude  →  /sync-upstream  →  /adopt-dannflow --force
 ```
 
-- **Copying `commands/`** gets you the *commands*.
-- **Running them** gets you the *setup*.
+- **Copying `commands/`** gets you the _commands_.
+- **Running them** gets you the _setup_.
 
 You need both.
 

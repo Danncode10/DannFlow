@@ -39,21 +39,43 @@ User input: **$ARGUMENTS**
    - create a focused conventional commit
    - if the implementation was already committed and the worktree is clean, reuse that existing commit instead of creating an empty commit
 10. Create or update one short verification note before marking the task done:
-   - path: `docs/tests/<task-id-lowercase>-<short-task-slug>.md`
-   - keep it text-only by default; do not copy screenshots, images, or large artifacts into the repo
-   - review the current task conversation and document the human verification that actually occurred
-   - under `## Human Evidence`, use a compact checklist that names each human action, its observed result, and any screenshot-backed result; preserve the order in which the checks occurred
-   - summarize screenshots in text only, including what they demonstrated; never copy images into the repository
-   - do not invent checks, results, or user actions that are not supported by the conversation
-   - write for beginners: explain what was tested, why the task mattered, what passed, and what would count as a failure
-   - keep the note concise; prefer 1-2 short paragraphs and a compact checklist
-   - if `docs/tests/` does not exist, create it
-11. After the implementation commit succeeds and the verification note is ready, update task tracking:
-   - mark the matching checkbox `[x]` in `MASTERPLAN.md`
-   - move the GitHub Project item to `Done`
-   - do not use `In review` unless the repository explicitly requires it
-12. Create a second small tracking commit for `MASTERPLAN.md` and the verification note unless the user explicitly asks to leave tracking uncommitted.
-13. Report the closed task, commit hash or hashes, verification note path, verification, and any remaining follow-up.
+
+- path: `docs/tests/<task-id-lowercase>-<short-task-slug>.md`
+- keep it text-only by default; do not copy screenshots, images, or large artifacts into the repo
+- review the current task conversation and document the human verification that actually occurred
+- under `## Human Evidence`, use a compact checklist that names each human action, its observed result, and any screenshot-backed result; preserve the order in which the checks occurred
+- summarize screenshots in text only, including what they demonstrated; never copy images into the repository
+- do not invent checks, results, or user actions that are not supported by the conversation
+- write for beginners: explain what was tested, why the task mattered, what passed, and what would count as a failure
+- keep the note concise; prefer 1-2 short paragraphs and a compact checklist
+- if `docs/tests/` does not exist, create it
+
+11. **Execute Documentation Updates & Clear Ledger**:
+
+- Read `docs/PENDING_DOC_UPDATES.md`.
+- Perform the actual documentation updates: edit the matching files in `docs/` and diagrams in `docs/diagrams/` to accurately reflect the changes made in this task.
+- Clear the processed entries from `docs/PENDING_DOC_UPDATES.md` so the ledger is clean.
+
+12. **Create Dedicated Documentation Commit**:
+
+- Stage the updated docs in `docs/`, `docs/diagrams/`, `docs/tests/`, and `docs/PENDING_DOC_UPDATES.md`.
+- Create a dedicated docs commit:
+  - subject: `docs(<task-id-lowercase>): update docs and verification for <short-task-slug>`
+  - (Example: `docs(p2.1): update profile service docs and verification note`)
+
+13. **Update Task Tracking & GitHub Board**:
+
+- mark the matching checkbox `[x]` in `MASTERPLAN.md`
+- move the GitHub Project item to `Done`
+- do not use `In review` unless the repository explicitly requires it
+
+14. **Create Tracking Commit**:
+
+- Stage `MASTERPLAN.md` and commit:
+  - subject: `chore(tasks): close <task-id> <short-task-slug>`
+  - body includes `Task: [P1.2] <title>` and `Verification: docs/tests/<file>.md`
+
+15. Report the closed task, commit hashes (implementation, docs, and tracking), verification note path, and next recommended task.
 
 ## Commit rules
 
@@ -63,10 +85,10 @@ User input: **$ARGUMENTS**
 - Never push.
 - If there are multiple unrelated changes, ask before grouping them into one implementation commit.
 - If a verification or pre-commit hook fails, fix the issue before committing or stop with a clear explanation.
-- Tracking commit message format:
-  - subject: `chore(tasks): close <task-id> <short-task-slug>`
-  - body includes `Task: [P1.2] <title>` and `Verification: docs/tests/<file>.md`
-  - do not rely on GitHub issue closing keywords unless the task is linked to a real issue number
+- **Commit Sequence**:
+  1. Implementation commit (if uncommitted): `feat(...)` / `fix(...)`
+  2. Documentation commit: `docs(<task-id-lowercase>): update docs and verification for <short-task-slug>`
+  3. Tracking commit: `chore(tasks): close <task-id> <short-task-slug>`
 
 ## Verification note format
 
@@ -76,9 +98,11 @@ Use this compact shape for `docs/tests/<task-id-lowercase>-<short-task-slug>.md`
 # [P2.2] <task title>
 
 ## Why This Task Mattered
+
 <1-2 beginner-friendly sentences explaining the user/product risk this task reduces.>
 
 ## What Was Verified
+
 - <automated check or code check>: <pass/fail and short note>
 - <human app check>: <pass/fail and short note>
 
@@ -93,6 +117,7 @@ Review the current conversation and record the human verification as a short ord
 If screenshots were provided, add only a concise text description of what each screenshot demonstrated. Do not store the image files. Do not list automated checks here unless a person directly observed or ran them during the verification.
 
 ## Result
+
 Pass. <one sentence on why it is safe to close.>
 ```
 
@@ -113,8 +138,9 @@ Closed:
   [P2.2] <title>
 
 Commits:
-  <hash> <implementation commit message>
-  <hash> <tracking commit message>
+  <hash> feat(p2.2): <implementation commit message>
+  <hash> docs(p2.2): update docs and verification note
+  <hash> chore(tasks): close P2.2 <task-slug>
 
 Verification note:
   docs/tests/p2.2-<task-slug>.md

@@ -15,14 +15,15 @@ Audit DannFlow's documentation surface for drift against the real state of the c
 
 By default audit all six surfaces. Use `--scope=<name>` to narrow.
 
-| Scope | What's checked | Sources of truth | Docs that must reflect it |
-|---|---|---|---|
-| `commands` | Top-level `.md` files in `.claude/commands/` (excluding `README.md`, subdirs, and `claude-flow-*.md`) | `.claude/commands/*.md` frontmatter | `docs/dannflow_docs/claude-workflow.md`, `.claude/commands/README.md`, `guide.sh` (commands helper) |
-| `skills` | Skills in `.claude/skills/` (symlinks into `.agents/skills/`) | `.claude/skills/*/SKILL.md` frontmatter | `SKILLS.md`, `README.md` (Design Taste + Quality sections), `docs/dannflow_docs/claude-workflow.md` |
-| `scripts` | npm scripts in `package.json` | `package.json` `"scripts"` block | `README.md`, `CLAUDE.md` workflow sections |
-| `env` | Required env vars in `.env.example` | `.env.example` | `README.md` Environment Variables section |
-| `stack` | Major deps (Next, React, Supabase, Tailwind, TanStack Query, Framer Motion, Sonner, etc.) | `package.json` `"dependencies"` | `CLAUDE.md` Tech stack section, `README.md` features table |
-| `structure` | Top-level folders under `src/` | filesystem | `CLAUDE.md` Project structure, `README.md` |
+| Scope          | What's checked                                                                                        | Sources of truth                        | Docs that must reflect it                                                                           |
+| -------------- | ----------------------------------------------------------------------------------------------------- | --------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `commands`     | Top-level `.md` files in `.claude/commands/` (excluding `README.md`, subdirs, and `claude-flow-*.md`) | `.claude/commands/*.md` frontmatter     | `docs/dannflow_docs/claude-workflow.md`, `.claude/commands/README.md`, `guide.sh` (commands helper) |
+| `skills`       | Skills in `.claude/skills/` (symlinks into `.agents/skills/`)                                         | `.claude/skills/*/SKILL.md` frontmatter | `SKILLS.md`, `README.md` (Design Taste + Quality sections), `docs/dannflow_docs/claude-workflow.md` |
+| `scripts`      | npm scripts in `package.json`                                                                         | `package.json` `"scripts"` block        | `README.md`, `CLAUDE.md` workflow sections                                                          |
+| `env`          | Required env vars in `.env.example`                                                                   | `.env.example`                          | `README.md` Environment Variables section                                                           |
+| `stack`        | Major deps (Next, React, Supabase, Tailwind, TanStack Query, Framer Motion, Sonner, etc.)             | `package.json` `"dependencies"`         | `CLAUDE.md` Tech stack section, `README.md` features table                                          |
+| `structure`    | Top-level folders under `src/`                                                                        | filesystem                              | `CLAUDE.md` Project structure, `README.md`                                                          |
+| `pending-docs` | Unprocessed entries in `docs/PENDING_DOC_UPDATES.md`                                                  | `docs/PENDING_DOC_UPDATES.md`           | `docs/dannflow_docs/`, `docs/diagrams/`                                                             |
 
 ## Procedure
 
@@ -135,5 +136,5 @@ Manual review needed: <count> issues (stack/structure)
 ## When to use this vs siblings
 
 - `/sync-commands` — commands only, faster, narrower.
-- `/no-conflict` — looks for *semantic* conflicts (e.g. README says "uses Stripe" but code doesn't). Overlap with `/auto-docs --scope=stack` but `/no-conflict` is read-only and judgement-heavy.
+- `/no-conflict` — looks for _semantic_ conflicts (e.g. README says "uses Stripe" but code doesn't). Overlap with `/auto-docs --scope=stack` but `/no-conflict` is read-only and judgement-heavy.
 - `/auto-docs` — broadest. Use after a session that added/removed any of: a command, a skill, an npm script, an env var, a major dep, a top-level folder.

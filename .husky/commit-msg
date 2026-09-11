@@ -1,0 +1,42 @@
+#!/bin/sh
+COMMIT_MSG_FILE="$1"
+if [ -n "$COMMIT_MSG_FILE" ] && [ -f "$COMMIT_MSG_FILE" ]; then
+  COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
+else
+  COMMIT_MSG=""
+fi
+
+# Check if staged files include architectural, service, type, or database changes
+STAGED_CORE_CODE=$(git diff --cached --name-only | grep -E '^(src/services/|src/types/|supabase/migrations/|src/app/api/)' || true)
+
+# Check if staged files include configuration, AI instructions, or package changes
+STAGED_CONFIG_CODE=$(git diff --cached --name-only | grep -E '^(\.agents/|\.claude/|\.codex/|\.github/|\.husky/|\.env\.example|CLAUDE\.md|AGENTS\.md|MASTERPLAN\.md|package\.json)' || true)
+
+if [ -n "$STAGED_CORE_CODE" ] || [ -n "$STAGED_CONFIG_CODE" ]; then
+  # Check if docs/PENDING_DOC_UPDATES.md was also staged
+  DOCS_STAGED=$(git diff --cached --name-only | grep -E '^docs/PENDING_DOC_UPDATES.md$' || true)
+  
+  # Check if commit message explicitly bypasses or is a docs/chore commit
+  BYPASS_DOCS=$(echo "$COMMIT_MSG" | grep -iE '(\[no-docs\]|no docs needed|no-docs-needed|^docs(\(.*\))?:|^chore(\(.*\))?:)' || true)
+
+  if [ -z "$DOCS_STAGED" ] && [ -z "$BYPASS_DOCS" ]; then
+    echo ""
+    echo "🚨 COMMIT BLOCKED: Code or configuration was modified without logging pending documentation!"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "Modified files requiring documentation note:"
+    if [ -n "$STAGED_CORE_CODE" ]; then
+      echo "$STAGED_CORE_CODE"
+    fi
+    if [ -n "$STAGED_CONFIG_CODE" ]; then
+      echo "$STAGED_CONFIG_CODE"
+    fi
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "👉 How to proceed:"
+    echo "1. Log your change in docs/PENDING_DOC_UPDATES.md and stage it: git add docs/PENDING_DOC_UPDATES.md"
+    echo "   - Did you change DannFlow framework rules? Update files in docs/dannflow_docs/ when you clear the ledger."
+    echo "   - Did you change project-specific app logic? Update files in docs/project/ when you clear the ledger."
+    echo "2. OR if no documentation is needed, include 'No docs needed' or '[no-docs]' in your commit message."
+    echo ""
+    exit 1
+  fi
+fi

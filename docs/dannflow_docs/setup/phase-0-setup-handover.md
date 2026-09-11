@@ -29,15 +29,15 @@ Keep `DATABASE_URL`, service-role keys, SMTP passwords, OAuth client secrets, an
 2. Use `.env.example` as the configuration contract. Add values through a secure channel; do not add them to this guide.
 3. Set the required values in the untracked `.env.local` file:
 
-   | Variable | Obtain it from |
-   | --- | --- |
-   | `NEXT_PUBLIC_SUPABASE_URL` | Supabase → Project Settings → Data API |
-   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase → Project Settings → Data API |
-   | `SUPABASE_PROJECT_ID` | Supabase → Project Settings → General |
-   | `DATABASE_URL` | Supabase → Connect |
-   | `SUPABASE_SERVICE_ROLE_KEY` | Supabase → Project Settings → Data API; server-only |
-   | `NEXT_PUBLIC_SITE_NAME` | Product configuration |
-   | `NEXT_PUBLIC_SITE_URL` | Local or production app origin |
+   | Variable                        | Obtain it from                                      |
+   | ------------------------------- | --------------------------------------------------- |
+   | `NEXT_PUBLIC_SUPABASE_URL`      | Supabase → Project Settings → Data API              |
+   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase → Project Settings → Data API              |
+   | `SUPABASE_PROJECT_ID`           | Supabase → Project Settings → General               |
+   | `DATABASE_URL`                  | Supabase → Connect                                  |
+   | `SUPABASE_SERVICE_ROLE_KEY`     | Supabase → Project Settings → Data API; server-only |
+   | `NEXT_PUBLIC_SITE_NAME`         | Product configuration                               |
+   | `NEXT_PUBLIC_SITE_URL`          | Local or production app origin                      |
 
 4. Run `pnpm dev`, then open `http://localhost:3000/login`.
 
@@ -104,12 +104,12 @@ The landing and login screens retain approved product copy and are readable, res
 5. In **Data Access**, make sure `openid` is present. Do not add sensitive or restricted scopes without a product decision.
 6. In **Clients**, create or update a Web application client:
 
-   | Field | Value |
-   | --- | --- |
-   | Application type | Web application |
-   | Name | `<PROJECT_NAME> local development` |
-   | Authorized JavaScript origin | `http://localhost:3000` |
-   | Authorized redirect URI | The callback shown by Supabase Google provider: `https://<SUPABASE_PROJECT_REF>.supabase.co/auth/v1/callback` |
+   | Field                        | Value                                                                                                         |
+   | ---------------------------- | ------------------------------------------------------------------------------------------------------------- |
+   | Application type             | Web application                                                                                               |
+   | Name                         | `<PROJECT_NAME> local development`                                                                            |
+   | Authorized JavaScript origin | `http://localhost:3000`                                                                                       |
+   | Authorized redirect URI      | The callback shown by Supabase Google provider: `https://<SUPABASE_PROJECT_REF>.supabase.co/auth/v1/callback` |
 
 7. Copy the Client ID and Client Secret. Keep the secret private.
 
@@ -240,6 +240,7 @@ When a setting, provider, URL, or workflow changes, update this file in the same
    ```
 
    Do not add `<PRODUCTION_ORIGIN>/auth/callback` as a Google redirect URI.
+
 4. For a custom production domain, add it to **Branding → Authorized domains** if required and complete any necessary verification before launch.
 
 ### D. Redeploy and verify
@@ -256,14 +257,14 @@ The canonical production URL is deployed, its Vercel production variables are co
 
 ### Deployment URL map
 
-| Platform | Setting | Value |
-| --- | --- | --- |
-| Vercel | `NEXT_PUBLIC_SUPABASE_URL` | `https://<SUPABASE_PROJECT_REF>.supabase.co` — never the production app URL |
-| Vercel | `NEXT_PUBLIC_SITE_URL` (Production) | `<PRODUCTION_ORIGIN>` |
-| Supabase | Site URL | Keep the intended fallback during testing; set `<PRODUCTION_ORIGIN>` at public launch |
-| Supabase | Redirect URLs | `<PRODUCTION_ORIGIN>/auth/callback`, `<PRODUCTION_ORIGIN>/reset-password` |
-| Google Cloud | Authorized JavaScript origin | `<PRODUCTION_ORIGIN>` |
-| Google Cloud | Authorized redirect URI | `https://<SUPABASE_PROJECT_REF>.supabase.co/auth/v1/callback` |
+| Platform     | Setting                             | Value                                                                                 |
+| ------------ | ----------------------------------- | ------------------------------------------------------------------------------------- |
+| Vercel       | `NEXT_PUBLIC_SUPABASE_URL`          | `https://<SUPABASE_PROJECT_REF>.supabase.co` — never the production app URL           |
+| Vercel       | `NEXT_PUBLIC_SITE_URL` (Production) | `<PRODUCTION_ORIGIN>`                                                                 |
+| Supabase     | Site URL                            | Keep the intended fallback during testing; set `<PRODUCTION_ORIGIN>` at public launch |
+| Supabase     | Redirect URLs                       | `<PRODUCTION_ORIGIN>/auth/callback`, `<PRODUCTION_ORIGIN>/reset-password`             |
+| Google Cloud | Authorized JavaScript origin        | `<PRODUCTION_ORIGIN>`                                                                 |
+| Google Cloud | Authorized redirect URI             | `https://<SUPABASE_PROJECT_REF>.supabase.co/auth/v1/callback`                         |
 
 ## Helpful references
 
