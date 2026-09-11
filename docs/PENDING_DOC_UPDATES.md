@@ -1,2 +1,3 @@
 - [Framework] Updated `.husky/commit-msg` to support `close(pX.Y):` commit prefixes.
 - [Skills] Added `.claude/skills/dannflow-task/SKILL.md` task orchestration skill.
+- [Skills] Added `.claude/skills/dannflow-masterplan/SKILL.md` SaaS onboarding, Masterplan, and GitHub Project sync skill.
