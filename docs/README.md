@@ -6,27 +6,34 @@ Welcome to the central documentation hub for **DannFlow** — the Next.js 16 + S
 
 ## 🧭 Navigation Index
 
-### 🚀 1. Getting Started & Operations
+### 🚀 1. Setup & Handover (`setup/`)
 
-- [**Setup Flow**](dannflow_docs/setup-flow.md) — Comprehensive step-by-step setup guide.
-- [**MCP Setup & Configuration**](dannflow_docs/mcp-setup.md) — Model Context Protocol configuration for Supabase, GitHub, and local tooling.
-- [**Updating Old Projects**](dannflow_docs/updating-old-projects.md) — Guide for upgrading existing projects to the latest DannFlow standards.
+- [**Setup Flow**](dannflow_docs/setup/setup-flow.md) — Comprehensive step-by-step setup guide.
+- [**MCP Setup & Configuration**](dannflow_docs/setup/mcp-setup.md) — Model Context Protocol configuration for Supabase, GitHub, and local tooling.
+- [**Phase 0 Setup Handover**](dannflow_docs/setup/phase-0-setup-handover.md) — Handoff checklist and validation for new projects.
 
-### 🏗️ 2. Architecture & Design Systems
+### 🏗️ 2. Architecture & Design Principles (`architecture/`)
 
-- [**The Holy Trinity**](dannflow_docs/the-holy-trinity.md) — Schema, Types, and Service Layer architecture.
-- [**UI System & Design Rules**](dannflow_docs/ui-system.md) — Tailwind v4, Shadcn, and semantic design tokens.
-- [**Database Workflow**](dannflow_docs/database-workflow.md) — Supabase CLI migrations, types generation, and live checkpoints.
-- [**Redis Rate Limiting**](dannflow_docs/redis-rate-limiting.md) — Rate-limiting production endpoints with Upstash Redis.
-- [**Social Auth & Security**](dannflow_docs/social-auth.md) — OAuth setup and Row Level Security (RLS) constraints.
-- [**Production Features**](dannflow_docs/production-features.md) — Production-ready modules and integrations.
+- [**The Holy Trinity**](dannflow_docs/architecture/the-holy-trinity.md) — Schema, Types, and Service Layer architecture.
+- [**Methodology**](dannflow_docs/architecture/methodology.md) — Core principles of the Vibe-Coding architecture.
+- [**UI System & Design Rules**](dannflow_docs/architecture/ui-system.md) — Tailwind v4, Shadcn, and semantic design tokens.
+- [**Error Handling & Logging**](dannflow_docs/architecture/error-handling.md) — Standard practices for error boundaries and service logs.
 
-### 🔄 3. Workflows & Synchronization
+### 🔄 3. Workflows & Maintenance (`workflows/`)
 
-- [**Branching & Upstream Sync**](dannflow_docs/branching-and-sync.md) — Git workflow, `dev`/`main` branches, and syncing with `DannFlow` upstream.
-- [**Backups & Checkpoints**](dannflow_docs/backups-and-sync.md) — Schema snapshotting and emergency backup protocols.
-- [**Claude & Agent Workflow**](dannflow_docs/claude-workflow.md) — AI agent slash commands and execution pipelines.
-- [**Methodology**](dannflow_docs/methodology.md) — Core principles of the Vibe-Coding architecture.
+- [**Claude & Agent Workflow**](dannflow_docs/workflows/claude-workflow.md) — AI agent slash commands and execution pipelines.
+- [**Database Workflow**](dannflow_docs/workflows/database-workflow.md) — Supabase CLI migrations, types generation, and live checkpoints.
+- [**Branching & Upstream Sync**](dannflow_docs/workflows/branching-and-sync.md) — Git workflow, `dev`/`main` branches, and syncing with `DannFlow` upstream.
+- [**Backups & Checkpoints**](dannflow_docs/workflows/backups-and-sync.md) — Schema snapshotting and emergency backup protocols.
+- [**Updating Old Projects**](dannflow_docs/workflows/updating-old-projects.md) — Guide for upgrading existing projects to the latest DannFlow standards.
+- [**Testing Strategy**](dannflow_docs/workflows/testing-strategy.md) — How to write tests for the isolated Service Layer and UI.
+- [**Deployment Guide**](dannflow_docs/workflows/deployment-guide.md) — Standard operating procedure for deploying to Vercel and Supabase.
+
+### ⚡ 4. Features & Integrations (`features/`)
+
+- [**Production Features**](dannflow_docs/features/production-features.md) — Production-ready modules and integrations.
+- [**Redis Rate Limiting**](dannflow_docs/features/redis-rate-limiting.md) — Rate-limiting production endpoints with Upstash Redis.
+- [**Social Auth & Security**](dannflow_docs/features/social-auth.md) — OAuth setup and Row Level Security (RLS) constraints.
 
 ### 📊 4. System Diagrams
 

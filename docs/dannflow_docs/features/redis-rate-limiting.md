@@ -55,7 +55,10 @@ DannFlow's template helper exports:
 Use the `namespace` argument to isolate different workflows:
 
 ```ts
-const { success, retryAfter } = await verifyRateLimit(user.id, "profile-update");
+const { success, retryAfter } = await verifyRateLimit(
+  user.id,
+  "profile-update",
+);
 ```
 
 Example limits:

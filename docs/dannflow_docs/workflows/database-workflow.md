@@ -10,7 +10,7 @@ You can run a local instance of Supabase for testing and visual schema editing:
 npm run db:setup
 ```
 
-This starts a local Docker stack (shared images across projects) and opens a local Supabase Studio in your browser. 
+This starts a local Docker stack (shared images across projects) and opens a local Supabase Studio in your browser.
 **Note:** Running the local Docker stack takes up ~9GB of storage globally on your machine. **It is optional.** If you want to save space, you can skip this and edit the live Supabase project directly or just use SQL files.
 
 ## 2. Vibe Coding Flow (AI Workflow)
