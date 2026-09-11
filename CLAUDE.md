@@ -170,6 +170,14 @@ For GitHub Projects, if the authenticated `gh` CLI reports a missing `read:proje
 
 If you don't know which custom command fits a task, run `/ask-command <your intent>`.
 
+## Core DannFlow Agent Skills
+
+DannFlow ships with three core native agent skills to orchestrate massive project workflows. Unlike simple commands, these skills give the AI autonomy to manage complex, multi-step processes:
+
+- **`dannflow-masterplan`**: Run this to start a new project, generate a Masterplan, sync a GitHub Project board, or initialize infrastructure.
+- **`dannflow-task`**: Run this to execute a specific task from `MASTERPLAN.md` end-to-end (includes automated quality gates and human verification steps).
+- **`dannflow-update`**: Run this to safely and surgically update an old DannFlow repository from upstream without destroying custom business logic.
+
 ## Memory & docs
 
 - **`PROJECT_CONTEXT.md`** (root) — project-specific decisions that override or extend this file: audience, stack choices, design rules, tone, anti-decisions. Read this before any feature work, UI rewrite, or marketing command. Fill it in once after running `/init-claude`.

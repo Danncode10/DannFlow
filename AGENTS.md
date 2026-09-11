@@ -143,6 +143,14 @@ Always check `src/types/supabase.ts` and **assume RLS is active on every table**
 
 A high-performance Next.js starter optimized for AI-native development (Vibe Coding), featuring automated type-safety and live database orchestration.
 
+## Core DannFlow Agent Skills
+
+DannFlow ships with three core native agent skills to orchestrate massive project workflows. Unlike simple commands, these skills give the AI autonomy to manage complex, multi-step processes:
+
+- **`dannflow-masterplan`**: Run this to start a new project, generate a Masterplan, sync a GitHub Project board, or initialize infrastructure.
+- **`dannflow-task`**: Run this to execute a specific task from `MASTERPLAN.md` end-to-end (includes automated quality gates and human verification steps).
+- **`dannflow-update`**: Run this to safely and surgically update an old DannFlow repository from upstream without destroying custom business logic.
+
 ## Codex Command Bridge
 
 DannFlow supports Codex through the `.codex/` folder:
