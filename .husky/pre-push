@@ -6,10 +6,16 @@ while read local_ref local_oid remote_ref remote_oid
 do
   if [[ "$remote_ref" == "refs/heads/main" || "$remote_ref" == "refs/heads/master" ]]; then
     if [ -f "docs/PENDING_DOC_UPDATES.md" ]; then
-      LINE_COUNT=$(wc -l < docs/PENDING_DOC_UPDATES.md | tr -d ' ')
-      if [ "$LINE_COUNT" -gt 1 ]; then
+      # Extract real pending lines (ignoring empty lines, comment blocks, and markdown title headers)
+      PENDING_ENTRIES=$(sed '/<!--/,/-->/d' docs/PENDING_DOC_UPDATES.md | grep -v '^[[:space:]]*$' | grep -v '^[[:space:]]*#[[:space:]]*')
+      if [ -n "$PENDING_ENTRIES" ]; then
+        echo ""
         echo "🚨 MERGE BLOCKED: You have pending documentation updates in docs/PENDING_DOC_UPDATES.md"
-        echo "Please integrate them into the official docs and reset the file to 1 line before pushing to main."
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo "$PENDING_ENTRIES"
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo "👉 Action Required: Transfer these notes into docs/ and docs/diagrams/ (or prune if reverted), then clear them from docs/PENDING_DOC_UPDATES.md before pushing to main."
+        echo ""
         exit 1
       fi
     fi

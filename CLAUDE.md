@@ -198,10 +198,11 @@ If you don't know which custom command fits a task, run `/ask-command <your inte
 
 ### Documentation Governance Protocol
 
-1. **As You Code**: If you change code that affects architecture, services (`src/services/`), or types (`src/types/`), you MUST append a brief note to `docs/PENDING_DOC_UPDATES.md` tracking what needs to be documented.
-2. **Masterplan Phase Requirement**: Every phase defined in `MASTERPLAN.md` must end with a mandatory documentation milestone task: `[PX.DOC] Finalize Phase X Documentation & Diagrams`.
-3. **Pre-Merge / Post-Task Rules**: Before closing out tasks (`/close-task`) or merging pull requests into `main`:
-   - Process the notes in `docs/PENDING_DOC_UPDATES.md`, update matching markdown files in `docs/` and visual diagrams in `docs/diagrams/`, and reset `docs/PENDING_DOC_UPDATES.md` back to 1 line to unblock pushes to `main`.
+1. **As You Code**: If you change code that affects architecture, services (`src/services/`), types (`src/types/`), database schemas (`supabase/migrations/`), or APIs, you MUST append a detailed note to `docs/PENDING_DOC_UPDATES.md` tracking what needs to be documented.
+2. **Revisions & Pruning (CRITICAL)**: If code is modified, refactored, or discarded during conversation, IMMEDIATELY edit or delete the corresponding note in `docs/PENDING_DOC_UPDATES.md` so the ledger remains accurate and never contains stale entries.
+3. **Masterplan Phase Requirement**: Every phase defined in `MASTERPLAN.md` must end with a mandatory documentation milestone task: `[PX.DOC] Finalize Phase X Documentation & Diagrams`.
+4. **Pre-Merge / Post-Task Rules**: Before closing out tasks (`/close-task`) or merging pull requests into `main`:
+   - Process all notes in `docs/PENDING_DOC_UPDATES.md`, update matching markdown files in `docs/` and visual diagrams in `docs/diagrams/`, commit the documentation with `docs(<task-id>): update docs and verification for <slug>`, and remove the logged entries from `docs/PENDING_DOC_UPDATES.md` to unblock pushes to `main`.
    - Ensure `docs/README.md` navigation links remain in sync with any newly added documentation files or templates.
 
 ---

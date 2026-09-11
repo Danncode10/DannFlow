@@ -46,12 +46,20 @@ This detects the completed project, links the existing board, creates detailed P
 You're done with setup. From here on, the daily loop is:
 
 ```
-1. Ask Claude to build something
+1. Ask Claude to build something (log notes into docs/PENDING_DOC_UPDATES.md as you code)
 2. /migrate              → for schema changes (authoring in supabase/migrations/ → Supabase)
 3. /checkpoint           → snapshot live DB before risky/destructive changes
 4. /review               → before opening a PR
-5. /commit               → stage + draft commit message
+5. /verify-task          → generate human verification checklist
+6. /close-task           → process pending doc notes, commit, and mark task Done
 ```
+
+### Continuous Documentation & Pre-Push Merge Blocker
+
+- **The Ledger (`docs/PENDING_DOC_UPDATES.md`)**: Whenever code is written that touches services, types, DB schemas, or APIs, a concise note is appended.
+- **Revision & Pruning**: If code is revised or discarded, the corresponding entry in the ledger is immediately edited or deleted.
+- **Git Hook Gate (`.husky/pre-push`)**: Pushing to `main` is blocked if unaddressed entries remain in `docs/PENDING_DOC_UPDATES.md`.
+- **Clearance**: Before merging to `main` or completing a task (`/close-task`), all entries are transferred to permanent `docs/` and `docs/diagrams/`, unblocking the push.
 
 ---
 
@@ -62,64 +70,70 @@ You're done with setup. From here on, the daily loop is:
 Run `/ask-command <what you want>` if you don't remember which command to use.
 
 ### Discovery & setup
-| Command | What it does |
-|---|---|
-| `/help-dannflow` | Report-only command catalog. Shows Claude and Codex usage, grouped command categories, and a Mermaid graph. |
-| `/ask-command <intent>` | Tells you which command to use for your task. Returns a copy-paste-ready prompt. |
-| `/init-claude` | Rewrites the entire Claude environment (`CLAUDE.md`, `SKILLS.md`, commands README, individual commands, and this file's command tables) to match the current README + src + package.json. Plan-then-confirm flow. |
-| `/make-command <description>` | Creates a new custom slash command from a plain-English description. Auto-updates this file's tables and proposes conflict-avoidance edits to existing commands. |
-| `/new-project [name]` | Initializes the SaaS identity, repository, Supabase connection, and tracked schema. |
-| `/masterplan-init` | Requires an existing Kanban-style GitHub Project, then links it and creates detailed Phase 0 cards. |
-| `/make-masterplan <phase>` | Expands a later phase without overwriting Phase 0. |
-| `/update-masterplan [--project-url <url>]` | Syncs `MASTERPLAN.md` edits to the linked GitHub Project while preserving task order and live statuses. |
+
+| Command                                    | What it does                                                                                                                                                                                                      |
+| ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/help-dannflow`                           | Report-only command catalog. Shows Claude and Codex usage, grouped command categories, and a Mermaid graph.                                                                                                       |
+| `/ask-command <intent>`                    | Tells you which command to use for your task. Returns a copy-paste-ready prompt.                                                                                                                                  |
+| `/init-claude`                             | Rewrites the entire Claude environment (`CLAUDE.md`, `SKILLS.md`, commands README, individual commands, and this file's command tables) to match the current README + src + package.json. Plan-then-confirm flow. |
+| `/make-command <description>`              | Creates a new custom slash command from a plain-English description. Auto-updates this file's tables and proposes conflict-avoidance edits to existing commands.                                                  |
+| `/new-project [name]`                      | Initializes the SaaS identity, repository, Supabase connection, and tracked schema.                                                                                                                               |
+| `/masterplan-init`                         | Requires an existing Kanban-style GitHub Project, then links it and creates detailed Phase 0 cards.                                                                                                               |
+| `/make-masterplan <phase>`                 | Expands a later phase without overwriting Phase 0.                                                                                                                                                                |
+| `/update-masterplan [--project-url <url>]` | Syncs `MASTERPLAN.md` edits to the linked GitHub Project while preserving task order and live statuses.                                                                                                           |
 
 ### Security & quality
-| Command | What it does |
-|---|---|
-| `/security-audit` | Full security scan: secret leaks, service-role exposure, XSS, missing auth gates, rate-limiting gaps. |
-| `/rls-check` | Walks `src/services/` and confirms every Supabase query has an ownership filter. |
-| `/rls <table>` | Inspects RLS policies for one table. Useful for "why can't this user see X?" debugging. |
-| `/ui` | **Active rewrite.** Makes the diff (or a target file) fully responsive — mobile-first, 48px touch targets, semantic tokens only. |
-| `/review` | Pre-PR review. Runs lint + typecheck, then critiques diff against `CLAUDE.md` guardrails. |
+
+| Command           | What it does                                                                                                                     |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `/security-audit` | Full security scan: secret leaks, service-role exposure, XSS, missing auth gates, rate-limiting gaps.                            |
+| `/rls-check`      | Walks `src/services/` and confirms every Supabase query has an ownership filter.                                                 |
+| `/rls <table>`    | Inspects RLS policies for one table. Useful for "why can't this user see X?" debugging.                                          |
+| `/ui`             | **Active rewrite.** Makes the diff (or a target file) fully responsive — mobile-first, 48px touch targets, semantic tokens only. |
+| `/review`         | Pre-PR review. Runs lint + typecheck, then critiques diff against `CLAUDE.md` guardrails.                                        |
 
 ### Supabase workflow
-| Command | What it does |
-|---|---|
-| `/checkpoint` | Snapshots live schema (tables, RLS, triggers, functions) to `supabase/backups/schema-MM-DD-YYYY-HH-MM.sql`. |
-| `/sync-types` | Regenerates `src/types/supabase.ts` from Supabase and summarizes drift. Usually handled by `npm run db:migrate`. |
-| `/explain-schema` | Plain-English summary of your live Supabase schema. |
-| `/migrate <description>` | Writes `supabase/migrations/*.sql`, applies with `npm run db:migrate`, then verifies Supabase. |
-| `/seed <table\|all>` | Generates type-safe seed data from `src/types/supabase.ts`. Respects FK dependency order and RLS ownership. Writes to `supabase/seeds/`. Never auto-applies. |
-| `/setup-supabase` | Guides existing-template environment values and Supabase dashboard settings without changing schema. |
-| `/setup-auth` | Configures existing-template email auth, Google sign-in, redirects, and branded emails without changing schema. |
+
+| Command                  | What it does                                                                                                                                                 |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `/checkpoint`            | Snapshots live schema (tables, RLS, triggers, functions) to `supabase/backups/schema-MM-DD-YYYY-HH-MM.sql`.                                                  |
+| `/sync-types`            | Regenerates `src/types/supabase.ts` from Supabase and summarizes drift. Usually handled by `npm run db:migrate`.                                             |
+| `/explain-schema`        | Plain-English summary of your live Supabase schema.                                                                                                          |
+| `/migrate <description>` | Writes `supabase/migrations/*.sql`, applies with `npm run db:migrate`, then verifies Supabase.                                                               |
+| `/seed <table\|all>`     | Generates type-safe seed data from `src/types/supabase.ts`. Respects FK dependency order and RLS ownership. Writes to `supabase/seeds/`. Never auto-applies. |
+| `/setup-supabase`        | Guides existing-template environment values and Supabase dashboard settings without changing schema.                                                         |
+| `/setup-auth`            | Configures existing-template email auth, Google sign-in, redirects, and branded emails without changing schema.                                              |
 
 ### Scaffolding
-| Command | What it does |
-|---|---|
-| `/new-feature <name>` | Scaffolds service + types + App Router page + Shadcn form for a new feature. |
-| `/new-page <route>` | Scaffolds an App Router page (Server Component) with `loading.tsx` + `error.tsx`. |
+
+| Command                   | What it does                                                                                                                                                                               |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `/new-feature <name>`     | Scaffolds service + types + App Router page + Shadcn form for a new feature.                                                                                                               |
+| `/new-page <route>`       | Scaffolds an App Router page (Server Component) with `loading.tsx` + `error.tsx`.                                                                                                          |
 | `/masterplan-task <task>` | Execute a single ordered task from `MASTERPLAN.md` with full context. Moves the linked GitHub Project item through `In progress` → `Done` and auto-generates `TEST.md` verification guide. |
 
 ### SEO & marketing
-| Command | What it does |
-|---|---|
-| `/seo-check [route]` | Per-route SEO audit — metadata, OG, canonical, sitemap.ts, robots.ts, JSON-LD, alt text, heading hierarchy. Reports gaps only. |
-| `/seo-fix <route\|all>` | Active rewrite — adds missing metadata, OG, canonical, JSON-LD, sitemap/robots files. Plan-then-confirm. |
-| `/marketing-check [route]` | Conversion-fundamentals audit for landing/pricing pages — headline clarity, CTA, social proof, friction, pricing legibility. Opinionated. Reports only. |
+
+| Command                         | What it does                                                                                                                                                                                |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/seo-check [route]`            | Per-route SEO audit — metadata, OG, canonical, sitemap.ts, robots.ts, JSON-LD, alt text, heading hierarchy. Reports gaps only.                                                              |
+| `/seo-fix <route\|all>`         | Active rewrite — adds missing metadata, OG, canonical, JSON-LD, sitemap/robots files. Plan-then-confirm.                                                                                    |
+| `/marketing-check [route]`      | Conversion-fundamentals audit for landing/pricing pages — headline clarity, CTA, social proof, friction, pricing legibility. Opinionated. Reports only.                                     |
 | `/hero-bg [creative direction]` | Inspects the active hero and creates a guided two-image, single 8-second AI-video background workflow with prompts and asset-delivery instructions. Does not modify code or generate media. |
 
 ### Housekeeping
-| Command | What it does |
-|---|---|
-| `/commit` | Stages changes + drafts a conventional commit message. |
-| `/cleanup` | Finds dead code, unused exports, orphaned components. Reports only — never deletes. |
-| `/sync-commands` | Audits `.claude/commands/` and validates docs against `claude-workflow.md` + `./guide.sh`. Identifies orphaned commands, optionally auto-patches. |
-| `/auto-docs` | Broader superset of `/sync-commands`. Audits commands, skills, npm scripts, env vars, tech stack, and folder structure for drift. `--fix` auto-patches the safe categories (commands/skills/scripts/env); stack and structure are report-only. |
-| `/init-update` | Update your DannFlow project to the latest version — pull new commands, scripts, guide, skills, and more while preserving your code. Interactive menu or `--all` for one-command full update. |
-| `/sync-upstream [path|--commits [N]]` | Pull template updates into a sync PR. It mirrors `.claude/commands/` exactly and automatically detects, migrates, verifies, and regenerates types for required generic template schema updates. File-level diff is default — safe for forked repos with no common git ancestry. |
-| `/sync-to-upstream` | Reverse of `/sync-upstream`. Classifies local changes as generic vs. business-specific, automatically verifies detected reusable DB/RLS/Auth changes in the template database instead of the project database, then creates a committed, pushed PR back to DannFlow with a verification comment. |
-| `/no-conflict` | Audits repo for conflicts between documentation (README, CLAUDE.md) and actual code — versions, features, commands, RLS, semantic tokens, folder structure. Reports only. |
-| `/ruflo-upgrade` | Re-applies Ruflo memory + parallel-agent patterns to the 5 core commands (`/new-feature`, `/new-page`, `/security-audit`, `/seo-fix`, `/migrate`). Safe to re-run after `/init-update`. |
+
+| Command               | What it does                                                                                                                                                                                                                                                                                     |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `/commit`             | Stages changes + drafts a conventional commit message.                                                                                                                                                                                                                                           |
+| `/cleanup`            | Finds dead code, unused exports, orphaned components. Reports only — never deletes.                                                                                                                                                                                                              |
+| `/sync-commands`      | Audits `.claude/commands/` and validates docs against `claude-workflow.md` + `./guide.sh`. Identifies orphaned commands, optionally auto-patches.                                                                                                                                                |
+| `/auto-docs`          | Broader superset of `/sync-commands`. Audits commands, skills, npm scripts, env vars, tech stack, and folder structure for drift. `--fix` auto-patches the safe categories (commands/skills/scripts/env); stack and structure are report-only.                                                   |
+| `/init-update`        | Update your DannFlow project to the latest version — pull new commands, scripts, guide, skills, and more while preserving your code. Interactive menu or `--all` for one-command full update.                                                                                                    |
+| `/sync-upstream [path | --commits [N]]`                                                                                                                                                                                                                                                                                  | Pull template updates into a sync PR. It mirrors `.claude/commands/` exactly and automatically detects, migrates, verifies, and regenerates types for required generic template schema updates. File-level diff is default — safe for forked repos with no common git ancestry. |
+| `/sync-to-upstream`   | Reverse of `/sync-upstream`. Classifies local changes as generic vs. business-specific, automatically verifies detected reusable DB/RLS/Auth changes in the template database instead of the project database, then creates a committed, pushed PR back to DannFlow with a verification comment. |
+| `/no-conflict`        | Audits repo for conflicts between documentation (README, CLAUDE.md) and actual code — versions, features, commands, RLS, semantic tokens, folder structure. Reports only.                                                                                                                        |
+| `/ruflo-upgrade`      | Re-applies Ruflo memory + parallel-agent patterns to the 5 core commands (`/new-feature`, `/new-page`, `/security-audit`, `/seo-fix`, `/migrate`). Safe to re-run after `/init-update`.                                                                                                          |
 
 ---
 
@@ -163,27 +177,28 @@ For what each Ruflo command does, run `/claude-flow-help` (top-level) or open th
 
 `install.sh` installs three complementary design-taste skill packs (refreshable via `./guide.sh skills-update`). Sources live in `.agents/skills/<name>/` and are symlinked into `.claude/skills/<name>/`. These are **skills**, not slash commands — they're invoked by Claude when relevant, not typed with `/`.
 
-| Pack | Repo | Skills | Risk |
-|---|---|---|---|
-| Leonxlnx | [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill) | 12 broad design-taste skills | Low |
-| Emil Kowalski | [emilkowalski/skill](https://github.com/emilkowalski/skill) | `emil-design-eng` (animation/UI craft) | Low |
-| Impeccable | [pbakaus/impeccable](https://github.com/pbakaus/impeccable) | `impeccable` (anti-pattern critique, 23 commands) | ⚠️ Med |
+| Pack          | Repo                                                            | Skills                                            | Risk   |
+| ------------- | --------------------------------------------------------------- | ------------------------------------------------- | ------ |
+| Leonxlnx      | [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill) | 12 broad design-taste skills                      | Low    |
+| Emil Kowalski | [emilkowalski/skill](https://github.com/emilkowalski/skill)     | `emil-design-eng` (animation/UI craft)            | Low    |
+| Impeccable    | [pbakaus/impeccable](https://github.com/pbakaus/impeccable)     | `impeccable` (anti-pattern critique, 23 commands) | ⚠️ Med |
 
 **Most relevant skills for DannFlow work:**
 
-| Skill | Trigger |
-|---|---|
-| `design-taste-frontend` (Leonxlnx) | Default polish pass after `/ui` |
-| `redesign-existing-projects` (Leonxlnx) | Auditing/upgrading an existing screen |
-| `high-end-visual-design` (Leonxlnx) | Premium landing/marketing surfaces |
-| `minimalist-ui` (Leonxlnx) | Clean editorial style (good SaaS default) |
-| `full-output-enforcement` (Leonxlnx) | Long generations that risk truncation |
-| `emil-design-eng` (Emil) | Any animation/interaction surface — drawers, modals, popovers, hovers, press states |
-| `impeccable` (pbakaus) | Pre-merge audit + anti-pattern scan on big visual changes |
+| Skill                                   | Trigger                                                                             |
+| --------------------------------------- | ----------------------------------------------------------------------------------- |
+| `design-taste-frontend` (Leonxlnx)      | Default polish pass after `/ui`                                                     |
+| `redesign-existing-projects` (Leonxlnx) | Auditing/upgrading an existing screen                                               |
+| `high-end-visual-design` (Leonxlnx)     | Premium landing/marketing surfaces                                                  |
+| `minimalist-ui` (Leonxlnx)              | Clean editorial style (good SaaS default)                                           |
+| `full-output-enforcement` (Leonxlnx)    | Long generations that risk truncation                                               |
+| `emil-design-eng` (Emil)                | Any animation/interaction surface — drawers, modals, popovers, hovers, press states |
+| `impeccable` (pbakaus)                  | Pre-merge audit + anti-pattern scan on big visual changes                           |
 
-**Rule:** taste skills run *after* `/ui` (which handles hard rules: responsive, 48px, semantic tokens, a11y). Don't polish a layout that may still get restructured. Full table + risk notes in [SKILLS.md](../../SKILLS.md).
+**Rule:** taste skills run _after_ `/ui` (which handles hard rules: responsive, 48px, semantic tokens, a11y). Don't polish a layout that may still get restructured. Full table + risk notes in [SKILLS.md](../../SKILLS.md).
 
 To pull the latest skill definitions:
+
 ```bash
 ./guide.sh skills-update
 ```
@@ -194,11 +209,11 @@ To pull the latest skill definitions:
 
 `install.sh` also installs three non-visual skill packs alongside the taste packs. Same `./guide.sh skills-update` refreshes them all.
 
-| Skill | Source | Auto-triggers when |
-|---|---|---|
-| `claude-api` | [anthropics/skills](https://github.com/anthropics/skills) | A file imports `@anthropic-ai/sdk` or you ask about prompt caching / model migration. Use if/when DannFlow grows AI features. |
-| `shadcn` | [shadcn/ui](https://github.com/shadcn-ui/ui) | Project has `components.json` (DannFlow does). Provides current Shadcn component docs + composition guidance. |
-| `a11y-audit` | [alirezarezvani/claude-skills](https://github.com/alirezarezvani/claude-skills) | You ask for WCAG 2.2 A/AA compliance, contrast checks, ARIA review, or alt-text passes. |
+| Skill        | Source                                                                          | Auto-triggers when                                                                                                            |
+| ------------ | ------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `claude-api` | [anthropics/skills](https://github.com/anthropics/skills)                       | A file imports `@anthropic-ai/sdk` or you ask about prompt caching / model migration. Use if/when DannFlow grows AI features. |
+| `shadcn`     | [shadcn/ui](https://github.com/shadcn-ui/ui)                                    | Project has `components.json` (DannFlow does). Provides current Shadcn component docs + composition guidance.                 |
+| `a11y-audit` | [alirezarezvani/claude-skills](https://github.com/alirezarezvani/claude-skills) | You ask for WCAG 2.2 A/AA compliance, contrast checks, ARIA review, or alt-text passes.                                       |
 
 All three are Low Risk. They complement `/ui` (hard responsive/touch-target rules) by adding domain knowledge `/ui` doesn't carry.
 
@@ -208,18 +223,18 @@ All three are Low Risk. They complement `/ui` (hard responsive/touch-target rule
 
 `install.sh` also installs two growth-focused packs since DannFlow targets SaaS use cases. Same `./guide.sh skills-update` refreshes them with everything else.
 
-| Pack | Source | Highlights |
-|---|---|---|
+| Pack                            | Source                                                       | Highlights                                                                                                                                                                                                                                                                                                                                                                                                   |
+| ------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `coreyhaines31/marketingskills` | [skills.sh](https://skills.sh/coreyhaines31/marketingskills) | 30+ skills: SEO (`seo-audit`, `programmatic-seo`, `ai-seo`, `schema`), copy (`copywriting`, `copy-editing`, `cold-email`, `emails`), CRO (`cro`, `pricing`, `paywalls`, `signup`, `onboarding`), GTM (`launch`, `referrals`, `directory-submissions`), channels (`ads`, `social`, `sms`, `video`), strategy (`marketing-psychology`, `customer-research`, `competitor-profiling`, `analytics`, `ab-testing`) |
-| `addyosmani/web-quality-skills` | [skills.sh](https://skills.sh/addyosmani/web-quality-skills) | `seo` skill — technical SEO + Core Web Vitals from Google Chrome team |
+| `addyosmani/web-quality-skills` | [skills.sh](https://skills.sh/addyosmani/web-quality-skills) | `seo` skill — technical SEO + Core Web Vitals from Google Chrome team                                                                                                                                                                                                                                                                                                                                        |
 
 These pair with three DannFlow slash commands that enforce per-route checks:
 
-| Command | Skills it composes with |
-|---|---|
-| `/seo-check` | `seo-audit`, `seo` (addy), `schema`, `site-architecture` |
-| `/seo-fix` | `seo-audit`, `schema`, `copywriting` (for titles/descriptions) |
-| `/marketing-check` | `cro`, `pricing`, `copywriting`, `marketing-psychology` |
+| Command            | Skills it composes with                                        |
+| ------------------ | -------------------------------------------------------------- |
+| `/seo-check`       | `seo-audit`, `seo` (addy), `schema`, `site-architecture`       |
+| `/seo-fix`         | `seo-audit`, `schema`, `copywriting` (for titles/descriptions) |
+| `/marketing-check` | `cro`, `pricing`, `copywriting`, `marketing-psychology`        |
 
 **Workflow order for new SaaS:** trigger `product-marketing` once to scaffold positioning context → use the other skills as needed for execution.
 
@@ -228,6 +243,7 @@ These pair with three DannFlow slash commands that enforce per-route checks:
 ## When to use what
 
 **Building a new feature?**
+
 ```
 /make-masterplan Phase 1         # expand the next phase after /masterplan-init
 /update-masterplan               # after editing MASTERPLAN.md, sync ordered cards back to GitHub
@@ -242,6 +258,7 @@ These pair with three DannFlow slash commands that enforce per-route checks:
 ```
 
 **Changed the database?**
+
 ```
 # Fastest path — one command chains all four steps:
 /migrate "add bio text column to profiles"
@@ -255,12 +272,14 @@ npm run db:migrate         # apply migration and regenerate types
 ```
 
 **Auditing security?**
+
 ```
 /security-audit
 /rls-check
 ```
 
 **Don't know what to do?**
+
 ```
 /help-dannflow
 /ask-command I want to <plain English>
@@ -270,10 +289,10 @@ npm run db:migrate         # apply migration and regenerate types
 
 ## How this differs from skills
 
-| Layer | Where it lives | When to use |
-|---|---|---|
-| **Custom command** (`.claude/commands/*.md`) | This repo | DannFlow-specific workflows (RLS check against `src/services/`, schema flow via `supabase/migrations/` and `npm run db:migrate`) |
-| **Skill** (`~/.claude/skills/` or plugin) | Your machine | Generally useful workflows reusable across all your projects (security review, code review, simplification) |
+| Layer                                        | Where it lives | When to use                                                                                                                      |
+| -------------------------------------------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| **Custom command** (`.claude/commands/*.md`) | This repo      | DannFlow-specific workflows (RLS check against `src/services/`, schema flow via `supabase/migrations/` and `npm run db:migrate`) |
+| **Skill** (`~/.claude/skills/` or plugin)    | Your machine   | Generally useful workflows reusable across all your projects (security review, code review, simplification)                      |
 
 See [SKILLS.md](../../SKILLS.md) for which Claude Code skills are recommended for this project.
 
@@ -284,6 +303,7 @@ See [SKILLS.md](../../SKILLS.md) for which Claude Code skills are recommended fo
 The `.claude/` directory is yours. Customize freely:
 
 - **Add a new command** — drop `your-command.md` into `.claude/commands/` with frontmatter:
+
   ```markdown
   ---
   description: One-line summary for /ask-command routing.

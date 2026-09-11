@@ -23,6 +23,7 @@ User input: **$ARGUMENTS**
    - unstaged and staged diffs
    - relevant files changed for the task
    - relevant docs or acceptance criteria for the task
+   - check `docs/PENDING_DOC_UPDATES.md` to ensure any new services, types, or schemas have logged pending doc notes
 6. Run safe, task-appropriate automated verification commands when available.
    - Prefer fast checks first.
    - Do not run destructive commands.
