@@ -32,15 +32,25 @@ flowchart TD
     TaskExists -- Yes --> MoveInProgress["📌 Move task to 'In progress' on GitHub Board"]
 
     MoveInProgress --> EditCode["💻 Implement changes in Service Layer & UI"]
-    EditCode --> RunTests["🧪 Run lint & typechecks (`npm run review`)"]
+    EditCode --> LogPending["📝 Log change in `docs/PENDING_DOC_UPDATES.md`"]
 
-    RunTests --> TaskComplete{"Is this the last task in Phase?"}
-    TaskComplete -- Yes --> DocTask["📚 Execute [PX.DOC] Finalize Documentation & Diagrams"]
-    TaskComplete -- No --> UpdateDocs["📝 Update affected docs/diagrams if services/types changed"]
+    LogPending --> CommitCode["💾 Commit Code (`git commit`)"]
+    CommitCode --> CommitHook{"🛡️ `commit-msg` Hook Check"}
+    CommitHook -- "No docs staged & no bypass" --> BlockCommit["❌ Commit BLOCKED!"]
+    CommitHook -- "Ledger staged OR 'No docs needed'" --> PassCommit["✅ Implementation Committed"]
 
-    DocTask --> CloseTask["✅ Run `/close-task` (Move card to Done & mark checked)"]
-    UpdateDocs --> CloseTask
-    CloseTask --> Commit["🎉 Commit with Conventional Commit message"]
+    PassCommit --> VerifyTask["🧪 Run `/verify-task` (Human verification)"]
+    VerifyTask --> CloseTask["🚀 Run `/close-task`"]
+
+    CloseTask --> UpdateRealDocs["📚 Update `docs/` & `docs/diagrams/`"]
+    UpdateRealDocs --> ClearLedger["🧹 Clear `docs/PENDING_DOC_UPDATES.md`"]
+    ClearLedger --> DocsCommit["🎉 Auto-commit `docs(pX.y): ...`"]
+    DocsCommit --> TrackingCommit["📌 Mark `[x]` & GitHub card to `Done`"]
+
+    TrackingCommit --> PushMain["🚀 Push to `main`"]
+    PushMain --> PrePushHook{"🛡️ `pre-push` Hook Check"}
+    PrePushHook -- "Ledger not empty" --> BlockPush["❌ Push to `main` BLOCKED!"]
+    PrePushHook -- "Ledger clean" --> PushSuccess["✅ Shipped cleanly to `main`!"]
 ```
 
 ---

@@ -1,0 +1,32 @@
+#!/bin/sh
+COMMIT_MSG_FILE="$1"
+if [ -n "$COMMIT_MSG_FILE" ] && [ -f "$COMMIT_MSG_FILE" ]; then
+  COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
+else
+  COMMIT_MSG=""
+fi
+
+# Check if staged files include architectural, service, type, or database changes
+STAGED_CORE_CODE=$(git diff --cached --name-only | grep -E '^(src/services/|src/types/|supabase/migrations/|src/app/api/)' || true)
+
+if [ -n "$STAGED_CORE_CODE" ]; then
+  # Check if docs/PENDING_DOC_UPDATES.md was also staged
+  DOCS_STAGED=$(git diff --cached --name-only | grep -E '^docs/PENDING_DOC_UPDATES.md$' || true)
+  
+  # Check if commit message explicitly bypasses or is a docs/chore commit
+  BYPASS_DOCS=$(echo "$COMMIT_MSG" | grep -iE '(\[no-docs\]|no docs needed|no-docs-needed|^docs(\(.*\))?:|^chore(\(.*\))?:)' || true)
+
+  if [ -z "$DOCS_STAGED" ] && [ -z "$BYPASS_DOCS" ]; then
+    echo ""
+    echo "🚨 COMMIT BLOCKED: Core code was modified without logging pending documentation!"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "Modified files requiring documentation note:"
+    echo "$STAGED_CORE_CODE"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "👉 How to proceed:"
+    echo "1. Log your change in docs/PENDING_DOC_UPDATES.md and stage it: git add docs/PENDING_DOC_UPDATES.md"
+    echo "2. OR if no documentation is needed, include 'No docs needed' or '[no-docs]' in your commit message."
+    echo ""
+    exit 1
+  fi
+fi
