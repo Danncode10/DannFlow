@@ -12,6 +12,7 @@
     "billing_module": false,
     "bir_module": false,
     "analytics_module": false,
-    "ai_secretary": false
+    "ai_secretary": false,
+    "scheduling_module": false
   }
 }

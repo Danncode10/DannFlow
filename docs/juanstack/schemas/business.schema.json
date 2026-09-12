@@ -114,6 +114,34 @@
           "type": "boolean",
           "default": false,
           "description": "Proactive AI Secretary system. Requires Supabase Edge Function deployment."
+        },
+        "scheduling_module": {
+          "type": "boolean",
+          "default": false,
+          "description": "Calendar and scheduling system with optional AI booking hooks."
+        }
+      }
+    },
+    "scheduling_rules": {
+      "type": "object",
+      "description": "Scheduling configuration for this vertical. Required when dannflow_features.scheduling_module is true.",
+      "required": ["requires_owner_approval"],
+      "additionalProperties": false,
+      "properties": {
+        "default_meeting_duration_minutes": {
+          "type": "integer",
+          "default": 30,
+          "description": "Default duration for scheduled meetings."
+        },
+        "requires_owner_approval": {
+          "type": "boolean",
+          "default": true,
+          "description": "If true, AI cannot auto-book; it must request approval from the business owner."
+        },
+        "enable_gcal_sync": {
+          "type": "boolean",
+          "default": false,
+          "description": "Toggle Google Calendar two-way synchronization."
         }
       }
     },

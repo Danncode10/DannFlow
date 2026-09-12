@@ -244,12 +244,13 @@ When a vertical repo uses `sync-to-upstream`, it creates a PR to `dannflow`. Wit
 
 ### Namespace Convention (Non-Negotiable)
 
-| Module        | Path Pattern                                     | Owner           |
-| ------------- | ------------------------------------------------ | --------------- |
-| BIR Tax Logic | `src/bir/{vertical_id}/`                         | That vertical   |
-| Analytics     | `src/analytics/{vertical_id}/`                   | That vertical   |
-| AI Persona    | `src/ai/personas/{vertical_id}.ai-manifest.json` | That vertical   |
-| Core Engine   | `src/bir/core/`, `src/analytics/core/`           | `dannflow` only |
+| Module        | Path Pattern                                                   | Owner           |
+| ------------- | -------------------------------------------------------------- | --------------- |
+| BIR Tax Logic | `src/bir/{vertical_id}/`                                       | That vertical   |
+| Analytics     | `src/analytics/{vertical_id}/`                                 | That vertical   |
+| Scheduling    | `src/scheduling/{vertical_id}/`                                | That vertical   |
+| AI Persona    | `src/ai/personas/{vertical_id}.ai-manifest.json`               | That vertical   |
+| Core Engine   | `src/bir/core/`, `src/analytics/core/`, `src/scheduling/core/` | `dannflow` only |
 
 ### Hard Rule
 
@@ -295,8 +296,9 @@ The following block must be appended to `dannflow/AGENTS.md` under heading: `## 
 When editing code in a vertical repo (e.g., `attyjuan`), you may ONLY modify:
 1. Files within `src/bir/{this_vertical_id}/`
 2. Files within `src/analytics/{this_vertical_id}/`
-3. Files named `src/ai/personas/{this_vertical_id}.ai-manifest.json`
-4. All other non-namespaced project files
+3. Files within `src/scheduling/{this_vertical_id}/`
+4. Files named `src/ai/personas/{this_vertical_id}.ai-manifest.json`
+5. All other non-namespaced project files
 
 You MUST NEVER modify:
 - `src/bir/core/` (requires a direct `dannflow` PR)
@@ -350,6 +352,31 @@ src/analytics/
 
 ---
 
+---
+
+## 📋 Revision 7: Scheduling Module Library
+
+```
+src/scheduling/
+├── core/
+│   ├── booking-engine.ts      # Conflict detection and constraints
+│   ├── gcal-sync.ts           # Google Calendar integration stub
+│   ├── scheduling-types.ts    # MeetingRequest, CalendarEvent
+│   └── index.ts
+├── legal/                     # Owned by: attyjuan
+│   └── .gitkeep
+├── veterinary/
+│   └── .gitkeep
+└── restaurant/
+    └── .gitkeep
+```
+
+### Scheduling Coding Rules
+
+- All booking actions must use the core engine.
+- AI Secretary must confirm bookings via UI skill if `requires_owner_approval` is true.
+- Google Calendar sync logic must live in `gcal-sync.ts`.
+
 ## ✅ Implementation Checklist
 
 ### Phase 1 — Foundation (Do This First)
@@ -373,12 +400,18 @@ src/analytics/
 - [ ] Implement `src/ai/secretary/task-engine.ts` (background job skeleton)
 - [ ] Implement `src/ai/secretary/task-queue.ts` (human-facing task queue)
 
-### Phase 4 — AGENTS.md Update
+### Phase 4 — Scheduling Core Engine
+
+- [ ] Define `src/scheduling/core/scheduling-types.ts`
+- [ ] Implement `src/scheduling/core/booking-engine.ts`
+- [ ] Implement `src/scheduling/core/gcal-sync.ts`
+
+### Phase 5 — AGENTS.md Update
 
 - [ ] Append JuanStack Vertical Namespace Rules to `dannflow/AGENTS.md`
 - [ ] Add `owned_paths` enforcement note to `sync-to-upstream` skill
 
-### Phase 5 — First Vertical Test (`attyjuan`)
+### Phase 6 — First Vertical Test (`attyjuan`)
 
 - [ ] Create `attyjuan/business.json` with full configuration
 - [ ] Populate `src/bir/legal/` with BIR form skeletons

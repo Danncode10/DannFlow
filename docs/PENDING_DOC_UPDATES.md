@@ -63,6 +63,38 @@
 
 ---
 
+## [juanStack-Architecture] Scheduling Module Architecture Addition
+
+**Branch:** `SaaS-Starter`
+**Date:** 2026-09-12
+**Status:** 🟢 Architecture expanded — pending implementation
+
+### What Was Done
+
+#### Schema Updates
+
+- Added `scheduling_module` feature flag to `business.schema.json`.
+- Added `scheduling_rules` block to schema for configuring meeting duration, owner approval requirement, and Google Calendar sync toggle.
+- Added `scheduling_module: false` to the root `business.json` template.
+
+#### Masterplan & Architecture Docs
+
+- Updated `docs/juanstack/juanstack_masterplan.md`:
+  - Inserted Phase 1E (Scheduling Module Library scaffolding).
+  - Updated Phase 3 (AI Secretary System) to include `SchedulingIntent` in the type definitions.
+  - Inserted a brand new Phase 4 (Scheduling Core Engine) handling conflict detection and API stubs.
+  - Bumped subsequent phases accordingly (we now have 9 phases).
+- Updated `docs/juanstack/DANNFLOW_REVISION_PLAN.md`:
+  - Added Revision 7 (Scheduling Module Library) and corresponding folder tree.
+  - Inserted Phase 4 into the checklist.
+  - Added `src/scheduling/` to the namespace rules block.
+
+#### Scaffolding
+
+- Generated the base folder skeleton: `src/scheduling/core/`, `src/scheduling/legal/`, `src/scheduling/veterinary/`, `src/scheduling/restaurant/`.
+- Placed `OWNERSHIP.md` guards in vertical directories to enforce `sync-to-upstream` namespace blocks.
+- Created `src/scheduling/core/scheduling-types.ts` and `index.ts`.
+
 ## [juanStack-P1.5] JuanStack Phase 1.5 — BIR Compliance Research & Schema Expansion
 
 **Branch:** `SaaS-Starter`

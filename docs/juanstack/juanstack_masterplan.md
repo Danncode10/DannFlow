@@ -83,6 +83,16 @@ These 5 decisions affect the entire architecture. Agree on them before writing a
 - `[x]` `[P1D.1]` Create `business.json` at the `dannflow` repo root — populate with the default/blank template (all features set to `false`, `vertical_id: "dannflow-default"`).
 - `[x]` `[P1D.2]` Create `businesses.registry.json` at repo root (or portal repo per `[D5]`) — populate with empty `verticals: []` array and `registry_version: "1.0.0"`.
 
+### 1E — Scheduling Module Library
+
+- `[x]` `[P1E.1]` Create `src/scheduling/` directory with:
+  - `src/scheduling/core/` — add `.gitkeep`
+  - `src/scheduling/legal/` — add `.gitkeep` + `OWNERSHIP.md`
+  - `src/scheduling/veterinary/` — add `.gitkeep` + `OWNERSHIP.md`
+  - `src/scheduling/restaurant/` — add `.gitkeep` + `OWNERSHIP.md`
+- `[x]` `[P1E.2]` Create `src/scheduling/core/scheduling-types.ts` — empty TypeScript file.
+- `[x]` `[P1E.3]` Create `src/scheduling/core/index.ts` — barrel file.
+
 - `[x]` `[P1.DOC]` Finalize Phase 1 Documentation — update `docs/juanstack/DANNFLOW_REVISION_PLAN.md` checklist to mark Phase 1 items done.
 
 ---
@@ -131,7 +141,8 @@ These 5 decisions affect the entire architecture. Agree on them before writing a
 > **Dependency:** `[P1C]` must be complete. `[D3]` must be resolved.
 
 - `[P3.1]` Implement `src/ai/secretary/types.ts`:
-  - `ObservableState` interface (matches `core.ai-manifest.json` schema)
+  - `ObservableState`
+  - `SchedulingIntent` (e.g. client_requested_meeting) interface (matches `core.ai-manifest.json` schema)
   - `SecretaryTask` interface: `{ id, title, description, priority, triggered_by, created_at, status: 'pending' | 'dismissed' | 'done' }`
   - `AIManifest` interface (validates the JSON manifest shape)
 - `[P3.2]` Implement `src/ai/secretary/task-engine.ts`:
@@ -156,97 +167,110 @@ These 5 decisions affect the entire architecture. Agree on them before writing a
 
 ---
 
-## **PHASE 4: Analytics Core Module**
+## **PHASE 4: Scheduling Core Engine**
+
+> Goal: Build the core scheduling and calendar integration module.
+> **Dependency:** `[P1E]` must be complete.
+
+- `[P4.1]` Define `src/scheduling/core/scheduling-types.ts`:
+  - `MeetingRequest`, `CalendarEvent`, `AvailabilitySlot`
+- `[P4.2]` Implement `src/scheduling/core/booking-engine.ts` — handles clash detection and booking constraints based on `business.json` rules.
+- `[P4.3]` Implement `src/scheduling/core/gcal-sync.ts` — optional Google Calendar synchronization (stubbed API).
+- `[P4.DOC]` Finalize Phase 4 Documentation.
+
+---
+
+## **PHASE 5: Analytics Core Module**
 
 > Goal: Build the shared analytics infrastructure that all vertical dashboards inherit from.
 > **Dependency:** `[P1B]` must be complete.
 
-- `[P4.1]` Define `src/analytics/core/analytics-types.ts`:
+- `[P5.1]` Define `src/analytics/core/analytics-types.ts`:
   - `KPIData`: `{ label, value, unit, trend: 'up' | 'down' | 'flat', change_percentage, period }`
   - `ChartDataPoint`: `{ x: string | number, y: number, label?: string }`
   - `DashboardWidget`: `{ id, title, component, data_service, col_span, row_span }`
-- `[P4.2]` Implement `src/analytics/core/KPICard.tsx` — Shadcn `Card`-based stat card. Props: `KPIData`. Shows value, label, trend arrow, and period. Uses only Shadcn semantic tokens.
-- `[P4.3]` Implement `src/analytics/core/ChartWrapper.tsx` — Recharts wrapper with loading skeleton (Shadcn `Skeleton`) and empty state. Props: `{ title, children, isLoading, isEmpty }`.
-- `[P4.4]` Implement `src/analytics/core/DashboardShell.tsx` — layout component. Reads `business.json → domain_nomenclature` to set the page header title. Renders a grid of `DashboardWidget` components.
-- `[P4.5]` Update `src/analytics/core/index.ts` barrel file.
+- `[P5.2]` Implement `src/analytics/core/KPICard.tsx` — Shadcn `Card`-based stat card. Props: `KPIData`. Shows value, label, trend arrow, and period. Uses only Shadcn semantic tokens.
+- `[P5.3]` Implement `src/analytics/core/ChartWrapper.tsx` — Recharts wrapper with loading skeleton (Shadcn `Skeleton`) and empty state. Props: `{ title, children, isLoading, isEmpty }`.
+- `[P5.4]` Implement `src/analytics/core/DashboardShell.tsx` — layout component. Reads `business.json → domain_nomenclature` to set the page header title. Renders a grid of `DashboardWidget` components.
+- `[P5.5]` Update `src/analytics/core/index.ts` barrel file.
 
-- `[P4.DOC]` Finalize Phase 4 Documentation — add Analytics Core component API to `docs/juanstack/analytics-core-api.md`.
+- `[P5.DOC]` Finalize Phase 5 Documentation — add Analytics Core component API to `docs/juanstack/analytics-core-api.md`.
 
 ---
 
-## **PHASE 5: `business.json` Runtime Integration**
+## **PHASE 6: `business.json` Runtime Integration**
 
 > Goal: Wire `business.json` into the Next.js app so feature flags, domain terminology, and BIR rules are respected at runtime.
 > **Dependency:** `[D1]` must be resolved. `[P1D.1]` must be complete.
 
-- `[P5.1]` Create `src/lib/vertical-config.ts`:
+- `[P6.1]` Create `src/lib/vertical-config.ts`:
   - `getVerticalConfig(): Promise<VerticalConfig>` — loads and validates `business.json` (either from filesystem at build time or from API at runtime, per `[D1]`).
   - `isFeatureEnabled(feature: keyof DannflowFeatures): boolean` — checks `dannflow_features`.
   - `getTerm(key: keyof DomainNomenclature): string` — resolves domain terminology.
-- `[P5.2]` Create `src/context/VerticalConfigContext.tsx` — React context provider that wraps the app and makes `VerticalConfig` available to all client components without prop drilling.
-- `[P5.3]` Create `src/hooks/useVerticalConfig.ts` — convenience hook: `const { getTerm, isFeatureEnabled, birRules } = useVerticalConfig()`.
-- `[P5.4]` Create `src/hooks/useTerm.ts` — micro-hook: `const clientLabel = useTerm('consumer')` — returns the domain-specific label for any nomenclature key.
-- `[P5.5]` Audit existing `dannflow` components for hardcoded domain nouns. Replace all instances with `useTerm()` or `getTerm()`.
-- `[P5.6]` Implement feature flag gating — wrap feature-specific nav items, routes, and components with `isFeatureEnabled()` checks.
+- `[P6.2]` Create `src/context/VerticalConfigContext.tsx` — React context provider that wraps the app and makes `VerticalConfig` available to all client components without prop drilling.
+- `[P6.3]` Create `src/hooks/useVerticalConfig.ts` — convenience hook: `const { getTerm, isFeatureEnabled, birRules } = useVerticalConfig()`.
+- `[P6.4]` Create `src/hooks/useTerm.ts` — micro-hook: `const clientLabel = useTerm('consumer')` — returns the domain-specific label for any nomenclature key.
+- `[P6.5]` Audit existing `dannflow` components for hardcoded domain nouns. Replace all instances with `useTerm()` or `getTerm()`.
+- `[P6.6]` Implement feature flag gating — wrap feature-specific nav items, routes, and components with `isFeatureEnabled()` checks.
 
-- `[P5.DOC]` Finalize Phase 5 Documentation — update `docs/juanstack/DANNFLOW_REVISION_PLAN.md` and write `docs/juanstack/vertical-config-guide.md`.
+- `[P6.DOC]` Finalize Phase 6 Documentation — update `docs/juanstack/DANNFLOW_REVISION_PLAN.md` and write `docs/juanstack/vertical-config-guide.md`.
 
 ---
 
-## **PHASE 6: First Vertical Test (`attyjuan`)**
+## **PHASE 7: First Vertical Test (`attyjuan`)**
 
 > Goal: Create `attyjuan` as the first real vertical repo. Validate the entire system end-to-end. Fix whatever breaks.
-> **Dependency:** All Phases 1–5 must be complete.
+> **Dependency:** All Phases 1–6 must be complete.
 
-- `[P6.1]` Create `attyjuan` GitHub repo and initialize it as a `dannflow` instance (fork or clone + upstream setup).
-- `[P6.2]` Create `attyjuan/business.json` with full legal vertical configuration (see `DANNFLOW_REVISION_PLAN.md` Revision 1 for the full spec).
-- `[P6.3]` Populate `src/bir/legal/` with legal BIR form implementations:
+- `[P7.1]` Create `attyjuan` GitHub repo and initialize it as a `dannflow` instance (fork or clone + upstream setup).
+- `[P7.2]` Create `attyjuan/business.json` with full legal vertical configuration (see `DANNFLOW_REVISION_PLAN.md` Revision 1 for the full spec).
+- `[P7.3]` Populate `src/bir/legal/` with legal BIR form implementations:
   - `form-2307.ts` — using types from `src/bir/core/form-types.ts`
   - `form-1701Q.ts`
   - `form-2551Q.ts`
   - `legal-bir-summary.tsx` — dashboard widget
-- `[P6.4]` Create `src/ai/personas/legal.ai-manifest.json` — extend `core.ai-manifest.json` with the 2 legal-specific triggers (`case_deadline_approaching`, `bir_quarter_due`).
-- `[P6.5]` Populate `src/analytics/legal/` with skeleton KPI components:
+- `[P7.4]` Create `src/ai/personas/legal.ai-manifest.json` — extend `core.ai-manifest.json` with the 2 legal-specific triggers (`case_deadline_approaching`, `bir_quarter_due`).
+- `[P7.5]` Populate `src/analytics/legal/` with skeleton KPI components:
   - `CaseRevenueChart.tsx`
   - `BillableHoursKPI.tsx`
   - `CollectionRateCard.tsx`
   - `index.ts` barrel
-- `[P6.6]` Validate that `sync-to-upstream` **only stages** files inside `owned_paths`. Attempt a sync with a file outside `owned_paths` and confirm it is blocked.
-- `[P6.7]` Validate feature flags — toggle `bir_module: false` in `attyjuan/business.json` and confirm the BIR section disappears from the UI without code changes.
-- `[P6.8]` Validate domain terminology — confirm every UI label reads "Lawyer", "Client", "Billable Case" and there are zero hardcoded strings.
-- `[P6.9]` Test the AI Secretary with a seeded `invoice_overdue` record — confirm the task appears in the human task queue.
+- `[P7.6]` Validate that `sync-to-upstream` **only stages** files inside `owned_paths`. Attempt a sync with a file outside `owned_paths` and confirm it is blocked.
+- `[P7.7]` Validate feature flags — toggle `bir_module: false` in `attyjuan/business.json` and confirm the BIR section disappears from the UI without code changes.
+- `[P7.8]` Validate domain terminology — confirm every UI label reads "Lawyer", "Client", "Billable Case" and there are zero hardcoded strings.
+- `[P7.9]` Test the AI Secretary with a seeded `invoice_overdue` record — confirm the task appears in the human task queue.
 
-- `[P6.DOC]` Finalize Phase 6 Documentation — write `docs/juanstack/vertical-setup-guide.md` as a how-to for creating a new vertical repo from `dannflow`.
+- `[P7.DOC]` Finalize Phase 7 Documentation — write `docs/juanstack/vertical-setup-guide.md` as a how-to for creating a new vertical repo from `dannflow`.
 
 ---
 
-## **PHASE 7: Second Vertical Smoke Test (`vetstack`)**
+## **PHASE 8: Second Vertical Smoke Test (`vetstack`)**
 
 > Goal: Prove that the architecture is not attyjuan-specific. Add a second vertical with minimal friction.
-> **Dependency:** Phase 6 must pass all validations.
+> **Dependency:** Phase 7 must pass all validations.
 
-- `[P7.1]` Create `vetstack` GitHub repo and initialize as a `dannflow` instance.
-- `[P7.2]` Create `vetstack/business.json` — veterinary configuration with `vertical_id: "veterinary"`, terminology: `provider: "Veterinarian"`, `consumer: "Pet Owner"`, `transaction: "Appointment"`.
-- `[P7.3]` Create `src/bir/veterinary/` stub files for the most common vet BIR form.
-- `[P7.4]` Create `src/ai/personas/veterinary.ai-manifest.json` with at least 1 vet-specific observable state.
-- `[P7.5]` Confirm `attyjuan` and `vetstack` can both sync to upstream independently without collisions.
-- `[P7.6]` Measure time to add second vertical. Target: under 2 hours from repo creation to working feature flags and AI persona.
+- `[P8.1]` Create `vetstack` GitHub repo and initialize as a `dannflow` instance.
+- `[P8.2]` Create `vetstack/business.json` — veterinary configuration with `vertical_id: "veterinary"`, terminology: `provider: "Veterinarian"`, `consumer: "Pet Owner"`, `transaction: "Appointment"`.
+- `[P8.3]` Create `src/bir/veterinary/` stub files for the most common vet BIR form.
+- `[P8.4]` Create `src/ai/personas/veterinary.ai-manifest.json` with at least 1 vet-specific observable state.
+- `[P8.5]` Confirm `attyjuan` and `vetstack` can both sync to upstream independently without collisions.
+- `[P8.6]` Measure time to add second vertical. Target: under 2 hours from repo creation to working feature flags and AI persona.
 
-- `[P7.DOC]` Finalize Phase 7 Documentation — update `docs/juanstack/vertical-setup-guide.md` with any friction points found during `vetstack` setup.
+- `[P8.DOC]` Finalize Phase 8 Documentation — update `docs/juanstack/vertical-setup-guide.md` with any friction points found during `vetstack` setup.
 
 ---
 
-## **PHASE 8: `businesses.registry.json` & JuanStack Portal**
+## **PHASE 9: `businesses.registry.json` & JuanStack Portal**
 
 > Goal: Build the discovery layer that connects all verticals to a central portal.
-> **Dependency:** `[D5]` must be resolved. Phase 7 must be complete.
+> **Dependency:** `[D5]` must be resolved. Phase 8 must be complete.
 
-- `[P8.1]` Populate `businesses.registry.json` with entries for `attyjuan` and `vetstack`.
-- `[P8.2]` Implement a registry reader utility: `src/lib/registry.ts` — `fetchRegistry(): Promise<VerticalRegistry>`.
-- `[P8.3]` _(If portal is a separate repo)_ Initialize `juanstack-portal` as a new Next.js app — minimal UI: a search bar and vertical cards pulled from `businesses.registry.json`.
-- `[P8.4]` Implement dynamic routing: clicking a vertical card routes the user to the correct vertical's app URL.
+- `[P9.1]` Populate `businesses.registry.json` with entries for `attyjuan` and `vetstack`.
+- `[P9.2]` Implement a registry reader utility: `src/lib/registry.ts` — `fetchRegistry(): Promise<VerticalRegistry>`.
+- `[P9.3]` _(If portal is a separate repo)_ Initialize `juanstack-portal` as a new Next.js app — minimal UI: a search bar and vertical cards pulled from `businesses.registry.json`.
+- `[P9.4]` Implement dynamic routing: clicking a vertical card routes the user to the correct vertical's app URL.
 
-- `[P8.DOC]` Finalize Phase 8 Documentation — write `docs/juanstack/registry-guide.md`.
+- `[P9.DOC]` Finalize Phase 9 Documentation — write `docs/juanstack/registry-guide.md`.
 
 ---
 
