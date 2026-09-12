@@ -173,13 +173,13 @@ When running a Claude command from Codex:
 
 ### Architecture Decisions (Locked — Do Not Override)
 
-| Decision                       | Resolution                                                     |
-| ------------------------------ | -------------------------------------------------------------- |
-| `business.json` load strategy  | **Build-time** — read from filesystem during `next build`      |
-| Multi-tenancy model            | **Separate Supabase projects** per vertical                    |
-| AI Secretary runtime           | **Supabase Edge Function with pg_cron**                        |
-| `sync-to-upstream` enforcement | **Hard block** — stops push if files are outside `owned_paths` |
-| Registry location              | **Separate `juanstack-portal` repo** — not in `dannflow`       |
+| Decision                       | Resolution                                                                                                                                                                                                                                              |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `business.json` load strategy  | **Build-time** — read from filesystem during `next build`                                                                                                                                                                                               |
+| Multi-tenancy model            | **SEPARATE Supabase projects** per vertical. Verticals DO NOT share a database. The `dannflow` repo only holds the migration _templates_. When a vertical is created, `db:migrate` applies the template to the vertical's completely isolated database. |
+| AI Secretary runtime           | **Supabase Edge Function with pg_cron**                                                                                                                                                                                                                 |
+| `sync-to-upstream` enforcement | **Hard block** — stops push if files are outside `owned_paths`                                                                                                                                                                                          |
+| Registry location              | **Separate `juanstack-portal` repo** — not in `dannflow`                                                                                                                                                                                                |
 
 ### The Golden Rule: Respect the Namespace
 
@@ -212,7 +212,7 @@ When editing code **directly in `dannflow`** (Template Mode), you may ONLY modif
 
 ### Before Starting Any BIR, Analytics, or AI Task
 
-1. **Read `business.json`** at the repo root.
+1. **Read `business.json`** at the repo root. _(Note: Ensure any modifications to this file strictly adhere to `docs/juanstack/schemas/business.schema.json`)_.
 2. **Confirm `vertical_id`** — this tells you which namespace folder you own.
 3. **Check `dannflow_features`** — only implement features where the flag is `true`.
 4. **Read the AI persona** at `business.json → ai_rules.persona_manifest`.

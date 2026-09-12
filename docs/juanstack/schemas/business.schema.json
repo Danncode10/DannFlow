@@ -148,7 +148,7 @@
     "bir_rules": {
       "type": "object",
       "description": "Philippine BIR tax configuration for this vertical. Required when dannflow_features.bir_module is true.",
-      "required": ["module_path", "taxpayer_classification"],
+      "required": ["module_path", "applicable_laws"],
       "additionalProperties": false,
       "properties": {
         "module_path": {
@@ -157,60 +157,26 @@
           "pattern": "^src/bir/[a-z][a-z0-9_]*/",
           "examples": ["src/bir/legal/"]
         },
-        "taxpayer_classification": {
-          "type": "string",
-          "enum": ["Micro", "Small", "Medium", "Large"],
-          "description": "Default BIR taxpayer classification per RA 11976 (EOPT Act). Micro = under ₱3M gross sales."
-        },
-        "withholding_tax_percentage": {
-          "type": "number",
-          "minimum": 0,
-          "maximum": 100,
-          "description": "Creditable withholding tax rate for this industry (e.g., 10 for professional services)."
-        },
-        "eligible_for_8_percent_gross": {
-          "type": "boolean",
-          "description": "Whether this vertical can elect the 8% gross receipt tax option instead of graduated rates."
-        },
         "applicable_laws": {
           "type": "array",
           "items": { "type": "string" },
           "description": "List of applicable Philippine laws and regulations.",
           "examples": [["RA 11976 (Ease of Paying Taxes Act)"]]
         },
-        "rdo_code": {
-          "type": "string",
-          "pattern": "^[0-9]{3}$",
-          "description": "Revenue District Office (RDO) Code (e.g., 039)."
+        "default_withholding_tax_percentage": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Default creditable withholding tax rate for this industry, if applicable (e.g., 10 for professional services)."
         },
-        "registered_address": {
-          "type": "string",
-          "description": "Official registered business address."
-        },
-        "psic_code": {
-          "type": "string",
-          "description": "Philippine Standard Industrial Classification (PSIC) Code."
-        },
-        "line_of_business": {
-          "type": "string",
-          "description": "Registered Line of Business."
-        },
-        "vat_status": {
-          "type": "string",
-          "enum": ["VAT", "Non-VAT"],
-          "description": "Value-Added Tax Registration Status."
-        },
-        "atc_percentage_tax": {
-          "type": "string",
-          "description": "Alphanumeric Tax Code for Percentage Tax (e.g., PT010)."
-        },
-        "atc_income_tax": {
-          "type": "string",
-          "description": "Alphanumeric Tax Code for Income Tax (e.g., II012, II014)."
-        },
-        "atc_withholding_tax": {
-          "type": "string",
-          "description": "Alphanumeric Tax Code for Creditable Withholding Tax (e.g., WI157)."
+        "industry_default_atcs": {
+          "type": "object",
+          "description": "Industry-standard Alphanumeric Tax Codes.",
+          "properties": {
+            "percentage_tax": { "type": "string" },
+            "income_tax": { "type": "string" },
+            "withholding_tax": { "type": "string" }
+          }
         }
       }
     },

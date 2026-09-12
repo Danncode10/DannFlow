@@ -135,6 +135,29 @@ These 5 decisions affect the entire architecture. Agree on them before writing a
 
 ---
 
+## **PHASE 2.5: SaaS Architecture Cleanup**
+
+> Goal: Align schema and documentation with the realization that JuanStack verticals are multi-tenant SaaS platforms. Vertical configuration (`business.json`) must only hold platform-wide settings, while tenant-specific data (e.g., RDO code, taxpayer classification) is deferred to the database.
+> **Dependency:** Phase 2 must be complete.
+
+- `[x]` `[P2.5.1]` Modify `docs/juanstack/schemas/business.schema.json` — Remove single-tenant fields (`taxpayer_classification`, `rdo_code`, `registered_address`, `psic_code`, `line_of_business`, `vat_status`, `eligible_for_8_percent_gross`) from `bir_rules`. Consolidate ATCs into `industry_default_atcs`.
+- `[x]` `[P2.5.2]` Update `docs/juanstack/juanstack_masterplan.md` to reflect Phase 2.5 and explicitly clarify that initialization wizards are optional.
+- `[x]` `[P2.5.DOC]` Update `docs/PENDING_DOC_UPDATES.md` to remove the incorrect Phase 1.5 schema history and log this architectural cleanup.
+
+---
+
+## **PHASE 2.6: Core Database Schema (Supabase)**
+
+> Goal: Establish the foundational Supabase migrations natively inside the `dannflow` template. **CRITICAL:** Verticals DO NOT share a database. The `dannflow` repo simply holds the migration templates. When you clone a new vertical, running `db:migrate` applies this template to that vertical's **completely separate, isolated database**.
+> **Dependency:** Phase 2.5 must be complete.
+
+- `[ ]` `[P2.6.1]` Create migration `supabase/migrations/*_core_tenant_schema.sql`. Define the `organizations` (or `tenant_profiles`) table. This table will hold the tenant-specific SaaS data shifted out of `business.json` (e.g., `rdo_code`, `taxpayer_classification`, `vat_status`, `registered_address`).
+- `[ ]` `[P2.6.2]` Create migration `supabase/migrations/*_ai_secretary_schema.sql`. Define the `secretary_tasks` table (`id, user_id, vertical_id, title, description, priority, triggered_by_state_id, status, created_at, updated_at`).
+- `[ ]` `[P2.6.3]` Apply strict Row Level Security (RLS) policies ensuring cross-tenant isolation (e.g., users can only see their own organization and their own AI tasks).
+- `[ ]` `[P2.6.DOC]` Finalize Phase 2.6 Documentation — log the DB schema layout in `docs/PENDING_DOC_UPDATES.md`.
+
+---
+
 ## **PHASE 3: AI Secretary System**
 
 > Goal: Build the proactive AI Secretary backbone — the type system, the task engine, and the human-facing task queue. No vertical-specific triggers yet.
@@ -158,10 +181,7 @@ These 5 decisions affect the entire architecture. Agree on them before writing a
 - `[P3.4]` Wire the Task Engine to a scheduler _(implementation depends on `[D3]`)_:
   - **If Edge Function cron:** Create `supabase/functions/ai-secretary/index.ts` — runs on a schedule, calls `task-engine.ts`.
   - **If Next.js route handler:** Create `src/app/api/ai-secretary/cron/route.ts` — protected endpoint called by Vercel Cron.
-- `[P3.5]` Create the `secretary_tasks` Supabase migration:
-  - Table: `secretary_tasks (id, user_id, vertical_id, title, description, priority, triggered_by_state_id, status, created_at, updated_at)`
-  - RLS: user can only read/update their own tasks; service role can insert.
-- `[P3.6]` Create `src/services/secretary.service.ts` — wraps `task-queue.ts` with proper auth/RLS context.
+- `[P3.5]` Create `src/services/secretary.service.ts` — wraps `task-queue.ts` with proper auth/RLS context.
 
 - `[P3.DOC]` Finalize Phase 3 Documentation — add AI Secretary architecture diagram to `docs/juanstack/ai-secretary-architecture.md`.
 
@@ -271,6 +291,20 @@ These 5 decisions affect the entire architecture. Agree on them before writing a
 - `[P9.4]` Implement dynamic routing: clicking a vertical card routes the user to the correct vertical's app URL.
 
 - `[P9.DOC]` Finalize Phase 9 Documentation — write `docs/juanstack/registry-guide.md`.
+
+---
+
+## **PHASE 10: Codex Command Alignment**
+
+> Goal: Ensure all `.claude/commands/` (especially initialization commands) are fully aware of JuanStack rules, the BIR core engine, and the `business.schema.json`.
+> **Dependency:** All previous core phases should be complete so the architecture is stable.
+
+- `[ ]` `[P10.1]` Review `.claude/commands/masterplan-init.md` and update it to prompt the user for BIR/JuanStack specific fields (e.g., RDO code, line of business, tax classification) when starting a new vertical.
+- `[ ]` `[P10.2]` Review and update `.claude/commands/new-project.md` to ensure it generates a valid `business.json` that complies with the schema.
+- `[ ]` `[P10.3]` Audit other AI agent commands in `.claude/commands/` to ensure they respect the vertical namespace rules (`OWNERSHIP.md`) and do not modify `core/` folders when operating in a vertical.
+- `[ ]` `[P10.4]` **Optional**: Create a dedicated `juanstack-init` command/agent. This is an _optional user tooling wizard_, not a mandatory system component. It acts as an interactive wizard, interviewing the user about the new vertical (domain names, features needed) and automatically scaffolding the namespace folders, `business.json`, and initial database schema.
+- `[ ]` `[P10.5]` Create a `juanstack-doctor` (or `juanstack-db-sync`) command. This AI agent command will read `business.json` and `ai-manifest.json` (the source of truth), pull the live Supabase schema via MCP, and compare them. If the JSON enables a feature/AI trigger but the database lacks the required table or RLS policy, the agent will automatically generate the missing SQL migration to keep Supabase perfectly in sync with the JSON.
+- `[ ]` `[P10.DOC]` Finalize Phase 10 Documentation — summarize command updates in `docs/PENDING_DOC_UPDATES.md`.
 
 ---
 

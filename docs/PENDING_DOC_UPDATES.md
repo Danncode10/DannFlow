@@ -110,15 +110,7 @@
 
 #### Schema Updates
 
-- Expanded `docs/juanstack/schemas/business.schema.json`. Added 8 new real-world data points to the `bir_rules` object:
-  - `rdo_code`
-  - `registered_address`
-  - `psic_code`
-  - `line_of_business`
-  - `vat_status`
-  - `atc_percentage_tax`
-  - `atc_income_tax`
-  - `atc_withholding_tax`
+- Expanded `docs/juanstack/schemas/business.schema.json`. Added base industry rules. Note: Tenant-specific fields originally planned here were moved out of the schema config per Phase 2.5 SaaS Architecture rules.
 
 #### Checklists Updated
 
@@ -152,3 +144,8 @@
 - **Date**: 2026-09-12
 - **Changes**: Implemented standard Philippine tax computations in `src/bir/core/` (EOPT Engine, Tax Calculator with Graduated/8% rules, Withholding tax logic). Added `bir-core-api.md` as API reference.
 - **Impact**: All verticals will now import compute functions from this central core.
+
+### Phase 2.5: SaaS Architecture Cleanup
+
+- **Date**: 2026-09-12
+- **Changes**: Cleaned up `business.schema.json` to strip out single-tenant data fields from the platform config, reinforcing the multi-tenant SaaS architecture. Made the `juanstack-init` wizard completely optional in the masterplan.
