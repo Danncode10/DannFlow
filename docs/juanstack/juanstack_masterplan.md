@@ -92,9 +92,9 @@ These 5 decisions affect the entire architecture. Agree on them before writing a
 > Goal: Research actual Philippine BIR requirements (RA 11976 EOPT Act, ATC codes, RDOs, specific fields for 2551Q/1701Q/2307) and expand the `business.schema.json` so the AI Secretary has enough real-world data to generate forms later.
 > **Dependency:** `[P1D]` must be complete.
 
-- `[P1.5.1]` Research exact data fields needed for BIR Form 2551Q (Quarterly Percentage Tax), 1701Q (Quarterly Income Tax), and 2307 (Creditable Withholding Tax).
-- `[P1.5.2]` Update `docs/juanstack/schemas/business.schema.json` to include real-world data points under `bir_rules` (e.g., RDO code, registered address, PSIC/Line of Business, VAT/Non-VAT status, ATCs).
-- `[P1.5.DOC]` Finalize Phase 1.5 Documentation — document the updated schema and research findings in a new file `docs/juanstack/bir-compliance-research.md`.
+- `[x]` `[P1.5.1]` Research exact data fields needed for BIR Form 2551Q (Quarterly Percentage Tax), 1701Q (Quarterly Income Tax), and 2307 (Creditable Withholding Tax).
+- `[x]` `[P1.5.2]` Update `docs/juanstack/schemas/business.schema.json` to include real-world data points under `bir_rules` (e.g., RDO code, registered address, PSIC/Line of Business, VAT/Non-VAT status, ATCs).
+- `[x]` `[P1.5.DOC]` Finalize Phase 1.5 Documentation — document the updated schema and research findings in a new file `docs/juanstack/bir-compliance-research.md`.
 
 ---
 

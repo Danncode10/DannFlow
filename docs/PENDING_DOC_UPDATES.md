@@ -63,6 +63,35 @@
 
 ---
 
+## [juanStack-P1.5] JuanStack Phase 1.5 — BIR Compliance Research & Schema Expansion
+
+**Branch:** `SaaS-Starter`
+**Date:** 2026-09-12
+**Status:** 🟢 Phase 1.5 complete — pending human verification
+
+### What Was Done
+
+#### Research & Documentation
+
+- Created `docs/juanstack/bir-compliance-research.md` containing research on RA 11976 (EOPT Act) changes (Micro/Small/Medium/Large classifications, file-and-pay anywhere).
+- Documented exact field requirements for BIR Forms 2551Q, 1701Q, and 2307.
+
+#### Schema Updates
+
+- Expanded `docs/juanstack/schemas/business.schema.json`. Added 8 new real-world data points to the `bir_rules` object:
+  - `rdo_code`
+  - `registered_address`
+  - `psic_code`
+  - `line_of_business`
+  - `vat_status`
+  - `atc_percentage_tax`
+  - `atc_income_tax`
+  - `atc_withholding_tax`
+
+#### Checklists Updated
+
+- `docs/juanstack/juanstack_masterplan.md` — Marked Phase 1.5 tasks (`[P1.5.1]` to `[P1.5.DOC]`) as done `[x]`.
+
 ## [juanStack-P1] JuanStack Phase 1 — Folder Architecture & Skeleton Files
 
 **Branch:** `SaaS-Starter`
