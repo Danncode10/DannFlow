@@ -170,6 +170,16 @@ These 5 decisions affect the entire architecture. Agree on them before writing a
 
 ---
 
+## **PHASE 2.8: Legacy Module Multi-Tenant Upgrade**
+
+> Goal: Preserve DannFlow's rich starter modules (Blog, Services, Gallery, Leads, Bookings) by upgrading them from single-tenant to multi-tenant tables.
+> **Dependency:** Phase 2.6 must be complete.
+
+- `[x]` `[P2.8.1]` Generate `20260912000002_core_modules_multitenant.sql` to recreate legacy modules with `organization_id` and RLS.
+- `[x]` `[P2.8.2]` Run `npm run db:migrate` and regenerate `src/types/supabase.ts` so the Next.js UI compiles correctly.
+
+---
+
 ## **PHASE 3: AI Secretary System**
 
 > Goal: Build the proactive AI Secretary backbone — the type system, the task engine, and the human-facing task queue. No vertical-specific triggers yet.
