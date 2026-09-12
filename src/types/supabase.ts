@@ -41,7 +41,7 @@ export type Database = {
     Tables: {
       blog_posts: {
         Row: {
-          content: string | null;
+          content: string;
           cover_image_url: string | null;
           created_at: string;
           excerpt: string | null;
@@ -56,13 +56,13 @@ export type Database = {
           updated_at: string;
         };
         Insert: {
-          content?: string | null;
+          content: string;
           cover_image_url?: string | null;
           created_at?: string;
           excerpt?: string | null;
           id?: string;
           is_published?: boolean;
-          organization_id: string;
+          organization_id?: string;
           published_at?: string | null;
           seo_description?: string | null;
           seo_title?: string | null;
@@ -71,7 +71,7 @@ export type Database = {
           updated_at?: string;
         };
         Update: {
-          content?: string | null;
+          content?: string;
           cover_image_url?: string | null;
           created_at?: string;
           excerpt?: string | null;
@@ -112,7 +112,7 @@ export type Database = {
           email: string;
           id?: string;
           name: string;
-          organization_id: string;
+          organization_id?: string;
           service_id?: string | null;
           status?: string;
         };
@@ -160,7 +160,7 @@ export type Database = {
           id?: string;
           image_url: string;
           is_published?: boolean;
-          organization_id: string;
+          organization_id?: string;
           service_tag?: string | null;
           title?: string | null;
         };
@@ -197,7 +197,7 @@ export type Database = {
           email: string;
           id?: string;
           name: string;
-          organization_id: string;
+          organization_id?: string;
         };
         Update: {
           created_at?: string;
@@ -352,7 +352,7 @@ export type Database = {
           is_featured?: boolean;
           is_published?: boolean;
           name: string;
-          organization_id: string;
+          organization_id?: string;
           price_from?: number | null;
           price_to?: number | null;
           updated_at?: string;
@@ -429,6 +429,7 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      get_current_org_id: { Args: never; Returns: string };
       is_admin: { Args: never; Returns: boolean };
     };
     Enums: {

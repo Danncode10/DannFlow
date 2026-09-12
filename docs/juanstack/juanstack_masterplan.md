@@ -177,6 +177,7 @@ These 5 decisions affect the entire architecture. Agree on them before writing a
 
 - `[x]` `[P2.8.1]` Generate `20260912000002_core_modules_multitenant.sql` to recreate legacy modules with `organization_id` and RLS.
 - `[x]` `[P2.8.2]` Run `npm run db:migrate` and regenerate `src/types/supabase.ts` so the Next.js UI compiles correctly.
+- `[x]` `[P2.8.3]` Generate `20260912000003_fix_core_modules.sql` to auto-assign `organization_id` via Postgres function so the UI TypeScript checks pass cleanly.
 
 ---
 
