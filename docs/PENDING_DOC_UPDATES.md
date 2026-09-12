@@ -149,3 +149,11 @@
 
 - **Date**: 2026-09-12
 - **Changes**: Cleaned up `business.schema.json` to strip out single-tenant data fields from the platform config, reinforcing the multi-tenant SaaS architecture. Made the `juanstack-init` wizard completely optional in the masterplan.
+
+### Phase 2.6: Core Database Schema (Supabase)
+
+- **Date**: 2026-09-12
+- **Changes**: Created `20260912000000_core_tenant_schema.sql` (organizations table) and `20260912000001_ai_secretary_schema.sql` (secretary_tasks table) in `dannflow` template. Both tables include Row Level Security (RLS) policies for cross-tenant data isolation.
+- **Impact**: Any vertical cloned from `dannflow` can now run `db:migrate` to instantly provision its own database with tenant profiles and the AI task queue.
+
+- Human Verified Phase 2.6

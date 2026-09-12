@@ -151,10 +151,10 @@ These 5 decisions affect the entire architecture. Agree on them before writing a
 > Goal: Establish the foundational Supabase migrations natively inside the `dannflow` template. **CRITICAL:** Verticals DO NOT share a database. The `dannflow` repo simply holds the migration templates. When you clone a new vertical, running `db:migrate` applies this template to that vertical's **completely separate, isolated database**.
 > **Dependency:** Phase 2.5 must be complete.
 
-- `[ ]` `[P2.6.1]` Create migration `supabase/migrations/*_core_tenant_schema.sql`. Define the `organizations` (or `tenant_profiles`) table. This table will hold the tenant-specific SaaS data shifted out of `business.json` (e.g., `rdo_code`, `taxpayer_classification`, `vat_status`, `registered_address`).
-- `[ ]` `[P2.6.2]` Create migration `supabase/migrations/*_ai_secretary_schema.sql`. Define the `secretary_tasks` table (`id, user_id, vertical_id, title, description, priority, triggered_by_state_id, status, created_at, updated_at`).
-- `[ ]` `[P2.6.3]` Apply strict Row Level Security (RLS) policies ensuring cross-tenant isolation (e.g., users can only see their own organization and their own AI tasks).
-- `[ ]` `[P2.6.DOC]` Finalize Phase 2.6 Documentation — log the DB schema layout in `docs/PENDING_DOC_UPDATES.md`.
+- `[x]` `[P2.6.1]` Create migration `supabase/migrations/*_core_tenant_schema.sql`. Define the `organizations` (or `tenant_profiles`) table. This table will hold the tenant-specific SaaS data shifted out of `business.json` (e.g., `rdo_code`, `taxpayer_classification`, `vat_status`, `registered_address`).
+- `[x]` `[P2.6.2]` Create migration `supabase/migrations/*_ai_secretary_schema.sql`. Define the `secretary_tasks` table (`id, user_id, vertical_id, title, description, priority, triggered_by_state_id, status, created_at, updated_at`).
+- `[x]` `[P2.6.3]` Apply strict Row Level Security (RLS) policies ensuring cross-tenant isolation (e.g., users can only see their own organization and their own AI tasks).
+- `[x]` `[P2.6.DOC]` Finalize Phase 2.6 Documentation — log the DB schema layout in `docs/PENDING_DOC_UPDATES.md`.
 
 ---
 
