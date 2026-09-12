@@ -113,25 +113,25 @@ These 5 decisions affect the entire architecture. Agree on them before writing a
 > Goal: Build the shared Philippine tax computation engine in `src/bir/core/`. This is the logic that ALL verticals depend on. No vertical-specific code.
 > **Dependency:** `[P1A]` must be complete.
 
-- `[P2.1]` Implement `src/bir/core/form-types.ts` — define TypeScript interfaces for:
+- `[x]` `[P2.1]` Implement `src/bir/core/form-types.ts` — define TypeScript interfaces for:
   - `BIRTaxpayerClassification` (Micro | Small | Medium | Large)
   - `BIRForm2307Data`
   - `BIRForm1701QData`
   - `BIRForm2551QData`
   - `EOPTFilingPeriod`
-- `[P2.2]` Implement `src/bir/core/eopt-engine.ts` — pure function `classifyTaxpayer(annualGrossSales: number): BIRTaxpayerClassification` based on RA 11976 thresholds (Micro < ₱3M, Small ₱3M–₱20M, etc.).
-- `[P2.3]` Implement `src/bir/core/tax-calculator.ts`:
+- `[x]` `[P2.2]` Implement `src/bir/core/eopt-engine.ts` — pure function `classifyTaxpayer(annualGrossSales: number): BIRTaxpayerClassification` based on RA 11976 thresholds (Micro < ₱3M, Small ₱3M–₱20M, etc.).
+- `[x]` `[P2.3]` Implement `src/bir/core/tax-calculator.ts`:
   - `computeGrossPercentageTax(grossReceipts: number): number` — 3% standard rate
   - `computeEightPercentTax(grossReceipts: number): number` — 8% optional rate
   - `computeGraduatedTax(taxableIncome: number): number` — bracketed rate table
   - `determineOptimalTaxScheme(grossReceipts: number, expenses: number): '8_percent' | 'graduated'` — recommends the lower-tax option
-- `[P2.4]` Implement `src/bir/core/withholding-tax.ts`:
+- `[x]` `[P2.4]` Implement `src/bir/core/withholding-tax.ts`:
   - `computeWithholdingTax(amount: number, classification: BIRTaxpayerClassification): number`
   - Include the 10% professional services rate and 5%/10% graduated creditable withholding table.
-- `[P2.5]` Write unit tests for all `src/bir/core/` functions (Jest). Test edge cases: ₱0 income, exactly at ₱3M threshold, maximum gross sales for Micro classification.
-- `[P2.6]` Update `src/bir/core/index.ts` to re-export all implemented modules.
+- `[x]` `[P2.5]` Write unit tests for all `src/bir/core/` functions (Jest). Test edge cases: ₱0 income, exactly at ₱3M threshold, maximum gross sales for Micro classification.
+- `[x]` `[P2.6]` Update `src/bir/core/index.ts` to re-export all implemented modules.
 
-- `[P2.DOC]` Finalize Phase 2 Documentation — add BIR Core Engine API reference to `docs/juanstack/bir-core-api.md`.
+- `[x]` `[P2.DOC]` Finalize Phase 2 Documentation — add BIR Core Engine API reference to `docs/juanstack/bir-core-api.md`.
 
 ---
 

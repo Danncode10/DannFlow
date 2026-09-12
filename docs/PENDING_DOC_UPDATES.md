@@ -146,3 +146,9 @@
 
 - `docs/juanstack/juanstack_masterplan.md` — Marked all Phase 1 tasks (`[P1A.1]` to `[P1.DOC]`) as done `[x]`.
 - `docs/juanstack/DANNFLOW_REVISION_PLAN.md` — Marked Phase 1 checklist at the bottom as `[x]`.
+
+### Phase 2: BIR Core Engine Complete
+
+- **Date**: 2026-09-12
+- **Changes**: Implemented standard Philippine tax computations in `src/bir/core/` (EOPT Engine, Tax Calculator with Graduated/8% rules, Withholding tax logic). Added `bir-core-api.md` as API reference.
+- **Impact**: All verticals will now import compute functions from this central core.
