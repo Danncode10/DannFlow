@@ -354,11 +354,11 @@ src/analytics/
 
 ### Phase 1 — Foundation (Do This First)
 
-- [ ] Create `src/bir/` folder structure with `core/` and vertical placeholders
-- [ ] Create `src/analytics/` folder structure with `core/` and vertical placeholders
-- [ ] Create `src/ai/` folder structure with `core.ai-manifest.json` template
-- [ ] Create `business.json` default template at `dannflow` root
-- [ ] Update `dannflow.json` version anchor
+- [x] Create `src/bir/` folder structure with `core/` and vertical placeholders
+- [x] Create `src/analytics/` folder structure with `core/` and vertical placeholders
+- [x] Create `src/ai/` folder structure with `core.ai-manifest.json` template
+- [x] Create `business.json` default template at `dannflow` root
+- [x] Update `dannflow.json` version anchor
 
 ### Phase 2 — BIR Core Engine
 

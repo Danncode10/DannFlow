@@ -52,38 +52,38 @@ These 5 decisions affect the entire architecture. Agree on them before writing a
 
 ### 1A — BIR Module Library
 
-- `[P1A.1]` Create `src/bir/` directory with the following structure:
+- `[x]` `[P1A.1]` Create `src/bir/` directory with the following structure:
   - `src/bir/core/` — add `.gitkeep`
   - `src/bir/legal/` — add `.gitkeep` + `OWNERSHIP.md` (states: "Owned by: attyjuan. Do not modify from any other vertical.")
   - `src/bir/veterinary/` — add `.gitkeep` + `OWNERSHIP.md`
   - `src/bir/restaurant/` — add `.gitkeep` + `OWNERSHIP.md`
-- `[P1A.2]` Create `src/bir/core/form-types.ts` — empty TypeScript file with module doc comment describing its purpose.
-- `[P1A.3]` Create `src/bir/core/index.ts` — barrel file, re-exports all core modules (empty for now).
+- `[x]` `[P1A.2]` Create `src/bir/core/form-types.ts` — empty TypeScript file with module doc comment describing its purpose.
+- `[x]` `[P1A.3]` Create `src/bir/core/index.ts` — barrel file, re-exports all core modules (empty for now).
 
 ### 1B — Analytics Module Library
 
-- `[P1B.1]` Create `src/analytics/` directory with:
+- `[x]` `[P1B.1]` Create `src/analytics/` directory with:
   - `src/analytics/core/` — add `.gitkeep`
   - `src/analytics/legal/` — add `.gitkeep` + `OWNERSHIP.md`
   - `src/analytics/veterinary/` — add `.gitkeep` + `OWNERSHIP.md`
   - `src/analytics/restaurant/` — add `.gitkeep` + `OWNERSHIP.md`
-- `[P1B.2]` Create `src/analytics/core/analytics-types.ts` — empty TypeScript file for shared `KPIData` interfaces.
-- `[P1B.3]` Create `src/analytics/core/index.ts` — barrel file.
+- `[x]` `[P1B.2]` Create `src/analytics/core/analytics-types.ts` — empty TypeScript file for shared `KPIData` interfaces.
+- `[x]` `[P1B.3]` Create `src/analytics/core/index.ts` — barrel file.
 
 ### 1C — AI Secretary System
 
-- `[P1C.1]` Create `src/ai/` directory with:
+- `[x]` `[P1C.1]` Create `src/ai/` directory with:
   - `src/ai/secretary/` — add `.gitkeep`
   - `src/ai/personas/` — add `.gitkeep`
-- `[P1C.2]` Create `src/ai/core.ai-manifest.json` — populate with the 3 universal observable states from `DANNFLOW_REVISION_PLAN.md` Revision 2 Tier 1.
-- `[P1C.3]` Create `src/ai/secretary/types.ts` — empty TypeScript file for `SecretaryTask` and `ObservableState` interfaces.
+- `[x]` `[P1C.2]` Create `src/ai/core.ai-manifest.json` — populate with the 3 universal observable states from `DANNFLOW_REVISION_PLAN.md` Revision 2 Tier 1.
+- `[x]` `[P1C.3]` Create `src/ai/secretary/types.ts` — empty TypeScript file for `SecretaryTask` and `ObservableState` interfaces.
 
 ### 1D — Root Config Files
 
-- `[P1D.1]` Create `business.json` at the `dannflow` repo root — populate with the default/blank template (all features set to `false`, `vertical_id: "dannflow-default"`).
-- `[P1D.2]` Create `businesses.registry.json` at repo root (or portal repo per `[D5]`) — populate with empty `verticals: []` array and `registry_version: "1.0.0"`.
+- `[x]` `[P1D.1]` Create `business.json` at the `dannflow` repo root — populate with the default/blank template (all features set to `false`, `vertical_id: "dannflow-default"`).
+- `[x]` `[P1D.2]` Create `businesses.registry.json` at repo root (or portal repo per `[D5]`) — populate with empty `verticals: []` array and `registry_version: "1.0.0"`.
 
-- `[P1.DOC]` Finalize Phase 1 Documentation — update `docs/juanstack/DANNFLOW_REVISION_PLAN.md` checklist to mark Phase 1 items done.
+- `[x]` `[P1.DOC]` Finalize Phase 1 Documentation — update `docs/juanstack/DANNFLOW_REVISION_PLAN.md` checklist to mark Phase 1 items done.
 
 ---
 
