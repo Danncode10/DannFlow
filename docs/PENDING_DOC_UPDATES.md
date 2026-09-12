@@ -26,6 +26,8 @@
   - Pre-task and pre-sync checklists
   - Domain Terminology Rule (`useTerm()` / `getTerm()` enforcement)
   - Build-time loading declaration for `business.json`
+- `CLAUDE.md` — Appended the exact same **JuanStack Vertical Namespace Rules** section to keep Claude's specific rulebook perfectly in sync with the general `AGENTS.md`.
+- `docs/juanstack/juanstack_masterplan.md` — Injected **Phase 1.5: BIR Compliance Research & Schema Expansion** before Phase 2. This ensures we research exact EOPT/ATC/RDO requirements before building the core engine.
 - `.agents/skills/source-command-sync-to-upstream/SKILL.md` — Inserted **Step 1.5: JuanStack Owned-Path Validation (HARD BLOCK)**. The sync script now reads `business.json → owned_paths` and stops the PR if any staged file falls outside declared owned paths.
 - `dannflow.json` — Bumped `dannflow_version` to `2.0.0-juanstack-alpha`. Added `revision_notes` field describing the JuanStack revision scope.
 - `docs/README.md` — Added **Section 7: JuanStack Vertical Engine Revision** linking to all planning docs and schemas.
@@ -56,3 +58,5 @@
 - `docs/juanstack/analytics-core-api.md` is written
 
 ---
+
+- Verified Phase 0 tasks complete
