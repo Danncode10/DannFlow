@@ -124,10 +124,9 @@ A config file at the root of every vertical repo that `dannflow` reads at boot t
 
   "bir_rules": {
     "module_path": "src/bir/legal/",
-    "taxpayer_classification": "Micro",
     "withholding_tax_percentage": 10.0,
-    "eligible_for_8_percent_gross": true,
-    "applicable_laws": ["RA 11976 (Ease of Paying Taxes Act)"]
+    "applicable_laws": ["RA 11976 (Ease of Paying Taxes Act)"],
+    "industry_default_atcs": ["WI151", "PT010"]
   },
 
   "ai_rules": {

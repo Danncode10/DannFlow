@@ -157,3 +157,9 @@
 - **Impact**: Any vertical cloned from `dannflow` can now run `db:migrate` to instantly provision its own database with tenant profiles and the AI task queue.
 
 - Human Verified Phase 2.6
+
+### Phase 2.7: Pre-Phase 3 Architecture Cleanup
+
+- **Date**: 2026-09-12
+- **Changes**: Swept the entire masterplan and revision docs for architectural conflicts following the multi-tenant database shift. Corrected Phase 3 to rely on Supabase generated types instead of manual typing. Updated Phase 4 to enforce DB migrations for scheduling records. Updated Phase 10 to mandate that initialization tools push tenant data into the Supabase database instead of `business.json`. Scrubbed `DANNFLOW_REVISION_PLAN.md` to remove old single-tenant BIR rules.
+- **Impact**: AI coding assistants (Codex/Claude) reading the masterplan will no longer hallucinate or contradict the rules established in Phase 2.5 and Phase 2.6.

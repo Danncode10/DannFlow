@@ -158,6 +158,18 @@ These 5 decisions affect the entire architecture. Agree on them before writing a
 
 ---
 
+## **PHASE 2.7: Pre-Phase 3 Architecture Cleanup**
+
+> Goal: Perform a sweeping documentation audit to eliminate architectural contradictions before starting Phase 3.
+> **Dependency:** Phase 2.6 must be complete.
+
+- `[x]` `[P2.7.1]` Update Masterplan Phase 3 to rely strictly on Supabase generated types for the AI Secretary instead of duplicating the `SecretaryTask` interface manually.
+- `[x]` `[P2.7.2]` Update Masterplan Phase 4 to enforce database migrations for scheduling entities.
+- `[x]` `[P2.7.3]` Update Masterplan Phase 10 to ensure the initialization wizard correctly pushes tenant rules (RDO code, etc.) to Supabase instead of `business.json`.
+- `[x]` `[P2.7.4]` Clean `DANNFLOW_REVISION_PLAN.md` to remove outdated single-tenant BIR config fields from the JSON example.
+
+---
+
 ## **PHASE 3: AI Secretary System**
 
 > Goal: Build the proactive AI Secretary backbone — the type system, the task engine, and the human-facing task queue. No vertical-specific triggers yet.
@@ -166,18 +178,18 @@ These 5 decisions affect the entire architecture. Agree on them before writing a
 - `[P3.1]` Implement `src/ai/secretary/types.ts`:
   - `ObservableState`
   - `SchedulingIntent` (e.g. client_requested_meeting) interface (matches `core.ai-manifest.json` schema)
-  - `SecretaryTask` interface: `{ id, title, description, priority, triggered_by, created_at, status: 'pending' | 'dismissed' | 'done' }`
   - `AIManifest` interface (validates the JSON manifest shape)
+  - _Note: `SecretaryTask` must be imported directly from `src/types/supabase.ts` (`Tables<'secretary_tasks'>`). Do not redefine it here._
 - `[P3.2]` Implement `src/ai/secretary/task-engine.ts`:
   - `loadManifest(manifestPath: string): AIManifest` — reads and validates the JSON manifest
   - `mergeManifests(core: AIManifest, vertical: AIManifest): AIManifest` — merges `extends` chain
   - `evaluateState(state: ObservableState, dbRow: Record<string, unknown>): boolean` — checks if a trigger condition is met
-  - `createTask(state: ObservableState, context: Record<string, unknown>): SecretaryTask` — generates the task object
+  - `createTask(state: ObservableState, organizationId: string, context: Record<string, unknown>)` — generates the task object for the specific tenant
   - **Note:** The actual scheduler/cron wiring depends on `[D3]`. Implement as a pure function module for now; wiring happens in `[P3.4]`.
-- `[P3.3]` Implement `src/ai/secretary/task-queue.ts`:
-  - `getOpenTasks(userId: string): Promise<SecretaryTask[]>` — fetches pending tasks from Supabase
-  - `dismissTask(taskId: string): Promise<void>`
-  - `completeTask(taskId: string): Promise<void>`
+- `[P3.3]` Implement `src/ai/secretary/task-queue.ts` (using Supabase Client):
+  - `getOpenTasks(supabase: SupabaseClient): Promise<Tables<'secretary_tasks'>[]>` — fetches pending tasks, relying on RLS for tenant isolation
+  - `dismissTask(supabase: SupabaseClient, taskId: string): Promise<void>`
+  - `completeTask(supabase: SupabaseClient, taskId: string): Promise<void>`
 - `[P3.4]` Wire the Task Engine to a scheduler _(implementation depends on `[D3]`)_:
   - **If Edge Function cron:** Create `supabase/functions/ai-secretary/index.ts` — runs on a schedule, calls `task-engine.ts`.
   - **If Next.js route handler:** Create `src/app/api/ai-secretary/cron/route.ts` — protected endpoint called by Vercel Cron.
@@ -194,6 +206,7 @@ These 5 decisions affect the entire architecture. Agree on them before writing a
 
 - `[P4.1]` Define `src/scheduling/core/scheduling-types.ts`:
   - `MeetingRequest`, `CalendarEvent`, `AvailabilitySlot`
+  - _Note: If any of these represent database entities, you must create a Supabase migration (`npm run db:migrate`) and import their types from `src/types/supabase.ts`._
 - `[P4.2]` Implement `src/scheduling/core/booking-engine.ts` — handles clash detection and booking constraints based on `business.json` rules.
 - `[P4.3]` Implement `src/scheduling/core/gcal-sync.ts` — optional Google Calendar synchronization (stubbed API).
 - `[P4.DOC]` Finalize Phase 4 Documentation.
@@ -299,7 +312,7 @@ These 5 decisions affect the entire architecture. Agree on them before writing a
 > Goal: Ensure all `.claude/commands/` (especially initialization commands) are fully aware of JuanStack rules, the BIR core engine, and the `business.schema.json`.
 > **Dependency:** All previous core phases should be complete so the architecture is stable.
 
-- `[ ]` `[P10.1]` Review `.claude/commands/masterplan-init.md` and update it to prompt the user for BIR/JuanStack specific fields (e.g., RDO code, line of business, tax classification) when starting a new vertical.
+- `[ ]` `[P10.1]` Review `.claude/commands/masterplan-init.md` and update it to prompt the user for BIR/JuanStack specific fields (e.g., RDO code, line of business, tax classification) when starting a new vertical. **Crucially, the command must insert these fields into the live Supabase `organizations` table using a seed script, because they are no longer allowed in `business.json`.**
 - `[ ]` `[P10.2]` Review and update `.claude/commands/new-project.md` to ensure it generates a valid `business.json` that complies with the schema.
 - `[ ]` `[P10.3]` Audit other AI agent commands in `.claude/commands/` to ensure they respect the vertical namespace rules (`OWNERSHIP.md`) and do not modify `core/` folders when operating in a vertical.
 - `[ ]` `[P10.4]` **Optional**: Create a dedicated `juanstack-init` command/agent. This is an _optional user tooling wizard_, not a mandatory system component. It acts as an interactive wizard, interviewing the user about the new vertical (domain names, features needed) and automatically scaffolding the namespace folders, `business.json`, and initial database schema.
