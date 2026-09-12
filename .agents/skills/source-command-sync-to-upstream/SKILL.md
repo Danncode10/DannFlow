@@ -14,6 +14,7 @@ Use this skill when the user asks to run the migrated source command `sync-to-up
 Push improvements from your project back to the DannFlow upstream repo. This is the **reverse** of `/sync-upstream`.
 
 Use this when:
+
 - You improved a `.claude/commands/` or `.codex/commands/` file that would benefit every DannFlow project
 - You wrote a new doc, script, or skill that belongs in the template
 - You found and fixed a bug that exists in the upstream source
@@ -29,13 +30,14 @@ Strict output rule: `/sync-to-upstream` may return a GitHub PR URL only after th
 - `/sync-to-upstream` → interactive mode — scans default paths, classifies, asks which to include
 - `/sync-to-upstream --dry-run` → show the classification report, make no git changes
 - `/sync-to-upstream <path>` → scope the scan to one file or directory
-Database handling is automatic: selected `db/schema/`, `db/migrations/`, `src/types/supabase.ts`, or database SQL/RLS/function/trigger/Storage-policy changes require template-schema verification against a dedicated DannFlow template database. It must never migrate the source project's database while preparing an upstream contribution.
+  Database handling is automatic: selected `db/schema/`, `db/migrations/`, `src/types/supabase.ts`, or database SQL/RLS/function/trigger/Storage-policy changes require template-schema verification against a dedicated DannFlow template database. It must never migrate the source project's database while preparing an upstream contribution.
 
 ---
 
 ## Step 1 — Preflight checks
 
 1. **Read `dannflow.json`** to get the base commit:
+
    ```bash
    cat dannflow.json
    ```
@@ -48,12 +50,15 @@ Database handling is automatic: selected `db/schema/`, `db/migrations/`, `src/ty
    - Show: `Base DannFlow commit: <dannflow_commit> (synced <synced_at>)`
 
 2. Verify working tree is clean:
+
    ```bash
    git status --porcelain
    ```
+
    If dirty, stop: tell the user to commit or stash first. Do not proceed over uncommitted work.
 
 3. Verify `upstream` remote exists and matches `dannflow.json`'s `repo` field:
+
    ```bash
    git remote get-url upstream
    ```
@@ -64,6 +69,60 @@ Database handling is automatic: selected `db/schema/`, `db/migrations/`, `src/ty
    ```bash
    git fetch upstream --quiet
    ```
+
+---
+
+## Step 1.5 — JuanStack Owned-Path Validation (HARD BLOCK)
+
+> **This step is mandatory for all JuanStack vertical repos.** Skip only if `business.json` does not exist at the repo root (non-JuanStack project).
+
+1. **Check if `business.json` exists:**
+
+   ```bash
+   test -f business.json && echo "JuanStack vertical detected" || echo "Not a JuanStack vertical — skipping owned-path check"
+   ```
+
+2. **If `business.json` exists, read `owned_paths`:**
+
+   ```bash
+   cat business.json | python3 -c "import json,sys; d=json.load(sys.stdin); print('\n'.join(d.get('owned_paths', [])))"
+   ```
+
+3. **Get the list of all changed files** since the last `dannflow_commit`:
+
+   ```bash
+   git diff --name-only <dannflow_commit> HEAD
+   ```
+
+4. **Cross-reference:** For every changed file, check if it falls under an `owned_paths` entry.
+   - A file is **in-scope** if its path starts with any entry in `owned_paths`.
+   - A file is **out-of-scope** if it does NOT start with any `owned_paths` entry AND it is in the Step 2 scan list (i.e., it's a generic template file that belongs to dannflow's namespace, not a vertical namespace).
+
+5. **If ANY out-of-scope file is found → HARD STOP:**
+
+   ```
+   🚫 OWNED-PATH VIOLATION DETECTED
+
+   The following staged files are outside your declared owned_paths in business.json:
+
+     ❌ src/bir/veterinary/form-2307.ts   (owned by: vetstack — not attyjuan)
+     ❌ src/bir/core/eopt-engine.ts        (owned by: dannflow core — edit directly in dannflow)
+
+   Your declared owned_paths:
+     ✅ src/bir/legal/
+     ✅ src/analytics/legal/
+     ✅ src/ai/personas/legal.ai-manifest.json
+
+   ACTION REQUIRED:
+   - Remove the out-of-scope changes from your branch, OR
+   - Open a separate PR directly to the dannflow repo for core changes.
+
+   This is a hard block. The sync-to-upstream PR has NOT been created.
+   ```
+
+   Do not proceed. Do not create a PR. End the command.
+
+6. **If all changed files are in-scope → continue to Step 2.**
 
 ---
 
@@ -89,7 +148,7 @@ db/migrations/
 src/types/supabase.ts
 ```
 
-> Keep this list in sync with `/sync-upstream`'s default scan paths — the two commands should cover the same file set in both directions. **Exception:** `.github/workflows/ci.yml` is intentionally excluded here. Your project's `ci.yml` is tuned to *your* package manager and scripts; pushing it up would pollute the generic template. Contribute CI *improvements* by hand, not the tuned file.
+> Keep this list in sync with `/sync-upstream`'s default scan paths — the two commands should cover the same file set in both directions. **Exception:** `.github/workflows/ci.yml` is intentionally excluded here. Your project's `ci.yml` is tuned to _your_ package manager and scripts; pushing it up would pollute the generic template. Contribute CI _improvements_ by hand, not the tuned file.
 
 **Exclude from scanning (always business-specific — never upstream candidates):**
 
@@ -114,9 +173,11 @@ tsconfig.json
 `db/schema/`, `db/migrations/`, and `src/types/supabase.ts` are eligible only when their selected diff is generic; automatically require template-schema verification when any of these artifacts are selected.
 
 Build the candidate list using the `dannflow_commit` SHA from `dannflow.json` as the base — this is more precise than `upstream/main` because it reflects exactly what you last synced from, not the current tip:
+
 ```bash
 git diff --name-status <dannflow_commit> HEAD -- <each-scanned-path>
 ```
+
 If a file changed both in upstream (since `dannflow_commit`) and locally, flag it as 🟡 REVIEW NEEDED — it may conflict.
 
 ---
@@ -136,6 +197,7 @@ For each file in the candidate list, classify it. Apply these rules **in order**
 Scan the file content for signals that it's project-specific:
 
 **Business-specific signals (classify as 🔒 KEEP LOCAL):**
+
 - Hardcoded domain names, brand names, or client names
 - References to `siteConfig`, `organization_id`, tenant names
 - MASTERPLAN.md task references or project-specific phase names
@@ -144,6 +206,7 @@ Scan the file content for signals that it's project-specific:
 - API keys, tokens, or secrets of any kind
 
 **Generic signals (classify as 🟢 UPSTREAM CANDIDATE):**
+
 - Command is about git workflow, schema, auth, RLS, types
 - Command describes a general development pattern (not project-specific)
 - Docs describe DannFlow methodology (not your client's requirements)
@@ -152,6 +215,7 @@ Scan the file content for signals that it's project-specific:
 - Schema is a domain-neutral primitive with no project-specific tables, columns, terminology, or identifiers
 
 **Ambiguous (classify as 🟡 REVIEW NEEDED):**
+
 - Mix of generic and specific content
 - Not sure — let the user decide
 
@@ -179,6 +243,7 @@ Totals: 2 upstream candidates · 1 needs review · 2 keep local
 ```
 
 Then ask:
+
 ```
 Which would you like to contribute to upstream?
 - Enter numbers: 1,2 or 1-3
@@ -239,11 +304,13 @@ For each file the user selects:
    - **Skip** — leave it for now
 
 Create a patch directory:
+
 ```bash
 mkdir -p /tmp/dannflow-upstream-patch
 ```
 
 For each selected file:
+
 ```bash
 # Get upstream's version of the file (or empty if new)
 git show upstream/main:<path> > /tmp/dannflow-upstream-patch/<filename>.upstream 2>/dev/null || true
@@ -273,6 +340,7 @@ Patch files saved to: /tmp/dannflow-upstream-patch/
 Proceed directly with the PR flow unless a required tool or permission is missing:
 
 1. Run the clone + branch creation:
+
    ```bash
    git clone https://github.com/Danncode10/DannFlow.git /tmp/dannflow-contrib
    cd /tmp/dannflow-contrib
@@ -290,6 +358,7 @@ When selected files include `db/schema/`, `db/migrations/`, or `src/types/supaba
 In the clean clone only, write those values to untracked `.env.local` as `SUPABASE_PROJECT_ID` and `DATABASE_URL`. Review every migration, run `npm run db:migrate`, `npm exec drizzle-kit check`, `npx tsc --noEmit`, and `npm run build`, then use Supabase MCP to verify changed tables, functions, triggers, RLS/policies, and relevant Storage policies. Regenerate `src/types/supabase.ts` from that verification database and include it only when its diff is part of the reviewed generic change. Record every result for the PR comment. Never copy source-project credentials or types.
 
 4. Create a commit with provenance trailers (see the canonical spec in `/adopt-dannflow`). Record where the contribution came FROM — the origin repo and commit — so DannFlow history shows which project each improvement originated in:
+
    ```
    feat: <contribution description>
 
@@ -298,29 +367,35 @@ In the clean clone only, write those values to untracked `.env.local` as `SUPABA
 
    Co-Authored-By: Codex Opus 4.8 <noreply@anthropic.com>
    ```
-   Get the origin slug + sha from the *project* repo before cloning: `git remote get-url origin` and `git rev-parse --short HEAD`.
+
+   Get the origin slug + sha from the _project_ repo before cloning: `git remote get-url origin` and `git rev-parse --short HEAD`.
+
    ```bash
    git add <specific files only>
    git commit -F <message-file>
    ```
 
 5. Tell the user the clean docs refresh is included when applicable:
+
    ```text
    I've already updated /help-dannflow for the command changes and included that clean docs refresh in this upstream PR branch.
    ```
 
 6. Ask before pushing:
+
    ```
    Ready to push branch '<branch-name>' to origin (Danncode10/DannFlow)?
    This will create a branch on the remote. (y/n)
    ```
 
 7. If confirmed: `git push origin <branch-name>`. Before creating the PR, verify the remote branch is the exact local contribution commit:
+
    ```bash
    LOCAL_SHA=$(git rev-parse HEAD)
    REMOTE_SHA=$(git ls-remote origin "refs/heads/<branch-name>" | awk '{print $1}')
    test "$LOCAL_SHA" = "$REMOTE_SHA"
    ```
+
    If the SHAs differ, stop.
 
 8. Open the PR directly via the GitHub MCP (`create_pull_request`) or `gh pr create --repo Danncode10/DannFlow --base main --head <branch-name>` — DannFlow has no `dev` branch, so contributions PR straight into `main`, where its CI gate keeps the template clean. If neither is available, stop with a blocker; never present a compare URL as success.
@@ -340,7 +415,7 @@ In the clean clone only, write those values to untracked `.env.local` as `SUPABA
 - **Never** include files from the "never auto-touch" list unless the user typed the path explicitly.
 - **Never** include files with API keys, secrets, or env vars. Scan each selected file for common patterns (`sk-`, `eyJ`, `SUPABASE_`, `NEXT_PUBLIC_`) before including.
 - **Always** show the final file list and diffs before committing in the clean clone.
-- If a 🔒 KEEP LOCAL file is explicitly selected by the user, warn once: *"This file has business-specific content. Confirm you want to contribute it to the public DannFlow repo?"* Then proceed only if confirmed.
+- If a 🔒 KEEP LOCAL file is explicitly selected by the user, warn once: _"This file has business-specific content. Confirm you want to contribute it to the public DannFlow repo?"_ Then proceed only if confirmed.
 
 ---
 

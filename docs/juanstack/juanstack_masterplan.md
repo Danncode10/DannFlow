@@ -1,6 +1,6 @@
 # JUANSTACK MASTERPLAN — `dannflow` Vertical Engine Revision
 
-> **Branch:** `juanStack-rules`
+> **Branch:** `SaaS-Starter` (planning docs; vertical implementation branches off this)
 > **Reference:** See [`DANNFLOW_REVISION_PLAN.md`](./DANNFLOW_REVISION_PLAN.md) for the full architectural specification behind each task.
 > **How to use:** Work through each phase in order. Tasks marked `[BLOCKED]` cannot start until the listed dependency is resolved. After each coding session, run `/update-masterplan` to sync this file with any changes.
 
@@ -22,13 +22,13 @@
 
 These 5 decisions affect the entire architecture. Agree on them before writing any code.
 
-| ID     | Decision                                    | Options                                                                           | Status |
-| ------ | ------------------------------------------- | --------------------------------------------------------------------------------- | ------ |
-| `[D1]` | How does `business.json` load?              | A) Build-time (env var / `next.config`) · B) Runtime (API fetch per session)      | `[?]`  |
-| `[D2]` | Vertical multi-tenancy model?               | A) Separate Supabase projects per vertical · B) Separate schemas in one project   | `[?]`  |
-| `[D3]` | Where does the AI Secretary run?            | A) Supabase Edge Function (cron) · B) Next.js route handler · C) Separate service | `[?]`  |
-| `[D4]` | `sync-to-upstream` scope enforcement?       | A) Hard block — stops the push · B) Warning only — developer decides              | `[?]`  |
-| `[D5]` | Where does `businesses.registry.json` live? | A) In `dannflow` root · B) In a separate `juanstack-portal` repo                  | `[?]`  |
+| ID     | Decision                                    | Resolution                                                                                                | Status |
+| ------ | ------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ------ |
+| `[D1]` | How does `business.json` load?              | ✅ **Build-time** — read from filesystem during `next build`. Each vertical is its own deployment.        | `[x]`  |
+| `[D2]` | Vertical multi-tenancy model?               | ✅ **Separate Supabase projects** per vertical — true isolation, separate billing, separate API keys.     | `[x]`  |
+| `[D3]` | Where does the AI Secretary run?            | ✅ **Supabase Edge Function with pg_cron** — runs close to the data, no extra infra, native to the stack. | `[x]`  |
+| `[D4]` | `sync-to-upstream` scope enforcement?       | ✅ **Hard block** — script stops the push entirely if any staged file is outside `owned_paths`.           | `[x]`  |
+| `[D5]` | Where does `businesses.registry.json` live? | ✅ **Separate `juanstack-portal` repo** — registry is a portal concern; keeps `dannflow` generic.         | `[x]`  |
 
 ---
 
@@ -36,13 +36,13 @@ These 5 decisions affect the entire architecture. Agree on them before writing a
 
 > Goal: Lock all architectural decisions, document conventions, and update governance files before any folder or file is created. No code shipped in this phase.
 
-- `[P0.1]` Resolve all 5 Open Decisions `[D1]`–`[D5]` above and record answers in this file.
-- `[P0.2]` Write the **Vertical Namespace Contract** rules into `dannflow/AGENTS.md` (exact text in `DANNFLOW_REVISION_PLAN.md` → Revision 5).
-- `[P0.3]` Define the final `business.json` schema — finalize all keys, their types, and defaults. Save schema as `docs/juanstack/schemas/business.schema.json`.
-- `[P0.4]` Define the final `core.ai-manifest.json` schema — finalize `observable_states` structure. Save as `docs/juanstack/schemas/ai-manifest.schema.json`.
-- `[P0.5]` Write the **Sync-to-Upstream Ownership Rule** into the `sync-to-upstream` skill (`/.agents/skills/source-command-sync-to-upstream/SKILL.md`): the script must read `business.json → owned_paths` and validate staged files before creating a PR.
-- `[P0.6]` Update `dannflow.json` version anchor to `2.0.0-juanstack-alpha` to signal this is a major revision.
-- `[P0.DOC]` Finalize Phase 0 Documentation — update `docs/README.md` to reference the juanstack folder.
+- `[x]` **[P0.1]** Resolve all 5 Open Decisions `[D1]`–`[D5]` above and record answers in this file. ✅ All locked — see table above.
+- `[x]` **[P0.2]** Write the **Vertical Namespace Contract** rules into `dannflow/AGENTS.md`. ✅
+- `[x]` **[P0.3]** Define the final `business.json` schema. Saved as `docs/juanstack/schemas/business.schema.json`. ✅
+- `[x]` **[P0.4]** Define the final `core.ai-manifest.json` schema. Saved as `docs/juanstack/schemas/ai-manifest.schema.json`. ✅
+- `[x]` **[P0.5]** Write the **Sync-to-Upstream Ownership Rule** into the `sync-to-upstream` skill. ✅
+- `[x]` **[P0.6]** Update `dannflow.json` version anchor to `2.0.0-juanstack-alpha`. ✅
+- `[x]` **[P0.DOC]** Finalize Phase 0 Documentation — updated `docs/README.md` to reference the juanstack folder. ✅
 
 ---
 

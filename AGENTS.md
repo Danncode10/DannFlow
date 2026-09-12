@@ -167,4 +167,77 @@ When running a Claude command from Codex:
 4. Follow the loaded command unless it conflicts with AGENTS.md, active user instructions, or Codex environment safety rules.
 5. If the command requires unavailable MCP tooling, use the Missing Tool Alert Protocol unless the user explicitly says to proceed without discussing MCPs.
 
+## JuanStack Vertical Namespace Rules
+
+> These rules apply to ALL AI coding assistants (Claude, Codex, Gemini) working on any `dannflow`-based JuanStack vertical project. They exist to prevent cross-vertical code contamination and AI hallucination about file ownership.
+
+### Architecture Decisions (Locked — Do Not Override)
+
+| Decision                       | Resolution                                                     |
+| ------------------------------ | -------------------------------------------------------------- |
+| `business.json` load strategy  | **Build-time** — read from filesystem during `next build`      |
+| Multi-tenancy model            | **Separate Supabase projects** per vertical                    |
+| AI Secretary runtime           | **Supabase Edge Function with pg_cron**                        |
+| `sync-to-upstream` enforcement | **Hard block** — stops push if files are outside `owned_paths` |
+| Registry location              | **Separate `juanstack-portal` repo** — not in `dannflow`       |
+
+### The Golden Rule: Respect the Namespace
+
+When editing code **in a vertical repo** (e.g., `attyjuan`, `vetstack`, `restostack`), you may ONLY modify:
+
+1. Files within `src/bir/{this_vertical_id}/`
+2. Files within `src/analytics/{this_vertical_id}/`
+3. The file `src/ai/personas/{this_vertical_id}.ai-manifest.json`
+4. All non-namespaced project files (pages, components, services, etc.)
+
+You MUST NEVER modify:
+
+- `src/bir/core/` — requires a direct `dannflow` PR
+- `src/analytics/core/` — requires a direct `dannflow` PR
+- `src/ai/core.ai-manifest.json` — requires a direct `dannflow` PR
+- Any other vertical's namespace folder (e.g., do NOT touch `src/bir/veterinary/` when working in `attyjuan`)
+
+When editing code **directly in `dannflow`** (Template Mode), you may ONLY modify `core/` folders and generic template files. Never add vertical-specific logic directly here.
+
+### Namespace Convention Table
+
+| Module           | Path Pattern                                     | Owner                |
+| ---------------- | ------------------------------------------------ | -------------------- |
+| BIR Tax Logic    | `src/bir/{vertical_id}/`                         | That vertical's repo |
+| Analytics        | `src/analytics/{vertical_id}/`                   | That vertical's repo |
+| AI Persona       | `src/ai/personas/{vertical_id}.ai-manifest.json` | That vertical's repo |
+| BIR Core Engine  | `src/bir/core/`                                  | `dannflow` only      |
+| Analytics Core   | `src/analytics/core/`                            | `dannflow` only      |
+| AI Core Manifest | `src/ai/core.ai-manifest.json`                   | `dannflow` only      |
+
+### Before Starting Any BIR, Analytics, or AI Task
+
+1. **Read `business.json`** at the repo root.
+2. **Confirm `vertical_id`** — this tells you which namespace folder you own.
+3. **Check `dannflow_features`** — only implement features where the flag is `true`.
+4. **Read the AI persona** at `business.json → ai_rules.persona_manifest`.
+
+### Before Running `sync-to-upstream`
+
+1. **Read `business.json → owned_paths`**.
+2. **Verify every staged file** is within a declared `owned_paths` entry.
+3. If ANY staged file is outside `owned_paths` → **STOP**. Report the conflict and do not create a PR. This is a hard block, not a warning.
+
+### Domain Terminology Rule (Non-Negotiable)
+
+NEVER hardcode the words `Client`, `Patient`, `Customer`, `Case`, `Appointment`, `Lawyer`, `Vet`, or any domain noun in a `.tsx` or `.ts` file.
+
+Always resolve terminology from:
+
+```typescript
+const clientLabel = getTerm("consumer"); // from business.json → domain_nomenclature
+const caseLabel = getTerm("transaction"); // from business.json → domain_nomenclature
+```
+
+Use the `useTerm()` hook in client components and `getTerm()` in server components/utilities.
+
+### `business.json` Loading (Build-Time Pattern)
+
+`business.json` is read **at build time** via `src/lib/vertical-config.ts`. It is NOT fetched at runtime. Consequence: changing `business.json` requires a redeploy of the vertical. This is intentional — each vertical is its own independent deployment with its own Supabase project.
+
 <!-- END:nextjs-agent-rules -->

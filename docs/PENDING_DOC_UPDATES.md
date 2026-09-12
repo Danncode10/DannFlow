@@ -1,1 +1,58 @@
 <!-- Ledger cleared. Log new pending documentation updates here. -->
+
+---
+
+## [juanStack-P0] JuanStack Phase 0 — Architecture & Governance Setup
+
+**Branch:** `SaaS-Starter`
+**Date:** 2026-09-12
+**Status:** 🟡 Phase 0 complete — pending human verification (`/verify-task juanstack_masterplan phase0`)
+
+### What Was Done
+
+#### New Files Created
+
+- `docs/juanstack/DANNFLOW_REVISION_PLAN.md` — Full architectural spec for the JuanStack vertical engine revision. Covers 6 revisions: folder structure, `business.json` DNA, AI Manifest system, Namespace Contract, BIR module library, and analytics module library.
+- `docs/juanstack/juanstack_masterplan.md` — 8-phase step-by-step implementation masterplan with task IDs `[P0.x]` through `[P8.x]`.
+- `docs/juanstack/schemas/business.schema.json` — JSON Schema Draft-07 defining the full contract for the Vertical DNA `business.json` config file (all keys, types, required fields, enums, patterns).
+- `docs/juanstack/schemas/ai-manifest.schema.json` — JSON Schema Draft-07 defining the AI Secretary manifest contract including `ObservableState` shape, trigger condition patterns, priority enum, and cooldown rules.
+
+#### Files Modified
+
+- `AGENTS.md` — Appended the **JuanStack Vertical Namespace Rules** section:
+  - Locked architecture decisions table (D1–D5)
+  - The Golden Rule (which folders each vertical owns)
+  - Namespace Convention Table
+  - Pre-task and pre-sync checklists
+  - Domain Terminology Rule (`useTerm()` / `getTerm()` enforcement)
+  - Build-time loading declaration for `business.json`
+- `.agents/skills/source-command-sync-to-upstream/SKILL.md` — Inserted **Step 1.5: JuanStack Owned-Path Validation (HARD BLOCK)**. The sync script now reads `business.json → owned_paths` and stops the PR if any staged file falls outside declared owned paths.
+- `dannflow.json` — Bumped `dannflow_version` to `2.0.0-juanstack-alpha`. Added `revision_notes` field describing the JuanStack revision scope.
+- `docs/README.md` — Added **Section 7: JuanStack Vertical Engine Revision** linking to all planning docs and schemas.
+
+### Architecture Decisions Locked (D1–D5)
+
+| ID  | Decision                       | Resolution                              |
+| --- | ------------------------------ | --------------------------------------- |
+| D1  | `business.json` load strategy  | Build-time via `next build`             |
+| D2  | Multi-tenancy model            | Separate Supabase projects per vertical |
+| D3  | AI Secretary runtime           | Supabase Edge Function with pg_cron     |
+| D4  | `sync-to-upstream` enforcement | Hard block on `owned_paths` violations  |
+| D5  | Registry location              | Separate `juanstack-portal` repo        |
+
+### What Still Needs to Be Done (Tracked in Masterplan)
+
+- `[P1+]` All remaining phases (folder skeletons, BIR engine, AI Secretary, analytics core, vertical config wiring, attyjuan test, vetstack test, portal).
+- The `AGENTS.md` JuanStack section needs to also be copied into `CLAUDE.md` if that file is used as the primary agent context file — verify this is not a duplicate concern.
+- Once Phase 6 (`attyjuan`) is complete, create `docs/juanstack/vertical-setup-guide.md`.
+- Once Phase 3 (AI Secretary) is complete, create `docs/juanstack/ai-secretary-architecture.md` with a Mermaid diagram of the task-engine flow.
+
+### Clear This Entry When
+
+- All 8 masterplan phases are marked `[x]`
+- `docs/juanstack/vertical-setup-guide.md` is written
+- `docs/juanstack/ai-secretary-architecture.md` is written
+- `docs/juanstack/bir-core-api.md` is written
+- `docs/juanstack/analytics-core-api.md` is written
+
+---

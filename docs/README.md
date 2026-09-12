@@ -59,6 +59,15 @@ Welcome to the central documentation hub for **DannFlow** — the Next.js 16 + S
 - [**Technical Document**](project/technical-document.md) — Explains source code logic and database architectures.
 - [**User Manual**](project/user-manual.md) — The operational guide for end-users interacting with the system.
 
+### 🏗️ 7. JuanStack Vertical Engine Revision (`juanstack/`)
+
+> _Planning documents for the JuanStack vertical SaaS ecosystem revision. These files govern the architectural evolution of `dannflow` into a multi-vertical library registry._
+
+- [**Revision Plan**](juanstack/DANNFLOW_REVISION_PLAN.md) — Full architectural spec: folder structure, JSON schemas, AI manifest system, and coding rules.
+- [**JuanStack Masterplan**](juanstack/juanstack_masterplan.md) — Step-by-step implementation roadmap across 8 phases.
+- [**`business.json` Schema**](juanstack/schemas/business.schema.json) — JSON Schema (Draft-07) for the Vertical DNA config file.
+- [**AI Manifest Schema**](juanstack/schemas/ai-manifest.schema.json) — JSON Schema (Draft-07) for the AI Secretary observable states manifest.
+
 ---
 
 ## 📜 Documentation Governance & Post-Merge Rules
