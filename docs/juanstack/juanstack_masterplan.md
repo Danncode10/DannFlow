@@ -181,34 +181,15 @@ These 5 decisions affect the entire architecture. Agree on them before writing a
 
 ---
 
-## **PHASE 3: AI Secretary System**
+## **PHASE 3: Conversational AI Secretary System**
 
-> Goal: Build the proactive AI Secretary backbone — the type system, the task engine, and the human-facing task queue. No vertical-specific triggers yet.
-> **Dependency:** Phase 1 and 2 must be complete. `[D3]` is resolved (Edge Function).
+> Goal: Build an interactive, conversational AI agent using Vercel AI SDK and Tool Calling. The AI can be chatted with directly in the dashboard and can execute actions (like querying cases or scheduling) on behalf of the user.
 
-- `[P3.1]` Implement `src/ai/secretary/types.ts`:
-  - `ObservableState`
-  - `SchedulingIntent` (e.g. client_requested_meeting) interface (matches `core.ai-manifest.json` schema)
-  - `AIManifest` interface (validates the JSON manifest shape)
-  - _Note: `SecretaryTask` must be imported directly from `src/types/supabase.ts` (`Tables<'secretary_tasks'>`). Do not redefine it here._
-- `[x]` `[P3.1]` Define `SecretaryTask`, `ObservableState`, and `AIManifest` types in `src/ai/secretary/types.ts`.
-- `[x]` `[P3.2]` Create `task-engine.ts` — pure TypeScript logic that loads `core.ai-manifest.json` and evaluates state.
-- `[x]` `[P3.3]` Create the Supabase Edge Function (`ai-secretary`) using `Deno.cron` to scan tables via Service Role and insert into `secretary_tasks`.
-- `[x]` `[P3.4]` Create `src/ai/secretary/task-queue.ts` — backend helpers for fetching and updating tasks.
-- `[x]` `[P3.5]` Create `src/services/secretary.service.ts` — wraps `task-queue.ts` with proper auth/RLS context.
-- `[x]` `[P3.DOC]` Finalize Phase 3 Documentation — add AI Secretary architecture diagram to `docs/juanstack/ai-secretary-architecture.md`.
-
----
-
-## **PHASE 3A: AI Secretary UI Implementation**
-
-> Goal: Build the frontend React components where users will interact with the AI Secretary Tasks.
-
-- `[x]` `[P3A.0]` **Inspiration Protocol**: Ask the user if they want to fetch a reference UI project (like an AI chat interface) into the `inspirations/` folder before building the UI to save tokens and provide a design baseline.
-- `[x]` `[P3A.1]` Create a UI component (e.g., `src/components/dashboard/ai-secretary-widget.tsx`) to display pending tasks.
-- `[x]` `[P3A.2]` Integrate `secretary.service.ts` into the UI to fetch, dismiss, and complete tasks.
-- `[x]` `[P3A.3]` Add the AI Secretary Widget to the main Dashboard layout.
-- `[x]` `[P3A.DOC]` Finalize Phase 3A Documentation.
+- `[P3.1]` Setup Tool Manifest (`src/ai/tools.ai-manifest.json`) — acts as the source of truth for which tools are enabled for the current vertical.
+- `[P3.2]` Implement `src/app/api/chat/route.ts` — a secure Next.js App Router API route using the Vercel AI SDK (`streamText`) with OpenAI integration. Ensure RLS/tenant isolation applies to all AI data queries.
+- `[P3.3]` Build AI Tools library (`src/ai/tools/`) — implement functions like `getDatabaseSummary` or `scheduleMeeting`.
+- `[P3.4]` Refactor `src/components/dashboard/tabs/ai-secretary-tab.tsx` — replace the static task queue with a real-time chat interface using `useChat` from `@ai-sdk/react`.
+- `[P3.DOC]` Finalize Phase 3 Documentation — document the Tool Calling architecture and how to add new vertical-specific tools.
 
 ---
 

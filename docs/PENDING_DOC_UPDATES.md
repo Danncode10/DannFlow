@@ -185,4 +185,15 @@
 
 - **Date**: 2026-09-13
 - **Changes**: Cloned the Vercel AI Chatbot into `inspirations/` per the Inspiration Protocol. Built the `AiSecretaryTab` component in `src/components/dashboard/tabs/ai-secretary-tab.tsx` featuring a conversational scrollable feed and optimistic UI updates for completing/dismissing tasks. Integrated the tab into `src/lib/dashboard-features.ts` and `src/components/dashboard-shell.tsx`.
+- **Build & Integration Fixes**: Resolved all module resolution and type compatibility errors between the ported chatbot components and AI SDK v7 / Next.js 16 (Turbopack). Upgraded Radix UI primitives (`dropdown-menu`, `scroll-area`, `select`), added missing UI elements (`button-group`, `input-group`), aligned `streamText` tools with AI SDK 7 (`inputSchema`, `isStepCount`, `toUIMessageStreamResponse`), and excluded the reference `inspirations/` folder from `tsconfig.json`. Verified with a 100% clean production build (`npm run build`).
+- **Files Edited/Created**:
+  - `src/components/ui/*`: Added/upgraded `scroll-area.tsx`, `dropdown-menu.tsx`, `select.tsx`, `command.tsx`, `popover.tsx`, `hover-card.tsx`, `input-group.tsx`.
+  - `src/app/api/chat/route.ts`: Modernized for AI SDK v7 (`inputSchema`, `isStepCount`).
+  - `src/components/dashboard/tabs/ai-secretary-tab.tsx`: Updated to use local state and `sendMessage()` for AI SDK v7 compatibility.
+  - `src/lib/types.ts`: Added `WaitingStatusData` and `CustomUIDataTypes`.
+  - `src/lib/ai/models.ts`: Added `provider` and `capabilities` to `ChatModel`.
+  - `src/components/chat/document-preview.tsx`, `message.tsx`, `messages.tsx`: Fixed React 19 types and generic type errors.
+  - `src/app/(chat)/actions.ts`: Added server action stubs.
+  - `src/hooks/use-active-chat.tsx`, `use-auto-resume.ts`: Fixed string vs object parsing and explicit typing.
+  - `tsconfig.json`: Excluded `inspirations/` to prevent Next.js from typechecking it.
 - **Impact**: Users can now view and resolve their AI Secretary tasks directly from a dedicated, chat-inspired tab in the dashboard sidebar. Phase 3 and 3A are completely finished.

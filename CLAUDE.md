@@ -154,8 +154,8 @@ For GitHub Projects, if the authenticated `gh` CLI reports a missing `read:proje
 - `async`/`await` for all async ops.
 - Place new components in `src/components/`, logic in `src/lib/` or `src/hooks/`.
 - DRY + SOLID. Extract repeated logic into hooks or components.
-- **Inspiration Folder Protocol**: We have a dedicated `inspirations/` folder at the root (which is gitignored). Whenever you start a major UI task or a complex feature, FIRST ask the user if they want to clone/download a reference GitHub repo into `inspirations/` to serve as a design/code reference and save tokens. If the user agrees, fetch the reference repo there before coding. If they say to skip, proceed to code from scratch.
-- **Don't restructure** existing folder hierarchy or UI patterns unless explicitly asked.
+- **Inspiration Folder Protocol**: We have a dedicated `inspirations/` folder at the root (which is gitignored). Whenever you start a major UI task or a complex feature, FIRST ask the user if they want to clone/download a reference GitHub repo into `inspirations/` to serve as a design/code reference and save tokens. If the user agrees, fetch the reference repo there before coding.
+  - **CRITICAL RULE**: If an inspiration repo is present, you MUST copy its UI components, styling, and logic as exactly as possible into the project. Do not write your own simplified version from scratch. Your job is to extract the existing complex components from the inspiration folder and modify them only as necessary to wire them into the DannFlow repo.- **Don't restructure** existing folder hierarchy or UI patterns unless explicitly asked.
 - After making code changes, end your response with a one-line conventional commit message for easy copy-paste (e.g. `feat: add password re-auth gate`).
 
 ## Claude environment in this repo

@@ -1,0 +1,15 @@
+{
+  "version": "1.0",
+  "tools": [
+    {
+      "id": "getDatabaseSummary",
+      "description": "Fetch high-level statistics and a summary of cases or records for the user. Useful for answering questions like 'how many cases do I have?' or 'give me a summary of my work'.",
+      "enabled": true
+    },
+    {
+      "id": "createSchedule",
+      "description": "Create a new meeting or schedule in the calendar. Useful for when the user asks to 'book a meeting' or 'schedule an appointment'.",
+      "enabled": true
+    }
+  ]
+}

@@ -62,8 +62,8 @@ To fix:
 
 ## Vibe Workflow
 
-- **Inspiration Folder Protocol**: We have a dedicated `inspirations/` folder at the root (which is gitignored). Whenever you start a major UI task or a complex feature, FIRST ask the user if they want to clone/download a reference GitHub repo into `inspirations/` to serve as a design/code reference and save tokens. If the user agrees, fetch the reference repo there before coding. If they say to skip, proceed to code from scratch.
-
+- **Inspiration Folder Protocol**: We have a dedicated `inspirations/` folder at the root (which is gitignored). Whenever you start a major UI task or a complex feature, FIRST ask the user if they want to clone/download a reference GitHub repo into `inspirations/` to serve as a design/code reference and save tokens. If the user agrees, fetch the reference repo there before coding.
+  - **CRITICAL RULE**: If an inspiration repo is present, you MUST copy its UI components, styling, and logic as exactly as possible into the project. Do not write your own simplified version from scratch. Your job is to extract the existing complex components from the inspiration folder and modify them only as necessary to wire them into the DannFlow repo.
 - If you encounter a bug, fix it in the **Service** layer first.
 - If you need a new data structure, define or request generation of its types in `src/types/` first.
 - **Masterplan + GitHub Project Tracking**: For a new SaaS, `/new-project` must finish before `/masterplan-init`; the user must create a Kanban-style GitHub Project before `/masterplan-init` links it. Before later feature or task work, find the matching ordered task in `MASTERPLAN.md` and the linked GitHub Project when one exists. Use stable IDs like `[P2.1]`, `[P2.2]`, `[P3A.1]`; never create bare `[P2]` cards.
