@@ -131,9 +131,10 @@ Welcome to **${APP_NAME}**, built on the DannFlow SaaS architecture.
 
 ## 🚀 Quick Start
 
-### 1. Fill Out Project Context
-Define your product requirements, audience, and features in:
-- \`PROJECT_CONTEXT.md\`
+### 1. Initialize Context & Vertical DNA
+Define your product requirements, audience, and features:
+- **For JuanStack Verticals**: Run `/juanstack-init` in your AI IDE for an interactive setup interview.
+- **For Standard SaaS**: Fill out `PROJECT_CONTEXT.md`.
 
 ### 2. Next Steps with AI Agent
 Open this repository in your AI IDE (Claude Code, Antigravity, or Cursor) and follow this sequence:
@@ -192,7 +193,9 @@ echo -e "${BOLD}Your project:${NC} ./${PKG_NAME}"
 echo ""
 echo -e "${BOLD}Next steps:${NC}"
 echo -e "  1. ${CYAN}cd ${PKG_NAME}${NC}"
-echo -e "  2. Fill out ${CYAN}PROJECT_CONTEXT.md${NC}"
+echo -e "  2. Initialize project context:"
+echo -e "     • For JuanStack verticals: run ${CYAN}/juanstack-init${NC} in your AI IDE"
+echo -e "     • For standard SaaS: edit ${CYAN}PROJECT_CONTEXT.md${NC}"
 echo -e "  3. Open in your AI IDE and run ${CYAN}/new-project${NC} (to link origin) and ${CYAN}/masterplan-init${NC}"
 echo ""
 echo -e "${CYAN}Need help? Run ${BOLD}./guide.sh${NC}${CYAN} anytime for step-by-step setup.${NC}"
