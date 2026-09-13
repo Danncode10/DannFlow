@@ -39,6 +39,47 @@ export type Database = {
   };
   public: {
     Tables: {
+      availability_slots: {
+        Row: {
+          created_at: string;
+          day_of_week: number;
+          end_time: string;
+          id: string;
+          is_active: boolean;
+          organization_id: string;
+          start_time: string;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          day_of_week: number;
+          end_time: string;
+          id?: string;
+          is_active?: boolean;
+          organization_id: string;
+          start_time: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          day_of_week?: number;
+          end_time?: string;
+          id?: string;
+          is_active?: boolean;
+          organization_id?: string;
+          start_time?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "availability_slots_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       blog_posts: {
         Row: {
           content: string;
@@ -139,6 +180,56 @@ export type Database = {
             columns: ["service_id"];
             isOneToOne: false;
             referencedRelation: "services";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      calendar_events: {
+        Row: {
+          attendee_email: string | null;
+          attendee_name: string | null;
+          created_at: string;
+          description: string | null;
+          end_time: string;
+          id: string;
+          organization_id: string;
+          start_time: string;
+          status: string;
+          title: string;
+          updated_at: string;
+        };
+        Insert: {
+          attendee_email?: string | null;
+          attendee_name?: string | null;
+          created_at?: string;
+          description?: string | null;
+          end_time: string;
+          id?: string;
+          organization_id: string;
+          start_time: string;
+          status?: string;
+          title: string;
+          updated_at?: string;
+        };
+        Update: {
+          attendee_email?: string | null;
+          attendee_name?: string | null;
+          created_at?: string;
+          description?: string | null;
+          end_time?: string;
+          id?: string;
+          organization_id?: string;
+          start_time?: string;
+          status?: string;
+          title?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "calendar_events_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
             referencedColumns: ["id"];
           },
         ];

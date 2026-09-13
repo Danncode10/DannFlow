@@ -59,7 +59,7 @@ function PureMessages({
   }, [scrollToBottom]);
 
   return (
-    <div className="relative flex-1 bg-background">
+    <div className="relative flex-1 flex flex-col h-full w-full min-h-0 bg-background">
       {messages.length === 0 && !isLoading && (
         <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
           <p className="text-muted-foreground text-sm">

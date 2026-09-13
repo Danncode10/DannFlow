@@ -196,4 +196,14 @@
   - `src/app/(chat)/actions.ts`: Added server action stubs.
   - `src/hooks/use-active-chat.tsx`, `use-auto-resume.ts`: Fixed string vs object parsing and explicit typing.
   - `tsconfig.json`: Excluded `inspirations/` to prevent Next.js from typechecking it.
-- **Impact**: Users can now view and resolve their AI Secretary tasks directly from a dedicated, chat-inspired tab in the dashboard sidebar. Phase 3 and 3A are completely finished.
+
+### Phase 3: Conversational AI Secretary Chat Streaming & UI Stabilization
+
+- **Date**: 2026-09-13
+- **Changes**:
+  - **CSS Layout Flex Fix**: Resolved zero-height container collapse in `src/components/dashboard/tabs/ai-secretary-tab.tsx` and `src/components/chat/messages.tsx`. Added `flex flex-col min-h-0 h-full` to ensure the scrollable message area expands properly instead of collapsing to 0px height and hiding messages under `overflow-hidden`.
+  - **Vercel AI SDK v7 Transport**: Explicitly wired `DefaultChatTransport({ api: "/api/chat" })` into `useChat` and added an `onError` toast handler in `ai-secretary-tab.tsx` for client-side stream failure notifications.
+  - **Input & Submission Optimization**: Cleaned up `submitForm` in `src/components/chat/multimodal-input.tsx` to pass `{ text: input }` directly to `sendMessage` when no file attachments are present.
+  - **Null Safety Hardening**: Hardened `sanitizeText` in `src/lib/utils.ts` to guard against `undefined` or non-string values during stream state transitions, preventing React render tree crashes.
+  - **History Types & Exports**: Re-exported `ChatHistory`, `getChatHistoryPaginationKey`, and `useChatHistory` from `src/components/chat/sidebar-history.tsx` to satisfy TypeScript checks in `use-active-chat.tsx` and `use-chat-visibility.ts`.
+- **Verification**: Verified with `npx tsc --noEmit` (0 errors), end-to-end curl stream response, and live browser chat streaming confirmation from the user.

@@ -14,24 +14,24 @@ interface SuggestedActionsProps {
 
 const suggestions = [
   {
-    heading: "Summarize",
-    subheading: "a long document or article",
-    prompt: "Can you summarize a long document or article for me?",
+    heading: "Summarize Leads",
+    subheading: "get an overview of recent leads",
+    prompt: "Give me a summary of my recent leads.",
   },
   {
-    heading: "Draft",
-    subheading: "a professional email",
-    prompt: "Help me draft a professional email.",
+    heading: "Check Schedule",
+    subheading: "see upcoming appointments",
+    prompt: "What are my upcoming bookings for this week?",
   },
   {
-    heading: "Explain",
-    subheading: "a complex concept simply",
-    prompt: "Explain a complex concept in simple terms.",
+    heading: "Book Appointment",
+    subheading: "schedule a new consultation",
+    prompt: "Schedule a new booking for a client.",
   },
   {
-    heading: "Write",
-    subheading: "a creative story",
-    prompt: "Write a short creative story.",
+    heading: "Analyze Services",
+    subheading: "see which services are popular",
+    prompt: "Which of our services are most popular?",
   },
 ];
 

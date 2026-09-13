@@ -5,8 +5,8 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function sanitizeText(text: string) {
-  // Strip null bytes and non-printable characters often emitted by LLMs
+export function sanitizeText(text?: string | null) {
+  if (typeof text !== "string") return "";
   return text.replace(/\0/g, "");
 }
 

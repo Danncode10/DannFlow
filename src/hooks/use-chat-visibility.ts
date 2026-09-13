@@ -5,6 +5,7 @@ import useSWR, { useSWRConfig } from "swr";
 import { unstable_serialize } from "swr/infinite";
 import { updateChatVisibility } from "@/app/(chat)/actions";
 import {
+  type Chat,
   type ChatHistory,
   getChatHistoryPaginationKey,
 } from "@/components/chat/sidebar-history";
@@ -34,7 +35,9 @@ export function useChatVisibility({
     if (!history) {
       return localVisibility;
     }
-    const chat = history.chats.find((currentChat) => currentChat.id === chatId);
+    const chat = history.chats.find(
+      (currentChat: Chat) => currentChat.id === chatId,
+    );
     if (!chat) {
       return "private";
     }

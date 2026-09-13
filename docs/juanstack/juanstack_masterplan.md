@@ -185,11 +185,24 @@ These 5 decisions affect the entire architecture. Agree on them before writing a
 
 > Goal: Build an interactive, conversational AI agent using Vercel AI SDK and Tool Calling. The AI can be chatted with directly in the dashboard and can execute actions (like querying cases or scheduling) on behalf of the user.
 
-- `[P3.1]` Setup Tool Manifest (`src/ai/tools.ai-manifest.json`) — acts as the source of truth for which tools are enabled for the current vertical.
-- `[P3.2]` Implement `src/app/api/chat/route.ts` — a secure Next.js App Router API route using the Vercel AI SDK (`streamText`) with OpenAI integration. Ensure RLS/tenant isolation applies to all AI data queries.
-- `[P3.3]` Build AI Tools library (`src/ai/tools/`) — implement functions like `getDatabaseSummary` or `scheduleMeeting`.
-- `[P3.4]` Refactor `src/components/dashboard/tabs/ai-secretary-tab.tsx` — replace the static task queue with a real-time chat interface using `useChat` from `@ai-sdk/react`.
-- `[P3.DOC]` Finalize Phase 3 Documentation — document the Tool Calling architecture and how to add new vertical-specific tools.
+- `[x]` `[P3.1]` Setup Tool Manifest (`src/ai/tools.ai-manifest.json`) — acts as the source of truth for which tools are enabled for the current vertical.
+- `[x]` `[P3.2]` Implement `src/app/api/chat/route.ts` — a secure Next.js App Router API route using the Vercel AI SDK (`streamText`) with OpenAI integration. Ensure RLS/tenant isolation applies to all AI data queries.
+- `[x]` `[P3.3]` Build AI Tools library (`src/ai/tools/`) — implement functions like `getDatabaseSummary` or `scheduleMeeting`.
+- `[x]` `[P3.4]` Refactor `src/components/dashboard/tabs/ai-secretary-tab.tsx` — replace the static task queue with a real-time chat interface using `useChat` from `@ai-sdk/react`.
+- `[x]` `[P3.DOC]` Finalize Phase 3 Documentation — document the Tool Calling architecture and how to add new vertical-specific tools.
+
+---
+
+## **PHASE 3A: AI Conversation Persistence (Database & History)**
+
+> Goal: Set up the essential database tables to persist AI chat sessions and messages so the "History" sidebar functions correctly.
+
+- `[ ]` `[P3A.1]` Create Supabase migration `*_ai_chat_history.sql` to define:
+  - `ai_chats` (id, organization_id, user_id, title, created_at, updated_at)
+  - `ai_messages` (id, chat_id, role, content, tool_calls, created_at)
+- `[ ]` `[P3A.2]` Apply RLS policies ensuring users can only read/write chats belonging to their organization.
+- `[ ]` `[P3A.3]` Implement `src/app/api/history/route.ts` to fetch paginated chat history for the sidebar.
+- `[ ]` `[P3A.4]` Refactor `src/components/chat/sidebar-history.tsx` to fetch real data from the history API instead of using mock data.
 
 ---
 
@@ -198,7 +211,7 @@ These 5 decisions affect the entire architecture. Agree on them before writing a
 > Goal: Build the core scheduling and calendar integration module.
 > **Dependency:** `[P1E]` must be complete.
 
-- `[P4.1]` Define `src/scheduling/core/scheduling-types.ts`:
+- `[x]` `[P4.1]` Define `src/scheduling/core/scheduling-types.ts`:
   - `MeetingRequest`, `CalendarEvent`, `AvailabilitySlot`
   - _Note: If any of these represent database entities, you must create a Supabase migration (`npm run db:migrate`) and import their types from `src/types/supabase.ts`._
 - `[P4.2]` Implement `src/scheduling/core/booking-engine.ts` — handles clash detection and booking constraints based on `business.json` rules.
