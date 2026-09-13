@@ -46,113 +46,114 @@ Codex uses `.codex/commands/claude-command.md` as a bridge. The source-of-truth 
 
 ### Help & Routing
 
-| Command | Says |
-|---|---|
-| `/help-dannflow` | Shows this categorized command catalog and graph. Report-only. |
-| `/ask-command <intent>` | Chooses the best Claude command for a plain-English task. |
-| `/claude-flow-help` | Shows Claude-Flow/Ruflo orchestration command help. |
+| Command                 | Says                                                           |
+| ----------------------- | -------------------------------------------------------------- |
+| `/help-dannflow`        | Shows this categorized command catalog and graph. Report-only. |
+| `/ask-command <intent>` | Chooses the best Claude command for a plain-English task.      |
+| `/claude-flow-help`     | Shows Claude-Flow/Ruflo orchestration command help.            |
 
 ### Project Setup
 
-| Command | Says |
-|---|---|
-| `/new-project ["name"]` | Starts a new DannFlow project from the starter. |
-| `/masterplan-init` | Links an existing Kanban-style GitHub Project and creates detailed Phase 0 readiness cards, including Vercel deployment setup. |
-| `/setup-supabase` | Guides the existing template's Supabase environment values and dashboard settings without changing schema. |
-| `/setup-auth` | Configures the existing template's email auth, Google sign-in, redirects, and branded emails without changing schema. |
-| `/setup-vercel [production-origin]` | Deploys the app on Vercel and registers its canonical production URL with Supabase Auth and Google OAuth. |
-| `/business-init` | Captures business/project context. |
-| `/init-claude` | Refreshes Claude project context, skills, and command docs. |
-| `/init-update` | Updates the local DannFlow command/runtime setup. |
-| `/adopt-dannflow [--no-protect\|--force]` | Adopts an existing repo into DannFlow conventions. |
+| Command                                   | Says                                                                                                                           |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `/new-project ["name"]`                   | Starts a new DannFlow project from the starter.                                                                                |
+| `/juanstack-init ["name"]`                | Conducts domain interview and initializes JuanStack vertical DNA (`business.json`, AI manifest, BIR rules, project context).   |
+| `/masterplan-init`                        | Links an existing Kanban-style GitHub Project and creates detailed Phase 0 readiness cards, including Vercel deployment setup. |
+| `/setup-supabase`                         | Guides the existing template's Supabase environment values and dashboard settings without changing schema.                     |
+| `/setup-auth`                             | Configures the existing template's email auth, Google sign-in, redirects, and branded emails without changing schema.          |
+| `/setup-vercel [production-origin]`       | Deploys the app on Vercel and registers its canonical production URL with Supabase Auth and Google OAuth.                      |
+| `/business-init`                          | Captures business/project context.                                                                                             |
+| `/init-claude`                            | Refreshes Claude project context, skills, and command docs.                                                                    |
+| `/init-update`                            | Updates the local DannFlow command/runtime setup.                                                                              |
+| `/adopt-dannflow [--no-protect\|--force]` | Adopts an existing repo into DannFlow conventions.                                                                             |
 
 ### Planning & Task Tracking
 
-| Command | Says |
-|---|---|
-| `/make-masterplan <phase> [--project-url <url>]` | Expands a later phase and syncs its ordered task cards. |
-| `/update-masterplan [--project-url <url>]` | Syncs `MASTERPLAN.md` changes to GitHub Project cards. |
-| `/what-task [--project-url <url>]` | Shows current task status, explains why the chosen task matters, and keeps the next backlog task Ready. |
-| `/masterplan-task <task>` | Executes one ordered `MASTERPLAN.md` task. |
-| `/verify-task [task-id]` | Produces the human verification checklist for an active task. |
-| `/close-task [task-id]` | Closes a verified task, records a short test note, and moves project tracking to done. |
+| Command                                          | Says                                                                                                    |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
+| `/make-masterplan <phase> [--project-url <url>]` | Expands a later phase and syncs its ordered task cards.                                                 |
+| `/update-masterplan [--project-url <url>]`       | Syncs `MASTERPLAN.md` changes to GitHub Project cards.                                                  |
+| `/what-task [--project-url <url>]`               | Shows current task status, explains why the chosen task matters, and keeps the next backlog task Ready. |
+| `/masterplan-task <task>`                        | Executes one ordered `MASTERPLAN.md` task.                                                              |
+| `/verify-task [task-id]`                         | Produces the human verification checklist for an active task.                                           |
+| `/close-task [task-id]`                          | Closes a verified task, records a short test note, and moves project tracking to done.                  |
 
 ### Build & UI
 
-| Command | Says |
-|---|---|
-| `/new-feature <name>` | Scaffolds a feature with service, types, page, and form patterns. |
-| `/new-page <route>` | Scaffolds a Next.js App Router page. |
+| Command                       | Says                                                                                                                          |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `/new-feature <name>`         | Scaffolds a feature with service, types, page, and form patterns.                                                             |
+| `/new-page <route>`           | Scaffolds a Next.js App Router page.                                                                                          |
 | `/design-project ["section"]` | Applies approved product copy and semantic theme tokens while preserving the existing template, interactions, and hero media. |
-| `/ui [target]` | Rewrites UI for responsiveness, accessibility, and semantic tokens. |
+| `/ui [target]`                | Rewrites UI for responsiveness, accessibility, and semantic tokens.                                                           |
 
 ### Database & Supabase
 
-| Command | Says |
-|---|---|
-| `/migrate <description>` | Runs the tracked Supabase CLI migration workflow. |
-| `/schema-change <description>` | Runs the explicit live Supabase MCP schema-change workflow. |
-| `/checkpoint` | Snapshots the live Supabase schema. |
+| Command                                                       | Says                                                                                      |
+| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `/migrate <description>`                                      | Runs the tracked Supabase CLI migration workflow.                                         |
+| `/schema-change <description>`                                | Runs the explicit live Supabase MCP schema-change workflow.                               |
+| `/checkpoint`                                                 | Snapshots the live Supabase schema.                                                       |
 | `/start-supabase [project ref\|name] [--pause <project ref>]` | Starts or restores a paused Supabase project and handles free-plan active-project limits. |
-| `/pause-supabase [project id\|name]` | Pauses a Supabase project after listing, confirming, and verifying the target. |
-| `/sync-types` | Regenerates `src/types/supabase.ts`. |
-| `/explain-schema` | Explains the live Supabase schema. |
-| `/rls <table>` | Explains RLS policies for one table. |
-| `/seed <table\|all>` | Generates type-safe seed data. |
+| `/pause-supabase [project id\|name]`                          | Pauses a Supabase project after listing, confirming, and verifying the target.            |
+| `/sync-types`                                                 | Regenerates `src/types/supabase.ts`.                                                      |
+| `/explain-schema`                                             | Explains the live Supabase schema.                                                        |
+| `/rls <table>`                                                | Explains RLS policies for one table.                                                      |
+| `/seed <table\|all>`                                          | Generates type-safe seed data.                                                            |
 
 ### Security & Quality
 
-| Command | Says |
-|---|---|
-| `/review` | Runs a pre-PR quality review. |
-| `/security-audit` | Audits security risks and guardrail violations. |
-| `/rls-check` | Checks service-layer Supabase queries for ownership filters. |
-| `/cleanup` | Reports dead code, unused exports, and stale files. |
-| `/no-conflict` | Reports conflicts between docs and actual code. |
+| Command           | Says                                                         |
+| ----------------- | ------------------------------------------------------------ |
+| `/review`         | Runs a pre-PR quality review.                                |
+| `/security-audit` | Audits security risks and guardrail violations.              |
+| `/rls-check`      | Checks service-layer Supabase queries for ownership filters. |
+| `/cleanup`        | Reports dead code, unused exports, and stale files.          |
+| `/no-conflict`    | Reports conflicts between docs and actual code.              |
 
 ### SEO & Marketing
 
-| Command | Says |
-|---|---|
-| `/seo-check [route]` | Reports SEO gaps for a route. |
-| `/seo-fix <route\|all>` | Fixes missing SEO essentials after confirmation. |
-| `/marketing-check [route]` | Reports conversion and messaging gaps. |
+| Command                    | Says                                             |
+| -------------------------- | ------------------------------------------------ |
+| `/seo-check [route]`       | Reports SEO gaps for a route.                    |
+| `/seo-fix <route\|all>`    | Fixes missing SEO essentials after confirmation. |
+| `/marketing-check [route]` | Reports conversion and messaging gaps.           |
 
 ### GitHub & Release
 
-| Command | Says |
-|---|---|
-| `/commit` | Stages changes and drafts a conventional commit message. |
-| `/sync-upstream [path\|--commits N]` | Pulls DannFlow updates into a sync PR, exactly mirrors `.claude/commands/`, and automatically applies and verifies required template migrations. |
+| Command                               | Says                                                                                                                                                        |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/commit`                             | Stages changes and drafts a conventional commit message.                                                                                                    |
+| `/sync-upstream [path\|--commits N]`  | Pulls DannFlow updates into a sync PR, exactly mirrors `.claude/commands/`, and automatically applies and verifies required template migrations.            |
 | `/sync-to-upstream [path\|--dry-run]` | Promotes generic improvements upstream and automatically verifies detected database changes in the dedicated DannFlow template database before PR creation. |
-| `/github/*` | Advanced GitHub workflows: PRs, issues, releases, repo analysis, project sync. |
+| `/github/*`                           | Advanced GitHub workflows: PRs, issues, releases, repo analysis, project sync.                                                                              |
 
 ### Documentation & Command Maintenance
 
-| Command | Says |
-|---|---|
-| `/make-command <description>` | Creates a new custom command. |
-| `/sync-commands` | Audits command docs against command files. |
-| `/auto-docs [--fix]` | Audits broader project docs, scripts, env vars, skills, and commands. |
+| Command                       | Says                                                                  |
+| ----------------------------- | --------------------------------------------------------------------- |
+| `/make-command <description>` | Creates a new custom command.                                         |
+| `/sync-commands`              | Audits command docs against command files.                            |
+| `/auto-docs [--fix]`          | Audits broader project docs, scripts, env vars, skills, and commands. |
 
 ### Advanced Orchestration
 
-| Command | Says |
-|---|---|
-| `/claude-flow-swarm <task>` | Runs Claude-Flow swarm orchestration. |
-| `/claude-flow-memory <operation>` | Uses Claude-Flow memory operations. |
-| `/agents/*` | Agent lifecycle commands: spawn, list, status, logs, health, metrics, pool. |
-| `/swarm/*` | Swarm setup, research, development, testing, monitoring, and strategy commands. |
-| `/sparc/*` | SPARC modes: spec, architect, code, debug, test, review, optimize, document. |
-| `/hive-mind/*` | Hive-mind sessions, consensus, memory, metrics, spawn, resume, stop. |
-| `/coordination/*` | Task orchestration, agent spawn, and swarm initialization commands. |
-| `/automation/*` | Smart agents, auto-agent, self-healing, session memory, workflow selection. |
-| `/hooks/*` | Hook setup and lifecycle prompts. |
-| `/monitoring/*` | Agent metrics, status, real-time views, and swarm monitoring. |
-| `/analysis/*` | Performance and token analysis reports. |
-| `/memory/*` | Memory usage, search, persistence, and neural memory commands. |
-| `/optimization/*` | Parallel execution, topology, and cache optimization commands. |
-| `/workflows/*` | Workflow creation, execution, export, development, and research commands. |
+| Command                           | Says                                                                            |
+| --------------------------------- | ------------------------------------------------------------------------------- |
+| `/claude-flow-swarm <task>`       | Runs Claude-Flow swarm orchestration.                                           |
+| `/claude-flow-memory <operation>` | Uses Claude-Flow memory operations.                                             |
+| `/agents/*`                       | Agent lifecycle commands: spawn, list, status, logs, health, metrics, pool.     |
+| `/swarm/*`                        | Swarm setup, research, development, testing, monitoring, and strategy commands. |
+| `/sparc/*`                        | SPARC modes: spec, architect, code, debug, test, review, optimize, document.    |
+| `/hive-mind/*`                    | Hive-mind sessions, consensus, memory, metrics, spawn, resume, stop.            |
+| `/coordination/*`                 | Task orchestration, agent spawn, and swarm initialization commands.             |
+| `/automation/*`                   | Smart agents, auto-agent, self-healing, session memory, workflow selection.     |
+| `/hooks/*`                        | Hook setup and lifecycle prompts.                                               |
+| `/monitoring/*`                   | Agent metrics, status, real-time views, and swarm monitoring.                   |
+| `/analysis/*`                     | Performance and token analysis reports.                                         |
+| `/memory/*`                       | Memory usage, search, persistence, and neural memory commands.                  |
+| `/optimization/*`                 | Parallel execution, topology, and cache optimization commands.                  |
+| `/workflows/*`                    | Workflow creation, execution, export, development, and research commands.       |
 
 ## Command Graph
 
@@ -168,7 +169,9 @@ graph TD
   ACC --> ClaudeCommands
 
   Setup["Project Setup"] --> NP["/new-project"]
+  Setup --> JI["/juanstack-init"]
   NP --> MPI["Create Kanban Project → /masterplan-init"]
+  JI --> MPI
   Setup --> BI["/business-init"]
   Setup --> IC["/init-claude"]
   Setup --> IU["/init-update"]
