@@ -54,6 +54,8 @@ You're done with setup. From here on, the daily loop is:
 6. /close-task           → process pending doc notes, commit, and mark task Done
 ```
 
+**Inspiration Folder Protocol**: Whenever you start a major UI task or a complex feature, FIRST ask the user if they want to clone/download a reference GitHub repo into the `inspirations/` folder (which is gitignored) to serve as a design/code reference and save tokens. If the user agrees, fetch the reference repo there before coding. If they say to skip, proceed to code from scratch.
+
 ### Continuous Documentation & Pre-Push Merge Blocker
 
 - **The Ledger (`docs/PENDING_DOC_UPDATES.md`)**: Whenever code is written that touches services, types, DB schemas, or APIs, a concise note is appended.

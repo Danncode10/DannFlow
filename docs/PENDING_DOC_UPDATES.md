@@ -174,3 +174,9 @@
 - **Date**: 2026-09-13
 - **Changes**: Implemented the core engine for the AI Secretary. This included defining `types.ts`, building a pure-TypeScript `task-engine.ts` in `supabase/functions/_shared/`, and creating the `ai-secretary` Edge Function to act as the cron scheduler. Added `task-queue.ts` and `secretary.service.ts` to expose the tasks to the React frontend. Created `docs/juanstack/ai-secretary-architecture.md`.
 - **Impact**: The backend infrastructure for proactive AI task generation is complete. The system can now read `core.ai-manifest.json`, scan tables, and generate `secretary_tasks` securely. Next step is Phase 3A (UI Implementation).
+
+### Pre-Phase 3A: Inspiration Folder Protocol
+
+- **Date**: 2026-09-13
+- **Changes**: Added `inspirations/` to `.gitignore`. Updated `AGENTS.md`, `CLAUDE.md`, and `docs/dannflow_docs/workflows/claude-workflow.md` to enforce the Inspiration Folder Protocol for all major UI tasks. Inserted step `[P3A.0]` into `juanstack_masterplan.md`.
+- **Impact**: AI agents are now required to ask the user if they want to clone a reference GitHub repository into `inspirations/` before beginning complex UI tasks, conserving tokens and providing a solid design baseline.

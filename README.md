@@ -99,14 +99,7 @@ supabase/migrations/*.sql
 
 For a fresh local clone:
 
-```bash
-npm install
-cp .env.example .env.local
-npm run db:setup
-npm run dev
-```
-
-`npm run db:setup` starts local Supabase, applies migrations in `supabase/migrations/`, and regenerates `src/types/supabase.ts` from the local database. Hosted projects can use `npm run db:types:remote` after setting `SUPABASE_PROJECT_ID` in `.env.local`.
+`npm run db:migrate` applies migrations to the remote database. Hosted projects should use `npm run db:types:remote` after setting `SUPABASE_PROJECT_ID` in `.env.local` to generate types. **DO NOT** use `npm run db:setup` locally as it requires Docker and is disabled for low-storage environments.
 
 When you want to apply migrations to production:
 

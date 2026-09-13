@@ -24,7 +24,7 @@ Select one mode and follow its rules:
 If folder name and remotes disagree, stop before editing and explain the mismatch. A non-`Dannflow` checkout with only `upstream → DannFlow` is not ready for project work; configure `origin` and make `upstream` fetch-only first. Never infer mode from the files being viewed—use the repository root folder and remote configuration.
 
 ```
-npm run db:setup (optional local Studio) → make schema changes visually
+`npm run db:migrate` → run against remote cloud database directly (Do NOT use `npm run db:setup` or local Docker)
 npm run db:generate <name>      → capture SQL via `supabase db diff`
 npm run db:migrate              → apply to Supabase
 npm run db:types                → refresh src/types/supabase.ts
@@ -103,7 +103,7 @@ Theme variables live in `src/app/globals.css` under `@theme`.
 ## Database workflow (Supabase CLI)
 
 1. **Schema source of truth** — Database schema and migrations are managed natively via Supabase CLI in `supabase/migrations/`.
-2. **Generate SQL** — Write `.sql` files directly in `supabase/migrations/` (or make changes in local Supabase Studio via `npm run db:setup` and `npm run db:generate`).
+2. **Generate SQL** — Write `.sql` files directly in `supabase/migrations/` (Do NOT use `npm run db:setup` or local Docker, the user develops strictly on cloud).
 3. **Supabase platform SQL** — You can also manually add RLS policies, auth triggers, and functions directly to the generated SQL migration when needed.
 4. **Apply and sync** — Run `npm run db:migrate` to push to your remote database, and `npm run db:types` to refresh `src/types/supabase.ts`.
 5. **Checkpoint live state** — Before risky/destructive changes, run `npm run checkpoint` to snapshot the live project into `supabase/backups/`.
@@ -154,6 +154,7 @@ For GitHub Projects, if the authenticated `gh` CLI reports a missing `read:proje
 - `async`/`await` for all async ops.
 - Place new components in `src/components/`, logic in `src/lib/` or `src/hooks/`.
 - DRY + SOLID. Extract repeated logic into hooks or components.
+- **Inspiration Folder Protocol**: We have a dedicated `inspirations/` folder at the root (which is gitignored). Whenever you start a major UI task or a complex feature, FIRST ask the user if they want to clone/download a reference GitHub repo into `inspirations/` to serve as a design/code reference and save tokens. If the user agrees, fetch the reference repo there before coding. If they say to skip, proceed to code from scratch.
 - **Don't restructure** existing folder hierarchy or UI patterns unless explicitly asked.
 - After making code changes, end your response with a one-line conventional commit message for easy copy-paste (e.g. `feat: add password re-auth gate`).
 

@@ -211,6 +211,7 @@ These 5 decisions affect the entire architecture. Agree on them before writing a
 
 > Goal: Build the frontend React components where users will interact with the AI Secretary Tasks.
 
+- `[P3A.0]` **Inspiration Protocol**: Ask the user if they want to fetch a reference UI project (like an AI chat interface) into the `inspirations/` folder before building the UI to save tokens and provide a design baseline.
 - `[P3A.1]` Create a UI component (e.g., `src/components/dashboard/ai-secretary-widget.tsx`) to display pending tasks.
 - `[P3A.2]` Integrate `secretary.service.ts` into the UI to fetch, dismiss, and complete tasks.
 - `[P3A.3]` Add the AI Secretary Widget to the main Dashboard layout.

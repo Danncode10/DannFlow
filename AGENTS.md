@@ -62,6 +62,8 @@ To fix:
 
 ## Vibe Workflow
 
+- **Inspiration Folder Protocol**: We have a dedicated `inspirations/` folder at the root (which is gitignored). Whenever you start a major UI task or a complex feature, FIRST ask the user if they want to clone/download a reference GitHub repo into `inspirations/` to serve as a design/code reference and save tokens. If the user agrees, fetch the reference repo there before coding. If they say to skip, proceed to code from scratch.
+
 - If you encounter a bug, fix it in the **Service** layer first.
 - If you need a new data structure, define or request generation of its types in `src/types/` first.
 - **Masterplan + GitHub Project Tracking**: For a new SaaS, `/new-project` must finish before `/masterplan-init`; the user must create a Kanban-style GitHub Project before `/masterplan-init` links it. Before later feature or task work, find the matching ordered task in `MASTERPLAN.md` and the linked GitHub Project when one exists. Use stable IDs like `[P2.1]`, `[P2.2]`, `[P3A.1]`; never create bare `[P2]` cards.
@@ -83,7 +85,7 @@ To fix:
   1. Verify Supabase MCP connection.
   2. Read the live schema (Tables, Enums, RLS, Triggers) for the specified project ID.
   3. Generate the full DDL and save it to the specified timestamped SQL file in `supabase/backups/`.
-- **Schema Source of Truth**: Database schema and migrations are managed natively via Supabase CLI in `supabase/migrations/`. For normal schema changes, write `.sql` files directly in `supabase/migrations/` (or use local Supabase Studio via `npm run db:setup` and capture changes with `npm run db:generate`), then run `npm run db:migrate` (which runs `supabase db push`). Do **not** use Supabase MCP `apply_migration` or direct SQL on the live database for normal schema changes.
+- **Schema Source of Truth**: Database schema and migrations are managed natively via Supabase CLI in `supabase/migrations/`. For normal schema changes, write `.sql` files directly in `supabase/migrations/`, then run `npm run db:migrate` (which runs `supabase db push`) to deploy them to the remote cloud database. **DO NOT** use `npm run db:setup` or attempt to start local Docker containers, as the user has low storage. Always test and apply changes directly against the remote cloud database. Do **not** use Supabase MCP `apply_migration` or direct SQL on the live database for normal schema changes.
 - **Explicit Supabase MCP Schema Changes**: If the user explicitly asks to manipulate the live Supabase schema through MCP, use `.claude/commands/schema-change.md`. The tracked flow must checkpoint first, save the approved SQL to `supabase/migrations/YYYYMMDDHHMMSS_<name>.sql`, apply the exact SQL, regenerate `src/types/supabase.ts`, and verify the live schema/RLS state.
 - **Emergency Schema Hotfixes**: If a schema change is made directly through Supabase MCP or SQL on the live database, immediately capture it by running `supabase db pull` or generating a new migration in `supabase/migrations/`, and refresh `src/types/supabase.ts`. Never leave live schema drift untracked.
 - **Project Provisioning**: If requested to create a new project and apply a schema:
@@ -133,7 +135,7 @@ Always check `src/types/supabase.ts` and **assume RLS is active on every table**
 ## 🗄️ Supabase Workflow for AI Agents
 
 1. **Schema Source of Truth**: Database schema and migrations are managed natively via Supabase CLI in `supabase/migrations/`.
-2. **Migration Flow**: Write `.sql` files in `supabase/migrations/` (or make changes in local Supabase Studio via `npm run db:setup` and capture with `npm run db:generate`), then run `npm run db:migrate` to push them to the remote database.
+2. **Cloud-First Migration Flow**: Write `.sql` files in `supabase/migrations/`, then run `npm run db:migrate` to push them directly to the remote cloud database. **CRITICAL RULE:** Do NOT use `npm run db:setup`, `supabase start`, or Docker locally. The user has low storage constraints and develops exclusively against the cloud Supabase project.
 3. **MCP Read/Verify Role**: Use the Supabase MCP for live schema reads, verification, advisors, project provisioning, and checkpoint snapshots. Do not use MCP `apply_migration` for normal tracked schema changes.
 4. **Explicit MCP Mutation Flow**: When the user explicitly requests live Supabase schema manipulation through MCP, use `.claude/commands/schema-change.md` so the approved SQL is tracked in `supabase/migrations/`, and types are regenerated.
 5. **Sync Types**: After any schema change, refresh `src/types/supabase.ts` using `npm run db:types` or `npm run db:types:remote`. Rely ONLY on these generated definitions in app code.
