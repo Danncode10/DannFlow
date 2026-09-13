@@ -49,6 +49,7 @@ export async function signUpWithEmailRateLimited(
     throw new Error('Use a stronger password before creating your account.');
   }
 
+  const cleanOrigin = origin ? origin.replace('0.0.0.0', 'localhost') : 'http://localhost:3000';
   const supabase = await createClient();
   const { error } = await supabase.auth.signUp({
     email,
@@ -56,8 +57,8 @@ export async function signUpWithEmailRateLimited(
     options: {
       // After user clicks the email link, Supabase will redirect here
       // with ?code=... → our /auth/callback route exchanges it for a session
-      // → then redirects to /login (default next)
-      emailRedirectTo: `${origin}/auth/callback?next=/login`,
+      // → then redirects to /dashboard
+      emailRedirectTo: `${cleanOrigin}/auth/callback?next=/dashboard`,
       data: fullName ? { full_name: fullName } : undefined,
     },
   });
@@ -68,6 +69,8 @@ export async function signUpWithEmailRateLimited(
 export async function forgotPasswordRateLimited(email: string, redirectUrl: string) {
   const { success } = await verifyRateLimit(email, "password-reset");
   if (!success) throw new Error('Too many password reset attempts. Try again in a few moments.');
+
+  const cleanRedirectUrl = redirectUrl ? redirectUrl.replace('0.0.0.0', 'localhost') : 'http://localhost:3000/reset-password';
 
   // Recovery emails may be opened in a different browser from the one that
   // requested them. Avoid PKCE's browser-local verifier for this one flow.
@@ -84,7 +87,7 @@ export async function forgotPasswordRateLimited(email: string, redirectUrl: stri
     },
   );
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: redirectUrl,
+    redirectTo: cleanRedirectUrl,
   });
   if (error) throw error;
   return { success: true };
