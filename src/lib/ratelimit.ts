@@ -5,8 +5,12 @@ const DEFAULT_LIMIT = 5;
 const DEFAULT_WINDOW = "10 s";
 const REDIS_URL = process.env.UPSTASH_REDIS_REST_URL;
 const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
-const isRedisConfigured = Boolean(REDIS_URL && REDIS_TOKEN);
-const isProduction = process.env.NODE_ENV === "production";
+const isRedisConfigured = Boolean(
+  REDIS_URL &&
+  REDIS_TOKEN &&
+  !REDIS_URL.includes("your-upstash") &&
+  !REDIS_URL.includes("placeholder")
+);
 
 export type RateLimitCheck = {
   success: boolean;
@@ -34,33 +38,42 @@ const defaultLimiter = redis
     })
   : null;
 
-function retryAfterFromReset(reset: number): number {
-  return Math.max(1, Math.ceil((reset - Date.now()) / 1000));
-}
+const inMemoryStore = new Map<string, { count: number; reset: number }>();
 
-function unavailableResult(
-  reason: RateLimitCheck["reason"],
-  limit = DEFAULT_LIMIT
-): RateLimitCheck {
+function inMemoryRateLimit(key: string, limit = DEFAULT_LIMIT, windowSec = 10): RateLimitCheck {
+  const now = Date.now();
+  const entry = inMemoryStore.get(key);
+  if (!entry || now > entry.reset) {
+    inMemoryStore.set(key, { count: 1, reset: now + windowSec * 1000 });
+    return {
+      success: true,
+      limit,
+      remaining: limit - 1,
+      reset: now + windowSec * 1000,
+      retryAfter: 0,
+    };
+  }
+  if (entry.count < limit) {
+    entry.count++;
+    return {
+      success: true,
+      limit,
+      remaining: limit - entry.count,
+      reset: entry.reset,
+      retryAfter: 0,
+    };
+  }
   return {
     success: false,
     limit,
     remaining: 0,
-    reset: Date.now() + 60 * 1000,
-    retryAfter: 60,
-    reason,
+    reset: entry.reset,
+    retryAfter: Math.max(1, Math.ceil((entry.reset - now) / 1000)),
   };
 }
 
-function localBypassResult(limit = DEFAULT_LIMIT): RateLimitCheck {
-  return {
-    success: true,
-    limit,
-    remaining: limit,
-    reset: Date.now(),
-    retryAfter: 0,
-    reason: "redis_not_configured",
-  };
+function retryAfterFromReset(reset: number): number {
+  return Math.max(1, Math.ceil((reset - Date.now()) / 1000));
 }
 
 /**
@@ -74,13 +87,7 @@ export async function verifyRateLimit(
   const key = `${namespace}:${identifier}`;
 
   if (!defaultLimiter) {
-    if (!isProduction) {
-      console.warn("Rate limiter bypassed in local development: missing Upstash Redis env vars.");
-      return localBypassResult();
-    }
-
-    console.error("Rate limiter unavailable in production: missing Upstash Redis env vars.");
-    return unavailableResult("redis_not_configured");
+    return inMemoryRateLimit(key);
   }
 
   try {
@@ -95,13 +102,8 @@ export async function verifyRateLimit(
       pending: result.pending,
     };
   } catch (error) {
-    console.error("Rate limiter failed:", error);
-
-    if (!isProduction) {
-      return localBypassResult();
-    }
-
-    return unavailableResult("upstash_error");
+    console.warn("Upstash Redis rate limiter failed, falling back to in-memory limiter:", error);
+    return inMemoryRateLimit(key);
   }
 }
 
