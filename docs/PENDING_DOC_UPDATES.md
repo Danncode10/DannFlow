@@ -207,3 +207,25 @@
   - **Null Safety Hardening**: Hardened `sanitizeText` in `src/lib/utils.ts` to guard against `undefined` or non-string values during stream state transitions, preventing React render tree crashes.
   - **History Types & Exports**: Re-exported `ChatHistory`, `getChatHistoryPaginationKey`, and `useChatHistory` from `src/components/chat/sidebar-history.tsx` to satisfy TypeScript checks in `use-active-chat.tsx` and `use-chat-visibility.ts`.
 - **Verification**: Verified with `npx tsc --noEmit` (0 errors), end-to-end curl stream response, and live browser chat streaming confirmation from the user.
+
+### Phase 3A: AI Conversation Persistence (Database & History)
+
+- **Date**: 2026-09-13
+- **Changes**:
+  - **Database Migrations (`20260913000001_ai_chat_history.sql`, `20260913000002_ai_chat_id_text.sql`)**:
+    - Created `public.ai_chats` (`id`, `organization_id`, `user_id`, `title`, `visibility`, `created_at`, `updated_at`) and `public.ai_messages` (`id`, `chat_id`, `role`, `parts`, `created_at`) tables with cascading foreign keys and indexes.
+    - Implemented multi-tenant Row Level Security (RLS) policies for both tables, enforcing tenant boundaries via `organization_id IN (SELECT id FROM public.organizations WHERE owner_id = auth.uid())`.
+    - Applied migrations to the live Supabase project via `npm run db:migrate` and refreshed definitions in `src/types/supabase.ts` via `npm run db:types:remote`.
+  - **Service Layer (`src/services/ai-chat.service.ts`)**:
+    - Created modular service with `createOrGetChat()`, `listUserChats()`, `getChatMessages()`, `saveChatMessage()`, `deleteUserChat()`, and `updateChatTitle()`.
+  - **API Route (`src/app/api/history/route.ts`)**:
+    - Implemented `GET` for paginated chat history (returns `{ chats, hasMore }`) and for loading specific chat messages (`?chatId=...`).
+    - Implemented `DELETE` for removing chat sessions and cascading messages.
+  - **Chat Persistence in `/api/chat/route.ts`**:
+    - User messages are saved to `ai_messages` upon incoming request.
+    - First user message automatically derives a concise title for `ai_chats`.
+    - Assistant responses are persisted upon stream finish (`onFinish`).
+  - **UI Integration (`src/components/chat/sidebar-history.tsx` & `src/components/dashboard/tabs/ai-secretary-tab.tsx`)**:
+    - Connected `SidebarHistory` to `useChatHistory()` with real-time deletion, active session highlight, and "Start new conversation" button.
+    - Added `currentChatId` state and conversation switcher (`handleSelectChat`) to load historical conversations in `AiSecretaryTab`.
+- **Verification**: Verified with `npx tsc --noEmit` (0 errors), direct API curl test on `/api/history` (200 OK), and live Supabase table count check.

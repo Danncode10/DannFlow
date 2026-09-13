@@ -39,6 +39,76 @@ export type Database = {
   };
   public: {
     Tables: {
+      ai_chats: {
+        Row: {
+          created_at: string;
+          id: string;
+          organization_id: string;
+          title: string;
+          updated_at: string;
+          user_id: string | null;
+          visibility: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          organization_id?: string;
+          title?: string;
+          updated_at?: string;
+          user_id?: string | null;
+          visibility?: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          organization_id?: string;
+          title?: string;
+          updated_at?: string;
+          user_id?: string | null;
+          visibility?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "ai_chats_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      ai_messages: {
+        Row: {
+          chat_id: string;
+          created_at: string;
+          id: string;
+          parts: Json;
+          role: string;
+        };
+        Insert: {
+          chat_id: string;
+          created_at?: string;
+          id?: string;
+          parts?: Json;
+          role: string;
+        };
+        Update: {
+          chat_id?: string;
+          created_at?: string;
+          id?: string;
+          parts?: Json;
+          role?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "ai_messages_chat_id_fkey";
+            columns: ["chat_id"];
+            isOneToOne: false;
+            referencedRelation: "ai_chats";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       availability_slots: {
         Row: {
           created_at: string;

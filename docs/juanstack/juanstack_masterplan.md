@@ -197,12 +197,12 @@ These 5 decisions affect the entire architecture. Agree on them before writing a
 
 > Goal: Set up the essential database tables to persist AI chat sessions and messages so the "History" sidebar functions correctly.
 
-- `[ ]` `[P3A.1]` Create Supabase migration `*_ai_chat_history.sql` to define:
+- `[x]` `[P3A.1]` Create Supabase migration `*_ai_chat_history.sql` to define:
   - `ai_chats` (id, organization_id, user_id, title, created_at, updated_at)
   - `ai_messages` (id, chat_id, role, content, tool_calls, created_at)
-- `[ ]` `[P3A.2]` Apply RLS policies ensuring users can only read/write chats belonging to their organization.
-- `[ ]` `[P3A.3]` Implement `src/app/api/history/route.ts` to fetch paginated chat history for the sidebar.
-- `[ ]` `[P3A.4]` Refactor `src/components/chat/sidebar-history.tsx` to fetch real data from the history API instead of using mock data.
+- `[x]` `[P3A.2]` Apply RLS policies ensuring users can only read/write chats belonging to their organization.
+- `[x]` `[P3A.3]` Implement `src/app/api/history/route.ts` to fetch paginated chat history for the sidebar.
+- `[x]` `[P3A.4]` Refactor `src/components/chat/sidebar-history.tsx` to fetch real data from the history API instead of using mock data.
 
 ---
 

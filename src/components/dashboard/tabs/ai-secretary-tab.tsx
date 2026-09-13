@@ -12,9 +12,12 @@ import { DefaultChatTransport } from "ai";
 import { toast } from "sonner";
 
 export function AiSecretaryTab() {
+  const [currentChatId, setCurrentChatId] = useState<string>(
+    () => "chat-" + Date.now(),
+  );
   const [input, setInput] = useState("");
   const { messages, setMessages, status, stop, sendMessage, error } = useChat({
-    id: "secretary-chat",
+    id: currentChatId,
     transport: new DefaultChatTransport({
       api: "/api/chat",
     }),
@@ -26,11 +29,44 @@ export function AiSecretaryTab() {
 
   const [attachments, setAttachments] = useState<Attachment[]>([]);
 
+  const handleSelectChat = async (selectedId: string) => {
+    setCurrentChatId(selectedId);
+    try {
+      const res = await fetch(
+        `/api/history?chatId=${encodeURIComponent(selectedId)}`,
+      );
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data.messages)) {
+          const formatted = data.messages.map((m: any) => ({
+            id: m.id,
+            role: m.role,
+            parts: m.parts || [{ type: "text", text: "" }],
+          }));
+          setMessages(formatted);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to load conversation:", err);
+    }
+  };
+
+  const handleNewChat = () => {
+    const newId = "chat-" + Date.now();
+    setCurrentChatId(newId);
+    setMessages([]);
+    setInput("");
+  };
+
   return (
     <DataStreamProvider>
       <div className="flex h-[calc(100vh-6rem)] w-full flex-col md:flex-row bg-background relative overflow-hidden rounded-xl border border-border">
         {/* Left Sidebar (History) */}
-        <SidebarHistory />
+        <SidebarHistory
+          currentChatId={currentChatId}
+          onSelectChat={handleSelectChat}
+          onNewChat={handleNewChat}
+        />
 
         {/* Main Chat Area */}
         <div className="flex flex-1 flex-col overflow-hidden relative">
@@ -52,7 +88,7 @@ export function AiSecretaryTab() {
           {/* Chat Messages */}
           <div className="flex-1 flex flex-col min-h-0 overflow-hidden relative">
             <Messages
-              chatId="secretary-chat"
+              chatId={currentChatId}
               messages={messages as any}
               setMessages={setMessages as any}
               status={status}
@@ -66,7 +102,7 @@ export function AiSecretaryTab() {
           <div className="border-t border-border/50 bg-card/50 p-4">
             <div className="mx-auto max-w-3xl">
               <MultimodalInput
-                chatId="secretary-chat"
+                chatId={currentChatId}
                 input={input}
                 setInput={setInput}
                 status={status}
