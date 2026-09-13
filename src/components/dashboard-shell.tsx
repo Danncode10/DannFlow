@@ -16,6 +16,7 @@ import {
   X,
   Menu,
   ShieldCheck,
+  Bot,
   type LucideIcon,
 } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -24,7 +25,11 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { siteConfig } from "@/lib/config";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 
-import { getEnabledTabs, isFeatureEnabled, type DashboardTabId } from "@/lib/dashboard-features";
+import {
+  getEnabledTabs,
+  isFeatureEnabled,
+  type DashboardTabId,
+} from "@/lib/dashboard-features";
 import { OverviewTab } from "@/components/dashboard/tabs/overview-tab";
 import { ServicesTab } from "@/components/dashboard/tabs/services-tab";
 import { LeadsTab } from "@/components/dashboard/tabs/leads-tab";
@@ -32,10 +37,12 @@ import { BookingsTab } from "@/components/dashboard/tabs/bookings-tab";
 import { BlogTab } from "@/components/dashboard/tabs/blog-tab";
 import { AnalyticsTab } from "@/components/dashboard/tabs/analytics-tab";
 import { SettingsTab } from "@/components/dashboard/tabs/settings-tab";
+import { AiSecretaryTab } from "@/components/dashboard/tabs/ai-secretary-tab";
 import { NotificationsBell } from "@/components/dashboard/notifications-bell";
 
 const ICONS: Record<DashboardTabId, LucideIcon> = {
   overview: LayoutDashboard,
+  "ai-secretary": Bot,
   services: Tag,
   leads: Inbox,
   bookings: Calendar,
@@ -51,44 +58,63 @@ interface DashboardShellProps {
   children?: React.ReactNode;
 }
 
-export function DashboardShell({ user, profile, children }: DashboardShellProps) {
+export function DashboardShell({
+  user,
+  profile,
+  children,
+}: DashboardShellProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const userRole = profile?.role ?? "user";
   const enabledTabs = React.useMemo(() => getEnabledTabs(userRole), [userRole]);
-  const validIds = React.useMemo(() => new Set(enabledTabs.map((t) => t.id)), [enabledTabs]);
+  const validIds = React.useMemo(
+    () => new Set(enabledTabs.map((t) => t.id)),
+    [enabledTabs],
+  );
 
   const initialTab = (() => {
     const fromQuery = searchParams.get("tab") as DashboardTabId | null;
-    return fromQuery && fromQuery !== "team" && validIds.has(fromQuery) ? fromQuery : "overview";
+    return fromQuery && fromQuery !== "team" && validIds.has(fromQuery)
+      ? fromQuery
+      : "overview";
   })();
 
-  const [activeTab, setActiveTabLocal] = React.useState<DashboardTabId>(initialTab);
+  const [activeTab, setActiveTabLocal] =
+    React.useState<DashboardTabId>(initialTab);
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
   const [collapsed, setCollapsed] = React.useState(false);
   const [userMenuOpen, setUserMenuOpen] = React.useState(false);
 
-  const displayName = profile?.full_name || user.email?.split("@")[0] || "there";
-  const initials = displayName.split(" ").map((n: string) => n[0]).join("").slice(0, 2).toUpperCase();
+  const displayName =
+    profile?.full_name || user.email?.split("@")[0] || "there";
+  const initials = displayName
+    .split(" ")
+    .map((n: string) => n[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 
   React.useEffect(() => {
     if (userRole === "admin") router.prefetch("/dashboard/team");
   }, [router, userRole]);
 
-  const setTab = React.useCallback((tab: DashboardTabId) => {
-    if (!validIds.has(tab)) return;
+  const setTab = React.useCallback(
+    (tab: DashboardTabId) => {
+      if (!validIds.has(tab)) return;
 
-    if (tab === "team") {
-      router.push("/dashboard/team");
+      if (tab === "team") {
+        router.push("/dashboard/team");
+        setSidebarOpen(false);
+        return;
+      }
+
+      setActiveTabLocal(tab);
+      router.push(`/dashboard?tab=${tab}`, { scroll: false });
       setSidebarOpen(false);
-      return;
-    }
-
-    setActiveTabLocal(tab);
-    router.push(`/dashboard?tab=${tab}`, { scroll: false });
-    setSidebarOpen(false);
-  }, [router, validIds]);
+    },
+    [router, validIds],
+  );
 
   const handleSignOut = async () => {
     const supabase = createClient();
@@ -99,11 +125,11 @@ export function DashboardShell({ user, profile, children }: DashboardShellProps)
 
   const mainTabs = enabledTabs.filter((t) => t.id !== "settings");
   const activeTabId = pathname === "/dashboard/team" ? "team" : activeTab;
-  const activeLabel = enabledTabs.find((t) => t.id === activeTabId)?.label ?? "Overview";
+  const activeLabel =
+    enabledTabs.find((t) => t.id === activeTabId)?.label ?? "Overview";
 
   return (
     <div className="h-screen bg-background flex overflow-hidden">
-
       {sidebarOpen && (
         <div
           className="fixed inset-0 z-40 bg-foreground/20 backdrop-blur-sm md:hidden"
@@ -111,35 +137,52 @@ export function DashboardShell({ user, profile, children }: DashboardShellProps)
         />
       )}
 
-      <aside className={`
+      <aside
+        className={`
         fixed inset-y-0 left-0 z-50 bg-card border-r border-border flex flex-col
         transition-all duration-200 ease-in-out
         ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
         ${collapsed ? "md:w-14" : "md:w-56"}
         w-56 md:translate-x-0 md:relative md:z-auto md:h-full md:flex-shrink-0
-      `}>
-
+      `}
+      >
         <div className="h-14 flex items-center justify-between px-3 border-b border-border shrink-0">
-          <a href="/" className={`flex items-center gap-2.5 overflow-hidden ${collapsed ? "md:justify-center md:w-full" : ""}`}>
+          <a
+            href="/"
+            className={`flex items-center gap-2.5 overflow-hidden ${collapsed ? "md:justify-center md:w-full" : ""}`}
+          >
             <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary/70 shadow-[0_2px_8px_rgba(220,38,38,0.4)] shrink-0">
-              <span className="text-[11px] font-black text-white">{siteConfig.name.charAt(0)}</span>
+              <span className="text-[11px] font-black text-white">
+                {siteConfig.name.charAt(0)}
+              </span>
             </div>
-            <span className={`text-sm font-bold tracking-tight text-foreground whitespace-nowrap ${collapsed ? "md:hidden" : ""}`}>
+            <span
+              className={`text-sm font-bold tracking-tight text-foreground whitespace-nowrap ${collapsed ? "md:hidden" : ""}`}
+            >
               {siteConfig.name}
             </span>
           </a>
-          <button onClick={() => setSidebarOpen(false)} className="md:hidden p-1 text-muted-foreground hover:text-foreground rounded-md">
+          <button
+            onClick={() => setSidebarOpen(false)}
+            className="md:hidden p-1 text-muted-foreground hover:text-foreground rounded-md"
+          >
             <X className="w-4 h-4" />
           </button>
           {!collapsed && (
-            <button onClick={() => setCollapsed(true)} className="hidden md:flex p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+            <button
+              onClick={() => setCollapsed(true)}
+              className="hidden md:flex p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            >
               <PanelLeftClose className="w-4 h-4" />
             </button>
           )}
         </div>
 
         {collapsed && (
-          <button onClick={() => setCollapsed(false)} className="hidden md:flex items-center justify-center h-10 w-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+          <button
+            onClick={() => setCollapsed(false)}
+            className="hidden md:flex items-center justify-center h-10 w-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+          >
             <PanelLeft className="w-4 h-4" />
           </button>
         )}
@@ -157,14 +200,19 @@ export function DashboardShell({ user, profile, children }: DashboardShellProps)
               <button
                 key={id}
                 onClick={() => setTab(id)}
-                onMouseEnter={() => id === "team" && router.prefetch("/dashboard/team")}
-                onFocus={() => id === "team" && router.prefetch("/dashboard/team")}
+                onMouseEnter={() =>
+                  id === "team" && router.prefetch("/dashboard/team")
+                }
+                onFocus={() =>
+                  id === "team" && router.prefetch("/dashboard/team")
+                }
                 title={collapsed ? label : undefined}
                 className={`w-full flex items-center gap-3 rounded-lg text-[13px] transition-colors
                   ${collapsed ? "md:justify-center px-0 py-2.5" : "px-3 py-2"}
-                  ${isActive
-                    ? "bg-primary/10 text-primary font-medium"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  ${
+                    isActive
+                      ? "bg-primary/10 text-primary font-medium"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
                   }`}
               >
                 <Icon className="w-4 h-4 shrink-0" strokeWidth={1.5} />
@@ -191,22 +239,35 @@ export function DashboardShell({ user, profile, children }: DashboardShellProps)
           <div className="relative">
             {userMenuOpen && (
               <>
-                <div className="fixed inset-0 z-40" onClick={() => setUserMenuOpen(false)} />
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setUserMenuOpen(false)}
+                />
                 <div className="absolute bottom-full left-0 mb-2 w-52 z-50 bg-card border border-border rounded-xl shadow-lg overflow-hidden">
                   <div className="px-4 py-3 border-b border-border">
-                    <p className="text-[12px] font-bold text-foreground truncate">{displayName}</p>
-                    <p className="text-[11px] text-muted-foreground truncate mt-0.5">{user.email}</p>
+                    <p className="text-[12px] font-bold text-foreground truncate">
+                      {displayName}
+                    </p>
+                    <p className="text-[11px] text-muted-foreground truncate mt-0.5">
+                      {user.email}
+                    </p>
                   </div>
                   <div className="p-1">
                     <button
-                      onClick={() => { router.push("/"); setUserMenuOpen(false); }}
+                      onClick={() => {
+                        router.push("/");
+                        setUserMenuOpen(false);
+                      }}
                       className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                     >
                       <Home className="w-4 h-4 shrink-0" strokeWidth={1.5} />
                       Back to Home
                     </button>
                     <button
-                      onClick={() => { handleSignOut(); setUserMenuOpen(false); }}
+                      onClick={() => {
+                        handleSignOut();
+                        setUserMenuOpen(false);
+                      }}
                       className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] text-destructive hover:bg-destructive/10 transition-colors"
                     >
                       <LogOut className="w-4 h-4 shrink-0" strokeWidth={1.5} />
@@ -217,7 +278,7 @@ export function DashboardShell({ user, profile, children }: DashboardShellProps)
               </>
             )}
             <button
-              onClick={() => setUserMenuOpen(v => !v)}
+              onClick={() => setUserMenuOpen((v) => !v)}
               title={collapsed ? displayName : undefined}
               className={`w-full flex items-center gap-2.5 rounded-lg hover:bg-muted transition-colors
                 ${collapsed ? "md:justify-center px-0 py-2" : "px-3 py-2"}`}
@@ -227,9 +288,15 @@ export function DashboardShell({ user, profile, children }: DashboardShellProps)
                   {initials}
                 </AvatarFallback>
               </Avatar>
-              <div className={`flex-1 min-w-0 text-left ${collapsed ? "md:hidden" : ""}`}>
-                <p className="text-[12px] font-semibold text-foreground truncate">{displayName}</p>
-                <p className="text-[10px] text-muted-foreground truncate">{user.email}</p>
+              <div
+                className={`flex-1 min-w-0 text-left ${collapsed ? "md:hidden" : ""}`}
+              >
+                <p className="text-[12px] font-semibold text-foreground truncate">
+                  {displayName}
+                </p>
+                <p className="text-[10px] text-muted-foreground truncate">
+                  {user.email}
+                </p>
               </div>
             </button>
           </div>
@@ -237,26 +304,35 @@ export function DashboardShell({ user, profile, children }: DashboardShellProps)
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-
         <header className="h-14 flex items-center justify-between px-5 border-b border-border bg-background shrink-0">
-          <button onClick={() => setSidebarOpen(true)} className="md:hidden p-2 -ml-2 text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted transition-colors">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="md:hidden p-2 -ml-2 text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted transition-colors"
+          >
             <Menu className="w-5 h-5" />
           </button>
-          <span className="text-[14px] font-medium text-foreground hidden md:block">{activeLabel}</span>
+          <span className="text-[14px] font-medium text-foreground hidden md:block">
+            {activeLabel}
+          </span>
           <div className="flex-1 md:hidden" />
           <NotificationsBell setTab={setTab} />
         </header>
 
         <main className="flex-1 overflow-y-auto p-6 md:p-8">
-          {pathname === "/dashboard/team" && children ? children : (
+          {pathname === "/dashboard/team" && children ? (
+            children
+          ) : (
             <>
-              {activeTab === "overview"  && <OverviewTab displayName={displayName} setTab={setTab} />}
-              {activeTab === "services"  && <ServicesTab />}
-              {activeTab === "leads"     && <LeadsTab />}
-              {activeTab === "bookings"  && <BookingsTab />}
-              {activeTab === "blog"      && <BlogTab />}
+              {activeTab === "overview" && (
+                <OverviewTab displayName={displayName} setTab={setTab} />
+              )}
+              {activeTab === "services" && <ServicesTab />}
+              {activeTab === "leads" && <LeadsTab />}
+              {activeTab === "bookings" && <BookingsTab />}
+              {activeTab === "blog" && <BlogTab />}
               {activeTab === "analytics" && <AnalyticsTab />}
-              {activeTab === "settings"  && <SettingsTab />}
+              {activeTab === "settings" && <SettingsTab />}
+              {activeTab === "ai-secretary" && <AiSecretaryTab />}
             </>
           )}
         </main>

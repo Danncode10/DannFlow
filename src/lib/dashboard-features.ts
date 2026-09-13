@@ -1,5 +1,6 @@
 export type DashboardTabId =
   | "overview"
+  | "ai-secretary"
   | "services"
   | "leads"
   | "bookings"
@@ -26,21 +27,32 @@ interface TabConfig {
 }
 
 export const TAB_CONFIG: TabConfig[] = [
-  { id: "overview",   label: "Overview",   feature: "always" },
-  { id: "services",   label: "Services",   feature: "pricing" },
-  { id: "leads",      label: "Leads",      feature: "contactForm" },
-  { id: "bookings",   label: "Bookings",   feature: "contactForm" },
-  { id: "blog",       label: "Blog",       feature: "blog" },
-  { id: "analytics",  label: "Analytics",  feature: "analytics" },
-  { id: "team",       label: "Team",       feature: "admin-only" },
-  { id: "settings",   label: "Settings",   feature: "always" },
+  { id: "overview", label: "Overview", feature: "always" },
+  { id: "ai-secretary", label: "AI Secretary", feature: "always" },
+  { id: "services", label: "Services", feature: "pricing" },
+  { id: "leads", label: "Leads", feature: "contactForm" },
+  { id: "bookings", label: "Bookings", feature: "contactForm" },
+  { id: "blog", label: "Blog", feature: "blog" },
+  { id: "analytics", label: "Analytics", feature: "analytics" },
+  { id: "team", label: "Team", feature: "admin-only" },
+  { id: "settings", label: "Settings", feature: "always" },
 ];
 
-export function isFeatureEnabled(flag: FeatureFlag, role: string | null | undefined = "user"): boolean {
+export function isFeatureEnabled(
+  flag: FeatureFlag,
+  role: string | null | undefined = "user",
+): boolean {
   if (flag === "admin-only") return role === "admin";
-  return flag === "always" || flag === "pricing" || flag === "contactForm" || flag === "blog";
+  return (
+    flag === "always" ||
+    flag === "pricing" ||
+    flag === "contactForm" ||
+    flag === "blog"
+  );
 }
 
-export function getEnabledTabs(role: string | null | undefined = "user"): TabConfig[] {
+export function getEnabledTabs(
+  role: string | null | undefined = "user",
+): TabConfig[] {
   return TAB_CONFIG.filter((t) => isFeatureEnabled(t.feature, role));
 }
