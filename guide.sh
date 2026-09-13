@@ -679,7 +679,9 @@ show_claude() {
 
     echo -e "${BOLD}1. Configure GitHub MCP + Supabase MCP${NC}"
     echo -e "   See ${CYAN}docs/dannflow_docs/mcp-setup.md${NC}; GitHub MCP must access Projects.\n"
-    echo -e "${BOLD}2. Run /new-project in Claude Code${NC}"
+    echo -e "${BOLD}2. Initialize Context & Run /new-project in Claude Code${NC}"
+    echo -e "   • For JuanStack verticals: run ${CYAN}/juanstack-init${NC}"
+    echo -e "   • For standard SaaS: edit ${CYAN}PROJECT_CONTEXT.md${NC} and run ${CYAN}/new-project${NC}"
     echo -e "   Captures your SaaS description, connects the repo and Supabase, and verifies schema.\n"
     echo -e "${BOLD}3. Create a Kanban GitHub Project${NC}"
     echo -e "   Use Status values: Backlog, Ready, In progress, Done. Do not use a draft board.\n"
