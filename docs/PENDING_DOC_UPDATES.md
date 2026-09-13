@@ -228,4 +228,8 @@
   - **UI Integration (`src/components/chat/sidebar-history.tsx` & `src/components/dashboard/tabs/ai-secretary-tab.tsx`)**:
     - Connected `SidebarHistory` to `useChatHistory()` with real-time deletion, active session highlight, and "Start new conversation" button.
     - Added `currentChatId` state and conversation switcher (`handleSelectChat`) to load historical conversations in `AiSecretaryTab`.
-- **Verification**: Verified with `npx tsc --noEmit` (0 errors), direct API curl test on `/api/history` (200 OK), and live Supabase table count check.
+    - Added ChatGPT-style automatic sidebar synchronization: requests pass `{ body: { id: chatId } }`, and SWR history is revalidated immediately upon submission (`status === "submitted"`) and completion (`onFinish`).
+    - Added accessible `ConfirmationDialog` modal with destructive styling when deleting a chat, prompting the user before permanent deletion.
+  - **Organization Auto-Provisioning (`supabase/migrations/20260913000003_auto_org_creation.sql`)**:
+    - Backfilled missing default organization rows for existing users and updated `handle_new_user()` trigger to automatically create both `profiles` and `organizations` on signup, ensuring tenant RLS queries and chat persistence succeed without manual admin setup.
+- **Verification**: Verified with `npm run db:migrate` (succeeded), `npx tsc --noEmit` (0 errors), `npx eslint` (0 errors), confirmed database deletion with cascading message cleanup (tested and verified zero orphaned rows).

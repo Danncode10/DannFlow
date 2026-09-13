@@ -5,7 +5,11 @@ import fs from "fs";
 import path from "path";
 import { createClient } from "@/utils/supabase/server";
 import { aiToolsRegistry } from "@/ai/tools";
-import { saveChatMessage, updateChatTitle } from "@/services/ai-chat.service";
+import {
+  createOrGetChat,
+  saveChatMessage,
+  updateChatTitle,
+} from "@/services/ai-chat.service";
 
 export const maxDuration = 30;
 
@@ -58,21 +62,21 @@ export async function POST(req: Request) {
         { type: "text", text: userMessage.content || "" },
       ];
       const textContent = parts.find((p: any) => p.type === "text")?.text || "";
+      const isFirstMessage =
+        messages.filter((m: any) => m.role === "user").length === 1;
+      const title =
+        isFirstMessage && textContent
+          ? textContent.slice(0, 35) + (textContent.length > 35 ? "..." : "")
+          : undefined;
 
-      saveChatMessage(chatId, "user", parts).catch((err) =>
-        console.error("Error saving user message:", err),
-      );
-
-      // If it's the first message, set a friendly title for the chat
-      if (
-        messages.filter((m: any) => m.role === "user").length === 1 &&
-        textContent
-      ) {
-        const title =
-          textContent.slice(0, 35) + (textContent.length > 35 ? "..." : "");
-        updateChatTitle(chatId, title).catch((err) =>
-          console.error("Error updating chat title:", err),
-        );
+      try {
+        await createOrGetChat(chatId, title || "New Conversation");
+        if (title) {
+          await updateChatTitle(chatId, title);
+        }
+        await saveChatMessage(chatId, "user", parts);
+      } catch (err) {
+        console.error("Error saving user message:", err);
       }
     }
 

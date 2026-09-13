@@ -36,7 +36,7 @@ const suggestions = [
 ];
 
 function PureSuggestedActions({
-  chatId: _chatId,
+  chatId,
   selectedVisibilityType: _selectedVisibilityType,
   sendMessage,
 }: SuggestedActionsProps) {
@@ -48,6 +48,7 @@ function PureSuggestedActions({
       {suggestions.map((suggestion) => (
         <SuggestedActionButton
           key={suggestion.heading}
+          chatId={chatId}
           prompt={suggestion.prompt}
           heading={suggestion.heading}
           subheading={suggestion.subheading}
@@ -59,11 +60,13 @@ function PureSuggestedActions({
 }
 
 function SuggestedActionButton({
+  chatId,
   heading,
   subheading,
   prompt,
   sendMessage,
 }: {
+  chatId: string;
   heading: string;
   subheading: string;
   prompt: string;
@@ -71,11 +74,14 @@ function SuggestedActionButton({
     UseChatHelpers<ChatMessage>["sendMessage"] | (() => Promise<void>);
 }) {
   const handleClick = useCallback(() => {
-    sendMessage({
-      parts: [{ text: prompt, type: "text" }],
-      role: "user",
-    } as Parameters<UseChatHelpers<ChatMessage>["sendMessage"]>[0]);
-  }, [prompt, sendMessage]);
+    (sendMessage as any)(
+      {
+        parts: [{ text: prompt, type: "text" }],
+        role: "user",
+      },
+      { body: { id: chatId } },
+    );
+  }, [chatId, prompt, sendMessage]);
 
   return (
     <button

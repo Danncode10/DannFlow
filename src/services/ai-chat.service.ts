@@ -43,11 +43,27 @@ export async function createOrGetChat(
     .eq("owner_id", user.id)
     .maybeSingle();
 
-  if (!orgData) return null;
+  let orgId = orgData?.id;
+  if (!orgId) {
+    const orgName = user.email
+      ? `${user.email.split("@")[0]}'s Org`
+      : "My Organization";
+    const { data: newOrg } = await supabase
+      .from("organizations")
+      .insert({
+        owner_id: user.id,
+        name: orgName,
+      })
+      .select("id")
+      .single();
+    orgId = newOrg?.id;
+  }
+
+  if (!orgId) return null;
 
   const insertPayload: TablesInsert<"ai_chats"> = {
     id: chatId,
-    organization_id: orgData.id,
+    organization_id: orgId,
     user_id: user.id,
     title,
     visibility: "private",
@@ -80,8 +96,8 @@ export async function listUserChats(
 
   const { data, count, error } = await supabase
     .from("ai_chats")
-    .select("id, title, created_at, visibility", { count: "exact" })
-    .order("created_at", { ascending: false })
+    .select("id, title, created_at, updated_at, visibility", { count: "exact" })
+    .order("updated_at", { ascending: false })
     .range(from, to);
 
   if (error) {
@@ -92,7 +108,7 @@ export async function listUserChats(
   const chats: ChatListItem[] = (data || []).map((c) => ({
     id: c.id,
     title: c.title,
-    createdAt: c.created_at,
+    createdAt: c.updated_at || c.created_at,
     visibility: (c.visibility as "private" | "public") || "private",
   }));
 

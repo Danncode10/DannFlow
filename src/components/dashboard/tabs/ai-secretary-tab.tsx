@@ -7,25 +7,44 @@ import { MultimodalInput } from "@/components/chat/multimodal-input";
 import { Sparkles } from "lucide-react";
 import type { Attachment } from "@/lib/types";
 import { DataStreamProvider } from "@/components/chat/data-stream-provider";
-import { SidebarHistory } from "@/components/chat/sidebar-history";
+import {
+  SidebarHistory,
+  useChatHistory,
+} from "@/components/chat/sidebar-history";
 import { DefaultChatTransport } from "ai";
 import { toast } from "sonner";
+import { useEffect } from "react";
 
 export function AiSecretaryTab() {
   const [currentChatId, setCurrentChatId] = useState<string>(
     () => "chat-" + Date.now(),
   );
   const [input, setInput] = useState("");
+  const { mutate: mutateHistory } = useChatHistory();
+
   const { messages, setMessages, status, stop, sendMessage, error } = useChat({
     id: currentChatId,
     transport: new DefaultChatTransport({
       api: "/api/chat",
     }),
+    onFinish: () => {
+      mutateHistory();
+    },
     onError: (err) => {
       console.error("Chat streaming error:", err);
       toast.error(err.message || "Failed to receive response from AI");
     },
   });
+
+  // Automatically refresh history in sidebar as soon as message is submitted
+  useEffect(() => {
+    if (status === "submitted" || status === "streaming") {
+      const timer = setTimeout(() => {
+        mutateHistory();
+      }, 400);
+      return () => clearTimeout(timer);
+    }
+  }, [status, mutateHistory]);
 
   const [attachments, setAttachments] = useState<Attachment[]>([]);
 

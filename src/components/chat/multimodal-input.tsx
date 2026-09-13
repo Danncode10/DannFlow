@@ -227,25 +227,31 @@ function PureMultimodalInput({
 
   const submitForm = useCallback(() => {
     if (attachments.length > 0) {
-      sendMessage({
-        parts: [
-          ...attachments.map((attachment) => ({
-            mediaType: attachment.contentType,
-            name: attachment.name,
-            type: "file" as const,
-            url: attachment.url,
-          })),
-          {
-            text: input,
-            type: "text",
-          },
-        ],
-        role: "user",
-      });
+      (sendMessage as any)(
+        {
+          parts: [
+            ...attachments.map((attachment) => ({
+              mediaType: attachment.contentType,
+              name: attachment.name,
+              type: "file" as const,
+              url: attachment.url,
+            })),
+            {
+              text: input,
+              type: "text",
+            },
+          ],
+          role: "user",
+        },
+        { body: { id: chatId } },
+      );
     } else {
-      sendMessage({
-        text: input,
-      });
+      (sendMessage as any)(
+        {
+          text: input,
+        },
+        { body: { id: chatId } },
+      );
     }
 
     setAttachments([]);
