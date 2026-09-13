@@ -24,7 +24,7 @@ Select one mode and follow its rules:
 If folder name and remotes disagree, stop before editing and explain the mismatch. A non-`Dannflow` checkout with only `upstream → DannFlow` is not ready for project work; configure `origin` and make `upstream` fetch-only first. Never infer mode from the files being viewed—use the repository root folder and remote configuration.
 
 ```
-npm run db:setup (optional local Studio) → make schema changes visually
+`npm run db:migrate` → run against remote cloud database directly (Do NOT use `npm run db:setup` or local Docker)
 npm run db:generate <name>      → capture SQL via `supabase db diff`
 npm run db:migrate              → apply to Supabase
 npm run db:types                → refresh src/types/supabase.ts
@@ -103,7 +103,7 @@ Theme variables live in `src/app/globals.css` under `@theme`.
 ## Database workflow (Supabase CLI)
 
 1. **Schema source of truth** — Database schema and migrations are managed natively via Supabase CLI in `supabase/migrations/`.
-2. **Generate SQL** — Write `.sql` files directly in `supabase/migrations/` (or make changes in local Supabase Studio via `npm run db:setup` and `npm run db:generate`).
+2. **Generate SQL** — Write `.sql` files directly in `supabase/migrations/` (Do NOT use `npm run db:setup` or local Docker, the user develops strictly on cloud).
 3. **Supabase platform SQL** — You can also manually add RLS policies, auth triggers, and functions directly to the generated SQL migration when needed.
 4. **Apply and sync** — Run `npm run db:migrate` to push to your remote database, and `npm run db:types` to refresh `src/types/supabase.ts`.
 5. **Checkpoint live state** — Before risky/destructive changes, run `npm run checkpoint` to snapshot the live project into `supabase/backups/`.
@@ -154,7 +154,8 @@ For GitHub Projects, if the authenticated `gh` CLI reports a missing `read:proje
 - `async`/`await` for all async ops.
 - Place new components in `src/components/`, logic in `src/lib/` or `src/hooks/`.
 - DRY + SOLID. Extract repeated logic into hooks or components.
-- **Don't restructure** existing folder hierarchy or UI patterns unless explicitly asked.
+- **Inspiration Folder Protocol**: We have a dedicated `inspirations/` folder at the root (which is gitignored). Whenever you start a major UI task or a complex feature, FIRST ask the user if they want to clone/download a reference GitHub repo into `inspirations/` to serve as a design/code reference and save tokens. If the user agrees, fetch the reference repo there before coding.
+  - **CRITICAL RULE**: If an inspiration repo is present, you MUST copy its UI components, styling, and logic as exactly as possible into the project. Do not write your own simplified version from scratch. Your job is to extract the existing complex components from the inspiration folder and modify them only as necessary to wire them into the DannFlow repo.- **Don't restructure** existing folder hierarchy or UI patterns unless explicitly asked.
 - After making code changes, end your response with a one-line conventional commit message for easy copy-paste (e.g. `feat: add password re-auth gate`).
 
 ## Claude environment in this repo
@@ -177,6 +178,79 @@ DannFlow ships with three core native agent skills to orchestrate massive projec
 - **`dannflow-masterplan`**: Run this to start a new project, generate a Masterplan, sync a GitHub Project board, or initialize infrastructure.
 - **`dannflow-task`**: Run this to execute a specific task from `MASTERPLAN.md` end-to-end (includes automated quality gates and human verification steps).
 - **`dannflow-update`**: Run this to safely and surgically update an old DannFlow repository from upstream without destroying custom business logic.
+
+## JuanStack Vertical Namespace Rules
+
+> These rules apply to ALL AI coding assistants (Claude, Codex, Gemini) working on any `dannflow`-based JuanStack vertical project. They exist to prevent cross-vertical code contamination and AI hallucination about file ownership.
+
+### Architecture Decisions (Locked — Do Not Override)
+
+| Decision                       | Resolution                                                     |
+| ------------------------------ | -------------------------------------------------------------- |
+| `business.json` load strategy  | **Build-time** — read from filesystem during `next build`      |
+| Multi-tenancy model            | **Separate Supabase projects** per vertical                    |
+| AI Secretary runtime           | **Supabase Edge Function with pg_cron**                        |
+| `sync-to-upstream` enforcement | **Hard block** — stops push if files are outside `owned_paths` |
+| Registry location              | **Separate `juanstack-portal` repo** — not in `dannflow`       |
+
+### The Golden Rule: Respect the Namespace
+
+When editing code **in a vertical repo** (e.g., `attyjuan`, `vetstack`, `restostack`), you may ONLY modify:
+
+1. Files within `src/bir/{this_vertical_id}/`
+2. Files within `src/analytics/{this_vertical_id}/`
+3. The file `src/ai/personas/{this_vertical_id}.ai-manifest.json`
+4. All non-namespaced project files (pages, components, services, etc.)
+
+You MUST NEVER modify:
+
+- `src/bir/core/` — requires a direct `dannflow` PR
+- `src/analytics/core/` — requires a direct `dannflow` PR
+- `src/ai/core.ai-manifest.json` — requires a direct `dannflow` PR
+- Any other vertical's namespace folder (e.g., do NOT touch `src/bir/veterinary/` when working in `attyjuan`)
+
+When editing code **directly in `dannflow`** (Template Mode), you may ONLY modify `core/` folders and generic template files. Never add vertical-specific logic directly here.
+
+### Namespace Convention Table
+
+| Module           | Path Pattern                                     | Owner                |
+| ---------------- | ------------------------------------------------ | -------------------- |
+| BIR Tax Logic    | `src/bir/{vertical_id}/`                         | That vertical's repo |
+| Analytics        | `src/analytics/{vertical_id}/`                   | That vertical's repo |
+| AI Persona       | `src/ai/personas/{vertical_id}.ai-manifest.json` | That vertical's repo |
+| BIR Core Engine  | `src/bir/core/`                                  | `dannflow` only      |
+| Analytics Core   | `src/analytics/core/`                            | `dannflow` only      |
+| AI Core Manifest | `src/ai/core.ai-manifest.json`                   | `dannflow` only      |
+
+### Before Starting Any BIR, Analytics, or AI Task
+
+1. **Read `business.json`** at the repo root.
+2. **Confirm `vertical_id`** — this tells you which namespace folder you own.
+3. **Check `dannflow_features`** — only implement features where the flag is `true`.
+4. **Read the AI persona** at `business.json → ai_rules.persona_manifest`.
+
+### Before Running `sync-to-upstream`
+
+1. **Read `business.json → owned_paths`**.
+2. **Verify every staged file** is within a declared `owned_paths` entry.
+3. If ANY staged file is outside `owned_paths` → **STOP**. Report the conflict and do not create a PR. This is a hard block, not a warning.
+
+### Domain Terminology Rule (Non-Negotiable)
+
+NEVER hardcode the words `Client`, `Patient`, `Customer`, `Case`, `Appointment`, `Lawyer`, `Vet`, or any domain noun in a `.tsx` or `.ts` file.
+
+Always resolve terminology from:
+
+```typescript
+const clientLabel = getTerm("consumer"); // from business.json → domain_nomenclature
+const caseLabel = getTerm("transaction"); // from business.json → domain_nomenclature
+```
+
+Use the `useTerm()` hook in client components and `getTerm()` in server components/utilities.
+
+### `business.json` Loading (Build-Time Pattern)
+
+`business.json` is read **at build time** via `src/lib/vertical-config.ts`. It is NOT fetched at runtime. Consequence: changing `business.json` requires a redeploy of the vertical. This is intentional — each vertical is its own independent deployment with its own Supabase project.
 
 ## Memory & docs
 

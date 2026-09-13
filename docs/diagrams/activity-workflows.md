@@ -66,3 +66,25 @@ flowchart TD
     E --> F["🔄 Refresh `src/types/supabase.ts`"]
     F --> G["🔒 Service Layer (`src/services/`) consumes strict types"]
 ```
+
+---
+
+## 4. AI Secretary Conversation Lifecycle & Real-Time Sync Workflow
+
+```mermaid
+flowchart TD
+    UserPrompt["💬 User types prompt & hits Send"] --> ClientSubmit["Client calls `sendMessage({ body: { id: chatId } })`"]
+    ClientSubmit --> OptMutate["⚡ Trigger SWR revalidation (`status === 'submitted'`)"]
+    OptMutate --> SidebarNew["📑 New Chat session title pops up in Sidebar"]
+
+    ClientSubmit --> PostRoute["📡 POST /api/chat"]
+    PostRoute --> EnsureChat["🛠️ `createOrGetChat(chatId, title)`"]
+    EnsureChat --> SaveUserMsg["💾 `saveChatMessage(chatId, 'user', parts)`"]
+    SaveUserMsg --> StreamEngine["🤖 AI SDK `streamText` + Dynamic Tools"]
+
+    StreamEngine --> StreamTokens["🌊 Real-time token streaming to viewport"]
+    StreamEngine --> OnFinish["🏁 `onFinish` event triggers"]
+    OnFinish --> SaveAssistantMsg["💾 `saveChatMessage(chatId, 'assistant', parts)`"]
+    SaveAssistantMsg --> FinalMutate["🔄 `mutateHistory()` refreshes chat title & timestamp"]
+    FinalMutate --> ActiveHighlight["✨ Session highlighted in Chat History"]
+```

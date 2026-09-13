@@ -26,6 +26,13 @@ classDiagram
         +updateProfile(userId: string, data: ProfileUpdate)
     }
 
+    class AiChatService {
+        +createOrGetChat(chatId, title)
+        +listUserChats(page, limit)
+        +saveChatMessage(chatId, role, parts)
+        +deleteUserChat(chatId)
+    }
+
     class ServiceLayerBoundary {
         <<Interface>>
         +All DB queries isolated here
@@ -40,13 +47,33 @@ classDiagram
     }
 
     %% Backend Entities (Supabase PostgreSQL)
+    class OrganizationsTable {
+        +uuid id PK
+        +uuid owner_id FK
+        +text name
+        +timestamptz created_at
+    }
+
+    class AiChatsTable {
+        +text id PK
+        +uuid organization_id FK
+        +uuid user_id FK
+        +text title
+        +timestamptz updated_at
+    }
+
+    class AiMessagesTable {
+        +text id PK
+        +text chat_id FK
+        +text role
+        +jsonb parts
+    }
+
     class ProfilesTable {
         +uuid id PK
         +timestamp updated_at
         +text username
         +text full_name
-        +text avatar_url
-        +text website
     }
 
     class AuthUsersTable {
@@ -58,15 +85,25 @@ classDiagram
     %% Relationships
     NextJS_AppPage --> AuthService : invokes
     NextJS_AppPage --> ProfileService : invokes
+    NextJS_AppPage --> AiChatService : invokes
     AuthService ..|> ServiceLayerBoundary
     ProfileService ..|> ServiceLayerBoundary
+    AiChatService ..|> ServiceLayerBoundary
 
     ProfileService --> SupabaseTypes : uses strict types
     AuthService --> SupabaseTypes : uses strict types
+    AiChatService --> SupabaseTypes : uses strict types
 
+    SupabaseTypes --> OrganizationsTable : maps schema
+    SupabaseTypes --> AiChatsTable : maps schema
+    SupabaseTypes --> AiMessagesTable : maps schema
     SupabaseTypes --> ProfilesTable : maps schema
     SupabaseTypes --> AuthUsersTable : maps schema
+
     AuthUsersTable "1" -- "1" ProfilesTable : triggers on insert
+    AuthUsersTable "1" -- "1" OrganizationsTable : triggers on insert
+    OrganizationsTable "1" -- "*" AiChatsTable : tenant boundary
+    AiChatsTable "1" -- "*" AiMessagesTable : cascade delete
 ```
 
 ---

@@ -1,0 +1,129 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://dannflow.dev/schemas/ai-manifest.schema.json",
+  "title": "AI Manifest Schema — JuanStack AI Secretary",
+  "description": "Defines the contract for both core.ai-manifest.json (dannflow universal states) and {vertical_id}.ai-manifest.json (vertical-specific extensions). The AI Secretary's task-engine.ts reads and validates manifests against this schema at startup.",
+  "type": "object",
+  "required": ["manifest_version", "observable_states"],
+  "additionalProperties": false,
+  "properties": {
+    "manifest_version": {
+      "type": "string",
+      "description": "SemVer string for this manifest file. Used for compatibility checks.",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "examples": ["1.0.0"]
+    },
+    "vertical_id": {
+      "type": "string",
+      "description": "Present only in vertical-specific manifests. Must match business.json → vertical_id.",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "examples": ["attyjuan", "vetstack"]
+    },
+    "extends": {
+      "type": "string",
+      "description": "Present only in vertical-specific manifests. Path to the core manifest this one extends.",
+      "examples": ["src/ai/core.ai-manifest.json"]
+    },
+    "description": {
+      "type": "string",
+      "description": "Human-readable description of what this manifest covers."
+    },
+    "observable_states": {
+      "type": "array",
+      "description": "List of database states the AI Secretary monitors. Each state, when triggered, creates a SecretaryTask for the human.",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/ObservableState"
+      }
+    }
+  },
+  "definitions": {
+    "ObservableState": {
+      "type": "object",
+      "required": [
+        "id",
+        "table",
+        "trigger_field",
+        "trigger_condition",
+        "semantic_meaning",
+        "suggested_task",
+        "priority"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique snake_case identifier for this observable state. Used as the triggered_by_state_id in secretary_tasks table.",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "examples": [
+            "invoice_overdue",
+            "case_deadline_approaching",
+            "bir_quarter_due"
+          ]
+        },
+        "table": {
+          "type": "string",
+          "description": "The Supabase table to observe. The AI Secretary has READ-ONLY access — never write access.",
+          "examples": [
+            "invoices",
+            "cases",
+            "subscriptions",
+            "documents",
+            "bir_filings"
+          ]
+        },
+        "trigger_field": {
+          "type": "string",
+          "description": "The specific column in the table that is evaluated against the trigger_condition.",
+          "examples": [
+            "payment_status",
+            "next_hearing_date",
+            "upload_status",
+            "current_period_end"
+          ]
+        },
+        "trigger_condition": {
+          "type": "string",
+          "description": "The condition evaluated against trigger_field. Supported patterns: 'equals: {value}', 'within_{N}_days', 'within_{N}_hours', 'is_null', 'is_not_null', 'greater_than: {value}'.",
+          "examples": [
+            "equals: overdue",
+            "within_72_hours",
+            "within_7_days",
+            "within_14_days",
+            "equals: missing",
+            "is_null"
+          ]
+        },
+        "semantic_meaning": {
+          "type": "string",
+          "description": "Plain-English explanation of what this trigger means in business context. Used by the AI to generate natural language task descriptions."
+        },
+        "suggested_task": {
+          "type": "string",
+          "description": "The default task description shown to the human. May include template variables like [case_id], [invoice_number], [client_name].",
+          "examples": [
+            "Draft a polite follow-up email to the client.",
+            "Remind the lawyer to prepare documents for Case #[case_id].",
+            "Auto-generate the 2551Q draft and prompt the lawyer to review."
+          ]
+        },
+        "priority": {
+          "type": "string",
+          "enum": ["critical", "high", "medium", "low"],
+          "description": "Task priority level. critical = requires immediate attention (e.g., court hearing in 72h). high = same-day action needed. medium = action within the week. low = informational."
+        },
+        "cooldown_hours": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Optional. Minimum hours before this state can trigger the same task again for the same record. Prevents notification spam. Default: 24.",
+          "default": 24
+        },
+        "requires_confirmation": {
+          "type": "boolean",
+          "description": "Optional. If true, the AI Secretary must ask the user for confirmation before taking any suggested action. Default: true.",
+          "default": true
+        }
+      }
+    }
+  }
+}

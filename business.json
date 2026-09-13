@@ -1,0 +1,18 @@
+{
+  "vertical_id": "dannflow-default",
+  "name": "DannFlow Generic Template",
+  "owned_paths": [],
+  "domain_nomenclature": {
+    "provider": "Provider",
+    "consumer": "User",
+    "transaction": "Record"
+  },
+  "dannflow_features": {
+    "auth_module": false,
+    "billing_module": false,
+    "bir_module": false,
+    "analytics_module": false,
+    "ai_secretary": false,
+    "scheduling_module": false
+  }
+}

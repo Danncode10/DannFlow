@@ -1,0 +1,33 @@
+{
+  "manifest_version": "1.0.0",
+  "description": "Core observable states available to the AI Secretary in all dannflow verticals.",
+  "observable_states": [
+    {
+      "id": "subscription_expiring",
+      "table": "subscriptions",
+      "trigger_field": "current_period_end",
+      "trigger_condition": "within_7_days",
+      "semantic_meaning": "The user subscription is expiring within 7 days.",
+      "suggested_task": "Notify the owner to renew their subscription.",
+      "priority": "high"
+    },
+    {
+      "id": "invoice_overdue",
+      "table": "invoices",
+      "trigger_field": "payment_status",
+      "trigger_condition": "equals: overdue",
+      "semantic_meaning": "A client invoice has not been paid past the due date.",
+      "suggested_task": "Draft a polite follow-up email to the client.",
+      "priority": "medium"
+    },
+    {
+      "id": "document_missing",
+      "table": "documents",
+      "trigger_field": "upload_status",
+      "trigger_condition": "equals: missing",
+      "semantic_meaning": "A required document has not been uploaded for an active record.",
+      "suggested_task": "Prompt the owner to upload the missing document.",
+      "priority": "medium"
+    }
+  ]
+}

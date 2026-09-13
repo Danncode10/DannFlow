@@ -1,32 +1,731 @@
-// Generated from the DannFlow single-project schema. Do not edit manually.
-export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
-type Table<Row, Insert = Partial<Row>, Update = Partial<Row>> = { Row: Row; Insert: Insert; Update: Update; Relationships: [] };
-type Timestamp = string;
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[];
 
-type Profile = { id: string; email: string | null; created_at: Timestamp; role: "admin" | "user" | null; full_name: string | null; age: number | null; birthday: string | null; gender: string | null; is_active: boolean };
-type TeamAuditLog = { id: string; actor_id: string; target_profile_id: string; action: string; previous_values: Json | null; next_values: Json | null; created_at: Timestamp };
-type Lead = { id: string; name: string; email: string; phone: string | null; message: string | null; service_interest: string | null; source: string; status: string; notes: string | null; created_at: Timestamp; updated_at: Timestamp };
-type Service = { id: string; name: string; slug: string; description: string | null; short_desc: string | null; category: string | null; price_from: number | null; price_to: number | null; price_label: string | null; duration_minutes: number | null; is_featured: boolean | null; is_published: boolean | null; display_order: number | null; icon: string | null; image_url: string | null; created_at: Timestamp; updated_at: Timestamp };
-type Booking = { id: string; customer_name: string; customer_email: string; customer_phone: string | null; service_id: string | null; service_name: string; package: string | null; vehicle_type: string | null; vehicle_make: string | null; vehicle_model: string | null; vehicle_year: string | null; notes: string | null; preferred_date: string | null; preferred_time: string | null; confirmed_date: string | null; confirmed_time: string | null; status: string; price_quoted: number | null; price_paid: number | null; payment_status: string; source: string; lead_id: string | null; created_at: Timestamp; updated_at: Timestamp };
-type AnalyticsEvent = { id: string; event_type: string; page_path: string | null; referrer: string | null; user_agent: string | null; ip_hash: string | null; session_id: string | null; properties: Json; created_at: Timestamp };
-type GalleryItem = { id: string; title: string | null; caption: string | null; image_url: string; before_image_url: string | null; service_tag: string | null; display_order: number; is_published: boolean; created_at: Timestamp; updated_at: Timestamp };
-type Notification = { id: string; type: string; title: string; body: string | null; link: string | null; is_read: boolean; metadata: Json; created_at: Timestamp };
-type AuditLog = { id: string; actor_id: string | null; actor_email: string | null; action: string; resource_type: string; resource_id: string | null; old_data: Json | null; new_data: Json | null; diff: Json | null; ip_address: string | null; user_agent: string | null; created_at: Timestamp };
-type BlogPost = { id: string; title: string; slug: string; excerpt: string | null; content: string; cover_image_url: string | null; seo_title: string | null; seo_description: string | null; is_published: boolean; published_at: Timestamp | null; created_at: Timestamp; updated_at: Timestamp };
+export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.5";
+  };
+  graphql_public: {
+    Tables: {
+      [_ in never]: never;
+    };
+    Views: {
+      [_ in never]: never;
+    };
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json;
+          operationName?: string;
+          query?: string;
+          variables?: Json;
+        };
+        Returns: Json;
+      };
+    };
+    Enums: {
+      [_ in never]: never;
+    };
+    CompositeTypes: {
+      [_ in never]: never;
+    };
+  };
+  public: {
+    Tables: {
+      ai_chats: {
+        Row: {
+          created_at: string;
+          id: string;
+          organization_id: string;
+          title: string;
+          updated_at: string;
+          user_id: string | null;
+          visibility: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          organization_id?: string;
+          title?: string;
+          updated_at?: string;
+          user_id?: string | null;
+          visibility?: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          organization_id?: string;
+          title?: string;
+          updated_at?: string;
+          user_id?: string | null;
+          visibility?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "ai_chats_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      ai_messages: {
+        Row: {
+          chat_id: string;
+          created_at: string;
+          id: string;
+          parts: Json;
+          role: string;
+        };
+        Insert: {
+          chat_id: string;
+          created_at?: string;
+          id?: string;
+          parts?: Json;
+          role: string;
+        };
+        Update: {
+          chat_id?: string;
+          created_at?: string;
+          id?: string;
+          parts?: Json;
+          role?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "ai_messages_chat_id_fkey";
+            columns: ["chat_id"];
+            isOneToOne: false;
+            referencedRelation: "ai_chats";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      availability_slots: {
+        Row: {
+          created_at: string;
+          day_of_week: number;
+          end_time: string;
+          id: string;
+          is_active: boolean;
+          organization_id: string;
+          start_time: string;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          day_of_week: number;
+          end_time: string;
+          id?: string;
+          is_active?: boolean;
+          organization_id: string;
+          start_time: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          day_of_week?: number;
+          end_time?: string;
+          id?: string;
+          is_active?: boolean;
+          organization_id?: string;
+          start_time?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "availability_slots_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      blog_posts: {
+        Row: {
+          content: string;
+          cover_image_url: string | null;
+          created_at: string;
+          excerpt: string | null;
+          id: string;
+          is_published: boolean;
+          organization_id: string;
+          published_at: string | null;
+          seo_description: string | null;
+          seo_title: string | null;
+          slug: string;
+          title: string;
+          updated_at: string;
+        };
+        Insert: {
+          content: string;
+          cover_image_url?: string | null;
+          created_at?: string;
+          excerpt?: string | null;
+          id?: string;
+          is_published?: boolean;
+          organization_id?: string;
+          published_at?: string | null;
+          seo_description?: string | null;
+          seo_title?: string | null;
+          slug: string;
+          title: string;
+          updated_at?: string;
+        };
+        Update: {
+          content?: string;
+          cover_image_url?: string | null;
+          created_at?: string;
+          excerpt?: string | null;
+          id?: string;
+          is_published?: boolean;
+          organization_id?: string;
+          published_at?: string | null;
+          seo_description?: string | null;
+          seo_title?: string | null;
+          slug?: string;
+          title?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "blog_posts_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      bookings: {
+        Row: {
+          booking_date: string;
+          created_at: string;
+          email: string;
+          id: string;
+          name: string;
+          organization_id: string;
+          service_id: string | null;
+          status: string;
+        };
+        Insert: {
+          booking_date: string;
+          created_at?: string;
+          email: string;
+          id?: string;
+          name: string;
+          organization_id?: string;
+          service_id?: string | null;
+          status?: string;
+        };
+        Update: {
+          booking_date?: string;
+          created_at?: string;
+          email?: string;
+          id?: string;
+          name?: string;
+          organization_id?: string;
+          service_id?: string | null;
+          status?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "bookings_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "bookings_service_id_fkey";
+            columns: ["service_id"];
+            isOneToOne: false;
+            referencedRelation: "services";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      calendar_events: {
+        Row: {
+          attendee_email: string | null;
+          attendee_name: string | null;
+          created_at: string;
+          description: string | null;
+          end_time: string;
+          id: string;
+          organization_id: string;
+          start_time: string;
+          status: string;
+          title: string;
+          updated_at: string;
+        };
+        Insert: {
+          attendee_email?: string | null;
+          attendee_name?: string | null;
+          created_at?: string;
+          description?: string | null;
+          end_time: string;
+          id?: string;
+          organization_id: string;
+          start_time: string;
+          status?: string;
+          title: string;
+          updated_at?: string;
+        };
+        Update: {
+          attendee_email?: string | null;
+          attendee_name?: string | null;
+          created_at?: string;
+          description?: string | null;
+          end_time?: string;
+          id?: string;
+          organization_id?: string;
+          start_time?: string;
+          status?: string;
+          title?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "calendar_events_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      gallery_items: {
+        Row: {
+          caption: string | null;
+          created_at: string;
+          id: string;
+          image_url: string;
+          is_published: boolean;
+          organization_id: string;
+          service_tag: string | null;
+          title: string | null;
+        };
+        Insert: {
+          caption?: string | null;
+          created_at?: string;
+          id?: string;
+          image_url: string;
+          is_published?: boolean;
+          organization_id?: string;
+          service_tag?: string | null;
+          title?: string | null;
+        };
+        Update: {
+          caption?: string | null;
+          created_at?: string;
+          id?: string;
+          image_url?: string;
+          is_published?: boolean;
+          organization_id?: string;
+          service_tag?: string | null;
+          title?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "gallery_items_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      leads: {
+        Row: {
+          created_at: string;
+          email: string;
+          id: string;
+          name: string;
+          organization_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          email: string;
+          id?: string;
+          name: string;
+          organization_id?: string;
+        };
+        Update: {
+          created_at?: string;
+          email?: string;
+          id?: string;
+          name?: string;
+          organization_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "leads_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      organizations: {
+        Row: {
+          created_at: string;
+          id: string;
+          name: string;
+          owner_id: string;
+          rdo_code: string | null;
+          registered_address: string | null;
+          taxpayer_classification: string | null;
+          updated_at: string;
+          vat_status: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          name: string;
+          owner_id: string;
+          rdo_code?: string | null;
+          registered_address?: string | null;
+          taxpayer_classification?: string | null;
+          updated_at?: string;
+          vat_status?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          name?: string;
+          owner_id?: string;
+          rdo_code?: string | null;
+          registered_address?: string | null;
+          taxpayer_classification?: string | null;
+          updated_at?: string;
+          vat_status?: string | null;
+        };
+        Relationships: [];
+      };
+      profiles: {
+        Row: {
+          age: number | null;
+          birthday: string | null;
+          created_at: string;
+          email: string | null;
+          full_name: string | null;
+          gender: string | null;
+          id: string;
+          is_active: boolean;
+          role: Database["public"]["Enums"]["user_role"] | null;
+        };
+        Insert: {
+          age?: number | null;
+          birthday?: string | null;
+          created_at?: string;
+          email?: string | null;
+          full_name?: string | null;
+          gender?: string | null;
+          id: string;
+          is_active?: boolean;
+          role?: Database["public"]["Enums"]["user_role"] | null;
+        };
+        Update: {
+          age?: number | null;
+          birthday?: string | null;
+          created_at?: string;
+          email?: string | null;
+          full_name?: string | null;
+          gender?: string | null;
+          id?: string;
+          is_active?: boolean;
+          role?: Database["public"]["Enums"]["user_role"] | null;
+        };
+        Relationships: [];
+      };
+      secretary_tasks: {
+        Row: {
+          created_at: string;
+          description: string | null;
+          id: string;
+          organization_id: string;
+          priority: string;
+          status: string;
+          title: string;
+          triggered_by_state_id: string;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          description?: string | null;
+          id?: string;
+          organization_id: string;
+          priority?: string;
+          status?: string;
+          title: string;
+          triggered_by_state_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          description?: string | null;
+          id?: string;
+          organization_id?: string;
+          priority?: string;
+          status?: string;
+          title?: string;
+          triggered_by_state_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "secretary_tasks_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      services: {
+        Row: {
+          created_at: string;
+          duration_minutes: number | null;
+          id: string;
+          is_featured: boolean;
+          is_published: boolean;
+          name: string;
+          organization_id: string;
+          price_from: number | null;
+          price_to: number | null;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          duration_minutes?: number | null;
+          id?: string;
+          is_featured?: boolean;
+          is_published?: boolean;
+          name: string;
+          organization_id?: string;
+          price_from?: number | null;
+          price_to?: number | null;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          duration_minutes?: number | null;
+          id?: string;
+          is_featured?: boolean;
+          is_published?: boolean;
+          name?: string;
+          organization_id?: string;
+          price_from?: number | null;
+          price_to?: number | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "services_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      team_audit_logs: {
+        Row: {
+          action: string;
+          actor_id: string;
+          created_at: string;
+          id: string;
+          next_values: Json | null;
+          previous_values: Json | null;
+          target_profile_id: string;
+        };
+        Insert: {
+          action: string;
+          actor_id: string;
+          created_at?: string;
+          id?: string;
+          next_values?: Json | null;
+          previous_values?: Json | null;
+          target_profile_id: string;
+        };
+        Update: {
+          action?: string;
+          actor_id?: string;
+          created_at?: string;
+          id?: string;
+          next_values?: Json | null;
+          previous_values?: Json | null;
+          target_profile_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "team_audit_logs_actor_id_profiles_id_fk";
+            columns: ["actor_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "team_audit_logs_target_profile_id_profiles_id_fk";
+            columns: ["target_profile_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+    };
+    Views: {
+      [_ in never]: never;
+    };
+    Functions: {
+      get_current_org_id: { Args: never; Returns: string };
+      is_admin: { Args: never; Returns: boolean };
+    };
+    Enums: {
+      user_role: "admin" | "user";
+    };
+    CompositeTypes: {
+      [_ in never]: never;
+    };
+  };
+};
 
-export type Database = { public: { Tables: {
-  profiles: Table<Profile, Partial<Profile> & { id: string }>;
-  leads: Table<Lead, Partial<Lead> & { name: string; email: string }>;
-  services: Table<Service, Partial<Service> & { name: string; slug: string }>;
-  bookings: Table<Booking, Partial<Booking> & { customer_name: string; customer_email: string; service_name: string }>;
-  analytics_events: Table<AnalyticsEvent, Partial<AnalyticsEvent> & { event_type: string }>;
-  gallery_items: Table<GalleryItem, Partial<GalleryItem> & { image_url: string }>;
-  notifications: Table<Notification, Partial<Notification> & { type: string; title: string }>;
-  audit_logs: Table<AuditLog, Partial<AuditLog> & { action: string; resource_type: string }>;
-  blog_posts: Table<BlogPost, Partial<BlogPost> & { title: string; slug: string; content: string }>;
-  team_audit_logs: Table<TeamAuditLog, Partial<TeamAuditLog> & { actor_id: string; target_profile_id: string; action: string }>;
-}; Views: Record<string, never>; Functions: Record<string, never>; Enums: { user_role: "admin" | "user" }; CompositeTypes: Record<string, never> } };
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">;
 
-export type Tables<TableName extends keyof Database["public"]["Tables"]> = Database["public"]["Tables"][TableName]["Row"];
-export type TablesInsert<TableName extends keyof Database["public"]["Tables"]> = Database["public"]["Tables"][TableName]["Insert"];
-export type TablesUpdate<TableName extends keyof Database["public"]["Tables"]> = Database["public"]["Tables"][TableName]["Update"];
+type DefaultSchema = DatabaseWithoutInternals[Extract<
+  keyof Database,
+  "public"
+>];
+
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals;
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R;
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R;
+      }
+      ? R
+      : never
+    : never;
+
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    keyof DefaultSchema["Tables"] | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals;
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I;
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I;
+      }
+      ? I
+      : never
+    : never;
+
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    keyof DefaultSchema["Tables"] | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals;
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U;
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U;
+      }
+      ? U
+      : never
+    : never;
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    keyof DefaultSchema["Enums"] | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never) = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals;
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never;
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never) = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals;
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never;
+
+export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
+  public: {
+    Enums: {
+      user_role: ["admin", "user"],
+    },
+  },
+} as const;

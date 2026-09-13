@@ -59,6 +59,24 @@ Welcome to the central documentation hub for **DannFlow** — the Next.js 16 + S
 - [**Technical Document**](project/technical-document.md) — Explains source code logic and database architectures.
 - [**User Manual**](project/user-manual.md) — The operational guide for end-users interacting with the system.
 
+### 🏗️ 7. JuanStack Vertical Engine Revision (`juanstack/`)
+
+> _Planning documents for the JuanStack vertical SaaS ecosystem revision. These files govern the architectural evolution of `dannflow` into a multi-vertical library registry._
+
+- [**Revision Plan**](juanstack/DANNFLOW_REVISION_PLAN.md) — Full architectural spec: folder structure, JSON schemas, AI manifest system, and coding rules.
+- [**JuanStack Masterplan**](juanstack/juanstack_masterplan.md) — Step-by-step implementation roadmap across 10 phases.
+- [**Implementation Changelog**](juanstack/CHANGELOG.md) — Permanent archive of development notes and changes across Phases 0 through 3B.
+- [**Multi-Tenant Database Architecture**](juanstack/database-multi-tenant-architecture.md) — Multi-tenant organization model, auto-provisioning triggers, and RLS policies.
+- [**AI Conversation Persistence**](juanstack/ai-chat-persistence.md) — Database persistence, SWR history synchronization, and session lifecycle.
+- [**RBAC & Modular Dashboard Architecture**](juanstack/rbac-and-dashboard-architecture.md) — `roles.json` specification, tab permissions, and under-construction preview stubs.
+- [**AI Secretary Architecture**](juanstack/ai-secretary-architecture.md) — Edge Function, cron, and proactive task-engine flow.
+- [**AI Tools Architecture**](juanstack/ai-tools-architecture.md) — Dynamic tool-calling registry and multi-step streaming architecture.
+- [**JSON Source of Truth Architecture**](juanstack/json-source-of-truth-architecture.md) — Declarative JSON contracts and Phase 10 `juanstack-rules-sync` engine.
+- [**BIR Core API**](juanstack/bir-core-api.md) — Philippine BIR Tax Calculator and Form Generation API reference.
+- [**BIR Compliance Research**](juanstack/bir-compliance-research.md) — Research on EOPT Act (RA 11976), 2551Q, 1701Q, and 2307 rules.
+- [**`business.json` Schema**](juanstack/schemas/business.schema.json) — JSON Schema (Draft-07) for the Vertical DNA config file.
+- [**AI Manifest Schema**](juanstack/schemas/ai-manifest.schema.json) — JSON Schema (Draft-07) for the AI Secretary observable states manifest.
+
 ---
 
 ## 📜 Documentation Governance & Post-Merge Rules

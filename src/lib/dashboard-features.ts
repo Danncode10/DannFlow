@@ -1,12 +1,19 @@
+import rolesConfig from "@/config/roles.json";
+
 export type DashboardTabId =
   | "overview"
+  | "ai-secretary"
+  | "schedule"
+  | "bir"
+  | "analytics"
+  | "blog"
+  | "team"
+  | "settings"
   | "services"
   | "leads"
-  | "bookings"
-  | "blog"
-  | "analytics"
-  | "team"
-  | "settings";
+  | "bookings";
+
+export type JuanStackRole = "super_admin" | "admin" | "member";
 
 export type FeatureFlag =
   | "always"
@@ -17,30 +24,88 @@ export type FeatureFlag =
   | "testimonials"
   | "teamPage"
   | "admin-only"
-  | "blog";
+  | "blog"
+  | string;
 
-interface TabConfig {
+export interface TabConfig {
   id: DashboardTabId;
   label: string;
-  feature: FeatureFlag;
+  requiredRole?: JuanStackRole | JuanStackRole[];
+  isLegacyStarter?: boolean;
 }
 
 export const TAB_CONFIG: TabConfig[] = [
-  { id: "overview",   label: "Overview",   feature: "always" },
-  { id: "services",   label: "Services",   feature: "pricing" },
-  { id: "leads",      label: "Leads",      feature: "contactForm" },
-  { id: "bookings",   label: "Bookings",   feature: "contactForm" },
-  { id: "blog",       label: "Blog",       feature: "blog" },
-  { id: "analytics",  label: "Analytics",  feature: "analytics" },
-  { id: "team",       label: "Team",       feature: "admin-only" },
-  { id: "settings",   label: "Settings",   feature: "always" },
+  { id: "overview", label: "Overview" },
+  { id: "ai-secretary", label: "AI Secretary" },
+  { id: "schedule", label: "Schedule" },
+  {
+    id: "bir",
+    label: "BIR Compliance",
+    requiredRole: ["admin", "super_admin"],
+  },
+  {
+    id: "analytics",
+    label: "Analytics",
+    requiredRole: ["admin", "super_admin"],
+  },
+  { id: "team", label: "Team", requiredRole: ["admin", "super_admin"] },
+  { id: "blog", label: "Blog Management", requiredRole: "super_admin" },
+  { id: "settings", label: "Settings" },
+
+  // Legacy Starter Modules (Hidden by default in JuanStack to prevent clutter)
+  { id: "services", label: "Services", isLegacyStarter: true },
+  { id: "leads", label: "Leads", isLegacyStarter: true },
+  { id: "bookings", label: "Bookings", isLegacyStarter: true },
 ];
 
-export function isFeatureEnabled(flag: FeatureFlag, role: string | null | undefined = "user"): boolean {
-  if (flag === "admin-only") return role === "admin";
-  return flag === "always" || flag === "pricing" || flag === "contactForm" || flag === "blog";
+/**
+ * Normalizes user role string to canonical JuanStack role.
+ */
+export function normalizeRole(role: string | null | undefined): JuanStackRole {
+  if (!role) return "member";
+  if (role === "super_admin" || role === "superadmin") return "super_admin";
+  if (role === "admin" || role === "owner") return "admin";
+  return "member";
 }
 
-export function getEnabledTabs(role: string | null | undefined = "user"): TabConfig[] {
-  return TAB_CONFIG.filter((t) => isFeatureEnabled(t.feature, role));
+/**
+ * Checks if a specific tab is allowed for a user role according to roles.json
+ */
+export function isTabAllowedForRole(
+  tabId: DashboardTabId,
+  roleStr: string | null | undefined = "member",
+): boolean {
+  const role = normalizeRole(roleStr);
+  const roleDef = rolesConfig.roles[role] || rolesConfig.roles.member;
+  return roleDef.allowed_tabs.includes(tabId);
+}
+
+/**
+ * Legacy feature-check helper for backwards compatibility.
+ */
+export function isFeatureEnabled(
+  flag: string,
+  role: string | null | undefined = "member",
+): boolean {
+  if (flag === "admin-only") {
+    const canonicalRole = normalizeRole(role);
+    return canonicalRole === "admin" || canonicalRole === "super_admin";
+  }
+  return true;
+}
+
+/**
+ * Returns the list of enabled dashboard tabs for the current role.
+ */
+export function getEnabledTabs(
+  role: string | null | undefined = "member",
+  showLegacyModules = false,
+): TabConfig[] {
+  return TAB_CONFIG.filter((t) => {
+    // Hide legacy starter modules unless explicitly enabled
+    if (t.isLegacyStarter && !showLegacyModules) {
+      return false;
+    }
+    return isTabAllowedForRole(t.id, role);
+  });
 }

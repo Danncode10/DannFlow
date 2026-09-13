@@ -1,0 +1,218 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://dannflow.dev/schemas/business.schema.json",
+  "title": "business.json — JuanStack Vertical DNA Schema",
+  "description": "Defines the configuration contract for every JuanStack vertical repository. dannflow reads this file at build time to configure features, UI terminology, BIR rules, and AI persona.",
+  "type": "object",
+  "required": [
+    "vertical_id",
+    "name",
+    "owned_paths",
+    "domain_nomenclature",
+    "dannflow_features"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "vertical_id": {
+      "type": "string",
+      "description": "Unique snake_case identifier for this vertical. Used to resolve namespace paths (e.g., src/bir/{vertical_id}/).",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "examples": ["attyjuan", "vetstack", "restostack", "dannflow-default"]
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable display name for this vertical.",
+      "examples": ["AttyJuan", "VetStack", "RestoStack"]
+    },
+    "description": {
+      "type": "string",
+      "description": "One-sentence description of what this vertical manages."
+    },
+    "owned_paths": {
+      "type": "array",
+      "description": "Paths in the dannflow repo that this vertical OWNS. sync-to-upstream will HARD BLOCK any staged file outside this list.",
+      "items": {
+        "type": "string",
+        "pattern": "^src/"
+      },
+      "minItems": 1,
+      "examples": [
+        [
+          "src/bir/legal/",
+          "src/analytics/legal/",
+          "src/ai/personas/legal.ai-manifest.json"
+        ]
+      ]
+    },
+    "domain_nomenclature": {
+      "type": "object",
+      "description": "Domain-specific terminology. ALL UI components must read from here — never hardcode these words in .tsx files.",
+      "required": ["provider", "consumer", "transaction"],
+      "additionalProperties": false,
+      "properties": {
+        "provider": {
+          "type": "string",
+          "description": "The professional or service provider (e.g., Lawyer, Veterinarian, Chef)."
+        },
+        "consumer": {
+          "type": "string",
+          "description": "The end recipient of the service (e.g., Client, Pet Owner, Diner)."
+        },
+        "transaction": {
+          "type": "string",
+          "description": "The primary unit of work (e.g., Billable Case, Appointment, Order)."
+        },
+        "inventory_item": {
+          "type": ["string", "null"],
+          "description": "The primary inventory item if applicable. null if inventory is not used."
+        }
+      }
+    },
+    "dannflow_features": {
+      "type": "object",
+      "description": "Feature flags. Set to true to activate the module. Components must check isFeatureEnabled() before rendering.",
+      "required": [
+        "auth_module",
+        "billing_module",
+        "bir_module",
+        "analytics_module",
+        "ai_secretary"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "auth_module": {
+          "type": "boolean",
+          "default": true,
+          "description": "Supabase authentication and session management."
+        },
+        "billing_module": {
+          "type": "boolean",
+          "default": true,
+          "description": "Stripe subscription billing and plan gating."
+        },
+        "inventory_management": {
+          "type": "boolean",
+          "default": false,
+          "description": "Product/inventory CRUD for verticals that sell goods."
+        },
+        "pos_terminal": {
+          "type": "boolean",
+          "default": false,
+          "description": "Point-of-sale terminal UI and payment processing."
+        },
+        "bir_module": {
+          "type": "boolean",
+          "default": false,
+          "description": "Philippine BIR tax compliance module. Loads forms from src/bir/{vertical_id}/."
+        },
+        "analytics_module": {
+          "type": "boolean",
+          "default": false,
+          "description": "Analytics dashboard. Loads KPI components from src/analytics/{vertical_id}/."
+        },
+        "ai_secretary": {
+          "type": "boolean",
+          "default": false,
+          "description": "Proactive AI Secretary system. Requires Supabase Edge Function deployment."
+        },
+        "scheduling_module": {
+          "type": "boolean",
+          "default": false,
+          "description": "Calendar and scheduling system with optional AI booking hooks."
+        }
+      }
+    },
+    "scheduling_rules": {
+      "type": "object",
+      "description": "Scheduling configuration for this vertical. Required when dannflow_features.scheduling_module is true.",
+      "required": ["requires_owner_approval"],
+      "additionalProperties": false,
+      "properties": {
+        "default_meeting_duration_minutes": {
+          "type": "integer",
+          "default": 30,
+          "description": "Default duration for scheduled meetings."
+        },
+        "requires_owner_approval": {
+          "type": "boolean",
+          "default": true,
+          "description": "If true, AI cannot auto-book; it must request approval from the business owner."
+        },
+        "enable_gcal_sync": {
+          "type": "boolean",
+          "default": false,
+          "description": "Toggle Google Calendar two-way synchronization."
+        }
+      }
+    },
+    "bir_rules": {
+      "type": "object",
+      "description": "Philippine BIR tax configuration for this vertical. Required when dannflow_features.bir_module is true.",
+      "required": ["module_path", "applicable_laws"],
+      "additionalProperties": false,
+      "properties": {
+        "module_path": {
+          "type": "string",
+          "description": "Path to this vertical's BIR form templates within dannflow.",
+          "pattern": "^src/bir/[a-z][a-z0-9_]*/",
+          "examples": ["src/bir/legal/"]
+        },
+        "applicable_laws": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "List of applicable Philippine laws and regulations.",
+          "examples": [["RA 11976 (Ease of Paying Taxes Act)"]]
+        },
+        "default_withholding_tax_percentage": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Default creditable withholding tax rate for this industry, if applicable (e.g., 10 for professional services)."
+        },
+        "industry_default_atcs": {
+          "type": "object",
+          "description": "Industry-standard Alphanumeric Tax Codes.",
+          "properties": {
+            "percentage_tax": { "type": "string" },
+            "income_tax": { "type": "string" },
+            "withholding_tax": { "type": "string" }
+          }
+        }
+      }
+    },
+    "ai_rules": {
+      "type": "object",
+      "description": "AI Secretary configuration. Required when dannflow_features.ai_secretary is true.",
+      "required": ["persona_manifest", "system_prompt_persona"],
+      "additionalProperties": false,
+      "properties": {
+        "persona_manifest": {
+          "type": "string",
+          "description": "Path to the vertical-specific AI manifest within dannflow.",
+          "pattern": "^src/ai/personas/[a-z][a-z0-9_]*.ai-manifest.json$",
+          "examples": ["src/ai/personas/legal.ai-manifest.json"]
+        },
+        "system_prompt_persona": {
+          "type": "string",
+          "description": "The system-level persona description sent to the AI model at the start of every session."
+        },
+        "tone": {
+          "type": "string",
+          "enum": ["professional_warm", "formal", "casual", "technical"],
+          "default": "professional_warm",
+          "description": "Communication tone of the AI Secretary."
+        },
+        "hard_limits": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Absolute behavioral restrictions. The AI must never violate these.",
+          "examples": [
+            "Never provide legal advice. Administrative guidance only.",
+            "Never access or display another client's case data.",
+            "Always confirm before sending any external communication."
+          ]
+        }
+      }
+    }
+  }
+}
