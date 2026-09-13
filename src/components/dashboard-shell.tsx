@@ -17,6 +17,7 @@ import {
   Menu,
   ShieldCheck,
   Bot,
+  FileSpreadsheet,
   type LucideIcon,
 } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -38,11 +39,14 @@ import { BlogTab } from "@/components/dashboard/tabs/blog-tab";
 import { AnalyticsTab } from "@/components/dashboard/tabs/analytics-tab";
 import { SettingsTab } from "@/components/dashboard/tabs/settings-tab";
 import { AiSecretaryTab } from "@/components/dashboard/tabs/ai-secretary-tab";
+import { UnderConstructionTab } from "@/components/dashboard/tabs/under-construction-tab";
 import { NotificationsBell } from "@/components/dashboard/notifications-bell";
 
 const ICONS: Record<DashboardTabId, LucideIcon> = {
   overview: LayoutDashboard,
   "ai-secretary": Bot,
+  schedule: Calendar,
+  bir: FileSpreadsheet,
   services: Tag,
   leads: Inbox,
   bookings: Calendar,
@@ -333,6 +337,18 @@ export function DashboardShell({
               {activeTab === "analytics" && <AnalyticsTab />}
               {activeTab === "settings" && <SettingsTab />}
               {activeTab === "ai-secretary" && <AiSecretaryTab />}
+              {activeTab === "schedule" && (
+                <UnderConstructionTab
+                  module="schedule"
+                  onNavigateAiSecretary={() => setTab("ai-secretary")}
+                />
+              )}
+              {activeTab === "bir" && (
+                <UnderConstructionTab
+                  module="bir"
+                  onNavigateAiSecretary={() => setTab("ai-secretary")}
+                />
+              )}
             </>
           )}
         </main>

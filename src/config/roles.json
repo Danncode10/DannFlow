@@ -1,0 +1,37 @@
+{
+  "roles": {
+    "super_admin": {
+      "name": "Super Admin",
+      "description": "Platform administrator with full global control and platform blog management",
+      "allowed_tabs": [
+        "overview",
+        "ai-secretary",
+        "schedule",
+        "bir",
+        "analytics",
+        "blog",
+        "team",
+        "settings"
+      ]
+    },
+    "admin": {
+      "name": "Organization Owner / Admin",
+      "description": "Tenant administrator managing organization settings, team members, BIR compliance, and operations",
+      "allowed_tabs": [
+        "overview",
+        "ai-secretary",
+        "schedule",
+        "bir",
+        "analytics",
+        "team",
+        "settings"
+      ]
+    },
+    "member": {
+      "name": "Team Member",
+      "description": "Staff member handling daily consultations, client records, and AI Secretary workflows",
+      "allowed_tabs": ["overview", "ai-secretary", "schedule", "settings"]
+    }
+  },
+  "default_role": "member"
+}

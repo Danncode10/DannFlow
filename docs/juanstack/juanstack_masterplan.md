@@ -206,6 +206,18 @@ These 5 decisions affect the entire architecture. Agree on them before writing a
 
 ---
 
+## **PHASE 3B: Dashboard Stabilization, Under-Construction Stubs & RBAC (Pre-Merge Gate)**
+
+> Goal: Stabilize the dashboard navigation before merging to `main`, providing graceful 'Under Construction' previews for upcoming modules (`schedule`, `bir`), establishing a canonical RBAC `roles.json` source of truth, restricting the Blog to `super_admin`, and hiding clutter from legacy starter modules.
+
+- `[x]` `[P3B.1]` Create `src/components/dashboard/tabs/under-construction-tab.tsx` to provide rich, informative placeholder states for in-progress modules.
+- `[x]` `[P3B.2]` Wire `schedule` and `bir` tabs into navigation and `dashboard-shell.tsx` with upcoming milestone previews.
+- `[x]` `[P3B.3]` Create `src/config/roles.json` as canonical source of truth for `super_admin`, `admin`, and `member` roles.
+- `[x]` `[P3B.4]` Update `src/lib/dashboard-features.ts` to enforce RBAC permissions, restrict Blog to `super_admin`, and gate legacy starter modules (`leads`, `bookings`, `services`).
+- `[x]` `[P3B.DOC]` Document the RBAC structure and module roadmap in `docs/PENDING_DOC_UPDATES.md`.
+
+---
+
 ## **PHASE 4: Scheduling Core Engine**
 
 > Goal: Build the core scheduling and calendar integration module.
@@ -323,7 +335,7 @@ These 5 decisions affect the entire architecture. Agree on them before writing a
 - `[ ]` `[P10.2]` Review and update `.claude/commands/new-project.md` to ensure it generates a valid `business.json` that complies with the schema.
 - `[ ]` `[P10.3]` Audit other AI agent commands in `.claude/commands/` to ensure they respect the vertical namespace rules (`OWNERSHIP.md`) and do not modify `core/` folders when operating in a vertical.
 - `[ ]` `[P10.4]` **Optional**: Create a dedicated `juanstack-init` command/agent. This is an _optional user tooling wizard_, not a mandatory system component. It acts as an interactive wizard, interviewing the user about the new vertical (domain names, features needed) and automatically scaffolding the namespace folders, `business.json`, and initial database schema.
-- `[ ]` `[P10.5]` Create a `juanstack-doctor` (or `juanstack-db-sync`) command. This AI agent command will read `business.json` and `ai-manifest.json` (the source of truth), pull the live Supabase schema via MCP, and compare them. If the JSON enables a feature/AI trigger but the database lacks the required table or RLS policy, the agent will automatically generate the missing SQL migration to keep Supabase perfectly in sync with the JSON.
+- `[ ]` `[P10.5]` Create a `juanstack-rules-sync` command. This AI agent command will read `business.json`, `src/config/roles.json`, and `ai-manifest.json` (the JSON sources of truth), pull the live Supabase schema via MCP, and compare them. If the JSON enables a feature or role permission but the database lacks the required table or RLS policy, the agent will automatically generate the missing SQL migration to keep Supabase perfectly in sync with the JSON. _(See [docs/juanstack/json-source-of-truth-architecture.md](docs/juanstack/json-source-of-truth-architecture.md) for full architecture)_.
 - `[ ]` `[P10.DOC]` Finalize Phase 10 Documentation — summarize command updates in `docs/PENDING_DOC_UPDATES.md`.
 
 ---

@@ -233,3 +233,18 @@
   - **Organization Auto-Provisioning (`supabase/migrations/20260913000003_auto_org_creation.sql`)**:
     - Backfilled missing default organization rows for existing users and updated `handle_new_user()` trigger to automatically create both `profiles` and `organizations` on signup, ensuring tenant RLS queries and chat persistence succeed without manual admin setup.
 - **Verification**: Verified with `npm run db:migrate` (succeeded), `npx tsc --noEmit` (0 errors), `npx eslint` (0 errors), confirmed database deletion with cascading message cleanup (tested and verified zero orphaned rows).
+
+### Phase 3B: Dashboard Stabilization, Under-Construction Stubs & RBAC
+
+- **Date**: 2026-09-13
+- **Changes**:
+  - **RBAC Roles Specification (`src/config/roles.json`)**:
+    - Established the canonical source of truth for user roles (`super_admin`, `admin`, `member`) and their respective tab permissions.
+    - Restricted Platform Blog management strictly to `super_admin`.
+    - Allowed tenant admin actions (`bir`, `analytics`, `team`) to `admin` and `super_admin`.
+  - **Feature-Gating Legacy Modules (`src/lib/dashboard-features.ts`)**:
+    - Marked legacy DannFlow starter modules (`services`, `leads`, `bookings`) as `isLegacyStarter: true` and hid them from the default JuanStack dashboard to avoid navigation clutter.
+  - **Under-Construction Module Previews (`src/components/dashboard/tabs/under-construction-tab.tsx`)**:
+    - Created a reusable, agency-grade placeholder component with phase badges, upcoming milestone teasers, and a direct CTA to the AI Secretary.
+    - Wired preview screens for `schedule` (Phase 4 teaser) and `bir` (Phase 6 teaser) into `src/components/dashboard-shell.tsx`.
+- **Verification**: Verified with `npx tsc --noEmit` (0 errors) and `npx eslint` (0 errors).
