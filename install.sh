@@ -15,22 +15,26 @@ NC='\033[0m'
 BOLD='\033[1m'
 
 echo -e "${BLUE}${BOLD}"
-cat << "EOF"
+cat << "BANNER"
   _____                   ______ _
  |  __ \                 |  ____| |
  | |  | | __ _ _ __  _ __| |__  | | _____      __
  | |  | |/ _` | '_ \| '_ \  __| | |/ _ \ \ /\ / /
  | |__| | (_| | | | | | | | |   | | (_) \ V  V /
  |_____/ \__,_|_| |_|_| |_|_|   |_|\___/ \_/\_/
-EOF
+BANNER
 echo -e "${NC}"
 echo -e "${CYAN}The AI-Native Next.js SaaS Starter for Vibe Coding${NC}"
 echo ""
 
 # ── 1. Get app name ──────────────────────────────────────────
-if [ -t 0 ]; then
+# Check if /dev/tty is readable to allow interactive prompts when piped via `curl ... | bash`
+if [ -r /dev/tty ]; then
   read -p "$(echo -e "${BOLD}Enter your app name${NC} [my-app]: ")" INPUT_NAME < /dev/tty
   read -p "$(echo -e "${BOLD}GitHub URL for your project repo${NC} (optional): ")" PROJECT_REPO_URL < /dev/tty
+elif [ -t 0 ]; then
+  read -p "$(echo -e "${BOLD}Enter your app name${NC} [my-app]: ")" INPUT_NAME
+  read -p "$(echo -e "${BOLD}GitHub URL for your project repo${NC} (optional): ")" PROJECT_REPO_URL
 else
   # Non-interactive installs configure the project origin later via /new-project.
   INPUT_NAME=""
@@ -62,35 +66,36 @@ echo -e "${CYAN}📦 Cloning DannFlow into ./${PKG_NAME}...${NC}"
 git clone https://github.com/Danncode10/DannFlow.git "$TARGET_DIR"
 cd "$TARGET_DIR"
 
-# Record the exact template revision before the project history is rebranded.
-# Both sync commands use this anchor to calculate safe, file-level updates.
+# Record the exact template revision before resetting Git history.
+# /sync-upstream uses this anchor to calculate safe, file-level updates.
 DANNFLOW_COMMIT=$(git rev-parse HEAD)
 DANNFLOW_SYNCED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 printf '{\n  "dannflow_commit": "%s",\n  "synced_at": "%s",\n  "repo": "https://github.com/Danncode10/DannFlow",\n  "base_branch": "main",\n  "dev_branch": "dev"\n}\n' "$DANNFLOW_COMMIT" "$DANNFLOW_SYNCED_AT" > dannflow.json
 echo -e "✅ Created dannflow.json for DannFlow commit ${DANNFLOW_COMMIT:0:12}"
 
-# DannFlow is the template. Keep it as fetch-only upstream so project work
-# cannot accidentally be pushed back into the template repository.
-git remote rename origin upstream
+# Reset Git history to give the new project a clean slate.
+rm -rf .git
+git init -b main > /dev/null
+git remote add upstream https://github.com/Danncode10/DannFlow.git
 git remote set-url --push upstream DISABLED
 
 if [ -n "$PROJECT_REPO_URL" ]; then
   git remote add origin "$PROJECT_REPO_URL"
-  echo -e "✅ Remotes configured: origin → project, upstream → DannFlow (fetch-only)"
+  echo -e "✅ Remotes configured: origin → $PROJECT_REPO_URL, upstream → DannFlow (fetch-only)"
 else
   echo -e "✅ Remote configured: upstream → DannFlow (fetch-only)"
-  echo -e "   ${YELLOW}Your project still needs an origin remote. /new-project must create/repoint it before pushing.${NC}"
+  echo -e "   ${YELLOW}Note: Add your project repository origin later (or run /new-project).${NC}"
 fi
 
-# ── 4. Install npm dependencies ──────────────────────────────
-echo -e "\n${CYAN}📦 Installing npm dependencies...${NC}"
-npm install --silent
-echo -e "✅ npm install complete"
-
-# ── 5. Set up .env.local ─────────────────────────────────────
+# ── 4. Set up .env.local ─────────────────────────────────────
 if [ -f .env.example ] && [ ! -f .env.local ]; then
   cp .env.example .env.local
-  echo -e "✅ Created .env.local from .env.example"
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    sed -i '' "s/^NEXT_PUBLIC_SITE_NAME=.*/NEXT_PUBLIC_SITE_NAME=\"$APP_NAME\"/" .env.local
+  else
+    sed -i "s/^NEXT_PUBLIC_SITE_NAME=.*/NEXT_PUBLIC_SITE_NAME=\"$APP_NAME\"/" .env.local
+  fi
+  echo -e "✅ Created .env.local with NEXT_PUBLIC_SITE_NAME=\"$APP_NAME\""
   echo -e "   ${YELLOW}⚠️  Remember to fill in your Supabase keys in .env.local${NC}"
 elif [ -f .env.local ]; then
   echo -e "ℹ️  .env.local already exists — skipping"
@@ -98,34 +103,97 @@ else
   echo -e "${YELLOW}⚠️  .env.example not found — skipping .env.local creation${NC}"
 fi
 
-# ── 6. Rebrand project via guide.sh ──────────────────────────
-echo -e "\n${CYAN}🎨 Rebranding project to '${APP_NAME}'...${NC}"
-chmod +x guide.sh
-bash guide.sh init "$APP_NAME"
-echo -e "✅ Project rebranded"
-
-# ── 7. Install Ruflo (optional) ──────────────────────────────
-echo -e "\n${CYAN}🧠 Installing Ruflo (AI memory + swarm tools)...${NC}"
-if npm install -g ruflo@latest --silent 2>/dev/null; then
-  echo -e "✅ Ruflo installed globally"
-  echo -e "   ${YELLOW}Run 'ruflo init wizard' inside your project to finish Ruflo setup${NC}"
-else
-  echo -e "${YELLOW}⚠️  Ruflo install failed (permission issue or npm registry). Skipping.${NC}"
-  echo -e "   You can install it later with: ${CYAN}npm install -g ruflo@latest${NC}"
+# ── 5. Rebrand package.json & config.ts ──────────────────────
+echo -e "\n${CYAN}🎨 Configuring project for '${APP_NAME}'...${NC}"
+if [ -f package.json ]; then
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    sed -i '' "s/\"name\": \".*\"/\"name\": \"$PKG_NAME\"/" package.json
+  else
+    sed -i "s/\"name\": \".*\"/\"name\": \"$PKG_NAME\"/" package.json
+  fi
+  echo -e "✅ Updated package.json name to '$PKG_NAME'"
 fi
+
+if [ -f src/lib/config.ts ]; then
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    sed -i '' "s/name: process.env.NEXT_PUBLIC_SITE_NAME || \".*\"/name: process.env.NEXT_PUBLIC_SITE_NAME || \"$APP_NAME\"/" src/lib/config.ts
+  else
+    sed -i "s/name: process.env.NEXT_PUBLIC_SITE_NAME || \".*\"/name: process.env.NEXT_PUBLIC_SITE_NAME || \"$APP_NAME\"/" src/lib/config.ts
+  fi
+  echo -e "✅ Updated src/lib/config.ts fallback name"
+fi
+
+# ── 6. Write clean project README.md ─────────────────────────
+cat << STARTER_README > README.md
+# ${APP_NAME}
+
+Welcome to **${APP_NAME}**, built on the DannFlow SaaS architecture.
+
+## 🚀 Quick Start
+
+### 1. Fill Out Project Context
+Define your product requirements, audience, and features in:
+- \`PROJECT_CONTEXT.md\`
+
+### 2. Next Steps with AI Agent
+Open this repository in your AI IDE (Claude Code, Antigravity, or Cursor) and follow this sequence:
+
+1. **Configure Repository Origin (if not set):**
+   \`\`\`bash
+   /new-project
+   \`\`\`
+2. **Initialize Masterplan & Connect Database:**
+   Create a Kanban GitHub Project board with \`Backlog\`, \`Ready\`, \`In progress\`, and \`Done\` columns, then run:
+   \`\`\`bash
+   /masterplan-init
+   \`\`\`
+3. **Execute Tasks:**
+   \`\`\`bash
+   /what-task
+   \`\`\`
+
+### 3. Development Commands
+
+\`\`\`bash
+npm run dev          # Start local dev server (http://localhost:3000)
+npm run build        # Build production bundle
+npm run db:migrate   # Push Supabase migrations to remote cloud database
+npm run db:types     # Sync TypeScript types from database schema
+\`\`\`
+
+### 4. Upstream Syncing
+To pull template updates, new commands, and bug fixes from DannFlow without breaking custom code:
+\`\`\`bash
+/sync-upstream
+\`\`\`
+STARTER_README
+echo -e "✅ Created clean starter README.md"
+
+# ── 7. Initial Git Commit ────────────────────────────────────
+git add .
+git commit -m "chore: initialize $APP_NAME from DannFlow ($DANNFLOW_COMMIT)" > /dev/null
+echo -e "✅ Created clean initial commit on main"
+
+# ── 8. Install npm dependencies ──────────────────────────────
+echo -e "\n${CYAN}📦 Installing npm dependencies...${NC}"
+npm install
+echo -e "✅ npm install complete"
+
+# ── 9. Ruflo Setup (Optional) ────────────────────────────────
+echo -e "\n${CYAN}🧠 Ruflo (AI Memory & Swarm Tools)${NC}"
+echo -e "   Ruflo is optional. To install globally and launch its wizard, run:"
+echo -e "   ${CYAN}npm run setup:ruflo${NC} (or ${CYAN}npm install -g ruflo@latest${NC})"
 
 # ── Done ─────────────────────────────────────────────────────
 echo ""
-echo -e "${GREEN}${BOLD}✅ DannFlow installed successfully!${NC}"
+echo -e "${GREEN}${BOLD}✅ ${APP_NAME} installed successfully!${NC}"
 echo ""
 echo -e "${BOLD}Your project:${NC} ./${PKG_NAME}"
 echo ""
 echo -e "${BOLD}Next steps:${NC}"
 echo -e "  1. ${CYAN}cd ${PKG_NAME}${NC}"
-echo -e "  2. Open in Claude Code and run ${CYAN}/new-project${NC} to configure origin and project context"
-echo -e "  3. Configure ${CYAN}GitHub MCP${NC} and ${CYAN}Supabase MCP${NC} (see docs/dannflow_docs/mcp-setup.md)"
-echo -e "  4. Create a Kanban GitHub Project with Backlog, Ready, In progress, Done"
-echo -e "  5. Run ${CYAN}/masterplan-init${NC}, then ${CYAN}/what-task${NC}"
+echo -e "  2. Fill out ${CYAN}PROJECT_CONTEXT.md${NC}"
+echo -e "  3. Open in your AI IDE and run ${CYAN}/new-project${NC} (to link origin) and ${CYAN}/masterplan-init${NC}"
 echo ""
 echo -e "${CYAN}Need help? Run ${BOLD}./guide.sh${NC}${CYAN} anytime for step-by-step setup.${NC}"
 echo ""
