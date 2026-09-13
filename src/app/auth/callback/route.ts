@@ -4,18 +4,19 @@ import { createClient } from '@/utils/supabase/server'
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
+  const cleanOrigin = origin.replace('0.0.0.0', 'localhost')
   const code = searchParams.get('code')
   const tokenHash = searchParams.get('token_hash')
   const type = searchParams.get('type') as EmailOtpType | null
   const callbackError = searchParams.get('error_description') ?? searchParams.get('error')
   // `next` lets us send users to a specific page after confirming
-  // e.g. /auth/callback?next=/dashboard — defaults to /login
-  const fallbackNext = type === 'recovery' ? '/reset-password' : '/login'
+  // e.g. /auth/callback?next=/dashboard — defaults to /dashboard
+  const fallbackNext = type === 'recovery' ? '/reset-password' : '/dashboard'
   const nextParam = searchParams.get('next')
   const next = nextParam?.startsWith('/') ? nextParam : fallbackNext
 
   if (callbackError) {
-    return NextResponse.redirect(`${origin}/login?error=${encodeURIComponent(callbackError)}`)
+    return NextResponse.redirect(`${cleanOrigin}/login?error=${encodeURIComponent(callbackError)}`)
   }
 
   if (tokenHash && type) {
@@ -26,7 +27,7 @@ export async function GET(request: Request) {
     })
 
     if (!error) {
-      return NextResponse.redirect(`${origin}${next}`)
+      return NextResponse.redirect(`${cleanOrigin}${next}`)
     }
   }
 
@@ -35,10 +36,10 @@ export async function GET(request: Request) {
     const { error } = await supabase.auth.exchangeCodeForSession(code)
 
     if (!error) {
-      return NextResponse.redirect(`${origin}${next}`)
+      return NextResponse.redirect(`${cleanOrigin}${next}`)
     }
   }
 
   // Something went wrong — send back to login with an error flag
-  return NextResponse.redirect(`${origin}/login?error=confirmation_failed`)
+  return NextResponse.redirect(`${cleanOrigin}/login?error=confirmation_failed`)
 }

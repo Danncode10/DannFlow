@@ -31,11 +31,21 @@ export async function signInWithEmail(email: string, password: string) {
   return { success: true, requiresMFA: false };
 }
 
+function getSafeOrigin() {
+  if (typeof window === 'undefined') return 'http://localhost:3000';
+  return window.location.origin.replace('0.0.0.0', 'localhost');
+}
+
 export async function signUpWithEmail(email: string, password: string) {
   const client = createClient();
+  const origin = getSafeOrigin();
+  const redirectTo = `${origin}/auth/callback?next=/dashboard`;
   const { error } = await client.auth.signUp({
     email,
     password,
+    options: {
+      emailRedirectTo: redirectTo,
+    },
   });
   if (error) throw error;
   return { success: true };
@@ -51,11 +61,12 @@ export async function signOut() {
 export async function signInWithOAuthProvider(provider: Provider, next = '/dashboard') {
   const client = createClient();
   const safeNext = next.startsWith('/') ? next : '/dashboard';
+  const origin = getSafeOrigin();
 
   const { error } = await client.auth.signInWithOAuth({
     provider,
     options: {
-      redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(safeNext)}`,
+      redirectTo: `${origin}/auth/callback?next=${encodeURIComponent(safeNext)}`,
     },
   });
 
@@ -65,8 +76,9 @@ export async function signInWithOAuthProvider(provider: Provider, next = '/dashb
 
 export async function forgotPassword(email: string) {
   const client = createRecoveryClient();
+  const origin = getSafeOrigin();
   const { error } = await client.auth.resetPasswordForEmail(email, {
-    redirectTo: `${window.location.origin}/reset-password`,
+    redirectTo: `${origin}/reset-password`,
   });
   if (error) throw error;
   return { success: true };
