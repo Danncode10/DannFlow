@@ -1,3 +1,7 @@
+import type { Tables } from "@/types/supabase";
+
+export type SecretaryTask = Tables<"secretary_tasks">;
+
 export interface ObservableState {
   id: string;
   table: string;
@@ -10,17 +14,11 @@ export interface ObservableState {
   requires_confirmation?: boolean;
 }
 
-export interface SecretaryTask {
-  id: string;
-  user_id: string;
-  vertical_id: string;
-  title: string;
-  description: string;
+export interface SchedulingIntent {
+  intent: string;
+  suggested_duration_minutes: number;
   priority: "critical" | "high" | "medium" | "low";
-  triggered_by_state_id: string;
-  status: "pending" | "dismissed" | "done";
-  created_at: string;
-  updated_at: string;
+  requires_human_approval: boolean;
 }
 
 export interface AIManifest {

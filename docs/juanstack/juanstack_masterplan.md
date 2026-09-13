@@ -184,29 +184,37 @@ These 5 decisions affect the entire architecture. Agree on them before writing a
 ## **PHASE 3: AI Secretary System**
 
 > Goal: Build the proactive AI Secretary backbone — the type system, the task engine, and the human-facing task queue. No vertical-specific triggers yet.
-> **Dependency:** `[P1C]` must be complete. `[D3]` must be resolved.
+> **Dependency:** Phase 1 and 2 must be complete. `[D3]` is resolved (Edge Function).
 
 - `[P3.1]` Implement `src/ai/secretary/types.ts`:
   - `ObservableState`
   - `SchedulingIntent` (e.g. client_requested_meeting) interface (matches `core.ai-manifest.json` schema)
   - `AIManifest` interface (validates the JSON manifest shape)
   - _Note: `SecretaryTask` must be imported directly from `src/types/supabase.ts` (`Tables<'secretary_tasks'>`). Do not redefine it here._
-- `[P3.2]` Implement `src/ai/secretary/task-engine.ts`:
-  - `loadManifest(manifestPath: string): AIManifest` — reads and validates the JSON manifest
-  - `mergeManifests(core: AIManifest, vertical: AIManifest): AIManifest` — merges `extends` chain
-  - `evaluateState(state: ObservableState, dbRow: Record<string, unknown>): boolean` — checks if a trigger condition is met
-  - `createTask(state: ObservableState, organizationId: string, context: Record<string, unknown>)` — generates the task object for the specific tenant
-  - **Note:** The actual scheduler/cron wiring depends on `[D3]`. Implement as a pure function module for now; wiring happens in `[P3.4]`.
+- `[P3.2]` Implement `supabase/functions/_shared/task-engine.ts` (Shared Deno Module):
+  - `loadManifest()` — reads and validates the JSON manifest
+  - `mergeManifests()` — merges `extends` chain
+  - `evaluateState()` — checks if a trigger condition is met
+  - `createTask()` — generates the task object for the specific tenant
 - `[P3.3]` Implement `src/ai/secretary/task-queue.ts` (using Supabase Client):
   - `getOpenTasks(supabase: SupabaseClient): Promise<Tables<'secretary_tasks'>[]>` — fetches pending tasks, relying on RLS for tenant isolation
   - `dismissTask(supabase: SupabaseClient, taskId: string): Promise<void>`
   - `completeTask(supabase: SupabaseClient, taskId: string): Promise<void>`
-- `[P3.4]` Wire the Task Engine to a scheduler _(implementation depends on `[D3]`)_:
-  - **If Edge Function cron:** Create `supabase/functions/ai-secretary/index.ts` — runs on a schedule, calls `task-engine.ts`.
-  - **If Next.js route handler:** Create `src/app/api/ai-secretary/cron/route.ts` — protected endpoint called by Vercel Cron.
+- `[P3.4]` Wire the Task Engine to a scheduler (via `[D3]`):
+  - Create `supabase/functions/ai-secretary/index.ts` — Deno Edge Function that runs on pg_cron schedule and calls `task-engine.ts`.
 - `[P3.5]` Create `src/services/secretary.service.ts` — wraps `task-queue.ts` with proper auth/RLS context.
-
 - `[P3.DOC]` Finalize Phase 3 Documentation — add AI Secretary architecture diagram to `docs/juanstack/ai-secretary-architecture.md`.
+
+---
+
+## **PHASE 3A: AI Secretary UI Implementation**
+
+> Goal: Build the frontend React components where users will interact with the AI Secretary Tasks.
+
+- `[P3A.1]` Create a UI component (e.g., `src/components/dashboard/ai-secretary-widget.tsx`) to display pending tasks.
+- `[P3A.2]` Integrate `secretary.service.ts` into the UI to fetch, dismiss, and complete tasks.
+- `[P3A.3]` Add the AI Secretary Widget to the main Dashboard layout.
+- `[P3A.DOC]` Finalize Phase 3A Documentation.
 
 ---
 

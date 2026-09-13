@@ -168,3 +168,9 @@
 - **Date**: 2026-09-12
 - **Changes**: Generated SQL migrations `20260912000002_core_modules_multitenant.sql` and `20260912000003_fix_core_modules.sql` to resurrect and upgrade DannFlow's legacy starter modules (`blog_posts`, `services`, `gallery_items`, `leads`, `bookings`). Each table was re-created with an `organization_id` foreign key. We also created a Postgres function `public.get_current_org_id()` to auto-assign the tenant ID on inserts, which allowed the Next.js UI to compile cleanly without needing to manually pass `organization_id` from the frontend.
 - **Impact**: The legacy dashboard UI components will now compile successfully without TypeScript errors, and DannFlow retains its powerful built-in "SaaS-in-a-box" features while safely adhering to the JuanStack multi-tenant architecture.
+
+### Phase 3: AI Secretary System Backbone
+
+- **Date**: 2026-09-13
+- **Changes**: Implemented the core engine for the AI Secretary. This included defining `types.ts`, building a pure-TypeScript `task-engine.ts` in `supabase/functions/_shared/`, and creating the `ai-secretary` Edge Function to act as the cron scheduler. Added `task-queue.ts` and `secretary.service.ts` to expose the tasks to the React frontend. Created `docs/juanstack/ai-secretary-architecture.md`.
+- **Impact**: The backend infrastructure for proactive AI task generation is complete. The system can now read `core.ai-manifest.json`, scan tables, and generate `secretary_tasks` securely. Next step is Phase 3A (UI Implementation).
