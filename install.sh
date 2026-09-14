@@ -178,7 +178,8 @@ echo -e "✅ Created clean initial commit on main"
 # ── 8. Install npm dependencies ──────────────────────────────
 echo -e "\n${CYAN}📦 Installing npm dependencies...${NC}"
 npm install
-echo -e "✅ npm install complete"
+chmod +x .husky/pre-commit .husky/pre-push .husky/commit-msg 2>/dev/null || true
+echo -e "✅ npm install complete & husky hooks configured"
 
 # ── 9. Ruflo Setup (Optional) ────────────────────────────────
 echo -e "\n${CYAN}🧠 Ruflo (AI Memory & Swarm Tools)${NC}"
